@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>题材跟踪</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./board.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="top-band">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">2026-04-13 · 自动历史榜</p>
+            <h1>题材强弱与核心个股</h1>
+          </div>
+          <div class="summary-metrics" id="summaryMetrics"></div>
+        </div>
+      </section>
+
+      <section class="toolbar-band">
+        <div class="toolbar">
+          <label class="search-wrap">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="题材、中军、涨停股、人气龙">
+          </label>
+          <label class="select-wrap">
+            <span>排序</span>
+            <select id="sortSelect">
+              <option value="materialRate" selected>题材涨幅</option>
+              <option value="limitUpStocks">涨停数</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="rank-panel">
+          <div class="panel-title">
+            <span>板块前十</span>
+            <strong id="listCount">10</strong>
+          </div>
+          <div id="rankList" class="rank-list" aria-label="题材排名"></div>
+        </aside>
+
+        <section class="detail-panel" id="detailPanel" aria-live="polite"></section>
+
+        <aside class="stock-panel">
+          <div class="panel-title">
+            <span>核心个股</span>
+          </div>
+          <div id="stockPanel"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./board.js" type="module"></script>
+  </body>
+</html>
