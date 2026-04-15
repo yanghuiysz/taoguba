@@ -1,0 +1,2466 @@
+{
+  "date": "2026-04-15",
+  "sortBy": "strength",
+  "source": {
+    "name": "Kaipanla",
+    "kind": "public legacy app endpoint probe",
+    "note": "Only fields returned by the reachable Kaipanla endpoints are shown."
+  },
+  "availableFields": [
+    "plate strength",
+    "plate speed",
+    "plate change percent",
+    "plate amount",
+    "main net amount",
+    "large order net amount",
+    "limit-up/board label",
+    "stock reason tags",
+    "stock change percent",
+    "stock amount",
+    "stock turnover rate"
+  ],
+  "unavailableFields": [
+    "intraday plate trend from Kaipanla",
+    "limit-up hit time",
+    "first limit-up time",
+    "seal ratio",
+    "full long-form limit-up reason"
+  ],
+  "summary": {
+    "plateCount": 80,
+    "linkedPlateCount": 20,
+    "limitUpStockCount": 17,
+    "strongStockCount": 32
+  },
+  "plates": [
+    {
+      "rank": 1,
+      "sourceRank": 1,
+      "plateCode": "801045",
+      "plateName": "医药",
+      "strength": 7470.0,
+      "speed": 0.961,
+      "changePercent": 1.065,
+      "amount": 215505478327.0,
+      "mainNetAmount": 3023319457.0,
+      "largeOrderNetAmount": 1262149157.0,
+      "limitUpStocks": [
+        {
+          "rank": 4,
+          "code": "301408",
+          "name": "华人健康",
+          "boardLabel": "首板",
+          "reasonTags": "AI医疗、AI应用",
+          "latestPrice": 20.78,
+          "changePercent": 19.98,
+          "amount": 1272624495.0,
+          "turnoverRate": 38.66,
+          "industry": "医药",
+          "matchType": "industry_or_reason_tag"
+        },
+        {
+          "rank": 19,
+          "code": "002589",
+          "name": "瑞康医药",
+          "boardLabel": "首板",
+          "reasonTags": "医药零售、新冠药概念",
+          "latestPrice": 3.59,
+          "changePercent": 10.12,
+          "amount": 331610955.0,
+          "turnoverRate": 8.41,
+          "industry": "医药",
+          "matchType": "industry_or_reason_tag"
+        },
+        {
+          "rank": 20,
+          "code": "600572",
+          "name": "康恩贝",
+          "boardLabel": "首板",
+          "reasonTags": "创新药、病毒防治",
+          "latestPrice": 4.8,
+          "changePercent": 10.09,
+          "amount": 966306006.0,
+          "turnoverRate": 12.05,
+          "industry": "医药",
+          "matchType": "industry_or_reason_tag"
+        },
+        {
+          "rank": 21,
+          "code": "000788",
+          "name": "北大医药",
+          "boardLabel": "首板",
+          "reasonTags": "医药、新冠药概念",
+          "latestPrice": 6.77,
+          "changePercent": 10.08,
+          "amount": 741744970.0,
+          "turnoverRate": 28.85,
+          "industry": "医药",
+          "matchType": "industry_or_reason_tag"
+        },
+        {
+          "rank": 24,
+          "code": "600267",
+          "name": "海正药业",
+          "boardLabel": "首板",
+          "reasonTags": "创新药、医药零售",
+          "latestPrice": 11.39,
+          "changePercent": 10.05,
+          "amount": 548437451.0,
+          "turnoverRate": 6.62,
+          "industry": "医药",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 4,
+          "code": "301408",
+          "name": "华人健康",
+          "boardLabel": "首板",
+          "reasonTags": "AI医疗、AI应用",
+          "latestPrice": 20.78,
+          "changePercent": 19.98,
+          "amount": 1272624495.0,
+          "turnoverRate": 38.66,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 6,
+          "code": "301017",
+          "name": "漱玉平民",
+          "boardLabel": "",
+          "reasonTags": "医美、医药",
+          "latestPrice": 16.28,
+          "changePercent": 15.79,
+          "amount": 579013878.0,
+          "turnoverRate": 25.37,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 8,
+          "code": "688253",
+          "name": "英诺特",
+          "boardLabel": "",
+          "reasonTags": "流感、医药",
+          "latestPrice": 43.1,
+          "changePercent": 14.11,
+          "amount": 262364381.0,
+          "turnoverRate": 9.02,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 19,
+          "code": "002589",
+          "name": "瑞康医药",
+          "boardLabel": "首板",
+          "reasonTags": "医药零售、新冠药概念",
+          "latestPrice": 3.59,
+          "changePercent": 10.12,
+          "amount": 331610955.0,
+          "turnoverRate": 8.41,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 20,
+          "code": "600572",
+          "name": "康恩贝",
+          "boardLabel": "首板",
+          "reasonTags": "创新药、病毒防治",
+          "latestPrice": 4.8,
+          "changePercent": 10.09,
+          "amount": 966306006.0,
+          "turnoverRate": 12.05,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 21,
+          "code": "000788",
+          "name": "北大医药",
+          "boardLabel": "首板",
+          "reasonTags": "医药、新冠药概念",
+          "latestPrice": 6.77,
+          "changePercent": 10.08,
+          "amount": 741744970.0,
+          "turnoverRate": 28.85,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 24,
+          "code": "600267",
+          "name": "海正药业",
+          "boardLabel": "首板",
+          "reasonTags": "创新药、医药零售",
+          "latestPrice": 11.39,
+          "changePercent": 10.05,
+          "amount": 548437451.0,
+          "turnoverRate": 6.62,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 1.065,
+          "strength": 7470.0,
+          "limitUps": 5
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "sourceRank": 2,
+      "plateCode": "801807",
+      "plateName": "算力",
+      "strength": 5187.0,
+      "speed": -0.521,
+      "changePercent": 0.696,
+      "amount": 843577446848.0,
+      "mainNetAmount": -4000737845.0,
+      "largeOrderNetAmount": -1418263257.0,
+      "limitUpStocks": [
+        {
+          "rank": 3,
+          "code": "301189",
+          "name": "奥尼电子",
+          "boardLabel": "2连板",
+          "reasonTags": "车路云、消费电子",
+          "latestPrice": 86.39,
+          "changePercent": 20.0,
+          "amount": 1139401129.0,
+          "turnoverRate": 32.62,
+          "industry": "算力",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 3,
+          "code": "301189",
+          "name": "奥尼电子",
+          "boardLabel": "2连板",
+          "reasonTags": "车路云、消费电子",
+          "latestPrice": 86.39,
+          "changePercent": 20.0,
+          "amount": 1139401129.0,
+          "turnoverRate": 32.62,
+          "industry": "算力",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 7,
+          "code": "301248",
+          "name": "杰创智能",
+          "boardLabel": "",
+          "reasonTags": "通感一体化、数字经济",
+          "latestPrice": 57.75,
+          "changePercent": 14.52,
+          "amount": 909009118.0,
+          "turnoverRate": 16.7,
+          "industry": "算力",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.696,
+          "strength": 5187.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "sourceRank": 3,
+      "plateCode": "801843",
+      "plateName": "商业航天",
+      "strength": 3792.0,
+      "speed": -0.293,
+      "changePercent": 0.329,
+      "amount": 391100222451.0,
+      "mainNetAmount": 1363459503.0,
+      "largeOrderNetAmount": 1515274203.0,
+      "limitUpStocks": [
+        {
+          "rank": 26,
+          "code": "001208",
+          "name": "华菱线缆",
+          "boardLabel": "首板",
+          "reasonTags": "电气设备、碳中和",
+          "latestPrice": 21.4,
+          "changePercent": 10.03,
+          "amount": 926643868.0,
+          "turnoverRate": 16.65,
+          "industry": "商业航天",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 15,
+          "code": "301232",
+          "name": "飞沃科技",
+          "boardLabel": "",
+          "reasonTags": "商业航天、年报增长",
+          "latestPrice": 216.12,
+          "changePercent": 10.81,
+          "amount": 2523457569.0,
+          "turnoverRate": 27.98,
+          "industry": "商业航天",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 26,
+          "code": "001208",
+          "name": "华菱线缆",
+          "boardLabel": "首板",
+          "reasonTags": "电气设备、碳中和",
+          "latestPrice": 21.4,
+          "changePercent": 10.03,
+          "amount": 926643868.0,
+          "turnoverRate": 16.65,
+          "industry": "商业航天",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.329,
+          "strength": 3792.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "sourceRank": 4,
+      "plateCode": "801314",
+      "plateName": "ST板块",
+      "strength": 2628.0,
+      "speed": -0.21,
+      "changePercent": 0.99,
+      "amount": 14152998220.0,
+      "mainNetAmount": -106659664.0,
+      "largeOrderNetAmount": -47527088.0,
+      "limitUpStocks": [
+        {
+          "rank": 1,
+          "code": "688287",
+          "name": "*ST观典",
+          "boardLabel": "2连板",
+          "reasonTags": "低空经济、军工",
+          "latestPrice": 1.96,
+          "changePercent": 20.25,
+          "amount": 47534689.0,
+          "turnoverRate": 13.71,
+          "industry": "ST板块",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 1,
+          "code": "688287",
+          "name": "*ST观典",
+          "boardLabel": "2连板",
+          "reasonTags": "低空经济、军工",
+          "latestPrice": 1.96,
+          "changePercent": 20.25,
+          "amount": 47534689.0,
+          "turnoverRate": 13.71,
+          "industry": "ST板块",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.99,
+          "strength": 2628.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "sourceRank": 5,
+      "plateCode": "801408",
+      "plateName": "智能家居",
+      "strength": 2474.0,
+      "speed": 0.002,
+      "changePercent": 0.447,
+      "amount": 82631148136.0,
+      "mainNetAmount": 403013683.0,
+      "largeOrderNetAmount": 147332413.0,
+      "limitUpStocks": [
+        {
+          "rank": 17,
+          "code": "000785",
+          "name": "居然智家",
+          "boardLabel": "首板",
+          "reasonTags": "超跌、AI智能体",
+          "latestPrice": 2.7,
+          "changePercent": 10.2,
+          "amount": 349311281.0,
+          "turnoverRate": 5.96,
+          "industry": "智能家居",
+          "matchType": "industry_or_reason_tag"
+        },
+        {
+          "rank": 22,
+          "code": "002798",
+          "name": "帝欧水华",
+          "boardLabel": "首板",
+          "reasonTags": "装修家具、地产链",
+          "latestPrice": 6.67,
+          "changePercent": 10.07,
+          "amount": 132362091.0,
+          "turnoverRate": 5.44,
+          "industry": "智能家居",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 17,
+          "code": "000785",
+          "name": "居然智家",
+          "boardLabel": "首板",
+          "reasonTags": "超跌、AI智能体",
+          "latestPrice": 2.7,
+          "changePercent": 10.2,
+          "amount": 349311281.0,
+          "turnoverRate": 5.96,
+          "industry": "智能家居",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 22,
+          "code": "002798",
+          "name": "帝欧水华",
+          "boardLabel": "首板",
+          "reasonTags": "装修家具、地产链",
+          "latestPrice": 6.67,
+          "changePercent": 10.07,
+          "amount": 132362091.0,
+          "turnoverRate": 5.44,
+          "industry": "智能家居",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.447,
+          "strength": 2474.0,
+          "limitUps": 2
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "sourceRank": 6,
+      "plateCode": "801571",
+      "plateName": "一季报增长",
+      "strength": 2091.0,
+      "speed": -0.339,
+      "changePercent": 0.378,
+      "amount": 236316948420.0,
+      "mainNetAmount": -510627670.0,
+      "largeOrderNetAmount": 258108609.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.378,
+          "strength": 2091.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "sourceRank": 7,
+      "plateCode": "801001",
+      "plateName": "芯片",
+      "strength": 1993.0,
+      "speed": -0.702,
+      "changePercent": 0.567,
+      "amount": 870341670667.0,
+      "mainNetAmount": -15437408124.0,
+      "largeOrderNetAmount": -8008205556.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 5,
+          "code": "300097",
+          "name": "智云股份",
+          "boardLabel": "",
+          "reasonTags": "芯片、ST摘帽",
+          "latestPrice": 9.83,
+          "changePercent": 17.44,
+          "amount": 529054462.0,
+          "turnoverRate": 23.78,
+          "industry": "ST摘帽",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.567,
+          "strength": 1993.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "sourceRank": 8,
+      "plateCode": "801346",
+      "plateName": "智能电网",
+      "strength": 1757.0,
+      "speed": -0.045,
+      "changePercent": 1.086,
+      "amount": 341129945059.0,
+      "mainNetAmount": 2194556281.0,
+      "largeOrderNetAmount": 1285845488.0,
+      "limitUpStocks": [
+        {
+          "rank": 25,
+          "code": "001896",
+          "name": "豫能控股",
+          "boardLabel": "首板",
+          "reasonTags": "电力、智能电网",
+          "latestPrice": 16.57,
+          "changePercent": 10.03,
+          "amount": 4219852282.0,
+          "turnoverRate": 45.74,
+          "industry": "电力",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 14,
+          "code": "300444",
+          "name": "双杰电气",
+          "boardLabel": "",
+          "reasonTags": "变压器、智能电网",
+          "latestPrice": 15.37,
+          "changePercent": 10.97,
+          "amount": 2034934100.0,
+          "turnoverRate": 23.96,
+          "industry": "智能电网",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 25,
+          "code": "001896",
+          "name": "豫能控股",
+          "boardLabel": "首板",
+          "reasonTags": "电力、智能电网",
+          "latestPrice": 16.57,
+          "changePercent": 10.03,
+          "amount": 4219852282.0,
+          "turnoverRate": 45.74,
+          "industry": "电力",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 1.086,
+          "strength": 1757.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "sourceRank": 9,
+      "plateCode": "801250",
+      "plateName": "并购重组",
+      "strength": 1741.0,
+      "speed": -0.631,
+      "changePercent": 0.781,
+      "amount": 329791990474.0,
+      "mainNetAmount": -161802695.0,
+      "largeOrderNetAmount": 254640187.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 12,
+          "code": "301631",
+          "name": "壹连科技",
+          "boardLabel": "",
+          "reasonTags": "固态电池、锂电池",
+          "latestPrice": 102.99,
+          "changePercent": 12.19,
+          "amount": 563643275.0,
+          "turnoverRate": 18.37,
+          "industry": "并购重组",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.781,
+          "strength": 1741.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "sourceRank": 10,
+      "plateCode": "801033",
+      "plateName": "国有企业",
+      "strength": 1440.0,
+      "speed": -0.498,
+      "changePercent": 0.336,
+      "amount": 620409350676.0,
+      "mainNetAmount": -90866515.0,
+      "largeOrderNetAmount": 293744430.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.336,
+          "strength": 1440.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "sourceRank": 11,
+      "plateCode": "801631",
+      "plateName": "次新股",
+      "strength": 1307.0,
+      "speed": 1.152,
+      "changePercent": 0.676,
+      "amount": 36775636307.0,
+      "mainNetAmount": 586392941.0,
+      "largeOrderNetAmount": 521179680.0,
+      "limitUpStocks": [
+        {
+          "rank": 2,
+          "code": "688805",
+          "name": "健信超导",
+          "boardLabel": "首板",
+          "reasonTags": "次新股、医疗器械",
+          "latestPrice": 56.92,
+          "changePercent": 20.01,
+          "amount": 517692320.0,
+          "turnoverRate": 29.9,
+          "industry": "次新股",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 2,
+          "code": "688805",
+          "name": "健信超导",
+          "boardLabel": "首板",
+          "reasonTags": "次新股、医疗器械",
+          "latestPrice": 56.92,
+          "changePercent": 20.01,
+          "amount": 517692320.0,
+          "turnoverRate": 29.9,
+          "industry": "次新股",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.676,
+          "strength": 1307.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "sourceRank": 12,
+      "plateCode": "801270",
+      "plateName": "基础建设",
+      "strength": 955.0,
+      "speed": -0.352,
+      "changePercent": 0.634,
+      "amount": 155406859933.0,
+      "mainNetAmount": -265505155.0,
+      "largeOrderNetAmount": 246498675.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.634,
+          "strength": 955.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "sourceRank": 13,
+      "plateCode": "803014",
+      "plateName": "海峡两岸",
+      "strength": 944.0,
+      "speed": -0.378,
+      "changePercent": 0.949,
+      "amount": 185339877005.0,
+      "mainNetAmount": 174074178.0,
+      "largeOrderNetAmount": 126923424.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.949,
+          "strength": 944.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "sourceRank": 14,
+      "plateCode": "801328",
+      "plateName": "消费电子",
+      "strength": 877.0,
+      "speed": -0.558,
+      "changePercent": 0.6,
+      "amount": 528276783640.0,
+      "mainNetAmount": -1296422610.0,
+      "largeOrderNetAmount": 17146067.0,
+      "limitUpStocks": [
+        {
+          "rank": 3,
+          "code": "301189",
+          "name": "奥尼电子",
+          "boardLabel": "2连板",
+          "reasonTags": "车路云、消费电子",
+          "latestPrice": 86.39,
+          "changePercent": 20.0,
+          "amount": 1139401129.0,
+          "turnoverRate": 32.62,
+          "industry": "算力",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 3,
+          "code": "301189",
+          "name": "奥尼电子",
+          "boardLabel": "2连板",
+          "reasonTags": "车路云、消费电子",
+          "latestPrice": 86.39,
+          "changePercent": 20.0,
+          "amount": 1139401129.0,
+          "turnoverRate": 32.62,
+          "industry": "算力",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.6,
+          "strength": 877.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "sourceRank": 15,
+      "plateCode": "801046",
+      "plateName": "医疗器械",
+      "strength": 817.0,
+      "speed": 0.27,
+      "changePercent": 0.867,
+      "amount": 102330024768.0,
+      "mainNetAmount": -1685158.0,
+      "largeOrderNetAmount": -4231328.0,
+      "limitUpStocks": [
+        {
+          "rank": 2,
+          "code": "688805",
+          "name": "健信超导",
+          "boardLabel": "首板",
+          "reasonTags": "次新股、医疗器械",
+          "latestPrice": 56.92,
+          "changePercent": 20.01,
+          "amount": 517692320.0,
+          "turnoverRate": 29.9,
+          "industry": "次新股",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 2,
+          "code": "688805",
+          "name": "健信超导",
+          "boardLabel": "首板",
+          "reasonTags": "次新股、医疗器械",
+          "latestPrice": 56.92,
+          "changePercent": 20.01,
+          "amount": 517692320.0,
+          "turnoverRate": 29.9,
+          "industry": "次新股",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.867,
+          "strength": 817.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "sourceRank": 16,
+      "plateCode": "801069",
+      "plateName": "家电",
+      "strength": 744.0,
+      "speed": -0.19,
+      "changePercent": 0.423,
+      "amount": 79301433333.0,
+      "mainNetAmount": 295090499.0,
+      "largeOrderNetAmount": 108838272.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 16,
+          "code": "301055",
+          "name": "张小泉",
+          "boardLabel": "",
+          "reasonTags": "家电、AI应用",
+          "latestPrice": 33.0,
+          "changePercent": 10.22,
+          "amount": 376158287.0,
+          "turnoverRate": 17.75,
+          "industry": "AI应用",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.423,
+          "strength": 744.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "sourceRank": 17,
+      "plateCode": "801973",
+      "plateName": "保健品",
+      "strength": 582.0,
+      "speed": 1.341,
+      "changePercent": 0.131,
+      "amount": 31907623091.0,
+      "mainNetAmount": 138355611.0,
+      "largeOrderNetAmount": 36656875.0,
+      "limitUpStocks": [
+        {
+          "rank": 23,
+          "code": "605388",
+          "name": "均瑶健康",
+          "boardLabel": "首板",
+          "reasonTags": "食品饮料、保健品",
+          "latestPrice": 7.33,
+          "changePercent": 10.06,
+          "amount": 278189185.0,
+          "turnoverRate": 20.1,
+          "industry": "保健品",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 23,
+          "code": "605388",
+          "name": "均瑶健康",
+          "boardLabel": "首板",
+          "reasonTags": "食品饮料、保健品",
+          "latestPrice": 7.33,
+          "changePercent": 10.06,
+          "amount": 278189185.0,
+          "turnoverRate": 20.1,
+          "industry": "保健品",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.131,
+          "strength": 582.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "sourceRank": 18,
+      "plateCode": "801243",
+      "plateName": "宠物经济",
+      "strength": 563.0,
+      "speed": 1.119,
+      "changePercent": 0.137,
+      "amount": 24674400597.0,
+      "mainNetAmount": 112644400.0,
+      "largeOrderNetAmount": 75024208.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.137,
+          "strength": 563.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "sourceRank": 19,
+      "plateCode": "801082",
+      "plateName": "ST摘帽",
+      "strength": 541.0,
+      "speed": 0.918,
+      "changePercent": -0.178,
+      "amount": 8561892196.0,
+      "mainNetAmount": 29614522.0,
+      "largeOrderNetAmount": 42160721.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 5,
+          "code": "300097",
+          "name": "智云股份",
+          "boardLabel": "",
+          "reasonTags": "芯片、ST摘帽",
+          "latestPrice": 9.83,
+          "changePercent": 17.44,
+          "amount": 529054462.0,
+          "turnoverRate": 23.78,
+          "industry": "ST摘帽",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.178,
+          "strength": 541.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "sourceRank": 20,
+      "plateCode": "801220",
+      "plateName": "食品饮料",
+      "strength": 484.0,
+      "speed": -0.067,
+      "changePercent": 0.403,
+      "amount": 39751563450.0,
+      "mainNetAmount": -116667973.0,
+      "largeOrderNetAmount": -102296908.0,
+      "limitUpStocks": [
+        {
+          "rank": 23,
+          "code": "605388",
+          "name": "均瑶健康",
+          "boardLabel": "首板",
+          "reasonTags": "食品饮料、保健品",
+          "latestPrice": 7.33,
+          "changePercent": 10.06,
+          "amount": 278189185.0,
+          "turnoverRate": 20.1,
+          "industry": "保健品",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 23,
+          "code": "605388",
+          "name": "均瑶健康",
+          "boardLabel": "首板",
+          "reasonTags": "食品饮料、保健品",
+          "latestPrice": 7.33,
+          "changePercent": 10.06,
+          "amount": 278189185.0,
+          "turnoverRate": 20.1,
+          "industry": "保健品",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.403,
+          "strength": 484.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "sourceRank": 21,
+      "plateCode": "801159",
+      "plateName": "机器人概念",
+      "strength": 480.0,
+      "speed": -0.525,
+      "changePercent": 0.728,
+      "amount": 549076048554.0,
+      "mainNetAmount": -730695122.0,
+      "largeOrderNetAmount": 43765444.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.728,
+          "strength": 480.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "sourceRank": 22,
+      "plateCode": "801574",
+      "plateName": "年报增长",
+      "strength": 471.0,
+      "speed": -0.365,
+      "changePercent": 0.609,
+      "amount": 1212034329038.0,
+      "mainNetAmount": -466108247.0,
+      "largeOrderNetAmount": -313341996.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 15,
+          "code": "301232",
+          "name": "飞沃科技",
+          "boardLabel": "",
+          "reasonTags": "商业航天、年报增长",
+          "latestPrice": 216.12,
+          "changePercent": 10.81,
+          "amount": 2523457569.0,
+          "turnoverRate": 27.98,
+          "industry": "商业航天",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.609,
+          "strength": 471.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "sourceRank": 23,
+      "plateCode": "801330",
+      "plateName": "旅游",
+      "strength": 463.0,
+      "speed": -0.369,
+      "changePercent": 0.181,
+      "amount": 29104985953.0,
+      "mainNetAmount": 170714492.0,
+      "largeOrderNetAmount": 26948902.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.181,
+          "strength": 463.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "sourceRank": 24,
+      "plateCode": "801350",
+      "plateName": "一带一路",
+      "strength": 448.0,
+      "speed": -0.451,
+      "changePercent": 0.481,
+      "amount": 325514284872.0,
+      "mainNetAmount": -308970160.0,
+      "largeOrderNetAmount": 223765262.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.481,
+          "strength": 448.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "sourceRank": 25,
+      "plateCode": "801016",
+      "plateName": "稀土永磁",
+      "strength": 404.0,
+      "speed": -0.951,
+      "changePercent": 0.273,
+      "amount": 55490167863.0,
+      "mainNetAmount": -1543975598.0,
+      "largeOrderNetAmount": -572763782.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.273,
+          "strength": 404.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 26,
+      "sourceRank": 26,
+      "plateCode": "801379",
+      "plateName": "碳纤维",
+      "strength": 402.0,
+      "speed": -0.307,
+      "changePercent": 0.205,
+      "amount": 34922282972.0,
+      "mainNetAmount": 622071895.0,
+      "largeOrderNetAmount": 706398123.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.205,
+          "strength": 402.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 27,
+      "sourceRank": 27,
+      "plateCode": "801660",
+      "plateName": "通信",
+      "strength": 355.0,
+      "speed": -0.693,
+      "changePercent": 1.161,
+      "amount": 679290316443.0,
+      "mainNetAmount": -26045689843.0,
+      "largeOrderNetAmount": -9701789566.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 10,
+          "code": "688603",
+          "name": "天承科技",
+          "boardLabel": "",
+          "reasonTags": "玻璃基板、通信",
+          "latestPrice": 98.56,
+          "changePercent": 13.12,
+          "amount": 1008774701.0,
+          "turnoverRate": 22.2,
+          "industry": "通信",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 11,
+          "code": "688618",
+          "name": "三旺通信",
+          "boardLabel": "",
+          "reasonTags": "光纤概念、通信",
+          "latestPrice": 39.37,
+          "changePercent": 12.61,
+          "amount": 446102346.0,
+          "turnoverRate": 27.67,
+          "industry": "通信",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 1.161,
+          "strength": 355.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "sourceRank": 28,
+      "plateCode": "801580",
+      "plateName": "发电机",
+      "strength": 334.0,
+      "speed": -0.66,
+      "changePercent": 0.009,
+      "amount": 18458326345.0,
+      "mainNetAmount": 199753779.0,
+      "largeOrderNetAmount": 193776274.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.009,
+          "strength": 334.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 29,
+      "sourceRank": 29,
+      "plateCode": "801067",
+      "plateName": "面板",
+      "strength": 324.0,
+      "speed": -0.585,
+      "changePercent": 0.262,
+      "amount": 195658220750.0,
+      "mainNetAmount": -1241649959.0,
+      "largeOrderNetAmount": -313690039.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.262,
+          "strength": 324.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 30,
+      "sourceRank": 30,
+      "plateCode": "801874",
+      "plateName": "电源",
+      "strength": 314.0,
+      "speed": -0.704,
+      "changePercent": 0.054,
+      "amount": 70168881058.0,
+      "mainNetAmount": 209198956.0,
+      "largeOrderNetAmount": 480090027.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.054,
+          "strength": 314.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 31,
+      "sourceRank": 31,
+      "plateCode": "801039",
+      "plateName": "机场航空",
+      "strength": 277.0,
+      "speed": -0.229,
+      "changePercent": 0.025,
+      "amount": 6951219988.0,
+      "mainNetAmount": 235436702.0,
+      "largeOrderNetAmount": 101858925.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.025,
+          "strength": 277.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 32,
+      "sourceRank": 32,
+      "plateCode": "803023",
+      "plateName": "AI应用",
+      "strength": 262.0,
+      "speed": -0.488,
+      "changePercent": 0.449,
+      "amount": 272478169404.0,
+      "mainNetAmount": -3895930244.0,
+      "largeOrderNetAmount": -713151119.0,
+      "limitUpStocks": [
+        {
+          "rank": 4,
+          "code": "301408",
+          "name": "华人健康",
+          "boardLabel": "首板",
+          "reasonTags": "AI医疗、AI应用",
+          "latestPrice": 20.78,
+          "changePercent": 19.98,
+          "amount": 1272624495.0,
+          "turnoverRate": 38.66,
+          "industry": "医药",
+          "matchType": "industry_or_reason_tag"
+        }
+      ],
+      "strongStocks": [
+        {
+          "rank": 4,
+          "code": "301408",
+          "name": "华人健康",
+          "boardLabel": "首板",
+          "reasonTags": "AI医疗、AI应用",
+          "latestPrice": 20.78,
+          "changePercent": 19.98,
+          "amount": 1272624495.0,
+          "turnoverRate": 38.66,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 16,
+          "code": "301055",
+          "name": "张小泉",
+          "boardLabel": "",
+          "reasonTags": "家电、AI应用",
+          "latestPrice": 33.0,
+          "changePercent": 10.22,
+          "amount": 376158287.0,
+          "turnoverRate": 17.75,
+          "industry": "AI应用",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.449,
+          "strength": 262.0,
+          "limitUps": 1
+        }
+      ]
+    },
+    {
+      "rank": 33,
+      "sourceRank": 33,
+      "plateCode": "801087",
+      "plateName": "风电",
+      "strength": 247.0,
+      "speed": -0.321,
+      "changePercent": 0.337,
+      "amount": 211330759869.0,
+      "mainNetAmount": -2813680973.0,
+      "largeOrderNetAmount": -908805296.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.337,
+          "strength": 247.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 34,
+      "sourceRank": 34,
+      "plateCode": "801019",
+      "plateName": "物流",
+      "strength": 245.0,
+      "speed": -0.397,
+      "changePercent": 0.25,
+      "amount": 85452931718.0,
+      "mainNetAmount": 218581517.0,
+      "largeOrderNetAmount": 186638043.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.25,
+          "strength": 245.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 35,
+      "sourceRank": 35,
+      "plateCode": "801235",
+      "plateName": "化工",
+      "strength": 217.0,
+      "speed": -1.004,
+      "changePercent": 0.708,
+      "amount": 300653179868.0,
+      "mainNetAmount": -6122948639.0,
+      "largeOrderNetAmount": -1107171014.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 13,
+          "code": "300798",
+          "name": "锦鸡股份",
+          "boardLabel": "",
+          "reasonTags": "算力租赁、分散染料",
+          "latestPrice": 11.18,
+          "changePercent": 11.58,
+          "amount": 806726042.0,
+          "turnoverRate": 25.41,
+          "industry": "化工",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.708,
+          "strength": 217.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 36,
+      "sourceRank": 36,
+      "plateCode": "801653",
+      "plateName": "霍乱概念",
+      "strength": 205.0,
+      "speed": 2.837,
+      "changePercent": -0.44,
+      "amount": 4882154891.0,
+      "mainNetAmount": -2841239.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.44,
+          "strength": 205.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 37,
+      "sourceRank": 37,
+      "plateCode": "801074",
+      "plateName": "核电",
+      "strength": 182.0,
+      "speed": -0.054,
+      "changePercent": 0.203,
+      "amount": 242629243796.0,
+      "mainNetAmount": 489164456.0,
+      "largeOrderNetAmount": 183609102.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.203,
+          "strength": 182.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "sourceRank": 38,
+      "plateCode": "801085",
+      "plateName": "人工智能",
+      "strength": 166.0,
+      "speed": -0.387,
+      "changePercent": 0.583,
+      "amount": 957096630638.0,
+      "mainNetAmount": -4654024052.0,
+      "largeOrderNetAmount": -1521769378.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.583,
+          "strength": 166.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 39,
+      "sourceRank": 39,
+      "plateCode": "801374",
+      "plateName": "造船",
+      "strength": 161.0,
+      "speed": -0.883,
+      "changePercent": 0.03,
+      "amount": 10272798901.0,
+      "mainNetAmount": -128049182.0,
+      "largeOrderNetAmount": -63064426.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.03,
+          "strength": 161.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 40,
+      "sourceRank": 40,
+      "plateCode": "801322",
+      "plateName": "芬太尼替代",
+      "strength": 131.0,
+      "speed": 1.316,
+      "changePercent": 0.021,
+      "amount": 2131298494.0,
+      "mainNetAmount": -10770886.0,
+      "largeOrderNetAmount": -3124926.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.021,
+          "strength": 131.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 41,
+      "sourceRank": 41,
+      "plateCode": "801254",
+      "plateName": "防脱发",
+      "strength": 129.0,
+      "speed": 2.266,
+      "changePercent": 0.0,
+      "amount": 5619954873.0,
+      "mainNetAmount": 0.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.0,
+          "strength": 129.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 42,
+      "sourceRank": 42,
+      "plateCode": "801654",
+      "plateName": "眼科医疗",
+      "strength": 116.0,
+      "speed": 1.369,
+      "changePercent": -0.001,
+      "amount": 18655618500.0,
+      "mainNetAmount": -19264149.0,
+      "largeOrderNetAmount": 20109022.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.001,
+          "strength": 116.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 43,
+      "sourceRank": 43,
+      "plateCode": "801956",
+      "plateName": "卫生护理",
+      "strength": 105.0,
+      "speed": 1.056,
+      "changePercent": 0.052,
+      "amount": 1817867570.0,
+      "mainNetAmount": 40607110.0,
+      "largeOrderNetAmount": -4935670.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.052,
+          "strength": 105.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 44,
+      "sourceRank": 44,
+      "plateCode": "801027",
+      "plateName": "银行",
+      "strength": 81.0,
+      "speed": 0.82,
+      "changePercent": 0.297,
+      "amount": 24197049188.0,
+      "mainNetAmount": 619807977.0,
+      "largeOrderNetAmount": 681838803.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.297,
+          "strength": 81.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 45,
+      "sourceRank": 45,
+      "plateCode": "801613",
+      "plateName": "幽门螺杆菌",
+      "strength": 80.0,
+      "speed": 1.529,
+      "changePercent": 0.083,
+      "amount": 8153559299.0,
+      "mainNetAmount": 9123247.0,
+      "largeOrderNetAmount": 1778319.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.083,
+          "strength": 80.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 46,
+      "sourceRank": 46,
+      "plateCode": "801880",
+      "plateName": "燃气轮机",
+      "strength": 66.0,
+      "speed": -0.584,
+      "changePercent": -0.011,
+      "amount": 34028312336.0,
+      "mainNetAmount": 153076181.0,
+      "largeOrderNetAmount": 139254972.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.011,
+          "strength": 66.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 47,
+      "sourceRank": 47,
+      "plateCode": "801144",
+      "plateName": "医美",
+      "strength": 45.0,
+      "speed": 0.978,
+      "changePercent": 0.142,
+      "amount": 39350236724.0,
+      "mainNetAmount": 46916634.0,
+      "largeOrderNetAmount": -13369080.0,
+      "limitUpStocks": [],
+      "strongStocks": [
+        {
+          "rank": 6,
+          "code": "301017",
+          "name": "漱玉平民",
+          "boardLabel": "",
+          "reasonTags": "医美、医药",
+          "latestPrice": 16.28,
+          "changePercent": 15.79,
+          "amount": 579013878.0,
+          "turnoverRate": 25.37,
+          "industry": "医药",
+          "matchType": "industry_or_concept"
+        }
+      ],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.142,
+          "strength": 45.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 48,
+      "sourceRank": 48,
+      "plateCode": "801862",
+      "plateName": "高股息精选",
+      "strength": 36.0,
+      "speed": 0.431,
+      "changePercent": 0.232,
+      "amount": 75401776720.0,
+      "mainNetAmount": -21583309.0,
+      "largeOrderNetAmount": -34451409.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.232,
+          "strength": 36.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 49,
+      "sourceRank": 49,
+      "plateCode": "801198",
+      "plateName": "送转填权",
+      "strength": 35.0,
+      "speed": 0.354,
+      "changePercent": 0.082,
+      "amount": 452975271.0,
+      "mainNetAmount": 4363433.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.082,
+          "strength": 35.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 50,
+      "sourceRank": 50,
+      "plateCode": "801992",
+      "plateName": "文交所",
+      "strength": 30.0,
+      "speed": 0.308,
+      "changePercent": 0.0,
+      "amount": 2231339331.0,
+      "mainNetAmount": 0.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.0,
+          "strength": 30.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 51,
+      "sourceRank": 51,
+      "plateCode": "801705",
+      "plateName": "超导概念",
+      "strength": 27.0,
+      "speed": 1.5,
+      "changePercent": -0.072,
+      "amount": 36610806309.0,
+      "mainNetAmount": 112473599.0,
+      "largeOrderNetAmount": 7130439.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.072,
+          "strength": 27.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 52,
+      "sourceRank": 52,
+      "plateCode": "801909",
+      "plateName": "可转债",
+      "strength": 24.0,
+      "speed": 0.243,
+      "changePercent": 0.575,
+      "amount": 79058914484.0,
+      "mainNetAmount": 41148203.0,
+      "largeOrderNetAmount": -13569334.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.575,
+          "strength": 24.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 53,
+      "sourceRank": 53,
+      "plateCode": "801418",
+      "plateName": "民营医院",
+      "strength": 22.0,
+      "speed": 0.962,
+      "changePercent": 0.013,
+      "amount": 20656544463.0,
+      "mainNetAmount": -67139634.0,
+      "largeOrderNetAmount": -6971159.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.013,
+          "strength": 22.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 54,
+      "sourceRank": 54,
+      "plateCode": "801376",
+      "plateName": "健康中国",
+      "strength": 22.0,
+      "speed": 0.224,
+      "changePercent": 0.135,
+      "amount": 40532947441.0,
+      "mainNetAmount": 70430197.0,
+      "largeOrderNetAmount": 8866961.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.135,
+          "strength": 22.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 55,
+      "sourceRank": 55,
+      "plateCode": "801764",
+      "plateName": "西藏自治区",
+      "strength": 21.0,
+      "speed": 0.218,
+      "changePercent": 0.04,
+      "amount": 9091356338.0,
+      "mainNetAmount": 3765157.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.04,
+          "strength": 21.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 56,
+      "sourceRank": 56,
+      "plateCode": "801057",
+      "plateName": "石油石化",
+      "strength": 12.0,
+      "speed": -1.371,
+      "changePercent": 0.177,
+      "amount": 33132341787.0,
+      "mainNetAmount": -1132666007.0,
+      "largeOrderNetAmount": -136406902.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.177,
+          "strength": 12.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 57,
+      "sourceRank": 57,
+      "plateCode": "801117",
+      "plateName": "港口",
+      "strength": 9.0,
+      "speed": 0.1,
+      "changePercent": 0.144,
+      "amount": 1938391733.0,
+      "mainNetAmount": -26692467.0,
+      "largeOrderNetAmount": -5533497.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.144,
+          "strength": 9.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 58,
+      "sourceRank": 58,
+      "plateCode": "801415",
+      "plateName": "电子发票",
+      "strength": 6.0,
+      "speed": 0.069,
+      "changePercent": 0.0,
+      "amount": 1258263927.0,
+      "mainNetAmount": 0.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.0,
+          "strength": 6.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 59,
+      "sourceRank": 59,
+      "plateCode": "801694",
+      "plateName": "非金属材料",
+      "strength": 6.0,
+      "speed": 0.067,
+      "changePercent": -0.246,
+      "amount": 5478499518.0,
+      "mainNetAmount": -2121072.0,
+      "largeOrderNetAmount": 161868272.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.246,
+          "strength": 6.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 60,
+      "sourceRank": 60,
+      "plateCode": "803012",
+      "plateName": "SOFC电池",
+      "strength": 5.0,
+      "speed": -1.444,
+      "changePercent": 0.0,
+      "amount": 12669455942.0,
+      "mainNetAmount": -5990480.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.0,
+          "strength": 5.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 61,
+      "sourceRank": 61,
+      "plateCode": "801964",
+      "plateName": "压缩机",
+      "strength": 3.0,
+      "speed": 0.037,
+      "changePercent": 0.01,
+      "amount": 8370002535.0,
+      "mainNetAmount": 5227630.0,
+      "largeOrderNetAmount": 13010932.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.01,
+          "strength": 3.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 62,
+      "sourceRank": 62,
+      "plateCode": "801595",
+      "plateName": "北交所",
+      "strength": 1.0,
+      "speed": 0.02,
+      "changePercent": 1.212,
+      "amount": 14418571332.0,
+      "mainNetAmount": 0.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 1.212,
+          "strength": 1.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 63,
+      "sourceRank": 63,
+      "plateCode": "801246",
+      "plateName": "水务",
+      "strength": -2.0,
+      "speed": -0.023,
+      "changePercent": -0.046,
+      "amount": 1821577468.0,
+      "mainNetAmount": 8850556.0,
+      "largeOrderNetAmount": 4074722.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.046,
+          "strength": -2.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 64,
+      "sourceRank": 64,
+      "plateCode": "801391",
+      "plateName": "美容护理",
+      "strength": -4.0,
+      "speed": 0.163,
+      "changePercent": 0.066,
+      "amount": 9780301425.0,
+      "mainNetAmount": -19168568.0,
+      "largeOrderNetAmount": -12552341.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.066,
+          "strength": -4.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 65,
+      "sourceRank": 65,
+      "plateCode": "801850",
+      "plateName": "食品安全",
+      "strength": -4.0,
+      "speed": -0.045,
+      "changePercent": 0.227,
+      "amount": 14284887665.0,
+      "mainNetAmount": -28776513.0,
+      "largeOrderNetAmount": 4602518.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.227,
+          "strength": -4.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 66,
+      "sourceRank": 66,
+      "plateCode": "801251",
+      "plateName": "送转预期",
+      "strength": -7.0,
+      "speed": -0.075,
+      "changePercent": 0.35,
+      "amount": 6621940440.0,
+      "mainNetAmount": 24783505.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.35,
+          "strength": -7.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 67,
+      "sourceRank": 67,
+      "plateCode": "801138",
+      "plateName": "超级电容",
+      "strength": -9.0,
+      "speed": -0.092,
+      "changePercent": 0.005,
+      "amount": 32856041379.0,
+      "mainNetAmount": 9865103.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.005,
+          "strength": -9.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 68,
+      "sourceRank": 68,
+      "plateCode": "801970",
+      "plateName": "集装箱",
+      "strength": -10.0,
+      "speed": 0.906,
+      "changePercent": -0.28,
+      "amount": 3266888322.0,
+      "mainNetAmount": -4136293.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.28,
+          "strength": -10.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 69,
+      "sourceRank": 69,
+      "plateCode": "801382",
+      "plateName": "分拆上市预期",
+      "strength": -10.0,
+      "speed": -0.11,
+      "changePercent": -0.008,
+      "amount": 58032019354.0,
+      "mainNetAmount": -148523398.0,
+      "largeOrderNetAmount": -89097167.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.008,
+          "strength": -10.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 70,
+      "sourceRank": 70,
+      "plateCode": "801733",
+      "plateName": "中特估",
+      "strength": -12.0,
+      "speed": -0.029,
+      "changePercent": -0.006,
+      "amount": 103709931071.0,
+      "mainNetAmount": 33746489.0,
+      "largeOrderNetAmount": -35677689.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.006,
+          "strength": -12.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 71,
+      "sourceRank": 71,
+      "plateCode": "801451",
+      "plateName": "wifi6/7",
+      "strength": -13.0,
+      "speed": 0.308,
+      "changePercent": -0.072,
+      "amount": 32484320628.0,
+      "mainNetAmount": -84825654.0,
+      "largeOrderNetAmount": -13611368.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.072,
+          "strength": -13.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 72,
+      "sourceRank": 72,
+      "plateCode": "801662",
+      "plateName": "火电灵活改造",
+      "strength": -17.0,
+      "speed": -0.172,
+      "changePercent": 0.054,
+      "amount": 6834061477.0,
+      "mainNetAmount": -285029616.0,
+      "largeOrderNetAmount": -93411822.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.054,
+          "strength": -17.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 73,
+      "sourceRank": 73,
+      "plateCode": "801234",
+      "plateName": "航运",
+      "strength": -19.0,
+      "speed": -0.194,
+      "changePercent": 0.106,
+      "amount": 20715885139.0,
+      "mainNetAmount": -253957715.0,
+      "largeOrderNetAmount": -100962159.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.106,
+          "strength": -19.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 74,
+      "sourceRank": 74,
+      "plateCode": "801351",
+      "plateName": "科创板",
+      "strength": -19.0,
+      "speed": -0.009,
+      "changePercent": 1.089,
+      "amount": 294668764570.0,
+      "mainNetAmount": -227061447.0,
+      "largeOrderNetAmount": -156647914.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 1.089,
+          "strength": -19.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 75,
+      "sourceRank": 75,
+      "plateCode": "801149",
+      "plateName": "社区团购",
+      "strength": -22.0,
+      "speed": -0.222,
+      "changePercent": 0.153,
+      "amount": 4478523974.0,
+      "mainNetAmount": -10029612.0,
+      "largeOrderNetAmount": -3592845.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.153,
+          "strength": -22.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 76,
+      "sourceRank": 76,
+      "plateCode": "801742",
+      "plateName": "内蒙古自治区",
+      "strength": -24.0,
+      "speed": -0.243,
+      "changePercent": -0.09,
+      "amount": 20656155626.0,
+      "mainNetAmount": -4831095.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.09,
+          "strength": -24.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 77,
+      "sourceRank": 77,
+      "plateCode": "801443",
+      "plateName": "转基因",
+      "strength": -29.0,
+      "speed": -0.293,
+      "changePercent": 0.001,
+      "amount": 3245576179.0,
+      "mainNetAmount": -13967467.0,
+      "largeOrderNetAmount": 14134259.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.001,
+          "strength": -29.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 78,
+      "sourceRank": 78,
+      "plateCode": "801396",
+      "plateName": "云游戏",
+      "strength": -32.0,
+      "speed": 0.424,
+      "changePercent": -0.059,
+      "amount": 20582875563.0,
+      "mainNetAmount": 49151121.0,
+      "largeOrderNetAmount": -46273613.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": -0.059,
+          "strength": -32.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 79,
+      "sourceRank": 79,
+      "plateCode": "801651",
+      "plateName": "湖南",
+      "strength": -33.0,
+      "speed": -0.13,
+      "changePercent": 0.101,
+      "amount": 42967723112.0,
+      "mainNetAmount": -31793158.0,
+      "largeOrderNetAmount": -35811763.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.101,
+          "strength": -33.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 80,
+      "sourceRank": 80,
+      "plateCode": "801754",
+      "plateName": "江苏省",
+      "strength": -36.0,
+      "speed": -0.246,
+      "changePercent": 0.344,
+      "amount": 291231200624.0,
+      "mainNetAmount": -101063262.0,
+      "largeOrderNetAmount": -101051031.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.344,
+          "strength": -36.0,
+          "limitUps": 0
+        }
+      ]
+    }
+  ]
+}
