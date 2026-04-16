@@ -10,6 +10,7 @@ const state = {
   stockSortDirection: 'desc',
   data: null,
   history: [],
+  historyData: new Map(),
 };
 
 const number = (value, digits = 2) => {
@@ -32,10 +33,24 @@ async function loadDashboard(path) {
   const response = await fetch(path);
   const data = await response.json();
   state.data = data;
+  state.historyData.set(path, data);
   state.selectedDate = shortDate(data.date);
   if (!data.plates?.some((sector) => sector.plateCode === state.selectedCode)) {
     state.selectedCode = data.plates?.[0]?.plateCode || null;
   }
+}
+
+async function preloadHistoryData() {
+  const items = state.history.slice(0, 15);
+  await Promise.all(items.map(async (item) => {
+    if (!item.path || state.historyData.has(item.path)) return;
+    try {
+      const response = await fetch(item.path);
+      state.historyData.set(item.path, await response.json());
+    } catch {
+      state.historyData.set(item.path, null);
+    }
+  }));
 }
 
 function sortedSectors() {
@@ -54,10 +69,9 @@ function activeSector() {
 
 function sectorDescription(sector) {
   const external = sector.externalLimitMapping?.limitUpStocks?.length || 0;
-  const limit = sector.limitUpStocks?.length || 0;
   const strong = sector.strongStocks?.length || 0;
-  if (external) return `外部映射 ${external} 只涨停股，KPL 推断 ${limit} 只`;
-  if (limit || strong) return `已关联 ${limit} 只涨停/连板股、${strong} 只强势股`;
+  if (external) return `外部映射 ${external} 只涨停股，强势股 ${strong} 只`;
+  if (strong) return `已关联 ${strong} 只强势股`;
   return '当前开盘啦接口未关联到板块内个股';
 }
 
@@ -73,83 +87,60 @@ function metricCard(label, value, helper = '', dark = false) {
 
 function renderListPage() {
   const sectors = sortedSectors();
-  const top = sectors[0];
-  const summary = state.data.summary || {};
+  const sector = activeSector();
 
   app.innerHTML = `
-    <div class="stack">
-      <section class="card hero-card">
-        <div class="hero-row">
-          <div>
-            <p class="eyebrow">🔥 板块列表页</p>
-            <h1>每日强度前 20 板块</h1>
-            <p class="muted">这里只负责看板块；点击某个板块进入详情页。数据来自开盘啦可访问接口。</p>
-          </div>
-          <div class="controls">
-            <label class="input-shell">
-              <span>搜索</span>
-              <input id="keywordInput" value="${state.keyword}" placeholder="搜索板块，如 医药 / 算力">
-            </label>
-            <label class="select-shell">
-              <span>排序</span>
-              <select id="sortSelect">
-                <option value="strength" ${state.sortKey === 'strength' ? 'selected' : ''}>强度</option>
-                <option value="changePercent" ${state.sortKey === 'changePercent' ? 'selected' : ''}>涨幅</option>
-                <option value="mainNetAmount" ${state.sortKey === 'mainNetAmount' ? 'selected' : ''}>主力净额</option>
-                <option value="largeOrderNetAmount" ${state.sortKey === 'largeOrderNetAmount' ? 'selected' : ''}>大单净额</option>
-              </select>
-            </label>
-            <label class="select-shell">
-              <span>日期</span>
-              <select id="dateSelect">
-                ${state.history.map((item) => `
-                  <option value="${item.path}" ${item.date === state.data.date ? 'selected' : ''}>${item.date}</option>
-                `).join('')}
-              </select>
-            </label>
-          </div>
-        </div>
-        <div class="metrics">
-          ${metricCard('今日最强板块', top?.plateName || '暂无', `强度 ${number(top?.strength, 0)}`, true)}
-          ${metricCard('涨停家数', summary.externalLimitUpStockCount || summary.limitUpStockCount || 0, summary.externalLimitUpStockCount ? '同花顺概念 x 东财涨停池' : '已按板块标签归纳')}
-          ${metricCard('总成交额', money((state.data.plates || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0)), '用于判断强度是否有资金支撑')}
-        </div>
-      </section>
-
-      <section class="card section-card">
-        <div class="section-head">
+    <div class="workspace-layout">
+      <aside class="card sidebar-card">
+        <div class="sidebar-head">
           <div>
             <h2>板块排行</h2>
-            <p class="muted">点击后进入单独详情页</p>
+            <p class="muted">点击左侧板块，右侧查看详情</p>
           </div>
           <div class="count-pill">共 ${sectors.length} 个板块</div>
         </div>
-        <div class="sector-grid">
-          ${sectors.slice(0, 20).map((sector, index) => `
-            <button class="sector-card" data-code="${sector.plateCode}">
-              <div class="sector-main">
-                <div class="sector-left">
-                  <div class="rank-box">#${index + 1}</div>
-                  <div class="sector-title">
-                    <strong>${sector.plateName}</strong>
-                    <p>${sectorDescription(sector)}</p>
-                    <div class="tags">
-                      <span class="tag">涨跌幅 ${number(sector.changePercent)}%</span>
-                      <span class="tag">外部涨停 ${sector.externalLimitMapping?.limitUpStocks?.length || 0} 家</span>
-                      <span class="tag">KPL 推断 ${sector.limitUpStocks.length} 家</span>
-                      <span class="tag">成交额 ${money(sector.amount)}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="score">
-                  <span>强度</span>
-                  <strong>${number(sector.strength, 0)}</strong>
-                </div>
-              </div>
+        <div class="sidebar-controls">
+          <label class="input-shell">
+            <span>搜索</span>
+            <input id="keywordInput" value="${state.keyword}" placeholder="板块名 / 代码">
+          </label>
+          <label class="select-shell">
+            <span>排序</span>
+            <select id="sortSelect">
+              <option value="strength" ${state.sortKey === 'strength' ? 'selected' : ''}>强度</option>
+              <option value="changePercent" ${state.sortKey === 'changePercent' ? 'selected' : ''}>涨幅</option>
+              <option value="mainNetAmount" ${state.sortKey === 'mainNetAmount' ? 'selected' : ''}>主力净额</option>
+              <option value="largeOrderNetAmount" ${state.sortKey === 'largeOrderNetAmount' ? 'selected' : ''}>大单净额</option>
+            </select>
+          </label>
+          <label class="select-shell">
+            <span>日期</span>
+            <select id="dateSelect">
+              ${state.history.map((item) => `
+                <option value="${item.path}" ${item.date === state.data.date ? 'selected' : ''}>${item.date}</option>
+              `).join('')}
+            </select>
+          </label>
+        </div>
+        <div class="sector-list">
+          ${sectors.map((item, index) => `
+            <button class="sidebar-sector${item.plateCode === sector?.plateCode ? ' active' : ''}" data-code="${item.plateCode}">
+              <span class="sidebar-rank">#${index + 1}</span>
+              <span class="sidebar-title">
+                <strong>${item.plateName}</strong>
+                <small>${sectorDescription(item)}</small>
+              </span>
+              <span class="sidebar-score">
+                <small>强度</small>
+                <strong>${number(item.strength, 0)}</strong>
+              </span>
             </button>
           `).join('')}
         </div>
-      </section>
+      </aside>
+      <main class="detail-pane">
+        ${renderDetailContent(sector)}
+      </main>
     </div>
   `;
 
@@ -163,16 +154,17 @@ function renderListPage() {
   });
   document.querySelector('#dateSelect')?.addEventListener('change', async (event) => {
     await loadDashboard(event.target.value);
+    await preloadHistoryData();
     render();
   });
-  document.querySelectorAll('.sector-card').forEach((button) => {
+  document.querySelectorAll('.sidebar-sector').forEach((button) => {
     button.addEventListener('click', () => {
       state.selectedCode = button.dataset.code;
       state.selectedDate = shortDate(state.data.date);
-      state.page = 'detail';
       render();
     });
   });
+  bindDetailEvents();
 }
 
 function sortedLimitRows(sector) {
@@ -210,15 +202,63 @@ function timeText(value) {
 function conceptText(row) {
   const concepts = row.matchedConcepts || [];
   if (!concepts.length) return '暂无映射';
-  return concepts.map((item) => `${item.name} · ${item.matchType}`).join(' / ');
+  return concepts.map((item) => `${item.name} · ${matchTypeText(item.matchType)}`).join(' / ');
+}
+
+function matchTypeText(value) {
+  const labels = {
+    exact: '同名',
+    alias: '关联',
+    name_contains: '包含',
+  };
+  return labels[value] || value || '未知';
+}
+
+function historyItems() {
+  return state.history.slice(0, 15);
+}
+
+function findHistorySector(target, data) {
+  const sectors = data?.plates || [];
+  return sectors.find((sector) => sector.plateCode === target.plateCode)
+    || sectors.find((sector) => sector.plateName === target.plateName);
+}
+
+function sectorTrendFromHistory(sector) {
+  return historyItems()
+    .map((item) => {
+      const historySector = findHistorySector(sector, state.historyData.get(item.path));
+      if (!historySector) return null;
+      const rows = historySector.externalLimitMapping?.limitUpStocks || historySector.limitUpStocks || [];
+      return {
+        date: item.date || historySector.date,
+        change: historySector.changePercent,
+        strength: historySector.strength,
+        limitUps: rows.length,
+      };
+    })
+    .filter(Boolean)
+    .reverse();
+}
+
+function externalLimitHistory(sector) {
+  return historyItems().map((item) => {
+    const data = state.historyData.get(item.path);
+    const historySector = findHistorySector(sector, data);
+    return {
+      date: item.date,
+      sector: historySector,
+      mapping: historySector?.externalLimitMapping || null,
+    };
+  });
 }
 
 function renderTrendCard(sector) {
-  const trend = sector.trend || [];
+  const trend = sectorTrendFromHistory(sector);
   const chart = trend.length ? trendChart(trend, sector.plateName) : `
     <div>
       <strong>暂无历史</strong>
-      <p>还没有保存到 ${sector.plateName} 的历史快照。每天运行构建脚本后，这里会自动累积近 15 日涨跌幅。</p>
+      <p>近 15 个快照里还没有匹配到 ${sector.plateName} 的历史数据。</p>
     </div>
   `;
   return `
@@ -228,15 +268,10 @@ function renderTrendCard(sector) {
           <h2>近 15 日走势</h2>
           <p class="muted">来自每日保存的开盘啦历史快照，展示板块涨跌幅、强度与涨停家数。</p>
         </div>
-        <div class="count-pill">当前选中：${state.selectedDate}</div>
+        <div class="count-pill">有数据：${trend.length}/${historyItems().length} 天</div>
       </div>
       <div class="chart-box">
         ${chart}
-      </div>
-      <div class="date-row">
-        ${state.history.map((item) => `
-          <button class="date-btn" data-history-path="${item.path}">${shortDate(item.date)} · ${item.date === state.data.date ? '当前' : '历史'}</button>
-        `).join('')}
       </div>
     </section>
   `;
@@ -276,143 +311,111 @@ function trendChart(trend, plateName) {
   `;
 }
 
-function renderLimitTable(sector) {
-  const rows = sortedLimitRows(sector);
+function renderExternalRows(rows) {
   return `
-    <section class="card section-card">
-      <div class="section-head">
-        <div>
-          <h2>${state.selectedDate} KPL 推断涨停数据</h2>
-          <p class="muted">按开盘啦股票字段和板块名做标签匹配，作为对照数据保留。</p>
-        </div>
-        <div class="count-pill">当前板块：${sector.plateName}</div>
-      </div>
-      <div class="warn">涨停时间、首次封板、封单占比、完整长文本涨停原因：当前接口暂无返回。</div>
-      <div class="table-wrap" style="margin-top: 12px;">
-        <table>
-          <thead>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>代码</th>
+            <th>名称</th>
+            <th>匹配概念</th>
+            <th>涨跌幅</th>
+            <th>连板数</th>
+            <th>首次封板</th>
+            <th>最后封板</th>
+            <th>封板资金</th>
+            <th>炸板次数</th>
+            <th>所属行业</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.length ? rows.map((row) => `
             <tr>
-              <th>代码</th>
-              <th>名称</th>
-              <th>${sortButton('涨停原因', 'reason')}</th>
-              <th>${sortButton('成交额', 'amount')}</th>
-              <th>${sortButton('涨停时间', 'hitTime')}</th>
-              <th>首次封板</th>
-              <th>封单占比</th>
+              <td class="code">${row.code || '暂无'}</td>
+              <td><strong>${row.name || '暂无'}</strong><div class="muted">${row.limitStats || '暂无统计'}</div></td>
+              <td>${conceptText(row)}</td>
+              <td class="${Number(row.changePercent) >= 0 ? 'rise' : 'fall'}">${number(row.changePercent)}%</td>
+              <td>${row.consecutiveBoards ?? '暂无接口'}</td>
+              <td>${timeText(row.firstSealTime)}</td>
+              <td>${timeText(row.lastSealTime)}</td>
+              <td>${money(row.sealAmount)}</td>
+              <td>${row.openCount ?? '暂无接口'}</td>
+              <td>${row.industry || '暂无接口'}</td>
             </tr>
-          </thead>
-          <tbody>
-            ${rows.length ? rows.map((row) => `
-              <tr>
-                <td class="code">${row.code || '暂无'}</td>
-                <td><strong>${row.name || '暂无'}</strong><div class="muted">${row.boardLabel || '暂无接口'}</div></td>
-                <td>${row.reasonTags || '暂无接口'}</td>
-                <td>${money(row.amount)}</td>
-                <td class="missing">暂无接口</td>
-                <td class="missing">暂无接口</td>
-                <td class="missing">暂无接口</td>
-              </tr>
-            `).join('') : `<tr><td colspan="7" class="empty">当前接口没有归纳到该板块涨停股</td></tr>`}
-          </tbody>
-        </table>
-      </div>
-    </section>
+          `).join('') : `<tr><td colspan="10" class="empty">没有通过同花顺概念和东财涨停池映射到涨停股</td></tr>`}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
 function renderExternalLimitTable(sector) {
-  const mapping = sector.externalLimitMapping;
-  const rows = mapping?.limitUpStocks || [];
-  const concepts = mapping?.matchedConcepts || [];
+  const snapshots = externalLimitHistory(sector);
   return `
     <section class="card section-card">
       <div class="section-head">
         <div>
-          <h2>${state.selectedDate} 外部映射涨停股</h2>
-          <p class="muted">开盘啦板块映射到同花顺概念，再与东方财富涨停股池按股票代码求交集。</p>
+          <h2>近 15 日外部映射涨停股</h2>
+          <p class="muted">按日期下拉展开，查看同花顺概念与东方财富涨停池求交后的全部股票。</p>
         </div>
-        <div class="count-pill">映射涨停：${rows.length} 只</div>
+        <div class="count-pill">当前板块：${sector.plateName}</div>
       </div>
-      <div class="source-box">
-        <strong>匹配概念</strong>
-        <p>${concepts.length ? concepts.map((item) => `${item.name} · ${item.matchType}`).join(' / ') : '暂无匹配概念'}</p>
-        <small>这不是开盘啦官方板块详情接口；它用于替代登录态接口不可用时的可解释映射。</small>
-      </div>
-      <div class="table-wrap" style="margin-top: 12px;">
-        <table>
-          <thead>
-            <tr>
-              <th>代码</th>
-              <th>名称</th>
-              <th>匹配概念</th>
-              <th>涨跌幅</th>
-              <th>连板数</th>
-              <th>首次封板</th>
-              <th>最后封板</th>
-              <th>封板资金</th>
-              <th>炸板次数</th>
-              <th>所属行业</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.length ? rows.map((row) => `
-              <tr>
-                <td class="code">${row.code || '暂无'}</td>
-                <td><strong>${row.name || '暂无'}</strong><div class="muted">${row.limitStats || '暂无统计'}</div></td>
-                <td>${conceptText(row)}</td>
-                <td class="${Number(row.changePercent) >= 0 ? 'rise' : 'fall'}">${number(row.changePercent)}%</td>
-                <td>${row.consecutiveBoards ?? '暂无接口'}</td>
-                <td>${timeText(row.firstSealTime)}</td>
-                <td>${timeText(row.lastSealTime)}</td>
-                <td>${money(row.sealAmount)}</td>
-                <td>${row.openCount ?? '暂无接口'}</td>
-                <td>${row.industry || '暂无接口'}</td>
-              </tr>
-            `).join('') : `<tr><td colspan="10" class="empty">没有通过同花顺概念和东财涨停池映射到涨停股</td></tr>`}
-          </tbody>
-        </table>
+      <div class="external-list">
+        ${snapshots.map((snapshot) => {
+          const rows = snapshot.mapping?.limitUpStocks || [];
+          const concepts = snapshot.mapping?.matchedConcepts || [];
+          const isCurrent = snapshot.date === state.data.date;
+          return `
+            <details class="external-day" ${isCurrent ? 'open' : ''}>
+              <summary>
+                <span>${shortDate(snapshot.date)} 外部映射涨停股</span>
+                <strong>${rows.length} 只</strong>
+              </summary>
+              <div class="source-box">
+                <strong>匹配概念</strong>
+                <p>${concepts.length ? concepts.map((item) => `${item.name} · ${matchTypeText(item.matchType)}`).join(' / ') : '暂无匹配概念'}</p>
+                <small>这不是开盘啦官方板块详情接口；它用于替代登录态接口不可用时的可解释映射。</small>
+              </div>
+              ${snapshot.sector ? renderExternalRows(rows) : '<div class="empty">当天快照里没有匹配到这个板块</div>'}
+            </details>
+          `;
+        }).join('')}
       </div>
     </section>
   `;
 }
 
-function renderDetailPage() {
-  const sector = activeSector();
+function renderDetailContent(sector) {
   if (!sector) {
-    app.innerHTML = '<div class="card section-card empty">暂无开盘啦数据</div>';
-    return;
+    return '<div class="card section-card empty">暂无开盘啦数据</div>';
   }
 
-  app.innerHTML = `
+  return `
     <div class="stack">
       <section class="card detail-head">
         <div class="detail-title">
-          <button class="back-btn" id="backBtn">‹</button>
           <div>
-            <div class="muted">板块详情页</div>
+            <div class="muted">板块详情</div>
             <h1>${sector.plateName}</h1>
-            <p class="muted">这里单独展示板块走势、每日数据切换以及当日涨停个股明细。</p>
+            <p class="muted">展示板块走势、外部映射涨停股和当日关键数据。</p>
           </div>
         </div>
         <div class="badges">
           <span class="badge">强度 ${number(sector.strength, 0)}</span>
           <span class="badge">涨跌幅 ${number(sector.changePercent)}%</span>
           <span class="badge">外部涨停 ${sector.externalLimitMapping?.limitUpStocks?.length || 0} 家</span>
-          <span class="badge">KPL 推断 ${sector.limitUpStocks.length} 家</span>
           <span class="badge">成交额 ${money(sector.amount)}</span>
         </div>
       </section>
 
       ${renderTrendCard(sector)}
       ${renderExternalLimitTable(sector)}
-      ${renderLimitTable(sector)}
     </div>
   `;
+}
 
-  document.querySelector('#backBtn').addEventListener('click', () => {
-    state.page = 'list';
-    render();
-  });
+function bindDetailEvents() {
   document.querySelectorAll('[data-sort]').forEach((button) => {
     button.addEventListener('click', () => {
       const field = button.dataset.sort;
@@ -425,17 +428,10 @@ function renderDetailPage() {
       render();
     });
   });
-  document.querySelectorAll('[data-history-path]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      await loadDashboard(button.dataset.historyPath);
-      render();
-    });
-  });
 }
 
 function render() {
-  if (state.page === 'detail') renderDetailPage();
-  else renderListPage();
+  renderListPage();
 }
 
 async function boot() {
@@ -448,6 +444,7 @@ async function boot() {
   }
   const latestPath = state.history[0]?.path || './data/kpl_dashboard.json';
   await loadDashboard(latestPath);
+  await preloadHistoryData();
   if (!state.history.length) {
     state.history = [{ date: state.data.date, path: './data/kpl_dashboard.json' }];
   }

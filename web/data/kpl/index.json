@@ -5,10 +5,10 @@
       "date": "2026-04-16",
       "path": "./data/kpl/history/20260416.json",
       "summary": {
-        "plateCount": 80,
-        "linkedPlateCount": 22,
+        "plateCount": 268,
+        "linkedPlateCount": 24,
         "limitUpStockCount": 14,
-        "strongStockCount": 36
+        "strongStockCount": 38
       }
     },
     {

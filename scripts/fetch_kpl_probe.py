@@ -39,6 +39,7 @@ PLATE_RANKING_FORM = {
     "Type": "1",
     "ZSType": "7",
 }
+PLATE_PAGE_SIZE = 80
 
 
 def fetch_form(url: str, form: dict[str, str]) -> dict[str, Any]:
@@ -53,6 +54,33 @@ def fetch_form(url: str, form: dict[str, str]) -> dict[str, Any]:
     )
     with urllib.request.urlopen(request, timeout=30) as response:
         return json.loads(response.read().decode("utf-8"))
+
+
+def fetch_plate_ranking_pages() -> dict[str, Any]:
+    """Fetch every public plate-ranking page exposed by the legacy endpoint."""
+    combined: dict[str, Any] = {"list": [], "pages": []}
+    seen_codes: set[str] = set()
+    index = 0
+
+    while True:
+        form = {**PLATE_RANKING_FORM, "Index": str(index), "st": str(PLATE_PAGE_SIZE)}
+        payload = fetch_form(KPL_API_URL, form)
+        rows = [row for row in payload.get("list", []) if isinstance(row, list)]
+        new_rows = []
+        for row in rows:
+            code = str(row_value(row, 0, ""))
+            if not code or code in seen_codes:
+                continue
+            seen_codes.add(code)
+            new_rows.append(row)
+
+        combined["pages"].append({"index": index, "rows": len(rows), "newRows": len(new_rows)})
+        combined["list"].extend(new_rows)
+        if not rows or not new_rows:
+            break
+        index += PLATE_PAGE_SIZE
+
+    return combined
 
 
 def row_value(row: list[Any], index: int, default: Any = None) -> Any:
@@ -163,7 +191,7 @@ def main() -> None:
     write_csv(out_dir / "real_ranking.csv", real_rows)
     write_csv(out_dir / "limit_up_candidates.csv", limit_rows)
 
-    plate_ranking = fetch_form(KPL_API_URL, PLATE_RANKING_FORM)
+    plate_ranking = fetch_plate_ranking_pages()
     plate_rows = normalize_plate_ranking(plate_ranking)
     (out_dir / "plate_ranking_raw.json").write_text(
         json.dumps(plate_ranking, ensure_ascii=False, indent=2),
