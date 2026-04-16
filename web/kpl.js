@@ -53,8 +53,10 @@ function activeSector() {
 }
 
 function sectorDescription(sector) {
+  const external = sector.externalLimitMapping?.limitUpStocks?.length || 0;
   const limit = sector.limitUpStocks?.length || 0;
   const strong = sector.strongStocks?.length || 0;
+  if (external) return `外部映射 ${external} 只涨停股，KPL 推断 ${limit} 只`;
   if (limit || strong) return `已关联 ${limit} 只涨停/连板股、${strong} 只强势股`;
   return '当前开盘啦接口未关联到板块内个股';
 }
@@ -109,7 +111,7 @@ function renderListPage() {
         </div>
         <div class="metrics">
           ${metricCard('今日最强板块', top?.plateName || '暂无', `强度 ${number(top?.strength, 0)}`, true)}
-          ${metricCard('涨停家数', summary.limitUpStockCount || 0, '已按板块标签归纳')}
+          ${metricCard('涨停家数', summary.externalLimitUpStockCount || summary.limitUpStockCount || 0, summary.externalLimitUpStockCount ? '同花顺概念 x 东财涨停池' : '已按板块标签归纳')}
           ${metricCard('总成交额', money((state.data.plates || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0)), '用于判断强度是否有资金支撑')}
         </div>
       </section>
@@ -133,7 +135,8 @@ function renderListPage() {
                     <p>${sectorDescription(sector)}</p>
                     <div class="tags">
                       <span class="tag">涨跌幅 ${number(sector.changePercent)}%</span>
-                      <span class="tag">龙头涨停 ${sector.limitUpStocks.length} 家</span>
+                      <span class="tag">外部涨停 ${sector.externalLimitMapping?.limitUpStocks?.length || 0} 家</span>
+                      <span class="tag">KPL 推断 ${sector.limitUpStocks.length} 家</span>
                       <span class="tag">成交额 ${money(sector.amount)}</span>
                     </div>
                   </div>
@@ -196,6 +199,18 @@ function sortButton(label, field) {
   const active = state.stockSortField === field;
   const suffix = active ? (state.stockSortDirection === 'asc' ? ' 升序' : ' 降序') : '';
   return `<button class="sort-btn" data-sort="${field}">${label}${suffix}</button>`;
+}
+
+function timeText(value) {
+  const text = String(value || '').padStart(6, '0');
+  if (!/^\d{6}$/.test(text) || text === '000000') return '暂无接口';
+  return `${text.slice(0, 2)}:${text.slice(2, 4)}:${text.slice(4, 6)}`;
+}
+
+function conceptText(row) {
+  const concepts = row.matchedConcepts || [];
+  if (!concepts.length) return '暂无映射';
+  return concepts.map((item) => `${item.name} · ${item.matchType}`).join(' / ');
 }
 
 function renderTrendCard(sector) {
@@ -267,8 +282,8 @@ function renderLimitTable(sector) {
     <section class="card section-card">
       <div class="section-head">
         <div>
-          <h2>${state.selectedDate} 涨停数据</h2>
-          <p class="muted">字段支持排序：涨停原因、成交额、涨停时间。缺失字段按原位置明示。</p>
+          <h2>${state.selectedDate} KPL 推断涨停数据</h2>
+          <p class="muted">按开盘啦股票字段和板块名做标签匹配，作为对照数据保留。</p>
         </div>
         <div class="count-pill">当前板块：${sector.plateName}</div>
       </div>
@@ -305,6 +320,62 @@ function renderLimitTable(sector) {
   `;
 }
 
+function renderExternalLimitTable(sector) {
+  const mapping = sector.externalLimitMapping;
+  const rows = mapping?.limitUpStocks || [];
+  const concepts = mapping?.matchedConcepts || [];
+  return `
+    <section class="card section-card">
+      <div class="section-head">
+        <div>
+          <h2>${state.selectedDate} 外部映射涨停股</h2>
+          <p class="muted">开盘啦板块映射到同花顺概念，再与东方财富涨停股池按股票代码求交集。</p>
+        </div>
+        <div class="count-pill">映射涨停：${rows.length} 只</div>
+      </div>
+      <div class="source-box">
+        <strong>匹配概念</strong>
+        <p>${concepts.length ? concepts.map((item) => `${item.name} · ${item.matchType}`).join(' / ') : '暂无匹配概念'}</p>
+        <small>这不是开盘啦官方板块详情接口；它用于替代登录态接口不可用时的可解释映射。</small>
+      </div>
+      <div class="table-wrap" style="margin-top: 12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>代码</th>
+              <th>名称</th>
+              <th>匹配概念</th>
+              <th>涨跌幅</th>
+              <th>连板数</th>
+              <th>首次封板</th>
+              <th>最后封板</th>
+              <th>封板资金</th>
+              <th>炸板次数</th>
+              <th>所属行业</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.length ? rows.map((row) => `
+              <tr>
+                <td class="code">${row.code || '暂无'}</td>
+                <td><strong>${row.name || '暂无'}</strong><div class="muted">${row.limitStats || '暂无统计'}</div></td>
+                <td>${conceptText(row)}</td>
+                <td class="${Number(row.changePercent) >= 0 ? 'rise' : 'fall'}">${number(row.changePercent)}%</td>
+                <td>${row.consecutiveBoards ?? '暂无接口'}</td>
+                <td>${timeText(row.firstSealTime)}</td>
+                <td>${timeText(row.lastSealTime)}</td>
+                <td>${money(row.sealAmount)}</td>
+                <td>${row.openCount ?? '暂无接口'}</td>
+                <td>${row.industry || '暂无接口'}</td>
+              </tr>
+            `).join('') : `<tr><td colspan="10" class="empty">没有通过同花顺概念和东财涨停池映射到涨停股</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
 function renderDetailPage() {
   const sector = activeSector();
   if (!sector) {
@@ -326,12 +397,14 @@ function renderDetailPage() {
         <div class="badges">
           <span class="badge">强度 ${number(sector.strength, 0)}</span>
           <span class="badge">涨跌幅 ${number(sector.changePercent)}%</span>
-          <span class="badge">龙头涨停 ${sector.limitUpStocks.length} 家</span>
+          <span class="badge">外部涨停 ${sector.externalLimitMapping?.limitUpStocks?.length || 0} 家</span>
+          <span class="badge">KPL 推断 ${sector.limitUpStocks.length} 家</span>
           <span class="badge">成交额 ${money(sector.amount)}</span>
         </div>
       </section>
 
       ${renderTrendCard(sector)}
+      ${renderExternalLimitTable(sector)}
       ${renderLimitTable(sector)}
     </div>
   `;

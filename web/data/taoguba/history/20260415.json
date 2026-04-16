@@ -1,0 +1,1062 @@
+{
+  "date": "2026-04-15",
+  "source": {
+    "ranking": "public static history ranked by materialRate",
+    "history": "https://js.tgb.cn/hangqing/ticai/taoguba/ticai_data_history.json",
+    "nameMapping": "data\\ticai_extract\\ticai_topics.csv"
+  },
+  "top10": [
+    {
+      "rank": 1,
+      "materialSeq": "273",
+      "materialName": "题材ID 273",
+      "limitUpStocks": null,
+      "materialRate": 4.89,
+      "popularValue": null,
+      "humanDragon": "华人健康(sz301408)",
+      "middleTroops": "鹭燕医药(sz002788)",
+      "dayDragon": "鹭燕医药(sz002788)",
+      "limitUpStockNames": [
+        "鹭燕医药(sz002788)"
+      ],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "273",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 4.89,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "华人健康(sz301408)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": "鹭燕医药(sz002788)"
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 0.49,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "迪安诊断(sz300244)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -1.9,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "鹭燕医药(sz002788)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": -0.87,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "鹭燕医药(sz002788)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -4.02,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "鹭燕医药(sz002788)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 1.48,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "鹭燕医药(sz002788)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 1.98,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "鹭燕医药(sz002788)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "273",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -1.37,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "鹭燕医药(sz002788)",
+          "middleTroops": "鹭燕医药(sz002788)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "materialSeq": "104",
+      "materialName": "题材ID 104",
+      "limitUpStocks": null,
+      "materialRate": 2.42,
+      "popularValue": null,
+      "humanDragon": "漱玉平民(sz301017)",
+      "middleTroops": "东阿阿胶(sz000423)",
+      "dayDragon": "",
+      "limitUpStockNames": [],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "104",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 2.42,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "漱玉平民(sz301017)",
+          "middleTroops": "东阿阿胶(sz000423)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 0.84,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "康惠股份(sh603139)",
+          "middleTroops": "东阿阿胶(sz000423)",
+          "dayDragon": "康惠股份(sh603139)"
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -1.32,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "华森制药(sz002907)",
+          "middleTroops": "东阿阿胶(sz000423)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": -0.06,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "广誉远(sh600771)",
+          "middleTroops": "以岭药业(sz002603)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.94,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "康惠股份(sh603139)",
+          "middleTroops": "东阿阿胶(sz000423)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 0.81,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "一心堂(sz002727)",
+          "middleTroops": "东阿阿胶(sz000423)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 0.38,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "新天药业(sz002873)",
+          "middleTroops": "以岭药业(sz002603)",
+          "dayDragon": "新天药业(sz002873)"
+        },
+        {
+          "materialSeq": "104",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -1.56,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "漱玉平民(sz301017)",
+          "middleTroops": "云南白药(sz000538)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "materialSeq": "94",
+      "materialName": "题材ID 94",
+      "limitUpStocks": null,
+      "materialRate": 2.04,
+      "popularValue": null,
+      "humanDragon": "奥尼电子(sz301189)",
+      "middleTroops": "天康生物(sz002100)",
+      "dayDragon": "中宠股份(sz002891)",
+      "limitUpStockNames": [
+        "中宠股份(sz002891)"
+      ],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "94",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 2.04,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "天康生物(sz002100)",
+          "dayDragon": "中宠股份(sz002891)"
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 1.47,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "天康生物(sz002100)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -0.38,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "基蛋生物(sh603387)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 1.21,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "基蛋生物(sh603387)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.74,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "生物股份(sh600201)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 2.44,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "天康生物(sz002100)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 2.23,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "中牧股份(sh600195)",
+          "middleTroops": "生物股份(sh600201)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "94",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -2.58,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "奥尼电子(sz301189)",
+          "middleTroops": "天康生物(sz002100)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "materialSeq": "213",
+      "materialName": "题材ID 213",
+      "limitUpStocks": null,
+      "materialRate": 2.02,
+      "popularValue": null,
+      "humanDragon": "双鹭药业(sz002038)",
+      "middleTroops": "常山药业(sz300255)",
+      "dayDragon": "双鹭药业(sz002038)",
+      "limitUpStockNames": [
+        "双鹭药业(sz002038)"
+      ],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "213",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 2.02,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "双鹭药业(sz002038)",
+          "middleTroops": "常山药业(sz300255)",
+          "dayDragon": "双鹭药业(sz002038)"
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 0.8,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "常山药业(sz300255)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -0.31,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "翰宇药业(sz300199)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 0.31,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "双鹭药业(sz002038)",
+          "middleTroops": "翰宇药业(sz300199)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.98,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "翰宇药业(sz300199)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 0.9,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "一品红(sz300723)",
+          "middleTroops": "翰宇药业(sz300199)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 0.09,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "万邦德(sz002082)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": "通化金马(sz000766)"
+        },
+        {
+          "materialSeq": "213",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -1.92,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "双鹭药业(sz002038)",
+          "middleTroops": "华东医药(sz000963)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "materialSeq": "112",
+      "materialName": "题材ID 112",
+      "limitUpStocks": null,
+      "materialRate": 1.96,
+      "popularValue": null,
+      "humanDragon": "舒泰神(sz300204)",
+      "middleTroops": "药明康德(sh603259)",
+      "dayDragon": "",
+      "limitUpStockNames": [],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "112",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 1.96,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 0.05,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": 0.11,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": -0.05,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.04,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "华纳药厂(sh688799)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 1.11,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "一品红(sz300723)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": -1.43,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "药明康德(sh603259)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "112",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -1.89,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "舒泰神(sz300204)",
+          "middleTroops": "科伦药业(sz002422)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "materialSeq": "124",
+      "materialName": "题材ID 124",
+      "limitUpStocks": null,
+      "materialRate": 1.88,
+      "popularValue": null,
+      "humanDragon": "南京医药(sh600713)",
+      "middleTroops": "怡亚通(sz002183)",
+      "dayDragon": "瑞康医药(sz002589)",
+      "limitUpStockNames": [
+        "瑞康医药(sz002589)"
+      ],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "124",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 1.88,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "南京医药(sh600713)",
+          "middleTroops": "怡亚通(sz002183)",
+          "dayDragon": "瑞康医药(sz002589)"
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 0.57,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "南京医药(sh600713)",
+          "middleTroops": "怡亚通(sz002183)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -1.3,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "塞力医疗(sh603716)",
+          "middleTroops": "怡亚通(sz002183)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 0.69,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "南京医药(sh600713)",
+          "middleTroops": "怡亚通(sz002183)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -2.53,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "瑞康医药(sz002589)",
+          "middleTroops": "怡亚通(sz002183)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 1.66,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "合富中国(sh603122)",
+          "middleTroops": "怡亚通(sz002183)",
+          "dayDragon": "达实智能(sz002421)"
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 1.89,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "合富中国(sh603122)",
+          "middleTroops": "九州通(sh600998)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "124",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -1.3,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "合富中国(sh603122)",
+          "middleTroops": "九州通(sh600998)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "materialSeq": "122",
+      "materialName": "题材ID 122",
+      "limitUpStocks": null,
+      "materialRate": 1.69,
+      "popularValue": null,
+      "humanDragon": "美诺华(sh603538)",
+      "middleTroops": "药明康德(sh603259)",
+      "dayDragon": "双鹭药业(sz002038)",
+      "limitUpStockNames": [
+        "双鹭药业(sz002038)"
+      ],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "122",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 1.69,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "美诺华(sh603538)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": "双鹭药业(sz002038)"
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 1.28,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "美诺华(sh603538)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -0.62,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "常山药业(sz300255)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 1.81,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "美诺华(sh603538)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.31,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "美诺华(sh603538)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 2.05,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "美诺华(sh603538)",
+          "middleTroops": "药明康德(sh603259)",
+          "dayDragon": "美诺华(sh603538)"
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": -0.06,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "美诺华(sh603538)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "122",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -2.54,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "双鹭药业(sz002038)",
+          "middleTroops": "恒瑞医药(sh600276)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "materialSeq": "284",
+      "materialName": "题材ID 284",
+      "limitUpStocks": null,
+      "materialRate": 1.61,
+      "popularValue": null,
+      "humanDragon": "君实生物(sh688180)",
+      "middleTroops": "君实生物(sh688180)",
+      "dayDragon": "",
+      "limitUpStockNames": [],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "284",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 1.61,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "君实生物(sh688180)",
+          "middleTroops": "君实生物(sh688180)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 1.5,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "百普赛斯(sz301080)",
+          "middleTroops": "富祥药业(sz300497)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -0.42,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "君实生物(sh688180)",
+          "middleTroops": "君实生物(sh688180)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 0.34,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "百普赛斯(sz301080)",
+          "middleTroops": "君实生物(sh688180)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.65,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "百普赛斯(sz301080)",
+          "middleTroops": "君实生物(sh688180)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 1.25,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "百普赛斯(sz301080)",
+          "middleTroops": "君实生物(sh688180)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 1.42,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "富祥药业(sz300497)",
+          "middleTroops": "华海药业(sh600521)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "284",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -2.3,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "君实生物(sh688180)",
+          "middleTroops": "君实生物(sh688180)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "materialSeq": "154",
+      "materialName": "题材ID 154",
+      "limitUpStocks": null,
+      "materialRate": 1.52,
+      "popularValue": null,
+      "humanDragon": "科拓生物(sz300858)",
+      "middleTroops": "科拓生物(sz300858)",
+      "dayDragon": "均瑶健康(sh605388)",
+      "limitUpStockNames": [
+        "均瑶健康(sh605388)"
+      ],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "154",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 1.52,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "科拓生物(sz300858)",
+          "middleTroops": "科拓生物(sz300858)",
+          "dayDragon": "均瑶健康(sh605388)"
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 0.76,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "科拓生物(sz300858)",
+          "middleTroops": "科拓生物(sz300858)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -0.16,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "科拓生物(sz300858)",
+          "middleTroops": "科拓生物(sz300858)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 1.19,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "科拓生物(sz300858)",
+          "middleTroops": "科拓生物(sz300858)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.77,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "西麦食品(sz002956)",
+          "middleTroops": "科拓生物(sz300858)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 1.94,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "科拓生物(sz300858)",
+          "middleTroops": "皇氏集团(sz002329)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 2.17,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "皇氏集团(sz002329)",
+          "middleTroops": "皇氏集团(sz002329)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "154",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -2.65,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "西麦食品(sz002956)",
+          "middleTroops": "皇氏集团(sz002329)",
+          "dayDragon": ""
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "materialSeq": "280",
+      "materialName": "题材ID 280",
+      "limitUpStocks": null,
+      "materialRate": 1.4,
+      "popularValue": null,
+      "humanDragon": "泽宇智能(sz301179)",
+      "middleTroops": "思源电气(sz002028)",
+      "dayDragon": "",
+      "limitUpStockNames": [],
+      "limitUpStockSource": "public_history_representative",
+      "newEventNum": null,
+      "history": [
+        {
+          "materialSeq": "280",
+          "date": "2026-04-15",
+          "timestamp": 1776182400000,
+          "materialRate": 1.4,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "泽宇智能(sz301179)",
+          "middleTroops": "思源电气(sz002028)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-14",
+          "timestamp": 1776096000000,
+          "materialRate": 1.08,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "申昊科技(sz300853)",
+          "middleTroops": "思源电气(sz002028)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-13",
+          "timestamp": 1776009600000,
+          "materialRate": -0.51,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "通达股份(sz002560)",
+          "middleTroops": "思源电气(sz002028)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-10",
+          "timestamp": 1775750400000,
+          "materialRate": 0.72,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "通达股份(sz002560)",
+          "middleTroops": "思源电气(sz002028)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-09",
+          "timestamp": 1775664000000,
+          "materialRate": -1.62,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "金利华电(sz300069)",
+          "middleTroops": "中国能建(sh601868)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-08",
+          "timestamp": 1775577600000,
+          "materialRate": 4.96,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "晓程科技(sz300139)",
+          "middleTroops": "中国能建(sh601868)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-07",
+          "timestamp": 1775491200000,
+          "materialRate": 0.5,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "金利华电(sz300069)",
+          "middleTroops": "正泰电器(sh601877)",
+          "dayDragon": ""
+        },
+        {
+          "materialSeq": "280",
+          "date": "2026-04-03",
+          "timestamp": 1775145600000,
+          "materialRate": -1.92,
+          "popularValue": 0.0,
+          "label": null,
+          "humanDragon": "金利华电(sz300069)",
+          "middleTroops": "思源电气(sz002028)",
+          "dayDragon": "远东股份(sh600869)"
+        }
+      ]
+    }
+  ]
+}

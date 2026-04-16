@@ -203,6 +203,15 @@ h2 { margin: 0; font-size: 20px; }
 .date-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .date-btn { border: 0; border-radius: 999px; background: var(--dark); color: #ffffff; padding: 8px 12px; }
 .warn { border: 1px solid #ead59a; background: #fff9e8; color: var(--amber); border-radius: 8px; padding: 12px; }
+.source-box {
+  border: 1px solid #cfe0dd;
+  background: #f7fbfa;
+  border-radius: 8px;
+  padding: 12px;
+}
+.source-box strong { display: block; }
+.source-box p { margin: 6px 0; color: var(--ink); }
+.source-box small { color: var(--muted); }
 
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
 table { width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; }
@@ -211,6 +220,8 @@ th { background: #f8fbfb; color: var(--muted); font-weight: 600; }
 tbody tr:hover { background: #fbfdfc; }
 .sort-btn { border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 700; cursor: pointer; padding: 0; }
 .code { font-family: Consolas, "Courier New", monospace; color: var(--muted); }
+.rise { color: var(--red); font-weight: 700; }
+.fall { color: var(--green); font-weight: 700; }
 .missing { color: var(--amber); }
 .empty { padding: 22px; color: var(--muted); text-align: center; }
 

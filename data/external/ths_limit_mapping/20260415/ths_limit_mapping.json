@@ -1,0 +1,5918 @@
+{
+  "date": "20260415",
+  "source": {
+    "name": "Tonghuashun concepts + Eastmoney limit-up pool",
+    "date": "20260415",
+    "note": "Maps Kaipanla plates to Tonghuashun concepts, then intersects first-page concept constituents with Eastmoney limit-up pool."
+  },
+  "plates": [
+    {
+      "plateCode": "801045",
+      "plateName": "医药",
+      "matchedConcepts": [
+        {
+          "name": "创新药",
+          "code": "308014",
+          "matchType": "alias"
+        },
+        {
+          "name": "医药电商",
+          "code": "301565",
+          "matchType": "alias"
+        },
+        {
+          "name": "医疗器械概念",
+          "code": "301505",
+          "matchType": "alias"
+        },
+        {
+          "name": "智能医疗",
+          "code": "300682",
+          "matchType": "alias"
+        },
+        {
+          "name": "减肥药",
+          "code": "309081",
+          "matchType": "alias"
+        },
+        {
+          "name": "仿制药一致性评价",
+          "code": "308572",
+          "matchType": "alias"
+        },
+        {
+          "name": "医美概念",
+          "code": "308712",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "600664",
+          "name": "哈药股份",
+          "changePercent": 9.90099048614502,
+          "latestPrice": 4.44,
+          "amount": 1973541120.0,
+          "freeMarketCap": 11182183849.44,
+          "totalMarketCap": 11182183831.68,
+          "turnoverRate": 18.15741539001465,
+          "sealAmount": 142209204.0,
+          "firstSealTime": "095912",
+          "lastSealTime": "100930",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 8,
+              "changePercent": 9.9
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "301408",
+          "name": "华人健康",
+          "changePercent": 19.976905822753906,
+          "latestPrice": 20.78,
+          "amount": 1272624496.0,
+          "freeMarketCap": 4757776394.34,
+          "totalMarketCap": 8312207800.0,
+          "turnoverRate": 28.432920455932617,
+          "sealAmount": 236041910.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "132733",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            },
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 2,
+              "changePercent": 19.98
+            },
+            {
+              "concept": "医药电商",
+              "rank": 1,
+              "changePercent": 19.98
+            },
+            {
+              "concept": "医疗器械概念",
+              "rank": 2,
+              "changePercent": 19.98
+            },
+            {
+              "concept": "智能医疗",
+              "rank": 1,
+              "changePercent": 19.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000788",
+          "name": "北大医药",
+          "changePercent": 10.081300735473633,
+          "latestPrice": 6.77,
+          "amount": 741744976.0,
+          "freeMarketCap": 4034834867.2499995,
+          "totalMarketCap": 4034834860.4799995,
+          "turnoverRate": 19.395427703857422,
+          "sealAmount": 155694429.0,
+          "firstSealTime": "132157",
+          "lastSealTime": "132157",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 5,
+              "changePercent": 10.08
+            },
+            {
+              "concept": "医药电商",
+              "rank": 6,
+              "changePercent": 10.08
+            },
+            {
+              "concept": "医疗器械概念",
+              "rank": 4,
+              "changePercent": 10.08
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 3,
+              "changePercent": 10.08
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002788",
+          "name": "鹭燕医药",
+          "changePercent": 10.0,
+          "latestPrice": 15.95,
+          "amount": 1091815776.0,
+          "freeMarketCap": 6089611125.95,
+          "totalMarketCap": 6196841939.2,
+          "turnoverRate": 18.716392517089844,
+          "sealAmount": 121809527.0,
+          "firstSealTime": "111912",
+          "lastSealTime": "111912",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            },
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医药电商",
+              "rank": 8,
+              "changePercent": 10.0
+            },
+            {
+              "concept": "医疗器械概念",
+              "rank": 6,
+              "changePercent": 10.0
+            },
+            {
+              "concept": "智能医疗",
+              "rank": 8,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "688166",
+          "name": "博瑞医药",
+          "changePercent": 20.0,
+          "latestPrice": 57.66,
+          "amount": 1525964096.0,
+          "freeMarketCap": 24396202817.64,
+          "totalMarketCap": 24396202471.68,
+          "turnoverRate": 6.732831001281738,
+          "sealAmount": 120621894.0,
+          "firstSealTime": "112213",
+          "lastSealTime": "131104",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "减肥药",
+              "code": "309081",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 1,
+              "changePercent": 20.0
+            },
+            {
+              "concept": "减肥药",
+              "rank": 1,
+              "changePercent": 20.0
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 1,
+              "changePercent": 20.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000919",
+          "name": "金陵药业",
+          "changePercent": 9.986684799194336,
+          "latestPrice": 8.26,
+          "amount": 591954928.0,
+          "freeMarketCap": 5135793173.28,
+          "totalMarketCap": 5137096601.28,
+          "turnoverRate": 11.965309143066406,
+          "sealAmount": 111382093.0,
+          "firstSealTime": "095530",
+          "lastSealTime": "095530",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            },
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 7,
+              "changePercent": 9.99
+            },
+            {
+              "concept": "医疗器械概念",
+              "rank": 7,
+              "changePercent": 9.99
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 5,
+              "changePercent": 9.99
+            },
+            {
+              "concept": "医美概念",
+              "rank": 3,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002589",
+          "name": "瑞康医药",
+          "changePercent": 10.122699737548828,
+          "latestPrice": 3.59,
+          "amount": 331610960.0,
+          "freeMarketCap": 4902473657.32,
+          "totalMarketCap": 5401910565.76,
+          "turnoverRate": 6.881252765655518,
+          "sealAmount": 108408210.0,
+          "firstSealTime": "093439",
+          "lastSealTime": "093439",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            },
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 3,
+              "changePercent": 10.12
+            },
+            {
+              "concept": "医药电商",
+              "rank": 4,
+              "changePercent": 10.12
+            },
+            {
+              "concept": "医疗器械概念",
+              "rank": 3,
+              "changePercent": 10.12
+            },
+            {
+              "concept": "智能医疗",
+              "rank": 5,
+              "changePercent": 10.12
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002038",
+          "name": "双鹭药业",
+          "changePercent": 9.945504188537598,
+          "latestPrice": 8.07,
+          "amount": 1089549872.0,
+          "freeMarketCap": 6874941694.83,
+          "totalMarketCap": 8290714500.0,
+          "turnoverRate": 16.691652297973633,
+          "sealAmount": 104531517.0,
+          "firstSealTime": "112112",
+          "lastSealTime": "112112",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "减肥药",
+              "code": "309081",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            },
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 9,
+              "changePercent": 9.95
+            },
+            {
+              "concept": "医药电商",
+              "rank": 9,
+              "changePercent": 9.95
+            },
+            {
+              "concept": "减肥药",
+              "rank": 3,
+              "changePercent": 9.95
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 7,
+              "changePercent": 9.95
+            },
+            {
+              "concept": "医美概念",
+              "rank": 4,
+              "changePercent": 9.95
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "688805",
+          "name": "健信超导",
+          "changePercent": 20.008432388305664,
+          "latestPrice": 56.92,
+          "amount": 517692320.0,
+          "freeMarketCap": 1794053454.28,
+          "totalMarketCap": 9544345600.0,
+          "turnoverRate": 29.89674186706543,
+          "sealAmount": 94036962.0,
+          "firstSealTime": "095247",
+          "lastSealTime": "095247",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医疗器械",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 1,
+              "changePercent": 20.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600572",
+          "name": "康恩贝",
+          "changePercent": 10.091742515563965,
+          "latestPrice": 4.8,
+          "amount": 966306000.0,
+          "freeMarketCap": 12144735782.4,
+          "totalMarketCap": 12177096652.8,
+          "turnoverRate": 8.200553894042969,
+          "sealAmount": 83696928.0,
+          "firstSealTime": "132722",
+          "lastSealTime": "132722",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 4,
+              "changePercent": 10.09
+            },
+            {
+              "concept": "医药电商",
+              "rank": 5,
+              "changePercent": 10.09
+            },
+            {
+              "concept": "智能医疗",
+              "rank": 6,
+              "changePercent": 10.09
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 2,
+              "changePercent": 10.09
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600267",
+          "name": "海正药业",
+          "changePercent": 10.048309326171875,
+          "latestPrice": 11.39,
+          "amount": 548437456.0,
+          "freeMarketCap": 13653890022.44,
+          "totalMarketCap": 13653890068.0,
+          "turnoverRate": 4.115350246429443,
+          "sealAmount": 65966324.0,
+          "firstSealTime": "095439",
+          "lastSealTime": "095754",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            },
+            {
+              "name": "减肥药",
+              "code": "309081",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            },
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 6,
+              "changePercent": 10.05
+            },
+            {
+              "concept": "医药电商",
+              "rank": 7,
+              "changePercent": 10.05
+            },
+            {
+              "concept": "智能医疗",
+              "rank": 7,
+              "changePercent": 10.05
+            },
+            {
+              "concept": "减肥药",
+              "rank": 2,
+              "changePercent": 10.05
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 4,
+              "changePercent": 10.05
+            },
+            {
+              "concept": "医美概念",
+              "rank": 2,
+              "changePercent": 10.05
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600135",
+          "name": "乐凯胶片",
+          "changePercent": 10.019646644592285,
+          "latestPrice": 11.2,
+          "amount": 272931152.0,
+          "freeMarketCap": 6197039508.799999,
+          "totalMarketCap": 6197039564.799999,
+          "turnoverRate": 4.526124477386475,
+          "sealAmount": 62345169.0,
+          "firstSealTime": "095015",
+          "lastSealTime": "095015",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 5,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600594",
+          "name": "益佰制药",
+          "changePercent": 9.930715560913086,
+          "latestPrice": 4.76,
+          "amount": 855563600.0,
+          "freeMarketCap": 3769574424.0,
+          "totalMarketCap": 3769574462.08,
+          "turnoverRate": 23.650663375854492,
+          "sealAmount": 16813614.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "145203",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "医药电商",
+              "code": "301565",
+              "matchType": "alias"
+            },
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 10,
+              "changePercent": 9.93
+            },
+            {
+              "concept": "医药电商",
+              "rank": 10,
+              "changePercent": 9.93
+            },
+            {
+              "concept": "医美概念",
+              "rank": 5,
+              "changePercent": 9.93
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600488",
+          "name": "津药药业",
+          "changePercent": 9.967845916748047,
+          "latestPrice": 6.84,
+          "amount": 1582721168.0,
+          "freeMarketCap": 7468504891.2,
+          "totalMarketCap": 7468504945.92,
+          "turnoverRate": 22.38966941833496,
+          "sealAmount": 7497324.0,
+          "firstSealTime": "132329",
+          "lastSealTime": "134553",
+          "openCount": 5,
+          "limitStats": "13/8",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "创新药",
+              "code": "308014",
+              "matchType": "alias"
+            },
+            {
+              "name": "仿制药一致性评价",
+              "code": "308572",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "创新药",
+              "rank": 8,
+              "changePercent": 9.97
+            },
+            {
+              "concept": "仿制药一致性评价",
+              "rank": 6,
+              "changePercent": 9.97
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801807",
+      "plateName": "算力",
+      "matchedConcepts": [
+        {
+          "name": "东数西算(算力)",
+          "code": "308828",
+          "matchType": "alias"
+        },
+        {
+          "name": "算力租赁",
+          "code": "309068",
+          "matchType": "alias"
+        },
+        {
+          "name": "云计算",
+          "code": "300419",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002580",
+          "name": "圣阳股份",
+          "changePercent": 10.013060569763184,
+          "latestPrice": 25.27,
+          "amount": 2708185808.0,
+          "freeMarketCap": 11430601476.0,
+          "totalMarketCap": 11469269427.84,
+          "turnoverRate": 23.85525131225586,
+          "sealAmount": 240706453.0,
+          "firstSealTime": "093021",
+          "lastSealTime": "095939",
+          "openCount": 9,
+          "limitStats": "11/6",
+          "consecutiveBoards": 5,
+          "industry": "电池",
+          "matchedConcepts": [
+            {
+              "name": "东数西算(算力)",
+              "code": "308828",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "东数西算(算力)",
+              "rank": 7,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603629",
+          "name": "利通电子",
+          "changePercent": 10.006254196166992,
+          "latestPrice": 87.95,
+          "amount": 3714265696.0,
+          "freeMarketCap": 22590133400.0,
+          "totalMarketCap": 23071044000.0,
+          "turnoverRate": 17.216487884521484,
+          "sealAmount": 152637225.0,
+          "firstSealTime": "130619",
+          "lastSealTime": "130619",
+          "openCount": 0,
+          "limitStats": "6/3",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "东数西算(算力)",
+              "code": "308828",
+              "matchType": "alias"
+            },
+            {
+              "name": "算力租赁",
+              "code": "309068",
+              "matchType": "alias"
+            },
+            {
+              "name": "云计算",
+              "code": "300419",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "东数西算(算力)",
+              "rank": 8,
+              "changePercent": 10.01
+            },
+            {
+              "concept": "算力租赁",
+              "rank": 4,
+              "changePercent": 10.01
+            },
+            {
+              "concept": "云计算",
+              "rank": 4,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000889",
+          "name": "中嘉博创",
+          "changePercent": 9.976798057556152,
+          "latestPrice": 4.74,
+          "amount": 1402350160.0,
+          "freeMarketCap": 4123087464.2400002,
+          "totalMarketCap": 4438019908.8,
+          "turnoverRate": 36.60606384277344,
+          "sealAmount": 52194353.0,
+          "firstSealTime": "144354",
+          "lastSealTime": "144354",
+          "openCount": 0,
+          "limitStats": "6/5",
+          "consecutiveBoards": 2,
+          "industry": "通信服务",
+          "matchedConcepts": [
+            {
+              "name": "算力租赁",
+              "code": "309068",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "算力租赁",
+              "rank": 5,
+              "changePercent": 9.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603459",
+          "name": "红板科技",
+          "changePercent": 10.003216743469238,
+          "latestPrice": 68.4,
+          "amount": 1710739824.0,
+          "freeMarketCap": 5407147087.200001,
+          "totalMarketCap": 51556745145.600006,
+          "turnoverRate": 32.45186233520508,
+          "sealAmount": 233495917.0,
+          "firstSealTime": "093453",
+          "lastSealTime": "095011",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "元件",
+          "matchedConcepts": [
+            {
+              "name": "东数西算(算力)",
+              "code": "308828",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "东数西算(算力)",
+              "rank": 9,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001896",
+          "name": "豫能控股",
+          "changePercent": 10.02656078338623,
+          "latestPrice": 16.57,
+          "amount": 4219852288.0,
+          "freeMarketCap": 25282196638.100002,
+          "totalMarketCap": 25282196604.96,
+          "turnoverRate": 17.448261260986328,
+          "sealAmount": 75347816.0,
+          "firstSealTime": "101957",
+          "lastSealTime": "143103",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电力",
+          "matchedConcepts": [
+            {
+              "name": "东数西算(算力)",
+              "code": "308828",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "东数西算(算力)",
+              "rank": 6,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605289",
+          "name": "罗曼股份",
+          "changePercent": 10.0,
+          "latestPrice": 126.61,
+          "amount": 698940496.0,
+          "freeMarketCap": 13716610875.0,
+          "totalMarketCap": 13801439575.0,
+          "turnoverRate": 5.24545955657959,
+          "sealAmount": 74965781.0,
+          "firstSealTime": "112520",
+          "lastSealTime": "112520",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "专业工程",
+          "matchedConcepts": [
+            {
+              "name": "东数西算(算力)",
+              "code": "308828",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "东数西算(算力)",
+              "rank": 10,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801843",
+      "plateName": "商业航天",
+      "matchedConcepts": [
+        {
+          "name": "商业航天",
+          "code": "309130",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002297",
+          "name": "博云新材",
+          "changePercent": 10.007524490356445,
+          "latestPrice": 14.62,
+          "amount": 143482888.0,
+          "freeMarketCap": 8378792453.78,
+          "totalMarketCap": 8378792409.919999,
+          "turnoverRate": 1.712453007698059,
+          "sealAmount": 608327220.0,
+          "firstSealTime": "092500",
+          "lastSealTime": "092500",
+          "openCount": 0,
+          "limitStats": "3/3",
+          "consecutiveBoards": 3,
+          "industry": "航空装备",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 6,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002361",
+          "name": "神剑股份",
+          "changePercent": 10.02967357635498,
+          "latestPrice": 18.54,
+          "amount": 5460270592.0,
+          "freeMarketCap": 15001140123.359999,
+          "totalMarketCap": 17632188455.04,
+          "turnoverRate": 38.1609001159668,
+          "sealAmount": 271306944.0,
+          "firstSealTime": "103845",
+          "lastSealTime": "103921",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 3,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603459",
+          "name": "红板科技",
+          "changePercent": 10.003216743469238,
+          "latestPrice": 68.4,
+          "amount": 1710739824.0,
+          "freeMarketCap": 5407147087.200001,
+          "totalMarketCap": 51556745145.600006,
+          "turnoverRate": 32.45186233520508,
+          "sealAmount": 233495917.0,
+          "firstSealTime": "093453",
+          "lastSealTime": "095011",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "元件",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 7,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001208",
+          "name": "华菱线缆",
+          "changePercent": 10.025707244873047,
+          "latestPrice": 21.4,
+          "amount": 926643872.0,
+          "freeMarketCap": 5632699285.799999,
+          "totalMarketCap": 13660699244.8,
+          "turnoverRate": 16.928800582885742,
+          "sealAmount": 139851268.0,
+          "firstSealTime": "102048",
+          "lastSealTime": "102048",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 4,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603773",
+          "name": "沃格光电",
+          "changePercent": 9.99555778503418,
+          "latestPrice": 49.52,
+          "amount": 890186512.0,
+          "freeMarketCap": 11125095506.16,
+          "totalMarketCap": 11128958066.16,
+          "turnoverRate": 8.40613842010498,
+          "sealAmount": 63264176.0,
+          "firstSealTime": "103335",
+          "lastSealTime": "103335",
+          "openCount": 0,
+          "limitStats": "5/3",
+          "consecutiveBoards": 1,
+          "industry": "光学光电",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 9,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000026",
+          "name": "飞亚达",
+          "changePercent": 10.0,
+          "latestPrice": 17.82,
+          "amount": 627411168.0,
+          "freeMarketCap": 6496472262.06,
+          "totalMarketCap": 7230714480.0,
+          "turnoverRate": 10.043201446533203,
+          "sealAmount": 35536626.0,
+          "firstSealTime": "132930",
+          "lastSealTime": "135615",
+          "openCount": 3,
+          "limitStats": "3/2",
+          "consecutiveBoards": 1,
+          "industry": "饰品",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 8,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605222",
+          "name": "起帆电缆",
+          "changePercent": 10.021322250366211,
+          "latestPrice": 25.8,
+          "amount": 587966528.0,
+          "freeMarketCap": 10652905836.6,
+          "totalMarketCap": 10652905862.4,
+          "turnoverRate": 5.713198184967041,
+          "sealAmount": 14140980.0,
+          "firstSealTime": "131327",
+          "lastSealTime": "131327",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "商业航天",
+              "code": "309130",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "商业航天",
+              "rank": 5,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801314",
+      "plateName": "ST板块",
+      "matchedConcepts": [
+        {
+          "name": "ST板块",
+          "code": "300862",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801408",
+      "plateName": "智能家居",
+      "matchedConcepts": [
+        {
+          "name": "智能家居",
+          "code": "300920",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "301189",
+          "name": "奥尼电子",
+          "changePercent": 20.002777099609375,
+          "latestPrice": 86.39,
+          "amount": 1139401136.0,
+          "freeMarketCap": 9654762648.47,
+          "totalMarketCap": 10055490611.35,
+          "turnoverRate": 11.908071517944336,
+          "sealAmount": 68379412.0,
+          "firstSealTime": "094030",
+          "lastSealTime": "141654",
+          "openCount": 3,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 1,
+              "changePercent": 20.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002824",
+          "name": "和胜股份",
+          "changePercent": 9.988860130310059,
+          "latestPrice": 29.62,
+          "amount": 984461680.0,
+          "freeMarketCap": 6516433766.8,
+          "totalMarketCap": 9217117003.84,
+          "turnoverRate": 15.540926933288574,
+          "sealAmount": 81316970.0,
+          "firstSealTime": "100403",
+          "lastSealTime": "112448",
+          "openCount": 4,
+          "limitStats": "5/3",
+          "consecutiveBoards": 1,
+          "industry": "工业金属",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 8,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002705",
+          "name": "新宝股份",
+          "changePercent": 10.02538013458252,
+          "latestPrice": 17.34,
+          "amount": 834157504.0,
+          "freeMarketCap": 14012512956.0,
+          "totalMarketCap": 14077925955.84,
+          "turnoverRate": 6.151033878326416,
+          "sealAmount": 80948322.0,
+          "firstSealTime": "130548",
+          "lastSealTime": "130548",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "小家电",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 5,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002798",
+          "name": "帝欧水华",
+          "changePercent": 10.066006660461426,
+          "latestPrice": 6.67,
+          "amount": 132362092.0,
+          "freeMarketCap": 3197745073.5,
+          "totalMarketCap": 3669684485.2799997,
+          "turnoverRate": 4.22760009765625,
+          "sealAmount": 74122315.0,
+          "firstSealTime": "094857",
+          "lastSealTime": "094857",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "家居用品",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 4,
+              "changePercent": 10.07
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605365",
+          "name": "立达信",
+          "changePercent": 9.990706443786621,
+          "latestPrice": 23.67,
+          "amount": 212408048.0,
+          "freeMarketCap": 11882644774.92,
+          "totalMarketCap": 11882644869.6,
+          "turnoverRate": 1.8055415153503418,
+          "sealAmount": 53730900.0,
+          "firstSealTime": "093504",
+          "lastSealTime": "093504",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "照明设备",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 7,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000785",
+          "name": "居然智家",
+          "changePercent": 10.204081535339355,
+          "latestPrice": 2.7,
+          "amount": 349311280.0,
+          "freeMarketCap": 15923502352.800001,
+          "totalMarketCap": 16813031500.800001,
+          "turnoverRate": 2.2299067974090576,
+          "sealAmount": 51101741.0,
+          "firstSealTime": "093539",
+          "lastSealTime": "093815",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "一般零售",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 3,
+              "changePercent": 10.2
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603216",
+          "name": "梦天家居",
+          "changePercent": 10.016583442687988,
+          "latestPrice": 33.17,
+          "amount": 356901808.0,
+          "freeMarketCap": 7386627300.0,
+          "totalMarketCap": 7386627300.0,
+          "turnoverRate": 4.980373859405518,
+          "sealAmount": 31100192.0,
+          "firstSealTime": "105707",
+          "lastSealTime": "105707",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "家居用品",
+          "matchedConcepts": [
+            {
+              "name": "智能家居",
+              "code": "300920",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能家居",
+              "rank": 6,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801571",
+      "plateName": "一季报增长",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801001",
+      "plateName": "芯片",
+      "matchedConcepts": [
+        {
+          "name": "芯片概念",
+          "code": "301085",
+          "matchType": "alias"
+        },
+        {
+          "name": "存储芯片",
+          "code": "307940",
+          "matchType": "alias"
+        },
+        {
+          "name": "汽车芯片",
+          "code": "308725",
+          "matchType": "alias"
+        },
+        {
+          "name": "MCU芯片",
+          "code": "308300",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603629",
+          "name": "利通电子",
+          "changePercent": 10.006254196166992,
+          "latestPrice": 87.95,
+          "amount": 3714265696.0,
+          "freeMarketCap": 22590133400.0,
+          "totalMarketCap": 23071044000.0,
+          "turnoverRate": 17.216487884521484,
+          "sealAmount": 152637225.0,
+          "firstSealTime": "130619",
+          "lastSealTime": "130619",
+          "openCount": 0,
+          "limitStats": "6/3",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "芯片概念",
+              "code": "301085",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "芯片概念",
+              "rank": 8,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600605",
+          "name": "汇通能源",
+          "changePercent": 10.003402709960938,
+          "latestPrice": 32.33,
+          "amount": 598343552.0,
+          "freeMarketCap": 6669110929.57,
+          "totalMarketCap": 6669110929.57,
+          "turnoverRate": 9.162453651428223,
+          "sealAmount": 30037803.0,
+          "firstSealTime": "093124",
+          "lastSealTime": "130721",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "一般零售",
+          "matchedConcepts": [
+            {
+              "name": "芯片概念",
+              "code": "301085",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "芯片概念",
+              "rank": 10,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002990",
+          "name": "盛视科技",
+          "changePercent": 10.005224227905273,
+          "latestPrice": 42.11,
+          "amount": 1186953520.0,
+          "freeMarketCap": 5718479593.43,
+          "totalMarketCap": 11026593531.18,
+          "turnoverRate": 21.889394760131836,
+          "sealAmount": 19324279.0,
+          "firstSealTime": "135339",
+          "lastSealTime": "135657",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "计算机设",
+          "matchedConcepts": [
+            {
+              "name": "芯片概念",
+              "code": "301085",
+              "matchType": "alias"
+            },
+            {
+              "name": "存储芯片",
+              "code": "307940",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "芯片概念",
+              "rank": 9,
+              "changePercent": 10.01
+            },
+            {
+              "concept": "存储芯片",
+              "rank": 2,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603459",
+          "name": "红板科技",
+          "changePercent": 10.003216743469238,
+          "latestPrice": 68.4,
+          "amount": 1710739824.0,
+          "freeMarketCap": 5407147087.200001,
+          "totalMarketCap": 51556745145.600006,
+          "turnoverRate": 32.45186233520508,
+          "sealAmount": 233495917.0,
+          "firstSealTime": "093453",
+          "lastSealTime": "095011",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "元件",
+          "matchedConcepts": [
+            {
+              "name": "存储芯片",
+              "code": "307940",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "存储芯片",
+              "rank": 3,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002787",
+          "name": "华源控股",
+          "changePercent": 10.026385307312012,
+          "latestPrice": 16.68,
+          "amount": 456971200.0,
+          "freeMarketCap": 4184346701.52,
+          "totalMarketCap": 5590745554.559999,
+          "turnoverRate": 11.114302635192871,
+          "sealAmount": 79231668.0,
+          "firstSealTime": "094357",
+          "lastSealTime": "100248",
+          "openCount": 1,
+          "limitStats": "4/2",
+          "consecutiveBoards": 1,
+          "industry": "包装印刷",
+          "matchedConcepts": [
+            {
+              "name": "芯片概念",
+              "code": "301085",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "芯片概念",
+              "rank": 6,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603773",
+          "name": "沃格光电",
+          "changePercent": 9.99555778503418,
+          "latestPrice": 49.52,
+          "amount": 890186512.0,
+          "freeMarketCap": 11125095506.16,
+          "totalMarketCap": 11128958066.16,
+          "turnoverRate": 8.40613842010498,
+          "sealAmount": 63264176.0,
+          "firstSealTime": "103335",
+          "lastSealTime": "103335",
+          "openCount": 0,
+          "limitStats": "5/3",
+          "consecutiveBoards": 1,
+          "industry": "光学光电",
+          "matchedConcepts": [
+            {
+              "name": "存储芯片",
+              "code": "307940",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "存储芯片",
+              "rank": 4,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603216",
+          "name": "梦天家居",
+          "changePercent": 10.016583442687988,
+          "latestPrice": 33.17,
+          "amount": 356901808.0,
+          "freeMarketCap": 7386627300.0,
+          "totalMarketCap": 7386627300.0,
+          "turnoverRate": 4.980373859405518,
+          "sealAmount": 31100192.0,
+          "firstSealTime": "105707",
+          "lastSealTime": "105707",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "家居用品",
+          "matchedConcepts": [
+            {
+              "name": "芯片概念",
+              "code": "301085",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "芯片概念",
+              "rank": 7,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801346",
+      "plateName": "智能电网",
+      "matchedConcepts": [
+        {
+          "name": "智能电网",
+          "code": "300037",
+          "matchType": "exact"
+        },
+        {
+          "name": "电力物联网",
+          "code": "308477",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603063",
+          "name": "禾望电气",
+          "changePercent": 10.00867748260498,
+          "latestPrice": 38.03,
+          "amount": 2503207808.0,
+          "freeMarketCap": 17448201725.760002,
+          "totalMarketCap": 17448201725.760002,
+          "turnoverRate": 14.490106582641602,
+          "sealAmount": 183878510.0,
+          "firstSealTime": "093455",
+          "lastSealTime": "130031",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "风电设备",
+          "matchedConcepts": [
+            {
+              "name": "智能电网",
+              "code": "300037",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能电网",
+              "rank": 4,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002498",
+          "name": "汉缆股份",
+          "changePercent": 9.961190223693848,
+          "latestPrice": 8.5,
+          "amount": 1449685232.0,
+          "freeMarketCap": 28277766000.0,
+          "totalMarketCap": 28277766000.0,
+          "turnoverRate": 5.213320732116699,
+          "sealAmount": 125480901.0,
+          "firstSealTime": "094309",
+          "lastSealTime": "105757",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "智能电网",
+              "code": "300037",
+              "matchType": "exact"
+            },
+            {
+              "name": "电力物联网",
+              "code": "308477",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能电网",
+              "rank": 5,
+              "changePercent": 9.96
+            },
+            {
+              "concept": "电力物联网",
+              "rank": 2,
+              "changePercent": 9.96
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801250",
+      "plateName": "并购重组",
+      "matchedConcepts": [
+        {
+          "name": "股权转让(并购重组)",
+          "code": "302154",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002361",
+          "name": "神剑股份",
+          "changePercent": 10.02967357635498,
+          "latestPrice": 18.54,
+          "amount": 5460270592.0,
+          "freeMarketCap": 15001140123.359999,
+          "totalMarketCap": 17632188455.04,
+          "turnoverRate": 38.1609001159668,
+          "sealAmount": 271306944.0,
+          "firstSealTime": "103845",
+          "lastSealTime": "103921",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "股权转让(并购重组)",
+              "code": "302154",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "股权转让(并购重组)",
+              "rank": 5,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000788",
+          "name": "北大医药",
+          "changePercent": 10.081300735473633,
+          "latestPrice": 6.77,
+          "amount": 741744976.0,
+          "freeMarketCap": 4034834867.2499995,
+          "totalMarketCap": 4034834860.4799995,
+          "turnoverRate": 19.395427703857422,
+          "sealAmount": 155694429.0,
+          "firstSealTime": "132157",
+          "lastSealTime": "132157",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "股权转让(并购重组)",
+              "code": "302154",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "股权转让(并购重组)",
+              "rank": 3,
+              "changePercent": 10.08
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605289",
+          "name": "罗曼股份",
+          "changePercent": 10.0,
+          "latestPrice": 126.61,
+          "amount": 698940496.0,
+          "freeMarketCap": 13716610875.0,
+          "totalMarketCap": 13801439575.0,
+          "turnoverRate": 5.24545955657959,
+          "sealAmount": 74965781.0,
+          "firstSealTime": "112520",
+          "lastSealTime": "112520",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "专业工程",
+          "matchedConcepts": [
+            {
+              "name": "股权转让(并购重组)",
+              "code": "302154",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "股权转让(并购重组)",
+              "rank": 6,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002798",
+          "name": "帝欧水华",
+          "changePercent": 10.066006660461426,
+          "latestPrice": 6.67,
+          "amount": 132362092.0,
+          "freeMarketCap": 3197745073.5,
+          "totalMarketCap": 3669684485.2799997,
+          "turnoverRate": 4.22760009765625,
+          "sealAmount": 74122315.0,
+          "firstSealTime": "094857",
+          "lastSealTime": "094857",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "家居用品",
+          "matchedConcepts": [
+            {
+              "name": "股权转让(并购重组)",
+              "code": "302154",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "股权转让(并购重组)",
+              "rank": 4,
+              "changePercent": 10.07
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801033",
+      "plateName": "国有企业",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801631",
+      "plateName": "次新股",
+      "matchedConcepts": [
+        {
+          "name": "科创次新股",
+          "code": "308699",
+          "matchType": "name_contains"
+        },
+        {
+          "name": "新股与次新股",
+          "code": "300870",
+          "matchType": "name_contains"
+        },
+        {
+          "name": "注册制次新股",
+          "code": "308697",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603459",
+          "name": "红板科技",
+          "changePercent": 10.003216743469238,
+          "latestPrice": 68.4,
+          "amount": 1710739824.0,
+          "freeMarketCap": 5407147087.200001,
+          "totalMarketCap": 51556745145.600006,
+          "turnoverRate": 32.45186233520508,
+          "sealAmount": 233495917.0,
+          "firstSealTime": "093453",
+          "lastSealTime": "095011",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "元件",
+          "matchedConcepts": [
+            {
+              "name": "新股与次新股",
+              "code": "300870",
+              "matchType": "name_contains"
+            },
+            {
+              "name": "注册制次新股",
+              "code": "308697",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "新股与次新股",
+              "rank": 3,
+              "changePercent": 10.0
+            },
+            {
+              "concept": "注册制次新股",
+              "rank": 3,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "688805",
+          "name": "健信超导",
+          "changePercent": 20.008432388305664,
+          "latestPrice": 56.92,
+          "amount": 517692320.0,
+          "freeMarketCap": 1794053454.28,
+          "totalMarketCap": 9544345600.0,
+          "turnoverRate": 29.89674186706543,
+          "sealAmount": 94036962.0,
+          "firstSealTime": "095247",
+          "lastSealTime": "095247",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医疗器械",
+          "matchedConcepts": [
+            {
+              "name": "科创次新股",
+              "code": "308699",
+              "matchType": "name_contains"
+            },
+            {
+              "name": "新股与次新股",
+              "code": "300870",
+              "matchType": "name_contains"
+            },
+            {
+              "name": "注册制次新股",
+              "code": "308697",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "科创次新股",
+              "rank": 1,
+              "changePercent": 20.01
+            },
+            {
+              "concept": "新股与次新股",
+              "rank": 1,
+              "changePercent": 20.01
+            },
+            {
+              "concept": "注册制次新股",
+              "rank": 1,
+              "changePercent": 20.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801270",
+      "plateName": "基础建设",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "803014",
+      "plateName": "海峡两岸",
+      "matchedConcepts": [
+        {
+          "name": "海峡两岸",
+          "code": "300066",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002788",
+          "name": "鹭燕医药",
+          "changePercent": 10.0,
+          "latestPrice": 15.95,
+          "amount": 1091815776.0,
+          "freeMarketCap": 6089611125.95,
+          "totalMarketCap": 6196841939.2,
+          "turnoverRate": 18.716392517089844,
+          "sealAmount": 121809527.0,
+          "firstSealTime": "111912",
+          "lastSealTime": "111912",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "海峡两岸",
+              "code": "300066",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "海峡两岸",
+              "rank": 5,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603444",
+          "name": "吉比特",
+          "changePercent": 10.00055980682373,
+          "latestPrice": 393.34,
+          "amount": 1443282592.0,
+          "freeMarketCap": 28336646667.339996,
+          "totalMarketCap": 28336646667.339996,
+          "turnoverRate": 5.156619071960449,
+          "sealAmount": 88501500.0,
+          "firstSealTime": "093843",
+          "lastSealTime": "105519",
+          "openCount": 3,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "游戏Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "海峡两岸",
+              "code": "300066",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "海峡两岸",
+              "rank": 4,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002787",
+          "name": "华源控股",
+          "changePercent": 10.026385307312012,
+          "latestPrice": 16.68,
+          "amount": 456971200.0,
+          "freeMarketCap": 4184346701.52,
+          "totalMarketCap": 5590745554.559999,
+          "turnoverRate": 11.114302635192871,
+          "sealAmount": 79231668.0,
+          "firstSealTime": "094357",
+          "lastSealTime": "100248",
+          "openCount": 1,
+          "limitStats": "4/2",
+          "consecutiveBoards": 1,
+          "industry": "包装印刷",
+          "matchedConcepts": [
+            {
+              "name": "海峡两岸",
+              "code": "300066",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "海峡两岸",
+              "rank": 3,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605365",
+          "name": "立达信",
+          "changePercent": 9.990706443786621,
+          "latestPrice": 23.67,
+          "amount": 212408048.0,
+          "freeMarketCap": 11882644774.92,
+          "totalMarketCap": 11882644869.6,
+          "turnoverRate": 1.8055415153503418,
+          "sealAmount": 53730900.0,
+          "firstSealTime": "093504",
+          "lastSealTime": "093504",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "照明设备",
+          "matchedConcepts": [
+            {
+              "name": "海峡两岸",
+              "code": "300066",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "海峡两岸",
+              "rank": 6,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801328",
+      "plateName": "消费电子",
+      "matchedConcepts": [
+        {
+          "name": "消费电子概念",
+          "code": "308384",
+          "matchType": "alias"
+        },
+        {
+          "name": "AI手机",
+          "code": "309120",
+          "matchType": "alias"
+        },
+        {
+          "name": "AI PC",
+          "code": "309121",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603629",
+          "name": "利通电子",
+          "changePercent": 10.006254196166992,
+          "latestPrice": 87.95,
+          "amount": 3714265696.0,
+          "freeMarketCap": 22590133400.0,
+          "totalMarketCap": 23071044000.0,
+          "turnoverRate": 17.216487884521484,
+          "sealAmount": 152637225.0,
+          "firstSealTime": "130619",
+          "lastSealTime": "130619",
+          "openCount": 0,
+          "limitStats": "6/3",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 4,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "301189",
+          "name": "奥尼电子",
+          "changePercent": 20.002777099609375,
+          "latestPrice": 86.39,
+          "amount": 1139401136.0,
+          "freeMarketCap": 9654762648.47,
+          "totalMarketCap": 10055490611.35,
+          "turnoverRate": 11.908071517944336,
+          "sealAmount": 68379412.0,
+          "firstSealTime": "094030",
+          "lastSealTime": "141654",
+          "openCount": 3,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 1,
+              "changePercent": 20.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603459",
+          "name": "红板科技",
+          "changePercent": 10.003216743469238,
+          "latestPrice": 68.4,
+          "amount": 1710739824.0,
+          "freeMarketCap": 5407147087.200001,
+          "totalMarketCap": 51556745145.600006,
+          "turnoverRate": 32.45186233520508,
+          "sealAmount": 233495917.0,
+          "firstSealTime": "093453",
+          "lastSealTime": "095011",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "元件",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 5,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002824",
+          "name": "和胜股份",
+          "changePercent": 9.988860130310059,
+          "latestPrice": 29.62,
+          "amount": 984461680.0,
+          "freeMarketCap": 6516433766.8,
+          "totalMarketCap": 9217117003.84,
+          "turnoverRate": 15.540926933288574,
+          "sealAmount": 81316970.0,
+          "firstSealTime": "100403",
+          "lastSealTime": "112448",
+          "openCount": 4,
+          "limitStats": "5/3",
+          "consecutiveBoards": 1,
+          "industry": "工业金属",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 8,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603773",
+          "name": "沃格光电",
+          "changePercent": 9.99555778503418,
+          "latestPrice": 49.52,
+          "amount": 890186512.0,
+          "freeMarketCap": 11125095506.16,
+          "totalMarketCap": 11128958066.16,
+          "turnoverRate": 8.40613842010498,
+          "sealAmount": 63264176.0,
+          "firstSealTime": "103335",
+          "lastSealTime": "103335",
+          "openCount": 0,
+          "limitStats": "5/3",
+          "consecutiveBoards": 1,
+          "industry": "光学光电",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 6,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603327",
+          "name": "福蓉科技",
+          "changePercent": 10.02087688446045,
+          "latestPrice": 10.54,
+          "amount": 501324800.0,
+          "freeMarketCap": 11019141654.4,
+          "totalMarketCap": 11019141654.4,
+          "turnoverRate": 4.620234489440918,
+          "sealAmount": 43884206.0,
+          "firstSealTime": "093733",
+          "lastSealTime": "093839",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            },
+            {
+              "name": "AI手机",
+              "code": "309120",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 3,
+              "changePercent": 10.02
+            },
+            {
+              "concept": "AI手机",
+              "rank": 1,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603890",
+          "name": "春秋电子",
+          "changePercent": 9.994120597839355,
+          "latestPrice": 18.71,
+          "amount": 1239916512.0,
+          "freeMarketCap": 8359785182.71,
+          "totalMarketCap": 8359785164.0,
+          "turnoverRate": 15.115296363830566,
+          "sealAmount": 26634975.0,
+          "firstSealTime": "094235",
+          "lastSealTime": "095129",
+          "openCount": 4,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "消费电子概念",
+              "code": "308384",
+              "matchType": "alias"
+            },
+            {
+              "name": "AI PC",
+              "code": "309121",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "消费电子概念",
+              "rank": 7,
+              "changePercent": 9.99
+            },
+            {
+              "concept": "AI PC",
+              "rank": 1,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801046",
+      "plateName": "医疗器械",
+      "matchedConcepts": [
+        {
+          "name": "医疗器械概念",
+          "code": "301505",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "301408",
+          "name": "华人健康",
+          "changePercent": 19.976905822753906,
+          "latestPrice": 20.78,
+          "amount": 1272624496.0,
+          "freeMarketCap": 4757776394.34,
+          "totalMarketCap": 8312207800.0,
+          "turnoverRate": 28.432920455932617,
+          "sealAmount": 236041910.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "132733",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 2,
+              "changePercent": 19.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000788",
+          "name": "北大医药",
+          "changePercent": 10.081300735473633,
+          "latestPrice": 6.77,
+          "amount": 741744976.0,
+          "freeMarketCap": 4034834867.2499995,
+          "totalMarketCap": 4034834860.4799995,
+          "turnoverRate": 19.395427703857422,
+          "sealAmount": 155694429.0,
+          "firstSealTime": "132157",
+          "lastSealTime": "132157",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 4,
+              "changePercent": 10.08
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002788",
+          "name": "鹭燕医药",
+          "changePercent": 10.0,
+          "latestPrice": 15.95,
+          "amount": 1091815776.0,
+          "freeMarketCap": 6089611125.95,
+          "totalMarketCap": 6196841939.2,
+          "turnoverRate": 18.716392517089844,
+          "sealAmount": 121809527.0,
+          "firstSealTime": "111912",
+          "lastSealTime": "111912",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 6,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000919",
+          "name": "金陵药业",
+          "changePercent": 9.986684799194336,
+          "latestPrice": 8.26,
+          "amount": 591954928.0,
+          "freeMarketCap": 5135793173.28,
+          "totalMarketCap": 5137096601.28,
+          "turnoverRate": 11.965309143066406,
+          "sealAmount": 111382093.0,
+          "firstSealTime": "095530",
+          "lastSealTime": "095530",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 7,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002589",
+          "name": "瑞康医药",
+          "changePercent": 10.122699737548828,
+          "latestPrice": 3.59,
+          "amount": 331610960.0,
+          "freeMarketCap": 4902473657.32,
+          "totalMarketCap": 5401910565.76,
+          "turnoverRate": 6.881252765655518,
+          "sealAmount": 108408210.0,
+          "firstSealTime": "093439",
+          "lastSealTime": "093439",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 3,
+              "changePercent": 10.12
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "688805",
+          "name": "健信超导",
+          "changePercent": 20.008432388305664,
+          "latestPrice": 56.92,
+          "amount": 517692320.0,
+          "freeMarketCap": 1794053454.28,
+          "totalMarketCap": 9544345600.0,
+          "turnoverRate": 29.89674186706543,
+          "sealAmount": 94036962.0,
+          "firstSealTime": "095247",
+          "lastSealTime": "095247",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医疗器械",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 1,
+              "changePercent": 20.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600135",
+          "name": "乐凯胶片",
+          "changePercent": 10.019646644592285,
+          "latestPrice": 11.2,
+          "amount": 272931152.0,
+          "freeMarketCap": 6197039508.799999,
+          "totalMarketCap": 6197039564.799999,
+          "turnoverRate": 4.526124477386475,
+          "sealAmount": 62345169.0,
+          "firstSealTime": "095015",
+          "lastSealTime": "095015",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "医疗器械概念",
+              "code": "301505",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医疗器械概念",
+              "rank": 5,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801069",
+      "plateName": "家电",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801973",
+      "plateName": "保健品",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801243",
+      "plateName": "宠物经济",
+      "matchedConcepts": [
+        {
+          "name": "宠物经济",
+          "code": "308588",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "301189",
+          "name": "奥尼电子",
+          "changePercent": 20.002777099609375,
+          "latestPrice": 86.39,
+          "amount": 1139401136.0,
+          "freeMarketCap": 9654762648.47,
+          "totalMarketCap": 10055490611.35,
+          "turnoverRate": 11.908071517944336,
+          "sealAmount": 68379412.0,
+          "firstSealTime": "094030",
+          "lastSealTime": "141654",
+          "openCount": 3,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "宠物经济",
+              "code": "308588",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "宠物经济",
+              "rank": 1,
+              "changePercent": 20.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002891",
+          "name": "中宠股份",
+          "changePercent": 9.989484786987305,
+          "latestPrice": 41.84,
+          "amount": 926925536.0,
+          "freeMarketCap": 13373454468.720001,
+          "totalMarketCap": 13373454426.880001,
+          "turnoverRate": 7.138883113861084,
+          "sealAmount": 101214432.0,
+          "firstSealTime": "142003",
+          "lastSealTime": "142003",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "饲料",
+          "matchedConcepts": [
+            {
+              "name": "宠物经济",
+              "code": "308588",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "宠物经济",
+              "rank": 5,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002705",
+          "name": "新宝股份",
+          "changePercent": 10.02538013458252,
+          "latestPrice": 17.34,
+          "amount": 834157504.0,
+          "freeMarketCap": 14012512956.0,
+          "totalMarketCap": 14077925955.84,
+          "turnoverRate": 6.151033878326416,
+          "sealAmount": 80948322.0,
+          "firstSealTime": "130548",
+          "lastSealTime": "130548",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "小家电",
+          "matchedConcepts": [
+            {
+              "name": "宠物经济",
+              "code": "308588",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "宠物经济",
+              "rank": 4,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600267",
+          "name": "海正药业",
+          "changePercent": 10.048309326171875,
+          "latestPrice": 11.39,
+          "amount": 548437456.0,
+          "freeMarketCap": 13653890022.44,
+          "totalMarketCap": 13653890068.0,
+          "turnoverRate": 4.115350246429443,
+          "sealAmount": 65966324.0,
+          "firstSealTime": "095439",
+          "lastSealTime": "095754",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "宠物经济",
+              "code": "308588",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "宠物经济",
+              "rank": 3,
+              "changePercent": 10.05
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801082",
+      "plateName": "ST摘帽",
+      "matchedConcepts": [
+        {
+          "name": "摘帽",
+          "code": "301455",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002124",
+          "name": "天邦食品",
+          "changePercent": 10.175437927246094,
+          "latestPrice": 3.14,
+          "amount": 1211353408.0,
+          "freeMarketCap": 6193193594.72,
+          "totalMarketCap": 6976872257.6,
+          "turnoverRate": 19.74380111694336,
+          "sealAmount": 84476453.0,
+          "firstSealTime": "093218",
+          "lastSealTime": "131318",
+          "openCount": 4,
+          "limitStats": "3/3",
+          "consecutiveBoards": 3,
+          "industry": "养殖业",
+          "matchedConcepts": [
+            {
+              "name": "摘帽",
+              "code": "301455",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "摘帽",
+              "rank": 2,
+              "changePercent": 10.18
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000889",
+          "name": "中嘉博创",
+          "changePercent": 9.976798057556152,
+          "latestPrice": 4.74,
+          "amount": 1402350160.0,
+          "freeMarketCap": 4123087464.2400002,
+          "totalMarketCap": 4438019908.8,
+          "turnoverRate": 36.60606384277344,
+          "sealAmount": 52194353.0,
+          "firstSealTime": "144354",
+          "lastSealTime": "144354",
+          "openCount": 0,
+          "limitStats": "6/5",
+          "consecutiveBoards": 2,
+          "industry": "通信服务",
+          "matchedConcepts": [
+            {
+              "name": "摘帽",
+              "code": "301455",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "摘帽",
+              "rank": 3,
+              "changePercent": 9.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801220",
+      "plateName": "食品饮料",
+      "matchedConcepts": [
+        {
+          "name": "乳业",
+          "code": "300983",
+          "matchType": "alias"
+        },
+        {
+          "name": "白酒概念",
+          "code": "301496",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "605388",
+          "name": "均瑶健康",
+          "changePercent": 10.060060501098633,
+          "latestPrice": 7.33,
+          "amount": 278189184.0,
+          "freeMarketCap": 4401547720.0,
+          "totalMarketCap": 4401547720.0,
+          "turnoverRate": 6.583827972412109,
+          "sealAmount": 84249260.0,
+          "firstSealTime": "140324",
+          "lastSealTime": "140324",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "饮料乳品",
+          "matchedConcepts": [
+            {
+              "name": "乳业",
+              "code": "300983",
+              "matchType": "alias"
+            },
+            {
+              "name": "白酒概念",
+              "code": "301496",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "乳业",
+              "rank": 1,
+              "changePercent": 10.06
+            },
+            {
+              "concept": "白酒概念",
+              "rank": 1,
+              "changePercent": 10.06
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801159",
+      "plateName": "机器人概念",
+      "matchedConcepts": [
+        {
+          "name": "机器人概念",
+          "code": "300816",
+          "matchType": "exact"
+        },
+        {
+          "name": "人形机器人",
+          "code": "309119",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002124",
+          "name": "天邦食品",
+          "changePercent": 10.175437927246094,
+          "latestPrice": 3.14,
+          "amount": 1211353408.0,
+          "freeMarketCap": 6193193594.72,
+          "totalMarketCap": 6976872257.6,
+          "turnoverRate": 19.74380111694336,
+          "sealAmount": 84476453.0,
+          "firstSealTime": "093218",
+          "lastSealTime": "131318",
+          "openCount": 4,
+          "limitStats": "3/3",
+          "consecutiveBoards": 3,
+          "industry": "养殖业",
+          "matchedConcepts": [
+            {
+              "name": "机器人概念",
+              "code": "300816",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "机器人概念",
+              "rank": 7,
+              "changePercent": 10.18
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "301189",
+          "name": "奥尼电子",
+          "changePercent": 20.002777099609375,
+          "latestPrice": 86.39,
+          "amount": 1139401136.0,
+          "freeMarketCap": 9654762648.47,
+          "totalMarketCap": 10055490611.35,
+          "turnoverRate": 11.908071517944336,
+          "sealAmount": 68379412.0,
+          "firstSealTime": "094030",
+          "lastSealTime": "141654",
+          "openCount": 3,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "机器人概念",
+              "code": "300816",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "机器人概念",
+              "rank": 1,
+              "changePercent": 20.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002990",
+          "name": "盛视科技",
+          "changePercent": 10.005224227905273,
+          "latestPrice": 42.11,
+          "amount": 1186953520.0,
+          "freeMarketCap": 5718479593.43,
+          "totalMarketCap": 11026593531.18,
+          "turnoverRate": 21.889394760131836,
+          "sealAmount": 19324279.0,
+          "firstSealTime": "135339",
+          "lastSealTime": "135657",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "计算机设",
+          "matchedConcepts": [
+            {
+              "name": "人形机器人",
+              "code": "309119",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人形机器人",
+              "rank": 4,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001208",
+          "name": "华菱线缆",
+          "changePercent": 10.025707244873047,
+          "latestPrice": 21.4,
+          "amount": 926643872.0,
+          "freeMarketCap": 5632699285.799999,
+          "totalMarketCap": 13660699244.8,
+          "turnoverRate": 16.928800582885742,
+          "sealAmount": 139851268.0,
+          "firstSealTime": "102048",
+          "lastSealTime": "102048",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "机器人概念",
+              "code": "300816",
+              "matchType": "exact"
+            },
+            {
+              "name": "人形机器人",
+              "code": "309119",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "机器人概念",
+              "rank": 8,
+              "changePercent": 10.03
+            },
+            {
+              "concept": "人形机器人",
+              "rank": 3,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002705",
+          "name": "新宝股份",
+          "changePercent": 10.02538013458252,
+          "latestPrice": 17.34,
+          "amount": 834157504.0,
+          "freeMarketCap": 14012512956.0,
+          "totalMarketCap": 14077925955.84,
+          "turnoverRate": 6.151033878326416,
+          "sealAmount": 80948322.0,
+          "firstSealTime": "130548",
+          "lastSealTime": "130548",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "小家电",
+          "matchedConcepts": [
+            {
+              "name": "机器人概念",
+              "code": "300816",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "机器人概念",
+              "rank": 9,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000026",
+          "name": "飞亚达",
+          "changePercent": 10.0,
+          "latestPrice": 17.82,
+          "amount": 627411168.0,
+          "freeMarketCap": 6496472262.06,
+          "totalMarketCap": 7230714480.0,
+          "turnoverRate": 10.043201446533203,
+          "sealAmount": 35536626.0,
+          "firstSealTime": "132930",
+          "lastSealTime": "135615",
+          "openCount": 3,
+          "limitStats": "3/2",
+          "consecutiveBoards": 1,
+          "industry": "饰品",
+          "matchedConcepts": [
+            {
+              "name": "人形机器人",
+              "code": "309119",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人形机器人",
+              "rank": 5,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603890",
+          "name": "春秋电子",
+          "changePercent": 9.994120597839355,
+          "latestPrice": 18.71,
+          "amount": 1239916512.0,
+          "freeMarketCap": 8359785182.71,
+          "totalMarketCap": 8359785164.0,
+          "turnoverRate": 15.115296363830566,
+          "sealAmount": 26634975.0,
+          "firstSealTime": "094235",
+          "lastSealTime": "095129",
+          "openCount": 4,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "人形机器人",
+              "code": "309119",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人形机器人",
+              "rank": 6,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605222",
+          "name": "起帆电缆",
+          "changePercent": 10.021322250366211,
+          "latestPrice": 25.8,
+          "amount": 587966528.0,
+          "freeMarketCap": 10652905836.6,
+          "totalMarketCap": 10652905862.4,
+          "turnoverRate": 5.713198184967041,
+          "sealAmount": 14140980.0,
+          "firstSealTime": "131327",
+          "lastSealTime": "131327",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "机器人概念",
+              "code": "300816",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "机器人概念",
+              "rank": 10,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801574",
+      "plateName": "年报增长",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801330",
+      "plateName": "旅游",
+      "matchedConcepts": [
+        {
+          "name": "旅游概念",
+          "code": "301223",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002033",
+          "name": "丽江股份",
+          "changePercent": 9.955751419067383,
+          "latestPrice": 9.94,
+          "amount": 703301696.0,
+          "freeMarketCap": 5461832999.139999,
+          "totalMarketCap": 5461937597.759999,
+          "turnoverRate": 13.245874404907227,
+          "sealAmount": 51015459.0,
+          "firstSealTime": "105006",
+          "lastSealTime": "130657",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "旅游及景",
+          "matchedConcepts": [
+            {
+              "name": "旅游概念",
+              "code": "301223",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "旅游概念",
+              "rank": 2,
+              "changePercent": 9.96
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600683",
+          "name": "京投发展",
+          "changePercent": 9.988901138305664,
+          "latestPrice": 9.91,
+          "amount": 276090944.0,
+          "freeMarketCap": 7341105986.27,
+          "totalMarketCap": 7341106016.0,
+          "turnoverRate": 3.957059144973755,
+          "sealAmount": 22166906.0,
+          "firstSealTime": "131223",
+          "lastSealTime": "131223",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "房地产开",
+          "matchedConcepts": [
+            {
+              "name": "旅游概念",
+              "code": "301223",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "旅游概念",
+              "rank": 1,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801350",
+      "plateName": "一带一路",
+      "matchedConcepts": [
+        {
+          "name": "一带一路",
+          "code": "301365",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002051",
+          "name": "中工国际",
+          "changePercent": 9.981515884399414,
+          "latestPrice": 11.9,
+          "amount": 1430293344.0,
+          "freeMarketCap": 14724318832.300001,
+          "totalMarketCap": 14725166433.6,
+          "turnoverRate": 9.800546646118164,
+          "sealAmount": 60191021.0,
+          "firstSealTime": "093133",
+          "lastSealTime": "134139",
+          "openCount": 7,
+          "limitStats": "9/5",
+          "consecutiveBoards": 2,
+          "industry": "专业工程",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 8,
+              "changePercent": 9.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002990",
+          "name": "盛视科技",
+          "changePercent": 10.005224227905273,
+          "latestPrice": 42.11,
+          "amount": 1186953520.0,
+          "freeMarketCap": 5718479593.43,
+          "totalMarketCap": 11026593531.18,
+          "turnoverRate": 21.889394760131836,
+          "sealAmount": 19324279.0,
+          "firstSealTime": "135339",
+          "lastSealTime": "135657",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "计算机设",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 4,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603459",
+          "name": "红板科技",
+          "changePercent": 10.003216743469238,
+          "latestPrice": 68.4,
+          "amount": 1710739824.0,
+          "freeMarketCap": 5407147087.200001,
+          "totalMarketCap": 51556745145.600006,
+          "turnoverRate": 32.45186233520508,
+          "sealAmount": 233495917.0,
+          "firstSealTime": "093453",
+          "lastSealTime": "095011",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "元件",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 5,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002498",
+          "name": "汉缆股份",
+          "changePercent": 9.961190223693848,
+          "latestPrice": 8.5,
+          "amount": 1449685232.0,
+          "freeMarketCap": 28277766000.0,
+          "totalMarketCap": 28277766000.0,
+          "turnoverRate": 5.213320732116699,
+          "sealAmount": 125480901.0,
+          "firstSealTime": "094309",
+          "lastSealTime": "105757",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 9,
+              "changePercent": 9.96
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603150",
+          "name": "万朗磁塑",
+          "changePercent": 10.0,
+          "latestPrice": 57.53,
+          "amount": 194104442.0,
+          "freeMarketCap": 4917836990.0,
+          "totalMarketCap": 4917836990.0,
+          "turnoverRate": 4.078822612762451,
+          "sealAmount": 107615618.0,
+          "firstSealTime": "110617",
+          "lastSealTime": "110617",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 6,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603815",
+          "name": "交建股份",
+          "changePercent": 10.034602165222168,
+          "latestPrice": 6.36,
+          "amount": 135433728.0,
+          "freeMarketCap": 3936358134.6000004,
+          "totalMarketCap": 3936358166.4,
+          "turnoverRate": 3.512352466583252,
+          "sealAmount": 83036796.0,
+          "firstSealTime": "093906",
+          "lastSealTime": "093906",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "基础建设",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 3,
+              "changePercent": 10.04
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605365",
+          "name": "立达信",
+          "changePercent": 9.990706443786621,
+          "latestPrice": 23.67,
+          "amount": 212408048.0,
+          "freeMarketCap": 11882644774.92,
+          "totalMarketCap": 11882644869.6,
+          "turnoverRate": 1.8055415153503418,
+          "sealAmount": 53730900.0,
+          "firstSealTime": "093504",
+          "lastSealTime": "093504",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "照明设备",
+          "matchedConcepts": [
+            {
+              "name": "一带一路",
+              "code": "301365",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "一带一路",
+              "rank": 7,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801016",
+      "plateName": "稀土永磁",
+      "matchedConcepts": [
+        {
+          "name": "稀土永磁",
+          "code": "300382",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603150",
+          "name": "万朗磁塑",
+          "changePercent": 10.0,
+          "latestPrice": 57.53,
+          "amount": 194104442.0,
+          "freeMarketCap": 4917836990.0,
+          "totalMarketCap": 4917836990.0,
+          "turnoverRate": 4.078822612762451,
+          "sealAmount": 107615618.0,
+          "firstSealTime": "110617",
+          "lastSealTime": "110617",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "稀土永磁",
+              "code": "300382",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "稀土永磁",
+              "rank": 1,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801379",
+      "plateName": "碳纤维",
+      "matchedConcepts": [
+        {
+          "name": "碳纤维",
+          "code": "300352",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002297",
+          "name": "博云新材",
+          "changePercent": 10.007524490356445,
+          "latestPrice": 14.62,
+          "amount": 143482888.0,
+          "freeMarketCap": 8378792453.78,
+          "totalMarketCap": 8378792409.919999,
+          "turnoverRate": 1.712453007698059,
+          "sealAmount": 608327220.0,
+          "firstSealTime": "092500",
+          "lastSealTime": "092500",
+          "openCount": 0,
+          "limitStats": "3/3",
+          "consecutiveBoards": 3,
+          "industry": "航空装备",
+          "matchedConcepts": [
+            {
+              "name": "碳纤维",
+              "code": "300352",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "碳纤维",
+              "rank": 1,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801660",
+      "plateName": "通信",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801580",
+      "plateName": "发电机",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801067",
+      "plateName": "面板",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801874",
+      "plateName": "电源",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801039",
+      "plateName": "机场航空",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "803023",
+      "plateName": "AI应用",
+      "matchedConcepts": [
+        {
+          "name": "多模态AI",
+          "code": "309104",
+          "matchType": "alias"
+        },
+        {
+          "name": "智能医疗",
+          "code": "300682",
+          "matchType": "alias"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002990",
+          "name": "盛视科技",
+          "changePercent": 10.005224227905273,
+          "latestPrice": 42.11,
+          "amount": 1186953520.0,
+          "freeMarketCap": 5718479593.43,
+          "totalMarketCap": 11026593531.18,
+          "turnoverRate": 21.889394760131836,
+          "sealAmount": 19324279.0,
+          "firstSealTime": "135339",
+          "lastSealTime": "135657",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "计算机设",
+          "matchedConcepts": [
+            {
+              "name": "多模态AI",
+              "code": "309104",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "多模态AI",
+              "rank": 2,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "301408",
+          "name": "华人健康",
+          "changePercent": 19.976905822753906,
+          "latestPrice": 20.78,
+          "amount": 1272624496.0,
+          "freeMarketCap": 4757776394.34,
+          "totalMarketCap": 8312207800.0,
+          "turnoverRate": 28.432920455932617,
+          "sealAmount": 236041910.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "132733",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能医疗",
+              "rank": 1,
+              "changePercent": 19.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002788",
+          "name": "鹭燕医药",
+          "changePercent": 10.0,
+          "latestPrice": 15.95,
+          "amount": 1091815776.0,
+          "freeMarketCap": 6089611125.95,
+          "totalMarketCap": 6196841939.2,
+          "turnoverRate": 18.716392517089844,
+          "sealAmount": 121809527.0,
+          "firstSealTime": "111912",
+          "lastSealTime": "111912",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能医疗",
+              "rank": 8,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002589",
+          "name": "瑞康医药",
+          "changePercent": 10.122699737548828,
+          "latestPrice": 3.59,
+          "amount": 331610960.0,
+          "freeMarketCap": 4902473657.32,
+          "totalMarketCap": 5401910565.76,
+          "turnoverRate": 6.881252765655518,
+          "sealAmount": 108408210.0,
+          "firstSealTime": "093439",
+          "lastSealTime": "093439",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能医疗",
+              "rank": 5,
+              "changePercent": 10.12
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600572",
+          "name": "康恩贝",
+          "changePercent": 10.091742515563965,
+          "latestPrice": 4.8,
+          "amount": 966306000.0,
+          "freeMarketCap": 12144735782.4,
+          "totalMarketCap": 12177096652.8,
+          "turnoverRate": 8.200553894042969,
+          "sealAmount": 83696928.0,
+          "firstSealTime": "132722",
+          "lastSealTime": "132722",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能医疗",
+              "rank": 6,
+              "changePercent": 10.09
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600267",
+          "name": "海正药业",
+          "changePercent": 10.048309326171875,
+          "latestPrice": 11.39,
+          "amount": 548437456.0,
+          "freeMarketCap": 13653890022.44,
+          "totalMarketCap": 13653890068.0,
+          "turnoverRate": 4.115350246429443,
+          "sealAmount": 65966324.0,
+          "firstSealTime": "095439",
+          "lastSealTime": "095754",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "智能医疗",
+              "code": "300682",
+              "matchType": "alias"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能医疗",
+              "rank": 7,
+              "changePercent": 10.05
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801087",
+      "plateName": "风电",
+      "matchedConcepts": [
+        {
+          "name": "风电",
+          "code": "300200",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603063",
+          "name": "禾望电气",
+          "changePercent": 10.00867748260498,
+          "latestPrice": 38.03,
+          "amount": 2503207808.0,
+          "freeMarketCap": 17448201725.760002,
+          "totalMarketCap": 17448201725.760002,
+          "turnoverRate": 14.490106582641602,
+          "sealAmount": 183878510.0,
+          "firstSealTime": "093455",
+          "lastSealTime": "130031",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "风电设备",
+          "matchedConcepts": [
+            {
+              "name": "风电",
+              "code": "300200",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "风电",
+              "rank": 7,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001208",
+          "name": "华菱线缆",
+          "changePercent": 10.025707244873047,
+          "latestPrice": 21.4,
+          "amount": 926643872.0,
+          "freeMarketCap": 5632699285.799999,
+          "totalMarketCap": 13660699244.8,
+          "turnoverRate": 16.928800582885742,
+          "sealAmount": 139851268.0,
+          "firstSealTime": "102048",
+          "lastSealTime": "102048",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "风电",
+              "code": "300200",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "风电",
+              "rank": 5,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002498",
+          "name": "汉缆股份",
+          "changePercent": 9.961190223693848,
+          "latestPrice": 8.5,
+          "amount": 1449685232.0,
+          "freeMarketCap": 28277766000.0,
+          "totalMarketCap": 28277766000.0,
+          "turnoverRate": 5.213320732116699,
+          "sealAmount": 125480901.0,
+          "firstSealTime": "094309",
+          "lastSealTime": "105757",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "风电",
+              "code": "300200",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "风电",
+              "rank": 9,
+              "changePercent": 9.96
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001896",
+          "name": "豫能控股",
+          "changePercent": 10.02656078338623,
+          "latestPrice": 16.57,
+          "amount": 4219852288.0,
+          "freeMarketCap": 25282196638.100002,
+          "totalMarketCap": 25282196604.96,
+          "turnoverRate": 17.448261260986328,
+          "sealAmount": 75347816.0,
+          "firstSealTime": "101957",
+          "lastSealTime": "143103",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电力",
+          "matchedConcepts": [
+            {
+              "name": "风电",
+              "code": "300200",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "风电",
+              "rank": 4,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605289",
+          "name": "罗曼股份",
+          "changePercent": 10.0,
+          "latestPrice": 126.61,
+          "amount": 698940496.0,
+          "freeMarketCap": 13716610875.0,
+          "totalMarketCap": 13801439575.0,
+          "turnoverRate": 5.24545955657959,
+          "sealAmount": 74965781.0,
+          "firstSealTime": "112520",
+          "lastSealTime": "112520",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "专业工程",
+          "matchedConcepts": [
+            {
+              "name": "风电",
+              "code": "300200",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "风电",
+              "rank": 8,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605222",
+          "name": "起帆电缆",
+          "changePercent": 10.021322250366211,
+          "latestPrice": 25.8,
+          "amount": 587966528.0,
+          "freeMarketCap": 10652905836.6,
+          "totalMarketCap": 10652905862.4,
+          "turnoverRate": 5.713198184967041,
+          "sealAmount": 14140980.0,
+          "firstSealTime": "131327",
+          "lastSealTime": "131327",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "风电",
+              "code": "300200",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "风电",
+              "rank": 6,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801019",
+      "plateName": "物流",
+      "matchedConcepts": [
+        {
+          "name": "冷链物流",
+          "code": "301179",
+          "matchType": "name_contains"
+        },
+        {
+          "name": "智能物流",
+          "code": "301797",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002990",
+          "name": "盛视科技",
+          "changePercent": 10.005224227905273,
+          "latestPrice": 42.11,
+          "amount": 1186953520.0,
+          "freeMarketCap": 5718479593.43,
+          "totalMarketCap": 11026593531.18,
+          "turnoverRate": 21.889394760131836,
+          "sealAmount": 19324279.0,
+          "firstSealTime": "135339",
+          "lastSealTime": "135657",
+          "openCount": 1,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "计算机设",
+          "matchedConcepts": [
+            {
+              "name": "冷链物流",
+              "code": "301179",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "冷链物流",
+              "rank": 4,
+              "changePercent": 10.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002468",
+          "name": "申通快递",
+          "changePercent": 10.0,
+          "latestPrice": 16.39,
+          "amount": 158777404.0,
+          "freeMarketCap": 24047407442.74,
+          "totalMarketCap": 25089847402.4,
+          "turnoverRate": 0.6602683067321777,
+          "sealAmount": 348968406.0,
+          "firstSealTime": "092500",
+          "lastSealTime": "092500",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "物流",
+          "matchedConcepts": [
+            {
+              "name": "智能物流",
+              "code": "301797",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能物流",
+              "rank": 6,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000788",
+          "name": "北大医药",
+          "changePercent": 10.081300735473633,
+          "latestPrice": 6.77,
+          "amount": 741744976.0,
+          "freeMarketCap": 4034834867.2499995,
+          "totalMarketCap": 4034834860.4799995,
+          "turnoverRate": 19.395427703857422,
+          "sealAmount": 155694429.0,
+          "firstSealTime": "132157",
+          "lastSealTime": "132157",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "冷链物流",
+              "code": "301179",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "冷链物流",
+              "rank": 3,
+              "changePercent": 10.08
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002788",
+          "name": "鹭燕医药",
+          "changePercent": 10.0,
+          "latestPrice": 15.95,
+          "amount": 1091815776.0,
+          "freeMarketCap": 6089611125.95,
+          "totalMarketCap": 6196841939.2,
+          "turnoverRate": 18.716392517089844,
+          "sealAmount": 121809527.0,
+          "firstSealTime": "111912",
+          "lastSealTime": "111912",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "冷链物流",
+              "code": "301179",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "冷链物流",
+              "rank": 5,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002589",
+          "name": "瑞康医药",
+          "changePercent": 10.122699737548828,
+          "latestPrice": 3.59,
+          "amount": 331610960.0,
+          "freeMarketCap": 4902473657.32,
+          "totalMarketCap": 5401910565.76,
+          "turnoverRate": 6.881252765655518,
+          "sealAmount": 108408210.0,
+          "firstSealTime": "093439",
+          "lastSealTime": "093439",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "冷链物流",
+              "code": "301179",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "冷链物流",
+              "rank": 2,
+              "changePercent": 10.12
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603150",
+          "name": "万朗磁塑",
+          "changePercent": 10.0,
+          "latestPrice": 57.53,
+          "amount": 194104442.0,
+          "freeMarketCap": 4917836990.0,
+          "totalMarketCap": 4917836990.0,
+          "turnoverRate": 4.078822612762451,
+          "sealAmount": 107615618.0,
+          "firstSealTime": "110617",
+          "lastSealTime": "110617",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "塑料",
+          "matchedConcepts": [
+            {
+              "name": "冷链物流",
+              "code": "301179",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "冷链物流",
+              "rank": 6,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001896",
+          "name": "豫能控股",
+          "changePercent": 10.02656078338623,
+          "latestPrice": 16.57,
+          "amount": 4219852288.0,
+          "freeMarketCap": 25282196638.100002,
+          "totalMarketCap": 25282196604.96,
+          "turnoverRate": 17.448261260986328,
+          "sealAmount": 75347816.0,
+          "firstSealTime": "101957",
+          "lastSealTime": "143103",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电力",
+          "matchedConcepts": [
+            {
+              "name": "智能物流",
+              "code": "301797",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能物流",
+              "rank": 5,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605365",
+          "name": "立达信",
+          "changePercent": 9.990706443786621,
+          "latestPrice": 23.67,
+          "amount": 212408048.0,
+          "freeMarketCap": 11882644774.92,
+          "totalMarketCap": 11882644869.6,
+          "turnoverRate": 1.8055415153503418,
+          "sealAmount": 53730900.0,
+          "firstSealTime": "093504",
+          "lastSealTime": "093504",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "照明设备",
+          "matchedConcepts": [
+            {
+              "name": "智能物流",
+              "code": "301797",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能物流",
+              "rank": 7,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000785",
+          "name": "居然智家",
+          "changePercent": 10.204081535339355,
+          "latestPrice": 2.7,
+          "amount": 349311280.0,
+          "freeMarketCap": 15923502352.800001,
+          "totalMarketCap": 16813031500.800001,
+          "turnoverRate": 2.2299067974090576,
+          "sealAmount": 51101741.0,
+          "firstSealTime": "093539",
+          "lastSealTime": "093815",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "一般零售",
+          "matchedConcepts": [
+            {
+              "name": "智能物流",
+              "code": "301797",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "智能物流",
+              "rank": 4,
+              "changePercent": 10.2
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801235",
+      "plateName": "化工",
+      "matchedConcepts": [
+        {
+          "name": "氟化工概念",
+          "code": "300085",
+          "matchType": "name_contains"
+        },
+        {
+          "name": "磷化工",
+          "code": "300098",
+          "matchType": "name_contains"
+        },
+        {
+          "name": "煤化工概念",
+          "code": "300084",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603698",
+          "name": "航天工程",
+          "changePercent": 9.988870620727539,
+          "latestPrice": 39.53,
+          "amount": 832099456.0,
+          "freeMarketCap": 21187684700.0,
+          "totalMarketCap": 21187684700.0,
+          "turnoverRate": 3.9295942783355713,
+          "sealAmount": 172540939.0,
+          "firstSealTime": "093014",
+          "lastSealTime": "093147",
+          "openCount": 2,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "专用设备",
+          "matchedConcepts": [
+            {
+              "name": "煤化工概念",
+              "code": "300084",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "煤化工概念",
+              "rank": 1,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801653",
+      "plateName": "霍乱概念",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801074",
+      "plateName": "核电",
+      "matchedConcepts": [
+        {
+          "name": "核电",
+          "code": "300238",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "603698",
+          "name": "航天工程",
+          "changePercent": 9.988870620727539,
+          "latestPrice": 39.53,
+          "amount": 832099456.0,
+          "freeMarketCap": 21187684700.0,
+          "totalMarketCap": 21187684700.0,
+          "turnoverRate": 3.9295942783355713,
+          "sealAmount": 172540939.0,
+          "firstSealTime": "093014",
+          "lastSealTime": "093147",
+          "openCount": 2,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "专用设备",
+          "matchedConcepts": [
+            {
+              "name": "核电",
+              "code": "300238",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "核电",
+              "rank": 4,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "001208",
+          "name": "华菱线缆",
+          "changePercent": 10.025707244873047,
+          "latestPrice": 21.4,
+          "amount": 926643872.0,
+          "freeMarketCap": 5632699285.799999,
+          "totalMarketCap": 13660699244.8,
+          "turnoverRate": 16.928800582885742,
+          "sealAmount": 139851268.0,
+          "firstSealTime": "102048",
+          "lastSealTime": "102048",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "核电",
+              "code": "300238",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "核电",
+              "rank": 2,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002498",
+          "name": "汉缆股份",
+          "changePercent": 9.961190223693848,
+          "latestPrice": 8.5,
+          "amount": 1449685232.0,
+          "freeMarketCap": 28277766000.0,
+          "totalMarketCap": 28277766000.0,
+          "turnoverRate": 5.213320732116699,
+          "sealAmount": 125480901.0,
+          "firstSealTime": "094309",
+          "lastSealTime": "105757",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "核电",
+              "code": "300238",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "核电",
+              "rank": 6,
+              "changePercent": 9.96
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605222",
+          "name": "起帆电缆",
+          "changePercent": 10.021322250366211,
+          "latestPrice": 25.8,
+          "amount": 587966528.0,
+          "freeMarketCap": 10652905836.6,
+          "totalMarketCap": 10652905862.4,
+          "turnoverRate": 5.713198184967041,
+          "sealAmount": 14140980.0,
+          "firstSealTime": "131327",
+          "lastSealTime": "131327",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "电网设备",
+          "matchedConcepts": [
+            {
+              "name": "核电",
+              "code": "300238",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "核电",
+              "rank": 3,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801085",
+      "plateName": "人工智能",
+      "matchedConcepts": [
+        {
+          "name": "人工智能",
+          "code": "302035",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "301189",
+          "name": "奥尼电子",
+          "changePercent": 20.002777099609375,
+          "latestPrice": 86.39,
+          "amount": 1139401136.0,
+          "freeMarketCap": 9654762648.47,
+          "totalMarketCap": 10055490611.35,
+          "turnoverRate": 11.908071517944336,
+          "sealAmount": 68379412.0,
+          "firstSealTime": "094030",
+          "lastSealTime": "141654",
+          "openCount": 3,
+          "limitStats": "2/2",
+          "consecutiveBoards": 2,
+          "industry": "消费电子",
+          "matchedConcepts": [
+            {
+              "name": "人工智能",
+              "code": "302035",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人工智能",
+              "rank": 2,
+              "changePercent": 20.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "301408",
+          "name": "华人健康",
+          "changePercent": 19.976905822753906,
+          "latestPrice": 20.78,
+          "amount": 1272624496.0,
+          "freeMarketCap": 4757776394.34,
+          "totalMarketCap": 8312207800.0,
+          "turnoverRate": 28.432920455932617,
+          "sealAmount": 236041910.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "132733",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "人工智能",
+              "code": "302035",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人工智能",
+              "rank": 3,
+              "changePercent": 19.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002589",
+          "name": "瑞康医药",
+          "changePercent": 10.122699737548828,
+          "latestPrice": 3.59,
+          "amount": 331610960.0,
+          "freeMarketCap": 4902473657.32,
+          "totalMarketCap": 5401910565.76,
+          "turnoverRate": 6.881252765655518,
+          "sealAmount": 108408210.0,
+          "firstSealTime": "093439",
+          "lastSealTime": "093439",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医药商业",
+          "matchedConcepts": [
+            {
+              "name": "人工智能",
+              "code": "302035",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人工智能",
+              "rank": 10,
+              "changePercent": 10.12
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000785",
+          "name": "居然智家",
+          "changePercent": 10.204081535339355,
+          "latestPrice": 2.7,
+          "amount": 349311280.0,
+          "freeMarketCap": 15923502352.800001,
+          "totalMarketCap": 16813031500.800001,
+          "turnoverRate": 2.2299067974090576,
+          "sealAmount": 51101741.0,
+          "firstSealTime": "093539",
+          "lastSealTime": "093815",
+          "openCount": 2,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "一般零售",
+          "matchedConcepts": [
+            {
+              "name": "人工智能",
+              "code": "302035",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "人工智能",
+              "rank": 9,
+              "changePercent": 10.2
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801374",
+      "plateName": "造船",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801322",
+      "plateName": "芬太尼替代",
+      "matchedConcepts": [
+        {
+          "name": "芬太尼",
+          "code": "308438",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801254",
+      "plateName": "防脱发",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801654",
+      "plateName": "眼科医疗",
+      "matchedConcepts": [
+        {
+          "name": "眼科医疗",
+          "code": "301252",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "600572",
+          "name": "康恩贝",
+          "changePercent": 10.091742515563965,
+          "latestPrice": 4.8,
+          "amount": 966306000.0,
+          "freeMarketCap": 12144735782.4,
+          "totalMarketCap": 12177096652.8,
+          "turnoverRate": 8.200553894042969,
+          "sealAmount": 83696928.0,
+          "firstSealTime": "132722",
+          "lastSealTime": "132722",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "眼科医疗",
+              "code": "301252",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "眼科医疗",
+              "rank": 1,
+              "changePercent": 10.09
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801956",
+      "plateName": "卫生护理",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801027",
+      "plateName": "银行",
+      "matchedConcepts": [
+        {
+          "name": "参股银行",
+          "code": "301270",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "003036",
+          "name": "泰坦股份",
+          "changePercent": 10.0,
+          "latestPrice": 29.7,
+          "amount": 388400896.0,
+          "freeMarketCap": 6423471034.2,
+          "totalMarketCap": 6423635869.2,
+          "turnoverRate": 6.296235084533691,
+          "sealAmount": 143733090.0,
+          "firstSealTime": "100436",
+          "lastSealTime": "100436",
+          "openCount": 0,
+          "limitStats": "4/2",
+          "consecutiveBoards": 1,
+          "industry": "专用设备",
+          "matchedConcepts": [
+            {
+              "name": "参股银行",
+              "code": "301270",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "参股银行",
+              "rank": 2,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "603216",
+          "name": "梦天家居",
+          "changePercent": 10.016583442687988,
+          "latestPrice": 33.17,
+          "amount": 356901808.0,
+          "freeMarketCap": 7386627300.0,
+          "totalMarketCap": 7386627300.0,
+          "turnoverRate": 4.980373859405518,
+          "sealAmount": 31100192.0,
+          "firstSealTime": "105707",
+          "lastSealTime": "105707",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "家居用品",
+          "matchedConcepts": [
+            {
+              "name": "参股银行",
+              "code": "301270",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "参股银行",
+              "rank": 1,
+              "changePercent": 10.02
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801613",
+      "plateName": "幽门螺杆菌",
+      "matchedConcepts": [
+        {
+          "name": "幽门螺杆菌概念",
+          "code": "308818",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002038",
+          "name": "双鹭药业",
+          "changePercent": 9.945504188537598,
+          "latestPrice": 8.07,
+          "amount": 1089549872.0,
+          "freeMarketCap": 6874941694.83,
+          "totalMarketCap": 8290714500.0,
+          "turnoverRate": 16.691652297973633,
+          "sealAmount": 104531517.0,
+          "firstSealTime": "112112",
+          "lastSealTime": "112112",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "幽门螺杆菌概念",
+              "code": "308818",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "幽门螺杆菌概念",
+              "rank": 4,
+              "changePercent": 9.95
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "605388",
+          "name": "均瑶健康",
+          "changePercent": 10.060060501098633,
+          "latestPrice": 7.33,
+          "amount": 278189184.0,
+          "freeMarketCap": 4401547720.0,
+          "totalMarketCap": 4401547720.0,
+          "turnoverRate": 6.583827972412109,
+          "sealAmount": 84249260.0,
+          "firstSealTime": "140324",
+          "lastSealTime": "140324",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "饮料乳品",
+          "matchedConcepts": [
+            {
+              "name": "幽门螺杆菌概念",
+              "code": "308818",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "幽门螺杆菌概念",
+              "rank": 3,
+              "changePercent": 10.06
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600572",
+          "name": "康恩贝",
+          "changePercent": 10.091742515563965,
+          "latestPrice": 4.8,
+          "amount": 966306000.0,
+          "freeMarketCap": 12144735782.4,
+          "totalMarketCap": 12177096652.8,
+          "turnoverRate": 8.200553894042969,
+          "sealAmount": 83696928.0,
+          "firstSealTime": "132722",
+          "lastSealTime": "132722",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "幽门螺杆菌概念",
+              "code": "308818",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "幽门螺杆菌概念",
+              "rank": 2,
+              "changePercent": 10.09
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801880",
+      "plateName": "燃气轮机",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801144",
+      "plateName": "医美",
+      "matchedConcepts": [
+        {
+          "name": "医美概念",
+          "code": "308712",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "000919",
+          "name": "金陵药业",
+          "changePercent": 9.986684799194336,
+          "latestPrice": 8.26,
+          "amount": 591954928.0,
+          "freeMarketCap": 5135793173.28,
+          "totalMarketCap": 5137096601.28,
+          "turnoverRate": 11.965309143066406,
+          "sealAmount": 111382093.0,
+          "firstSealTime": "095530",
+          "lastSealTime": "095530",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医美概念",
+              "rank": 3,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002038",
+          "name": "双鹭药业",
+          "changePercent": 9.945504188537598,
+          "latestPrice": 8.07,
+          "amount": 1089549872.0,
+          "freeMarketCap": 6874941694.83,
+          "totalMarketCap": 8290714500.0,
+          "turnoverRate": 16.691652297973633,
+          "sealAmount": 104531517.0,
+          "firstSealTime": "112112",
+          "lastSealTime": "112112",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医美概念",
+              "rank": 4,
+              "changePercent": 9.95
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600267",
+          "name": "海正药业",
+          "changePercent": 10.048309326171875,
+          "latestPrice": 11.39,
+          "amount": 548437456.0,
+          "freeMarketCap": 13653890022.44,
+          "totalMarketCap": 13653890068.0,
+          "turnoverRate": 4.115350246429443,
+          "sealAmount": 65966324.0,
+          "firstSealTime": "095439",
+          "lastSealTime": "095754",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医美概念",
+              "rank": 2,
+              "changePercent": 10.05
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600594",
+          "name": "益佰制药",
+          "changePercent": 9.930715560913086,
+          "latestPrice": 4.76,
+          "amount": 855563600.0,
+          "freeMarketCap": 3769574424.0,
+          "totalMarketCap": 3769574462.08,
+          "turnoverRate": 23.650663375854492,
+          "sealAmount": 16813614.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "145203",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "医美概念",
+              "code": "308712",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "医美概念",
+              "rank": 5,
+              "changePercent": 9.93
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801862",
+      "plateName": "高股息精选",
+      "matchedConcepts": [
+        {
+          "name": "高股息精选",
+          "code": "309124",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "605098",
+          "name": "行动教育",
+          "changePercent": 10.003657341003418,
+          "latestPrice": 60.15,
+          "amount": 129416706.0,
+          "freeMarketCap": 7172953665.0,
+          "totalMarketCap": 7172953665.0,
+          "turnoverRate": 1.8199689388275146,
+          "sealAmount": 91326166.0,
+          "firstSealTime": "093931",
+          "lastSealTime": "093931",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "教育",
+          "matchedConcepts": [
+            {
+              "name": "高股息精选",
+              "code": "309124",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "高股息精选",
+              "rank": 1,
+              "changePercent": 10.0
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002033",
+          "name": "丽江股份",
+          "changePercent": 9.955751419067383,
+          "latestPrice": 9.94,
+          "amount": 703301696.0,
+          "freeMarketCap": 5461832999.139999,
+          "totalMarketCap": 5461937597.759999,
+          "turnoverRate": 13.245874404907227,
+          "sealAmount": 51015459.0,
+          "firstSealTime": "105006",
+          "lastSealTime": "130657",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "旅游及景",
+          "matchedConcepts": [
+            {
+              "name": "高股息精选",
+              "code": "309124",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "高股息精选",
+              "rank": 2,
+              "changePercent": 9.96
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801198",
+      "plateName": "送转填权",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801992",
+      "plateName": "文交所",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801705",
+      "plateName": "超导概念",
+      "matchedConcepts": [
+        {
+          "name": "超导概念",
+          "code": "309056",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "688805",
+          "name": "健信超导",
+          "changePercent": 20.008432388305664,
+          "latestPrice": 56.92,
+          "amount": 517692320.0,
+          "freeMarketCap": 1794053454.28,
+          "totalMarketCap": 9544345600.0,
+          "turnoverRate": 29.89674186706543,
+          "sealAmount": 94036962.0,
+          "firstSealTime": "095247",
+          "lastSealTime": "095247",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "医疗器械",
+          "matchedConcepts": [
+            {
+              "name": "超导概念",
+              "code": "309056",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "超导概念",
+              "rank": 1,
+              "changePercent": 20.01
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801909",
+      "plateName": "可转债",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801418",
+      "plateName": "民营医院",
+      "matchedConcepts": [
+        {
+          "name": "民营医院",
+          "code": "301346",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "000788",
+          "name": "北大医药",
+          "changePercent": 10.081300735473633,
+          "latestPrice": 6.77,
+          "amount": 741744976.0,
+          "freeMarketCap": 4034834867.2499995,
+          "totalMarketCap": 4034834860.4799995,
+          "turnoverRate": 19.395427703857422,
+          "sealAmount": 155694429.0,
+          "firstSealTime": "132157",
+          "lastSealTime": "132157",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "民营医院",
+              "code": "301346",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "民营医院",
+              "rank": 1,
+              "changePercent": 10.08
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "000919",
+          "name": "金陵药业",
+          "changePercent": 9.986684799194336,
+          "latestPrice": 8.26,
+          "amount": 591954928.0,
+          "freeMarketCap": 5135793173.28,
+          "totalMarketCap": 5137096601.28,
+          "turnoverRate": 11.965309143066406,
+          "sealAmount": 111382093.0,
+          "firstSealTime": "095530",
+          "lastSealTime": "095530",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "民营医院",
+              "code": "301346",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "民营医院",
+              "rank": 2,
+              "changePercent": 9.99
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "002038",
+          "name": "双鹭药业",
+          "changePercent": 9.945504188537598,
+          "latestPrice": 8.07,
+          "amount": 1089549872.0,
+          "freeMarketCap": 6874941694.83,
+          "totalMarketCap": 8290714500.0,
+          "turnoverRate": 16.691652297973633,
+          "sealAmount": 104531517.0,
+          "firstSealTime": "112112",
+          "lastSealTime": "112112",
+          "openCount": 0,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "化学制药",
+          "matchedConcepts": [
+            {
+              "name": "民营医院",
+              "code": "301346",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "民营医院",
+              "rank": 3,
+              "changePercent": 9.95
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        },
+        {
+          "code": "600594",
+          "name": "益佰制药",
+          "changePercent": 9.930715560913086,
+          "latestPrice": 4.76,
+          "amount": 855563600.0,
+          "freeMarketCap": 3769574424.0,
+          "totalMarketCap": 3769574462.08,
+          "turnoverRate": 23.650663375854492,
+          "sealAmount": 16813614.0,
+          "firstSealTime": "132733",
+          "lastSealTime": "145203",
+          "openCount": 1,
+          "limitStats": "1/1",
+          "consecutiveBoards": 1,
+          "industry": "中药Ⅱ",
+          "matchedConcepts": [
+            {
+              "name": "民营医院",
+              "code": "301346",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "民营医院",
+              "rank": 4,
+              "changePercent": 9.93
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801376",
+      "plateName": "健康中国",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801764",
+      "plateName": "西藏自治区",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801057",
+      "plateName": "石油石化",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801117",
+      "plateName": "港口",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801415",
+      "plateName": "电子发票",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801694",
+      "plateName": "非金属材料",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "803012",
+      "plateName": "SOFC电池",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801964",
+      "plateName": "压缩机",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801595",
+      "plateName": "北交所",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801246",
+      "plateName": "水务",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801391",
+      "plateName": "美容护理",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801850",
+      "plateName": "食品安全",
+      "matchedConcepts": [
+        {
+          "name": "食品安全",
+          "code": "300023",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002787",
+          "name": "华源控股",
+          "changePercent": 10.026385307312012,
+          "latestPrice": 16.68,
+          "amount": 456971200.0,
+          "freeMarketCap": 4184346701.52,
+          "totalMarketCap": 5590745554.559999,
+          "turnoverRate": 11.114302635192871,
+          "sealAmount": 79231668.0,
+          "firstSealTime": "094357",
+          "lastSealTime": "100248",
+          "openCount": 1,
+          "limitStats": "4/2",
+          "consecutiveBoards": 1,
+          "industry": "包装印刷",
+          "matchedConcepts": [
+            {
+              "name": "食品安全",
+              "code": "300023",
+              "matchType": "exact"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "食品安全",
+              "rank": 1,
+              "changePercent": 10.03
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801251",
+      "plateName": "送转预期",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801138",
+      "plateName": "超级电容",
+      "matchedConcepts": [
+        {
+          "name": "超级电容",
+          "code": "300926",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801970",
+      "plateName": "集装箱",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801382",
+      "plateName": "分拆上市预期",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801733",
+      "plateName": "中特估",
+      "matchedConcepts": [
+        {
+          "name": "同花顺中特估100",
+          "code": "309062",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [
+        {
+          "code": "002051",
+          "name": "中工国际",
+          "changePercent": 9.981515884399414,
+          "latestPrice": 11.9,
+          "amount": 1430293344.0,
+          "freeMarketCap": 14724318832.300001,
+          "totalMarketCap": 14725166433.6,
+          "turnoverRate": 9.800546646118164,
+          "sealAmount": 60191021.0,
+          "firstSealTime": "093133",
+          "lastSealTime": "134139",
+          "openCount": 7,
+          "limitStats": "9/5",
+          "consecutiveBoards": 2,
+          "industry": "专业工程",
+          "matchedConcepts": [
+            {
+              "name": "同花顺中特估100",
+              "code": "309062",
+              "matchType": "name_contains"
+            }
+          ],
+          "thsRanks": [
+            {
+              "concept": "同花顺中特估100",
+              "rank": 1,
+              "changePercent": 9.98
+            }
+          ],
+          "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "plateCode": "801451",
+      "plateName": "wifi6/7",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801662",
+      "plateName": "火电灵活改造",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801234",
+      "plateName": "航运",
+      "matchedConcepts": [
+        {
+          "name": "航运概念",
+          "code": "300973",
+          "matchType": "name_contains"
+        }
+      ],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801351",
+      "plateName": "科创板",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801149",
+      "plateName": "社区团购",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801742",
+      "plateName": "内蒙古自治区",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801443",
+      "plateName": "转基因",
+      "matchedConcepts": [
+        {
+          "name": "转基因",
+          "code": "300435",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801396",
+      "plateName": "云游戏",
+      "matchedConcepts": [
+        {
+          "name": "云游戏",
+          "code": "308624",
+          "matchType": "exact"
+        }
+      ],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801651",
+      "plateName": "湖南",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    },
+    {
+      "plateCode": "801754",
+      "plateName": "江苏省",
+      "matchedConcepts": [],
+      "limitUpStocks": [],
+      "errors": []
+    }
+  ]
+}
