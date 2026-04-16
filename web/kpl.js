@@ -18,6 +18,18 @@ const number = (value, digits = 2) => {
   return Number(value).toFixed(digits);
 };
 
+const EXCLUDED_SECTOR_PATTERNS = [
+  /^ST/i,
+  /摘帽/,
+  /一季报/,
+  /一季度/,
+  /半年报/,
+  /三季报/,
+  /年报/,
+  /业绩预/,
+  /预增/,
+];
+
 const money = (value) => {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return '暂无接口';
   const n = Number(value);
@@ -35,8 +47,8 @@ async function loadDashboard(path) {
   state.data = data;
   state.historyData.set(path, data);
   state.selectedDate = shortDate(data.date);
-  if (!data.plates?.some((sector) => sector.plateCode === state.selectedCode)) {
-    state.selectedCode = data.plates?.[0]?.plateCode || null;
+  if (!sortedSectors().some((sector) => sector.plateCode === state.selectedCode)) {
+    state.selectedCode = sortedSectors()[0]?.plateCode || null;
   }
 }
 
@@ -56,14 +68,24 @@ async function preloadHistoryData() {
 function sortedSectors() {
   const keyword = state.keyword.trim().toLowerCase();
   const rows = (state.data?.plates || []).filter((sector) => {
+    if (isExcludedSector(sector)) return false;
     if (!keyword) return true;
     return [sector.plateName, sector.plateCode].join(' ').toLowerCase().includes(keyword);
   });
   return rows.slice().sort((a, b) => (Number(b[state.sortKey]) || -999999) - (Number(a[state.sortKey]) || -999999));
 }
 
+function isExcludedSector(sector) {
+  const name = String(sector?.plateName || '');
+  return EXCLUDED_SECTOR_PATTERNS.some((pattern) => pattern.test(name));
+}
+
+function excludedSectorCount() {
+  return (state.data?.plates || []).filter(isExcludedSector).length;
+}
+
 function activeSector() {
-  const sectors = state.data?.plates || [];
+  const sectors = sortedSectors();
   return sectors.find((sector) => sector.plateCode === state.selectedCode) || sectors[0];
 }
 
@@ -97,7 +119,7 @@ function renderListPage() {
             <h2>板块排行</h2>
             <p class="muted">点击左侧板块，右侧查看详情</p>
           </div>
-          <div class="count-pill">共 ${sectors.length} 个板块</div>
+          <div class="count-pill">显示 ${sectors.length} 个，已过滤 ${excludedSectorCount()} 个</div>
         </div>
         <div class="sidebar-controls">
           <label class="input-shell">
@@ -210,6 +232,7 @@ function matchTypeText(value) {
     exact: '同名',
     alias: '关联',
     name_contains: '包含',
+    industry_or_concept: '行业/题材',
   };
   return labels[value] || value || '未知';
 }
@@ -350,6 +373,53 @@ function renderExternalRows(rows) {
   `;
 }
 
+function renderStrongStocksTable(sector) {
+  const rows = [...(sector.strongStocks || [])].sort((a, b) => (Number(b.changePercent) || 0) - (Number(a.changePercent) || 0));
+  return `
+    <section class="card section-card">
+      <div class="section-head">
+        <div>
+          <h2>KPL 关联强势股</h2>
+          <p class="muted">来自开盘啦股票排行字段，按行业或题材标签与当前板块关联。</p>
+        </div>
+        <div class="count-pill">${rows.length} 只</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代码</th>
+              <th>名称</th>
+              <th>题材标签</th>
+              <th>涨跌幅</th>
+              <th>成交额</th>
+              <th>换手率</th>
+              <th>板型</th>
+              <th>行业</th>
+              <th>匹配方式</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.length ? rows.map((row) => `
+              <tr>
+                <td class="code">${row.code || '暂无'}</td>
+                <td><strong>${row.name || '暂无'}</strong><div class="muted">排行 #${row.rank ?? '暂无'}</div></td>
+                <td>${row.reasonTags || '暂无接口'}</td>
+                <td class="${Number(row.changePercent) >= 0 ? 'rise' : 'fall'}">${number(row.changePercent)}%</td>
+                <td>${money(row.amount)}</td>
+                <td>${number(row.turnoverRate)}%</td>
+                <td>${row.boardLabel || '暂无'}</td>
+                <td>${row.industry || '暂无'}</td>
+                <td>${matchTypeText(row.matchType)}</td>
+              </tr>
+            `).join('') : `<tr><td colspan="9" class="empty">当前 KPL 股票排行没有关联到强势股</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
 function renderExternalLimitTable(sector) {
   const snapshots = externalLimitHistory(sector);
   return `
@@ -405,11 +475,13 @@ function renderDetailContent(sector) {
           <span class="badge">强度 ${number(sector.strength, 0)}</span>
           <span class="badge">涨跌幅 ${number(sector.changePercent)}%</span>
           <span class="badge">外部涨停 ${sector.externalLimitMapping?.limitUpStocks?.length || 0} 家</span>
+          <span class="badge">强势股 ${sector.strongStocks?.length || 0} 只</span>
           <span class="badge">成交额 ${money(sector.amount)}</span>
         </div>
       </section>
 
       ${renderTrendCard(sector)}
+      ${renderStrongStocksTable(sector)}
       ${renderExternalLimitTable(sector)}
     </div>
   `;
@@ -448,7 +520,7 @@ async function boot() {
   if (!state.history.length) {
     state.history = [{ date: state.data.date, path: './data/kpl_dashboard.json' }];
   }
-  state.selectedCode = state.data.plates?.[0]?.plateCode || null;
+  state.selectedCode = sortedSectors()[0]?.plateCode || null;
   state.selectedDate = shortDate(state.data.date);
   render();
 }
