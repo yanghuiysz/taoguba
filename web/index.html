@@ -12,11 +12,12 @@
         <div>
           <p class="eyebrow">Topic Intelligence</p>
           <h1>题材数据看板</h1>
-          <p class="intro">淘股吧题材历史与开盘啦板块强度分开呈现，数据口径互不混用。</p>
+          <p class="intro">淘股吧题材、开盘啦板块强度与自定义观察池分开呈现，数据口径互不混用。</p>
         </div>
         <nav class="tabs" aria-label="数据源切换">
           <button class="tab active" data-target="taoguba">淘股吧题材</button>
           <button class="tab" data-target="kpl">开盘啦强度</button>
+          <button class="tab" data-target="custom">自定义板块</button>
         </nav>
       </header>
 
@@ -26,6 +27,10 @@
 
       <section class="panel" id="panel-kpl">
         <iframe title="开盘啦强度" src="./kpl.html"></iframe>
+      </section>
+
+      <section class="panel" id="panel-custom">
+        <iframe title="自定义板块" src="./custom.html"></iframe>
       </section>
     </main>
 

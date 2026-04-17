@@ -2,6 +2,7 @@ const tabs = [...document.querySelectorAll(".tab")];
 const panels = {
   taoguba: document.querySelector("#panel-taoguba"),
   kpl: document.querySelector("#panel-kpl"),
+  custom: document.querySelector("#panel-custom"),
 };
 
 function activate(target) {

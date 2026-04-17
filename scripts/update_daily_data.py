@@ -87,6 +87,7 @@ def main() -> None:
     parser.add_argument("--skip-taoguba", action="store_true", help="Skip Taoguba public history update.")
     parser.add_argument("--skip-kpl", action="store_true", help="Skip Kaipanla public endpoint update.")
     parser.add_argument("--skip-external", action="store_true", help="Skip Tonghuashun/Eastmoney external mapping.")
+    parser.add_argument("--skip-custom", action="store_true", help="Skip custom board average history update.")
     parser.add_argument("--sort-by", default="strength", help="Kaipanla plate sort key.")
     args = parser.parse_args()
 
@@ -101,6 +102,9 @@ def main() -> None:
         if not args.skip_external:
             run_script(["scripts/build_ths_limit_mapping.py", "--date", args.date])
         verify_kpl_history(args.date)
+
+    if not args.skip_custom:
+        run_script(["scripts/build_custom_board_data.py", "--date", args.date])
 
     print("\nDaily data update complete.")
 
