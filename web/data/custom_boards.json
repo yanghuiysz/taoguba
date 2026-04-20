@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-17",
+  "date": "2026-04-20",
   "days": 15,
   "source": {
     "name": "AkShare stock_zh_a_hist",
@@ -12,7 +12,7 @@
       "name": "CPO",
       "stockCount": 17,
       "availableStockCount": 17,
-      "latestAverageChange": 5.7998,
+      "latestAverageChange": 5.7996,
       "stocks": [
         {
           "code": "600330",
@@ -123,7 +123,7 @@
           "name": "华工科技",
           "latestDate": "2026-04-17",
           "latestClose": 116.68,
-          "latestChangePercent": 3.8818,
+          "latestChangePercent": 3.88,
           "availableDays": 15
         },
         {
@@ -147,14 +147,14 @@
           "name": "特发信息",
           "latestDate": "2026-04-17",
           "latestClose": 20.33,
-          "latestChangePercent": -2.1184,
+          "latestChangePercent": -2.12,
           "availableDays": 15
         }
       ],
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 0.1634,
+          "averageChange": 0.1633,
           "stockCount": 17,
           "stocks": [
             {
@@ -172,7 +172,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 3.9393,
+              "changePercent": 3.94,
               "close": 109.5
             },
             {
@@ -184,7 +184,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 0.7712,
+              "changePercent": 0.77,
               "close": 15.68
             },
             {
@@ -287,7 +287,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.1888,
+              "changePercent": 3.19,
               "close": 16.18
             },
             {
@@ -347,7 +347,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -2.3288,
+              "changePercent": -2.33,
               "close": 106.95
             },
             {
@@ -372,13 +372,13 @@
         },
         {
           "date": "2026-03-31",
-          "averageChange": -2.0898,
+          "averageChange": -2.0902,
           "stockCount": 17,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0124,
+              "changePercent": 10.01,
               "close": 17.8
             },
             {
@@ -420,7 +420,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -3.2258,
+              "changePercent": -3.23,
               "close": 103.5
             },
             {
@@ -481,7 +481,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 4.0432,
+          "averageChange": 4.0433,
           "stockCount": 17,
           "stocks": [
             {
@@ -535,7 +535,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.6517,
+              "changePercent": 3.65,
               "close": 18.45
             },
             {
@@ -565,7 +565,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 1.1981,
+              "changePercent": 1.2,
               "close": 104.74
             },
             {
@@ -590,13 +590,13 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": -1.8659,
+          "averageChange": -1.8657,
           "stockCount": 17,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.9864,
+              "changePercent": 4.99,
               "close": 19.37
             },
             {
@@ -686,7 +686,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -4.2009,
+              "changePercent": -4.2,
               "close": 100.34
             },
             {
@@ -699,7 +699,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": 2.2575,
+          "averageChange": 2.2577,
           "stockCount": 17,
           "stocks": [
             {
@@ -741,7 +741,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 3.1892,
+              "changePercent": 3.19,
               "close": 103.54
             },
             {
@@ -801,14 +801,14 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.5622,
+              "changePercent": -3.56,
               "close": 18.68
             }
           ]
         },
         {
           "date": "2026-04-07",
-          "averageChange": -0.466,
+          "averageChange": -0.4656,
           "stockCount": 17,
           "stocks": [
             {
@@ -862,7 +862,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 0.6374,
+              "changePercent": 0.64,
               "close": 104.2
             },
             {
@@ -892,7 +892,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.9443,
+              "changePercent": -2.94,
               "close": 18.13
             },
             {
@@ -917,7 +917,7 @@
         },
         {
           "date": "2026-04-08",
-          "averageChange": 6.8122,
+          "averageChange": 6.8123,
           "stockCount": 17,
           "stocks": [
             {
@@ -989,7 +989,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 5.9597,
+              "changePercent": 5.96,
               "close": 110.41
             },
             {
@@ -1001,7 +1001,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.6884,
+              "changePercent": 4.69,
               "close": 18.98
             },
             {
@@ -1026,7 +1026,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": 3.5215,
+          "averageChange": 3.5213,
           "stockCount": 17,
           "stocks": [
             {
@@ -1038,7 +1038,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0105,
+              "changePercent": 10.01,
               "close": 20.88
             },
             {
@@ -1068,7 +1068,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 4.0938,
+              "changePercent": 4.09,
               "close": 114.93
             },
             {
@@ -1135,7 +1135,7 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": 1.7334,
+          "averageChange": 1.7335,
           "stockCount": 17,
           "stocks": [
             {
@@ -1183,7 +1183,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 0.8614,
+              "changePercent": 0.86,
               "close": 115.92
             },
             {
@@ -1231,7 +1231,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -5.364,
+              "changePercent": -5.36,
               "close": 19.76
             },
             {
@@ -1244,19 +1244,19 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": 2.1579,
+          "averageChange": 2.1577,
           "stockCount": 17,
           "stocks": [
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 7.971,
+              "changePercent": 7.97,
               "close": 125.16
             },
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 6.7814,
+              "changePercent": 6.78,
               "close": 21.1
             },
             {
@@ -1353,7 +1353,7 @@
         },
         {
           "date": "2026-04-14",
-          "averageChange": -0.1931,
+          "averageChange": -0.1934,
           "stockCount": 17,
           "stocks": [
             {
@@ -1443,13 +1443,13 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -3.6194,
+              "changePercent": -3.62,
               "close": 120.63
             },
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.8863,
+              "changePercent": -3.89,
               "close": 20.28
             },
             {
@@ -1558,26 +1558,26 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -6.9034,
+              "changePercent": -6.9,
               "close": 18.88
             },
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -6.9054,
+              "changePercent": -6.91,
               "close": 112.3
             }
           ]
         },
         {
           "date": "2026-04-16",
-          "averageChange": 2.7169,
+          "averageChange": 2.717,
           "stockCount": 17,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0106,
+              "changePercent": 10.01,
               "close": 20.77
             },
             {
@@ -1649,7 +1649,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 0.0178,
+              "changePercent": 0.02,
               "close": 112.32
             },
             {
@@ -1680,7 +1680,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": 5.7998,
+          "averageChange": 5.7996,
           "stockCount": 17,
           "stocks": [
             {
@@ -1764,7 +1764,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 3.8818,
+              "changePercent": 3.88,
               "close": 116.68
             },
             {
@@ -1782,7 +1782,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.1184,
+              "changePercent": -2.12,
               "close": 20.33
             }
           ]
@@ -4592,7 +4592,7 @@
       "name": "玻纤",
       "stockCount": 12,
       "availableStockCount": 12,
-      "latestAverageChange": 1.8466,
+      "latestAverageChange": 1.8465,
       "stocks": [
         {
           "code": "600707",
@@ -4679,7 +4679,7 @@
           "name": "特发信息",
           "latestDate": "2026-04-17",
           "latestClose": 20.33,
-          "latestChangePercent": -2.1184,
+          "latestChangePercent": -2.12,
           "availableDays": 15
         },
         {
@@ -4694,7 +4694,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": -0.1324,
+          "averageChange": -0.1325,
           "stockCount": 12,
           "stocks": [
             {
@@ -4718,7 +4718,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 0.7712,
+              "changePercent": 0.77,
               "close": 15.68
             },
             {
@@ -4773,7 +4773,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": 3.1648,
+          "averageChange": 3.1649,
           "stockCount": 12,
           "stocks": [
             {
@@ -4803,7 +4803,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.1888,
+              "changePercent": 3.19,
               "close": 16.18
             },
             {
@@ -4852,13 +4852,13 @@
         },
         {
           "date": "2026-03-31",
-          "averageChange": -1.0428,
+          "averageChange": -1.043,
           "stockCount": 12,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0124,
+              "changePercent": 10.01,
               "close": 17.8
             },
             {
@@ -4931,7 +4931,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 3.536,
+          "averageChange": 3.5359,
           "stockCount": 12,
           "stocks": [
             {
@@ -4979,7 +4979,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.6517,
+              "changePercent": 3.65,
               "close": 18.45
             },
             {
@@ -5010,13 +5010,13 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": -2.8131,
+          "averageChange": -2.8128,
           "stockCount": 12,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.9864,
+              "changePercent": 4.99,
               "close": 19.37
             },
             {
@@ -5089,7 +5089,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": -0.9929,
+          "averageChange": -0.9927,
           "stockCount": 12,
           "stocks": [
             {
@@ -5155,7 +5155,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.5622,
+              "changePercent": -3.56,
               "close": 18.68
             },
             {
@@ -5168,7 +5168,7 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 1.063,
+          "averageChange": 1.0634,
           "stockCount": 12,
           "stocks": [
             {
@@ -5234,7 +5234,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.9443,
+              "changePercent": -2.94,
               "close": 18.13
             },
             {
@@ -5247,7 +5247,7 @@
         },
         {
           "date": "2026-04-08",
-          "averageChange": 5.4767,
+          "averageChange": 5.4769,
           "stockCount": 12,
           "stocks": [
             {
@@ -5283,7 +5283,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.6884,
+              "changePercent": 4.69,
               "close": 18.98
             },
             {
@@ -5326,7 +5326,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": 3.6932,
+          "averageChange": 3.6931,
           "stockCount": 12,
           "stocks": [
             {
@@ -5344,7 +5344,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0105,
+              "changePercent": 10.01,
               "close": 20.88
             },
             {
@@ -5405,7 +5405,7 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": 4.2305,
+          "averageChange": 4.2308,
           "stockCount": 12,
           "stocks": [
             {
@@ -5477,14 +5477,14 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -5.364,
+              "changePercent": -5.36,
               "close": 19.76
             }
           ]
         },
         {
           "date": "2026-04-13",
-          "averageChange": 5.5194,
+          "averageChange": 5.5192,
           "stockCount": 12,
           "stocks": [
             {
@@ -5514,7 +5514,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 6.7814,
+              "changePercent": 6.78,
               "close": 21.1
             },
             {
@@ -5563,7 +5563,7 @@
         },
         {
           "date": "2026-04-14",
-          "averageChange": 1.5094,
+          "averageChange": 1.5091,
           "stockCount": 12,
           "stocks": [
             {
@@ -5635,14 +5635,14 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.8863,
+              "changePercent": -3.89,
               "close": 20.28
             }
           ]
         },
         {
           "date": "2026-04-15",
-          "averageChange": -0.63,
+          "averageChange": -0.6297,
           "stockCount": 12,
           "stocks": [
             {
@@ -5714,20 +5714,20 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -6.9034,
+              "changePercent": -6.9,
               "close": 18.88
             }
           ]
         },
         {
           "date": "2026-04-16",
-          "averageChange": 2.316,
+          "averageChange": 2.3159,
           "stockCount": 12,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0106,
+              "changePercent": 10.01,
               "close": 20.77
             },
             {
@@ -5800,7 +5800,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": 1.8466,
+          "averageChange": 1.8465,
           "stockCount": 12,
           "stocks": [
             {
@@ -5866,7 +5866,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.1184,
+              "changePercent": -2.12,
               "close": 20.33
             },
             {
@@ -5884,7 +5884,7 @@
       "name": "商业航天",
       "stockCount": 22,
       "availableStockCount": 22,
-      "latestAverageChange": 1.4827,
+      "latestAverageChange": 1.4828,
       "stocks": [
         {
           "code": "002297",
@@ -5987,7 +5987,7 @@
           "name": "航天科技",
           "latestDate": "2026-04-17",
           "latestClose": 23.12,
-          "latestChangePercent": 0.9607,
+          "latestChangePercent": 0.96,
           "availableDays": 15
         },
         {
@@ -6031,19 +6031,19 @@
           "availableDays": 15
         },
         {
+          "code": "000547",
+          "name": "航天发展",
+          "latestDate": "2026-04-17",
+          "latestClose": 26.98,
+          "latestChangePercent": -1.53,
+          "availableDays": 15
+        },
+        {
           "code": "000592",
           "name": "平潭发展",
           "latestDate": "2026-04-17",
           "latestClose": 10.94,
           "latestChangePercent": -1.5302,
-          "availableDays": 15
-        },
-        {
-          "code": "000547",
-          "name": "航天发展",
-          "latestDate": "2026-04-17",
-          "latestClose": 26.98,
-          "latestChangePercent": -1.5328,
           "availableDays": 15
         },
         {
@@ -6066,7 +6066,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 0.4543,
+          "averageChange": 0.4541,
           "stockCount": 22,
           "stocks": [
             {
@@ -6108,7 +6108,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 1.1515,
+              "changePercent": 1.15,
               "close": 21.96
             },
             {
@@ -6192,7 +6192,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -2.8064,
+              "changePercent": -2.81,
               "close": 27.36
             },
             {
@@ -6205,7 +6205,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": 4.7647,
+          "averageChange": 4.7643,
           "stockCount": 22,
           "stocks": [
             {
@@ -6259,7 +6259,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": 4.8246,
+              "changePercent": 4.82,
               "close": 28.68
             },
             {
@@ -6319,7 +6319,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 2.4135,
+              "changePercent": 2.41,
               "close": 22.49
             },
             {
@@ -6344,7 +6344,7 @@
         },
         {
           "date": "2026-03-31",
-          "averageChange": 1.8295,
+          "averageChange": 1.8293,
           "stockCount": 22,
           "stocks": [
             {
@@ -6428,7 +6428,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 0.1334,
+              "changePercent": 0.13,
               "close": 22.52
             },
             {
@@ -6458,7 +6458,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -0.7671,
+              "changePercent": -0.77,
               "close": 28.46
             },
             {
@@ -6483,7 +6483,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": -1.8068,
+          "averageChange": -1.807,
           "stockCount": 22,
           "stocks": [
             {
@@ -6531,7 +6531,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": -0.9769,
+              "changePercent": -0.98,
               "close": 22.3
             },
             {
@@ -6549,7 +6549,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -2.1785,
+              "changePercent": -2.18,
               "close": 27.84
             },
             {
@@ -6622,7 +6622,7 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": -1.9223,
+          "averageChange": -1.9222,
           "stockCount": 22,
           "stocks": [
             {
@@ -6670,7 +6670,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": -1.9731,
+              "changePercent": -1.97,
               "close": 21.86
             },
             {
@@ -6718,7 +6718,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -2.9095,
+              "changePercent": -2.91,
               "close": 27.03
             },
             {
@@ -6761,7 +6761,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": -2.2315,
+          "averageChange": -2.2314,
           "stockCount": 22,
           "stocks": [
             {
@@ -6851,7 +6851,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": -2.6075,
+              "changePercent": -2.61,
               "close": 21.29
             },
             {
@@ -6869,7 +6869,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -4.6245,
+              "changePercent": -4.62,
               "close": 25.78
             },
             {
@@ -6900,7 +6900,7 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 0.0504,
+          "averageChange": 0.0503,
           "stockCount": 22,
           "stocks": [
             {
@@ -6948,7 +6948,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": 0.5818,
+              "changePercent": 0.58,
               "close": 25.93
             },
             {
@@ -6966,7 +6966,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": -0.4697,
+              "changePercent": -0.47,
               "close": 21.19
             },
             {
@@ -7039,7 +7039,7 @@
         },
         {
           "date": "2026-04-08",
-          "averageChange": 5.812,
+          "averageChange": 5.8118,
           "stockCount": 22,
           "stocks": [
             {
@@ -7081,7 +7081,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": 6.4404,
+              "changePercent": 6.44,
               "close": 27.6
             },
             {
@@ -7099,7 +7099,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 5.9934,
+              "changePercent": 5.99,
               "close": 22.46
             },
             {
@@ -7178,7 +7178,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": -0.3377,
+          "averageChange": -0.3376,
           "stockCount": 22,
           "stocks": [
             {
@@ -7220,7 +7220,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": -0.3117,
+              "changePercent": -0.31,
               "close": 22.39
             },
             {
@@ -7286,7 +7286,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -2.971,
+              "changePercent": -2.97,
               "close": 26.78
             },
             {
@@ -7317,7 +7317,7 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": -1.2429,
+          "averageChange": -1.2427,
           "stockCount": 22,
           "stocks": [
             {
@@ -7347,7 +7347,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 0.0893,
+              "changePercent": 0.09,
               "close": 22.41
             },
             {
@@ -7395,7 +7395,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -1.0829,
+              "changePercent": -1.08,
               "close": 26.49
             },
             {
@@ -7456,7 +7456,7 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": 1.0468,
+          "averageChange": 1.0467,
           "stockCount": 22,
           "stocks": [
             {
@@ -7522,7 +7522,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 0.6247,
+              "changePercent": 0.62,
               "close": 22.55
             },
             {
@@ -7546,7 +7546,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -0.2643,
+              "changePercent": -0.26,
               "close": 26.42
             },
             {
@@ -7595,7 +7595,7 @@
         },
         {
           "date": "2026-04-14",
-          "averageChange": 4.241,
+          "averageChange": 4.2413,
           "stockCount": 22,
           "stocks": [
             {
@@ -7685,13 +7685,13 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": 2.8388,
+              "changePercent": 2.84,
               "close": 27.17
             },
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 2.306,
+              "changePercent": 2.31,
               "close": 23.07
             },
             {
@@ -7734,7 +7734,7 @@
         },
         {
           "date": "2026-04-15",
-          "averageChange": 2.1619,
+          "averageChange": 2.1617,
           "stockCount": 22,
           "stocks": [
             {
@@ -7794,7 +7794,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": 1.8403,
+              "changePercent": 1.84,
               "close": 27.67
             },
             {
@@ -7836,7 +7836,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 0.0433,
+              "changePercent": 0.04,
               "close": 23.08
             },
             {
@@ -7873,7 +7873,7 @@
         },
         {
           "date": "2026-04-16",
-          "averageChange": 0.8789,
+          "averageChange": 0.8787,
           "stockCount": 22,
           "stocks": [
             {
@@ -7975,7 +7975,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": -0.7799,
+              "changePercent": -0.78,
               "close": 22.9
             },
             {
@@ -7993,7 +7993,7 @@
             {
               "code": "000547",
               "name": "航天发展",
-              "changePercent": -0.9758,
+              "changePercent": -0.98,
               "close": 27.4
             },
             {
@@ -8012,7 +8012,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": 1.4827,
+          "averageChange": 1.4828,
           "stockCount": 22,
           "stocks": [
             {
@@ -8090,7 +8090,7 @@
             {
               "code": "000901",
               "name": "航天科技",
-              "changePercent": 0.9607,
+              "changePercent": 0.96,
               "close": 23.12
             },
             {
@@ -8124,16 +8124,16 @@
               "close": 9.14
             },
             {
+              "code": "000547",
+              "name": "航天发展",
+              "changePercent": -1.53,
+              "close": 26.98
+            },
+            {
               "code": "000592",
               "name": "平潭发展",
               "changePercent": -1.5302,
               "close": 10.94
-            },
-            {
-              "code": "000547",
-              "name": "航天发展",
-              "changePercent": -1.5328,
-              "close": 26.98
             },
             {
               "code": "603601",
@@ -8354,7 +8354,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 1.0986,
+          "averageChange": 1.0984,
           "stockCount": 24,
           "stocks": [
             {
@@ -8474,7 +8474,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": -2.5554,
+              "changePercent": -2.56,
               "close": 11.44
             },
             {
@@ -8505,7 +8505,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": -1.2291,
+          "averageChange": -1.2289,
           "stockCount": 24,
           "stocks": [
             {
@@ -8637,7 +8637,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": -6.993,
+              "changePercent": -6.99,
               "close": 10.64
             },
             {
@@ -8758,7 +8758,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": -4.9812,
+              "changePercent": -4.98,
               "close": 10.11
             },
             {
@@ -8807,7 +8807,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 2.3715,
+          "averageChange": 2.3713,
           "stockCount": 24,
           "stocks": [
             {
@@ -8909,7 +8909,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": 0.4946,
+              "changePercent": 0.49,
               "close": 10.16
             },
             {
@@ -8958,7 +8958,7 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": -1.9929,
+          "averageChange": -1.993,
           "stockCount": 24,
           "stocks": [
             {
@@ -9018,7 +9018,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": -1.9685,
+              "changePercent": -1.97,
               "close": 9.96
             },
             {
@@ -9260,7 +9260,7 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 1.8071,
+          "averageChange": 1.8072,
           "stockCount": 24,
           "stocks": [
             {
@@ -9338,7 +9338,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": 1.3388,
+              "changePercent": 1.34,
               "close": 9.84
             },
             {
@@ -9411,7 +9411,7 @@
         },
         {
           "date": "2026-04-08",
-          "averageChange": 4.0699,
+          "averageChange": 4.07,
           "stockCount": 24,
           "stocks": [
             {
@@ -9507,7 +9507,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": 2.439,
+              "changePercent": 2.44,
               "close": 10.08
             },
             {
@@ -9562,7 +9562,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": 6.8722,
+          "averageChange": 6.872,
           "stockCount": 24,
           "stocks": [
             {
@@ -9706,7 +9706,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": -2.9762,
+              "changePercent": -2.98,
               "close": 9.78
             }
           ]
@@ -9864,7 +9864,7 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": 3.1188,
+          "averageChange": 3.1187,
           "stockCount": 24,
           "stocks": [
             {
@@ -9936,7 +9936,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": 1.9427,
+              "changePercent": 1.94,
               "close": 9.97
             },
             {
@@ -10105,7 +10105,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": 0.4012,
+              "changePercent": 0.4,
               "close": 10.01
             },
             {
@@ -10250,7 +10250,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": -0.3996,
+              "changePercent": -0.4,
               "close": 9.97
             },
             {
@@ -10317,7 +10317,7 @@
         },
         {
           "date": "2026-04-16",
-          "averageChange": 2.1171,
+          "averageChange": 2.117,
           "stockCount": 24,
           "stocks": [
             {
@@ -10383,7 +10383,7 @@
             {
               "code": "000537",
               "name": "绿发电力",
-              "changePercent": 1.003,
+              "changePercent": 1.0,
               "close": 10.07
             },
             {
@@ -13502,7 +13502,7 @@
       "name": "存储芯片",
       "stockCount": 13,
       "availableStockCount": 13,
-      "latestAverageChange": 0.5288,
+      "latestAverageChange": 0.5289,
       "stocks": [
         {
           "code": "002990",
@@ -13533,7 +13533,7 @@
           "name": "深科技",
           "latestDate": "2026-04-17",
           "latestClose": 29.0,
-          "latestChangePercent": 0.7994,
+          "latestChangePercent": 0.8,
           "availableDays": 15
         },
         {
@@ -13612,7 +13612,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 0.0793,
+          "averageChange": 0.0792,
           "stockCount": 13,
           "stocks": [
             {
@@ -13684,7 +13684,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": -1.3281,
+              "changePercent": -1.33,
               "close": 27.49
             },
             {
@@ -13697,7 +13697,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": -0.35,
+          "averageChange": -0.3503,
           "stockCount": 13,
           "stocks": [
             {
@@ -13751,7 +13751,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": -1.4551,
+              "changePercent": -1.46,
               "close": 27.09
             },
             {
@@ -13782,7 +13782,7 @@
         },
         {
           "date": "2026-03-31",
-          "averageChange": -5.0228,
+          "averageChange": -5.0229,
           "stockCount": 13,
           "stocks": [
             {
@@ -13824,7 +13824,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": -4.7988,
+              "changePercent": -4.8,
               "close": 25.79
             },
             {
@@ -13867,7 +13867,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 2.9587,
+          "averageChange": 2.9586,
           "stockCount": 13,
           "stocks": [
             {
@@ -13897,7 +13897,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 3.4122,
+              "changePercent": 3.41,
               "close": 26.67
             },
             {
@@ -13952,7 +13952,7 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": -2.5892,
+          "averageChange": -2.5889,
           "stockCount": 13,
           "stocks": [
             {
@@ -14012,7 +14012,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": -3.8245,
+              "changePercent": -3.82,
               "close": 25.65
             },
             {
@@ -14122,7 +14122,7 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 1.9756,
+          "averageChange": 1.9753,
           "stockCount": 13,
           "stocks": [
             {
@@ -14170,7 +14170,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 1.4035,
+              "changePercent": 1.4,
               "close": 26.01
             },
             {
@@ -14207,7 +14207,7 @@
         },
         {
           "date": "2026-04-08",
-          "averageChange": 7.0948,
+          "averageChange": 7.095,
           "stockCount": 13,
           "stocks": [
             {
@@ -14249,7 +14249,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 6.9973,
+              "changePercent": 7.0,
               "close": 27.83
             },
             {
@@ -14292,7 +14292,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": 2.0823,
+          "averageChange": 2.082,
           "stockCount": 13,
           "stocks": [
             {
@@ -14346,7 +14346,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": -0.4671,
+              "changePercent": -0.47,
               "close": 27.7
             },
             {
@@ -14377,7 +14377,7 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": 2.7365,
+          "averageChange": 2.7362,
           "stockCount": 13,
           "stocks": [
             {
@@ -14425,7 +14425,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 1.444,
+              "changePercent": 1.44,
               "close": 28.1
             },
             {
@@ -14462,7 +14462,7 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": 1.2444,
+          "averageChange": 1.2441,
           "stockCount": 13,
           "stocks": [
             {
@@ -14510,7 +14510,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 0.5338,
+              "changePercent": 0.53,
               "close": 28.25
             },
             {
@@ -14547,7 +14547,7 @@
         },
         {
           "date": "2026-04-14",
-          "averageChange": 4.2297,
+          "averageChange": 4.23,
           "stockCount": 13,
           "stocks": [
             {
@@ -14595,7 +14595,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 3.115,
+              "changePercent": 3.12,
               "close": 29.13
             },
             {
@@ -14632,7 +14632,7 @@
         },
         {
           "date": "2026-04-15",
-          "averageChange": -1.1267,
+          "averageChange": -1.1269,
           "stockCount": 13,
           "stocks": [
             {
@@ -14692,7 +14692,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": -2.918,
+              "changePercent": -2.92,
               "close": 28.28
             },
             {
@@ -14717,7 +14717,7 @@
         },
         {
           "date": "2026-04-16",
-          "averageChange": 3.0527,
+          "averageChange": 3.0525,
           "stockCount": 13,
           "stocks": [
             {
@@ -14751,16 +14751,16 @@
               "close": 48.02
             },
             {
-              "code": "000021",
-              "name": "深科技",
-              "changePercent": 1.7327,
-              "close": 28.77
-            },
-            {
               "code": "603175",
               "name": "超颖电子",
               "changePercent": 1.7324,
               "close": 91.02
+            },
+            {
+              "code": "000021",
+              "name": "深科技",
+              "changePercent": 1.73,
+              "close": 28.77
             },
             {
               "code": "688347",
@@ -14802,7 +14802,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": 0.5288,
+          "averageChange": 0.5289,
           "stockCount": 13,
           "stocks": [
             {
@@ -14826,7 +14826,7 @@
             {
               "code": "000021",
               "name": "深科技",
-              "changePercent": 0.7994,
+              "changePercent": 0.8,
               "close": 29.0
             },
             {
@@ -19320,7 +19320,7 @@
       "name": "算力",
       "stockCount": 41,
       "availableStockCount": 41,
-      "latestAverageChange": 0.3035,
+      "latestAverageChange": 0.3034,
       "stocks": [
         {
           "code": "003018",
@@ -19375,7 +19375,7 @@
           "name": "深圳华强",
           "latestDate": "2026-04-17",
           "latestClose": 29.76,
-          "latestChangePercent": 3.9832,
+          "latestChangePercent": 3.98,
           "availableDays": 15
         },
         {
@@ -19383,7 +19383,7 @@
           "name": "华工科技",
           "latestDate": "2026-04-17",
           "latestClose": 116.68,
-          "latestChangePercent": 3.8818,
+          "latestChangePercent": 3.88,
           "availableDays": 15
         },
         {
@@ -19455,7 +19455,7 @@
           "name": "中国长城",
           "latestDate": "2026-04-17",
           "latestClose": 15.72,
-          "latestChangePercent": 0.7692,
+          "latestChangePercent": 0.77,
           "availableDays": 15
         },
         {
@@ -19479,7 +19479,7 @@
           "name": "常山北明",
           "latestDate": "2026-04-17",
           "latestClose": 17.81,
-          "latestChangePercent": -0.1122,
+          "latestChangePercent": -0.11,
           "availableDays": 15
         },
         {
@@ -19535,7 +19535,7 @@
           "name": "特发信息",
           "latestDate": "2026-04-17",
           "latestClose": 20.33,
-          "latestChangePercent": -2.1184,
+          "latestChangePercent": -2.12,
           "availableDays": 15
         },
         {
@@ -19654,7 +19654,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 0.9047,
+          "averageChange": 0.9045,
           "stockCount": 41,
           "stocks": [
             {
@@ -19678,13 +19678,13 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 4.162,
+              "changePercent": 4.16,
               "close": 27.78
             },
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 3.9393,
+              "changePercent": 3.94,
               "close": 109.5
             },
             {
@@ -19714,7 +19714,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 1.6422,
+              "changePercent": 1.64,
               "close": 17.33
             },
             {
@@ -19774,7 +19774,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 0.7712,
+              "changePercent": 0.77,
               "close": 15.68
             },
             {
@@ -19876,7 +19876,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -2.2064,
+              "changePercent": -2.21,
               "close": 15.07
             },
             {
@@ -19907,7 +19907,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": 1.5702,
+          "averageChange": 1.5703,
           "stockCount": 41,
           "stocks": [
             {
@@ -19955,7 +19955,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.1888,
+              "changePercent": 3.19,
               "close": 16.18
             },
             {
@@ -20069,7 +20069,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 0.4616,
+              "changePercent": 0.46,
               "close": 17.41
             },
             {
@@ -20123,7 +20123,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -1.0617,
+              "changePercent": -1.06,
               "close": 14.91
             },
             {
@@ -20141,7 +20141,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -2.3288,
+              "changePercent": -2.33,
               "close": 106.95
             },
             {
@@ -20153,14 +20153,14 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": -4.9316,
+              "changePercent": -4.93,
               "close": 26.41
             }
           ]
         },
         {
           "date": "2026-03-31",
-          "averageChange": -1.6806,
+          "averageChange": -1.6809,
           "stockCount": 41,
           "stocks": [
             {
@@ -20172,7 +20172,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0124,
+              "changePercent": 10.01,
               "close": 17.8
             },
             {
@@ -20214,7 +20214,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": -0.0574,
+              "changePercent": -0.06,
               "close": 17.4
             },
             {
@@ -20238,7 +20238,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -1.3414,
+              "changePercent": -1.34,
               "close": 14.71
             },
             {
@@ -20334,7 +20334,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -3.2258,
+              "changePercent": -3.23,
               "close": 103.5
             },
             {
@@ -20388,7 +20388,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": -6.437,
+              "changePercent": -6.44,
               "close": 24.71
             },
             {
@@ -20413,7 +20413,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 3.8454,
+          "averageChange": 3.8452,
           "stockCount": 41,
           "stocks": [
             {
@@ -20479,7 +20479,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 5.5443,
+              "changePercent": 5.54,
               "close": 26.08
             },
             {
@@ -20509,7 +20509,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.6517,
+              "changePercent": 3.65,
               "close": 18.45
             },
             {
@@ -20599,7 +20599,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 1.1981,
+              "changePercent": 1.2,
               "close": 104.74
             },
             {
@@ -20623,13 +20623,13 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 0.9517,
+              "changePercent": 0.95,
               "close": 14.85
             },
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 0.8621,
+              "changePercent": 0.86,
               "close": 17.55
             },
             {
@@ -20672,7 +20672,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.9864,
+              "changePercent": 4.99,
               "close": 19.37
             },
             {
@@ -20738,7 +20738,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": -2.1652,
+              "changePercent": -2.17,
               "close": 17.17
             },
             {
@@ -20750,7 +20750,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -2.8283,
+              "changePercent": -2.83,
               "close": 14.43
             },
             {
@@ -20786,7 +20786,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -4.2009,
+              "changePercent": -4.2,
               "close": 100.34
             },
             {
@@ -20894,7 +20894,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": -6.7101,
+              "changePercent": -6.71,
               "close": 24.33
             },
             {
@@ -20919,7 +20919,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": -0.6326,
+          "averageChange": -0.6324,
           "stockCount": 41,
           "stocks": [
             {
@@ -20961,7 +20961,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 3.1892,
+              "changePercent": 3.19,
               "close": 103.54
             },
             {
@@ -20979,7 +20979,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 0.9864,
+              "changePercent": 0.99,
               "close": 24.57
             },
             {
@@ -21039,7 +21039,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": -1.3395,
+              "changePercent": -1.34,
               "close": 16.94
             },
             {
@@ -21063,7 +21063,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -1.6632,
+              "changePercent": -1.66,
               "close": 14.19
             },
             {
@@ -21111,7 +21111,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.5622,
+              "changePercent": -3.56,
               "close": 18.68
             },
             {
@@ -21172,13 +21172,13 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 1.0347,
+          "averageChange": 1.0349,
           "stockCount": 41,
           "stocks": [
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 10.0122,
+              "changePercent": 10.01,
               "close": 27.03
             },
             {
@@ -21286,7 +21286,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 0.6374,
+              "changePercent": 0.64,
               "close": 104.2
             },
             {
@@ -21310,13 +21310,13 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 0.4228,
+              "changePercent": 0.42,
               "close": 14.25
             },
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 0.2361,
+              "changePercent": 0.24,
               "close": 16.98
             },
             {
@@ -21406,7 +21406,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.9443,
+              "changePercent": -2.94,
               "close": 18.13
             },
             {
@@ -21425,7 +21425,7 @@
         },
         {
           "date": "2026-04-08",
-          "averageChange": 7.5464,
+          "averageChange": 7.5465,
           "stockCount": 41,
           "stocks": [
             {
@@ -21587,7 +21587,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 5.9597,
+              "changePercent": 5.96,
               "close": 110.41
             },
             {
@@ -21617,25 +21617,25 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 5.1228,
+              "changePercent": 5.12,
               "close": 14.98
             },
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 4.947,
+              "changePercent": 4.95,
               "close": 17.82
             },
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 4.7355,
+              "changePercent": 4.74,
               "close": 28.31
             },
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.6884,
+              "changePercent": 4.69,
               "close": 18.98
             },
             {
@@ -21678,7 +21678,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": 1.2955,
+          "averageChange": 1.2957,
           "stockCount": 41,
           "stocks": [
             {
@@ -21690,7 +21690,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0105,
+              "changePercent": 10.01,
               "close": 20.88
             },
             {
@@ -21732,7 +21732,7 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 4.0938,
+              "changePercent": 4.09,
               "close": 114.93
             },
             {
@@ -21756,7 +21756,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 2.3667,
+              "changePercent": 2.37,
               "close": 28.98
             },
             {
@@ -21816,7 +21816,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -0.534,
+              "changePercent": -0.53,
               "close": 14.9
             },
             {
@@ -21888,7 +21888,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": -1.9641,
+              "changePercent": -1.96,
               "close": 17.47
             },
             {
@@ -21997,19 +21997,19 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 1.0738,
+              "changePercent": 1.07,
               "close": 15.06
             },
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 0.8614,
+              "changePercent": 0.86,
               "close": 115.92
             },
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 0.4579,
+              "changePercent": 0.46,
               "close": 17.55
             },
             {
@@ -22087,7 +22087,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": -1.3803,
+              "changePercent": -1.38,
               "close": 28.58
             },
             {
@@ -22159,7 +22159,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -5.364,
+              "changePercent": -5.36,
               "close": 19.76
             },
             {
@@ -22184,7 +22184,7 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": 1.4654,
+          "averageChange": 1.4653,
           "stockCount": 41,
           "stocks": [
             {
@@ -22220,13 +22220,13 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 7.971,
+              "changePercent": 7.97,
               "close": 125.16
             },
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 6.7814,
+              "changePercent": 6.78,
               "close": 21.1
             },
             {
@@ -22244,7 +22244,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 2.1912,
+              "changePercent": 2.19,
               "close": 15.39
             },
             {
@@ -22328,7 +22328,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 0.3849,
+              "changePercent": 0.38,
               "close": 28.69
             },
             {
@@ -22340,7 +22340,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 0.057,
+              "changePercent": 0.06,
               "close": 17.56
             },
             {
@@ -22599,7 +22599,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 1.1696,
+              "changePercent": 1.17,
               "close": 15.57
             },
             {
@@ -22635,7 +22635,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 0.2278,
+              "changePercent": 0.23,
               "close": 17.6
             },
             {
@@ -22659,7 +22659,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": -0.4183,
+              "changePercent": -0.42,
               "close": 28.57
             },
             {
@@ -22677,20 +22677,20 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -3.6194,
+              "changePercent": -3.62,
               "close": 120.63
             },
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.8863,
+              "changePercent": -3.89,
               "close": 20.28
             }
           ]
         },
         {
           "date": "2026-04-15",
-          "averageChange": -0.0185,
+          "averageChange": -0.0188,
           "stockCount": 41,
           "stocks": [
             {
@@ -22780,7 +22780,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 0.5138,
+              "changePercent": 0.51,
               "close": 15.65
             },
             {
@@ -22798,7 +22798,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": -0.2273,
+              "changePercent": -0.23,
               "close": 17.56
             },
             {
@@ -22858,7 +22858,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": -1.9951,
+              "changePercent": -2.0,
               "close": 28.0
             },
             {
@@ -22924,13 +22924,13 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -6.9034,
+              "changePercent": -6.9,
               "close": 18.88
             },
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": -6.9054,
+              "changePercent": -6.91,
               "close": 112.3
             },
             {
@@ -22961,7 +22961,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0106,
+              "changePercent": 10.01,
               "close": 20.77
             },
             {
@@ -23117,7 +23117,7 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 2.2143,
+              "changePercent": 2.21,
               "close": 28.62
             },
             {
@@ -23135,7 +23135,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": 1.5376,
+              "changePercent": 1.54,
               "close": 17.83
             },
             {
@@ -23171,13 +23171,13 @@
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 0.0178,
+              "changePercent": 0.02,
               "close": 112.32
             },
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": -0.3195,
+              "changePercent": -0.32,
               "close": 15.6
             },
             {
@@ -23196,7 +23196,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": 0.3035,
+          "averageChange": 0.3034,
           "stockCount": 41,
           "stocks": [
             {
@@ -23238,13 +23238,13 @@
             {
               "code": "000062",
               "name": "深圳华强",
-              "changePercent": 3.9832,
+              "changePercent": 3.98,
               "close": 29.76
             },
             {
               "code": "000988",
               "name": "华工科技",
-              "changePercent": 3.8818,
+              "changePercent": 3.88,
               "close": 116.68
             },
             {
@@ -23298,7 +23298,7 @@
             {
               "code": "000066",
               "name": "中国长城",
-              "changePercent": 0.7692,
+              "changePercent": 0.77,
               "close": 15.72
             },
             {
@@ -23316,7 +23316,7 @@
             {
               "code": "000158",
               "name": "常山北明",
-              "changePercent": -0.1122,
+              "changePercent": -0.11,
               "close": 17.81
             },
             {
@@ -23358,7 +23358,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.1184,
+              "changePercent": -2.12,
               "close": 20.33
             },
             {
@@ -23454,7 +23454,7 @@
       "name": "光纤",
       "stockCount": 11,
       "availableStockCount": 11,
-      "latestAverageChange": 0.1772,
+      "latestAverageChange": 0.177,
       "stocks": [
         {
           "code": "603618",
@@ -23525,7 +23525,7 @@
           "name": "特发信息",
           "latestDate": "2026-04-17",
           "latestClose": 20.33,
-          "latestChangePercent": -2.1184,
+          "latestChangePercent": -2.12,
           "availableDays": 15
         },
         {
@@ -23548,7 +23548,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 2.865,
+          "averageChange": 2.8649,
           "stockCount": 11,
           "stocks": [
             {
@@ -23602,7 +23602,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 0.7712,
+              "changePercent": 0.77,
               "close": 15.68
             },
             {
@@ -23621,7 +23621,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": 7.5937,
+          "averageChange": 7.5938,
           "stockCount": 11,
           "stocks": [
             {
@@ -23687,20 +23687,20 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.1888,
+              "changePercent": 3.19,
               "close": 16.18
             }
           ]
         },
         {
           "date": "2026-03-31",
-          "averageChange": 2.8445,
+          "averageChange": 2.8443,
           "stockCount": 11,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0124,
+              "changePercent": 10.01,
               "close": 17.8
             },
             {
@@ -23767,7 +23767,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 0.1623,
+          "averageChange": 0.1621,
           "stockCount": 11,
           "stocks": [
             {
@@ -23779,7 +23779,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 3.6517,
+              "changePercent": 3.65,
               "close": 18.45
             },
             {
@@ -23840,7 +23840,7 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": 2.4198,
+          "averageChange": 2.4201,
           "stockCount": 11,
           "stocks": [
             {
@@ -23858,7 +23858,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.9864,
+              "changePercent": 4.99,
               "close": 19.37
             },
             {
@@ -23913,7 +23913,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": 3.3122,
+          "averageChange": 3.3124,
           "stockCount": 11,
           "stocks": [
             {
@@ -23979,14 +23979,14 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.5622,
+              "changePercent": -3.56,
               "close": 18.68
             }
           ]
         },
         {
           "date": "2026-04-07",
-          "averageChange": 2.0524,
+          "averageChange": 2.0527,
           "stockCount": 11,
           "stocks": [
             {
@@ -24052,14 +24052,14 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.9443,
+              "changePercent": -2.94,
               "close": 18.13
             }
           ]
         },
         {
           "date": "2026-04-08",
-          "averageChange": 2.9505,
+          "averageChange": 2.9507,
           "stockCount": 11,
           "stocks": [
             {
@@ -24089,7 +24089,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 4.6884,
+              "changePercent": 4.69,
               "close": 18.98
             },
             {
@@ -24138,7 +24138,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0105,
+              "changePercent": 10.01,
               "close": 20.88
             },
             {
@@ -24205,7 +24205,7 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": -3.8811,
+          "averageChange": -3.8807,
           "stockCount": 11,
           "stocks": [
             {
@@ -24241,7 +24241,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -5.364,
+              "changePercent": -5.36,
               "close": 19.76
             },
             {
@@ -24278,13 +24278,13 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": -1.7964,
+          "averageChange": -1.7965,
           "stockCount": 11,
           "stocks": [
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 6.7814,
+              "changePercent": 6.78,
               "close": 21.1
             },
             {
@@ -24351,7 +24351,7 @@
         },
         {
           "date": "2026-04-14",
-          "averageChange": -1.8144,
+          "averageChange": -1.8147,
           "stockCount": 11,
           "stocks": [
             {
@@ -24393,7 +24393,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -3.8863,
+              "changePercent": -3.89,
               "close": 20.28
             },
             {
@@ -24424,7 +24424,7 @@
         },
         {
           "date": "2026-04-15",
-          "averageChange": -2.6348,
+          "averageChange": -2.6345,
           "stockCount": 11,
           "stocks": [
             {
@@ -24490,7 +24490,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -6.9034,
+              "changePercent": -6.9,
               "close": 18.88
             }
           ]
@@ -24503,7 +24503,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": 10.0106,
+              "changePercent": 10.01,
               "close": 20.77
             },
             {
@@ -24570,7 +24570,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": 0.1772,
+          "averageChange": 0.177,
           "stockCount": 11,
           "stocks": [
             {
@@ -24624,7 +24624,7 @@
             {
               "code": "000070",
               "name": "特发信息",
-              "changePercent": -2.1184,
+              "changePercent": -2.12,
               "close": 20.33
             },
             {
@@ -26136,7 +26136,7 @@
       "name": "机器人",
       "stockCount": 44,
       "availableStockCount": 44,
-      "latestAverageChange": -0.105,
+      "latestAverageChange": -0.1049,
       "stocks": [
         {
           "code": "603922",
@@ -26431,7 +26431,7 @@
           "name": "万向钱潮",
           "latestDate": "2026-04-17",
           "latestClose": 16.29,
-          "latestChangePercent": -1.5115,
+          "latestChangePercent": -1.51,
           "availableDays": 15
         },
         {
@@ -26487,14 +26487,14 @@
           "name": "威孚高科",
           "latestDate": "2026-04-17",
           "latestClose": 19.19,
-          "latestChangePercent": -7.7847,
+          "latestChangePercent": -7.78,
           "availableDays": 15
         }
       ],
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 1.1938,
+          "averageChange": 1.1939,
           "stockCount": 44,
           "stocks": [
             {
@@ -26722,7 +26722,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -0.194,
+              "changePercent": -0.19,
               "close": 15.43
             },
             {
@@ -26921,7 +26921,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -0.1944,
+              "changePercent": -0.19,
               "close": 15.4
             },
             {
@@ -26975,7 +26975,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -0.7756,
+              "changePercent": -0.78,
               "close": 20.47
             },
             {
@@ -27036,7 +27036,7 @@
         },
         {
           "date": "2026-03-31",
-          "averageChange": -0.6783,
+          "averageChange": -0.6785,
           "stockCount": 44,
           "stocks": [
             {
@@ -27096,7 +27096,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 0.1948,
+              "changePercent": 0.19,
               "close": 15.43
             },
             {
@@ -27126,7 +27126,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -0.5862,
+              "changePercent": -0.59,
               "close": 20.35
             },
             {
@@ -27307,7 +27307,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 1.8904,
+          "averageChange": 1.8906,
           "stockCount": 44,
           "stocks": [
             {
@@ -27415,7 +27415,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": 1.8673,
+              "changePercent": 1.87,
               "close": 20.73
             },
             {
@@ -27439,7 +27439,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 1.685,
+              "changePercent": 1.69,
               "close": 15.69
             },
             {
@@ -27578,7 +27578,7 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": -2.0746,
+          "averageChange": -2.0747,
           "stockCount": 44,
           "stocks": [
             {
@@ -27638,7 +27638,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -1.3989,
+              "changePercent": -1.4,
               "close": 20.44
             },
             {
@@ -27780,16 +27780,16 @@
               "close": 95.75
             },
             {
-              "code": "000559",
-              "name": "万向钱潮",
-              "changePercent": -2.8681,
-              "close": 15.24
-            },
-            {
               "code": "603030",
               "name": "全筑股份",
               "changePercent": -2.8689,
               "close": 2.37
+            },
+            {
+              "code": "000559",
+              "name": "万向钱潮",
+              "changePercent": -2.87,
+              "close": 15.24
             },
             {
               "code": "002046",
@@ -27849,7 +27849,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": -2.0239,
+          "averageChange": -2.0241,
           "stockCount": 44,
           "stocks": [
             {
@@ -27933,7 +27933,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -1.5166,
+              "changePercent": -1.52,
               "close": 20.13
             },
             {
@@ -28023,7 +28023,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -2.8871,
+              "changePercent": -2.89,
               "close": 14.8
             },
             {
@@ -28120,7 +28120,7 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 0.8178,
+          "averageChange": 0.8177,
           "stockCount": 44,
           "stocks": [
             {
@@ -28270,7 +28270,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 0.3378,
+              "changePercent": 0.34,
               "close": 14.85
             },
             {
@@ -28330,7 +28330,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -0.4471,
+              "changePercent": -0.45,
               "close": 20.04
             },
             {
@@ -28505,7 +28505,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 5.6566,
+              "changePercent": 5.66,
               "close": 15.69
             },
             {
@@ -28547,7 +28547,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": 4.6407,
+              "changePercent": 4.64,
               "close": 20.97
             },
             {
@@ -28662,7 +28662,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": -1.319,
+          "averageChange": -1.3189,
           "stockCount": 44,
           "stocks": [
             {
@@ -28746,7 +28746,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -1.0014,
+              "changePercent": -1.0,
               "close": 20.76
             },
             {
@@ -28878,7 +28878,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -2.4219,
+              "changePercent": -2.42,
               "close": 15.31
             },
             {
@@ -28933,13 +28933,13 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": 1.4491,
+          "averageChange": 1.4492,
           "stockCount": 44,
           "stocks": [
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 6.597,
+              "changePercent": 6.6,
               "close": 16.32
             },
             {
@@ -29071,7 +29071,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": 1.3006,
+              "changePercent": 1.3,
               "close": 21.03
             },
             {
@@ -29204,7 +29204,7 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": -0.1646,
+          "averageChange": -0.1645,
           "stockCount": 44,
           "stocks": [
             {
@@ -29372,7 +29372,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -0.7608,
+              "changePercent": -0.76,
               "close": 20.87
             },
             {
@@ -29408,7 +29408,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -1.0417,
+              "changePercent": -1.04,
               "close": 16.15
             },
             {
@@ -29475,7 +29475,7 @@
         },
         {
           "date": "2026-04-14",
-          "averageChange": 0.812,
+          "averageChange": 0.8119,
           "stockCount": 44,
           "stocks": [
             {
@@ -29523,7 +29523,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 1.9195,
+              "changePercent": 1.92,
               "close": 16.46
             },
             {
@@ -29611,16 +29611,16 @@
               "close": 8.14
             },
             {
-              "code": "000581",
-              "name": "威孚高科",
-              "changePercent": 0.575,
-              "close": 20.99
-            },
-            {
               "code": "002526",
               "name": "山东矿机",
               "changePercent": 0.5731,
               "close": 3.51
+            },
+            {
+              "code": "000581",
+              "name": "威孚高科",
+              "changePercent": 0.57,
+              "close": 20.99
             },
             {
               "code": "605133",
@@ -29746,7 +29746,7 @@
         },
         {
           "date": "2026-04-15",
-          "averageChange": -0.9911,
+          "averageChange": -0.991,
           "stockCount": 44,
           "stocks": [
             {
@@ -29830,7 +29830,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -0.6193,
+              "changePercent": -0.62,
               "close": 20.86
             },
             {
@@ -29884,7 +29884,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -1.0936,
+              "changePercent": -1.09,
               "close": 16.28
             },
             {
@@ -30125,7 +30125,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": 1.5971,
+              "changePercent": 1.6,
               "close": 16.54
             },
             {
@@ -30263,7 +30263,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -0.2397,
+              "changePercent": -0.24,
               "close": 20.81
             },
             {
@@ -30288,7 +30288,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": -0.105,
+          "averageChange": -0.1049,
           "stockCount": 44,
           "stocks": [
             {
@@ -30510,7 +30510,7 @@
             {
               "code": "000559",
               "name": "万向钱潮",
-              "changePercent": -1.5115,
+              "changePercent": -1.51,
               "close": 16.29
             },
             {
@@ -30552,7 +30552,7 @@
             {
               "code": "000581",
               "name": "威孚高科",
-              "changePercent": -7.7847,
+              "changePercent": -7.78,
               "close": 19.19
             }
           ]
@@ -30564,7 +30564,7 @@
       "name": "医药",
       "stockCount": 27,
       "availableStockCount": 27,
-      "latestAverageChange": -2.5531,
+      "latestAverageChange": -2.5532,
       "stocks": [
         {
           "code": "002940",
@@ -30731,7 +30731,7 @@
           "name": "金陵药业",
           "latestDate": "2026-04-17",
           "latestClose": 7.96,
-          "latestChangePercent": -4.0964,
+          "latestChangePercent": -4.1,
           "availableDays": 15
         },
         {
@@ -30786,7 +30786,7 @@
       "trend": [
         {
           "date": "2026-03-27",
-          "averageChange": 5.6888,
+          "averageChange": 5.6887,
           "stockCount": 27,
           "stocks": [
             {
@@ -30924,7 +30924,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 2.7221,
+              "changePercent": 2.72,
               "close": 7.17
             },
             {
@@ -30955,7 +30955,7 @@
         },
         {
           "date": "2026-03-30",
-          "averageChange": 3.5536,
+          "averageChange": 3.5535,
           "stockCount": 27,
           "stocks": [
             {
@@ -31027,7 +31027,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 1.8131,
+              "changePercent": 1.81,
               "close": 7.3
             },
             {
@@ -31124,7 +31124,7 @@
         },
         {
           "date": "2026-03-31",
-          "averageChange": 1.3924,
+          "averageChange": 1.3926,
           "stockCount": 27,
           "stocks": [
             {
@@ -31256,7 +31256,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": -1.6438,
+              "changePercent": -1.64,
               "close": 7.18
             },
             {
@@ -31293,7 +31293,7 @@
         },
         {
           "date": "2026-04-01",
-          "averageChange": 5.2146,
+          "averageChange": 5.2147,
           "stockCount": 27,
           "stocks": [
             {
@@ -31443,7 +31443,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 2.0891,
+              "changePercent": 2.09,
               "close": 7.33
             },
             {
@@ -31462,7 +31462,7 @@
         },
         {
           "date": "2026-04-02",
-          "averageChange": 2.384,
+          "averageChange": 2.3841,
           "stockCount": 27,
           "stocks": [
             {
@@ -31540,7 +31540,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 1.2278,
+              "changePercent": 1.23,
               "close": 7.42
             },
             {
@@ -31631,7 +31631,7 @@
         },
         {
           "date": "2026-04-03",
-          "averageChange": -2.082,
+          "averageChange": -2.0821,
           "stockCount": 27,
           "stocks": [
             {
@@ -31679,7 +31679,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": -0.8086,
+              "changePercent": -0.81,
               "close": 7.36
             },
             {
@@ -31800,13 +31800,13 @@
         },
         {
           "date": "2026-04-07",
-          "averageChange": 0.7418,
+          "averageChange": 0.7416,
           "stockCount": 27,
           "stocks": [
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 10.0543,
+              "changePercent": 10.05,
               "close": 8.1
             },
             {
@@ -32138,7 +32138,7 @@
         },
         {
           "date": "2026-04-09",
-          "averageChange": -1.6598,
+          "averageChange": -1.6597,
           "stockCount": 27,
           "stocks": [
             {
@@ -32270,7 +32270,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": -3.7037,
+              "changePercent": -3.7,
               "close": 8.58
             },
             {
@@ -32307,7 +32307,7 @@
         },
         {
           "date": "2026-04-10",
-          "averageChange": -0.1453,
+          "averageChange": -0.1455,
           "stockCount": 27,
           "stocks": [
             {
@@ -32457,7 +32457,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": -7.5758,
+              "changePercent": -7.58,
               "close": 7.93
             },
             {
@@ -32476,7 +32476,7 @@
         },
         {
           "date": "2026-04-13",
-          "averageChange": -2.2179,
+          "averageChange": -2.2181,
           "stockCount": 27,
           "stocks": [
             {
@@ -32638,14 +32638,14 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": -8.575,
+              "changePercent": -8.58,
               "close": 7.25
             }
           ]
         },
         {
           "date": "2026-04-14",
-          "averageChange": 1.9714,
+          "averageChange": 1.9715,
           "stockCount": 27,
           "stocks": [
             {
@@ -32681,7 +32681,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 3.5862,
+              "changePercent": 3.59,
               "close": 7.51
             },
             {
@@ -32814,7 +32814,7 @@
         },
         {
           "date": "2026-04-15",
-          "averageChange": 4.1291,
+          "averageChange": 4.1292,
           "stockCount": 27,
           "stocks": [
             {
@@ -32838,7 +32838,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 9.9867,
+              "changePercent": 9.99,
               "close": 8.26
             },
             {
@@ -32983,7 +32983,7 @@
         },
         {
           "date": "2026-04-16",
-          "averageChange": -0.3351,
+          "averageChange": -0.3353,
           "stockCount": 27,
           "stocks": [
             {
@@ -33025,7 +33025,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": 0.4843,
+              "changePercent": 0.48,
               "close": 8.3
             },
             {
@@ -33152,7 +33152,7 @@
         },
         {
           "date": "2026-04-17",
-          "averageChange": -2.5531,
+          "averageChange": -2.5532,
           "stockCount": 27,
           "stocks": [
             {
@@ -33278,7 +33278,7 @@
             {
               "code": "000919",
               "name": "金陵药业",
-              "changePercent": -4.0964,
+              "changePercent": -4.1,
               "close": 7.96
             },
             {
