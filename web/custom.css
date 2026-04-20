@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light;
   --ink: #172126;
   --muted: #66747d;
@@ -14,19 +14,24 @@
 
 * { box-sizing: border-box; }
 
+html {
+  zoom: 0.85;
+}
+
 body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
   font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  font-size: 14px;
   letter-spacing: 0;
 }
 
 .app-shell {
-  min-height: 100vh;
+  min-height: auto;
   width: min(1280px, calc(100% - 28px));
   margin: 0 auto;
-  padding: 22px 0 34px;
+  padding: 12px 0 10px;
 }
 
 .workspace-layout {
@@ -49,22 +54,92 @@ body {
   max-height: calc(100vh - 32px);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 12px;
-  padding: 14px;
+  gap: 8px;
+  padding: 10px;
   overflow: hidden;
 }
 
-.sidebar-head {
+.sort-inline {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  align-items: flex-start;
+  gap: 8px;
   padding: 2px;
 }
 
+.sort-mode-group {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sort-mode-btn {
+  min-width: 52px;
+  height: 30px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.sort-mode-btn:last-child {
+  border-right: 0;
+}
+
+.sort-mode-btn.active {
+  background: #0b7893;
+  color: #ffffff;
+}
+
+.sort-date-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-date-label span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.sort-date-label select {
+  min-width: 86px;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.date-nav-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.date-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 h1, h2 { margin: 0; line-height: 1.2; }
-h1 { font-size: 28px; }
-h2 { font-size: 20px; }
+h1 { font-size: 24px; }
+h2 { font-size: 18px; }
 p { line-height: 1.55; }
 .muted { color: var(--muted); }
 
@@ -74,29 +149,29 @@ p { line-height: 1.55; }
   background: var(--soft);
   color: var(--muted);
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .board-list {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 6px;
   overflow-y: auto;
   padding-right: 3px;
 }
 
 .board-button {
   width: 100%;
-  min-height: 76px;
+  min-height: 58px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 78px;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 66px;
+  gap: 8px;
   align-items: center;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
   color: var(--ink);
-  padding: 12px;
+  padding: 8px 10px;
   text-align: left;
   cursor: pointer;
 }
@@ -109,9 +184,11 @@ p { line-height: 1.55; }
 
 .board-button.active { box-shadow: inset 3px 0 0 #0b7893; }
 .board-button strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.board-button small { display: block; margin-top: 5px; color: var(--muted); }
+.board-button strong { font-size: 16px; line-height: 1.1; }
+.board-button small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
 .board-score { text-align: right; }
-.board-score strong { font-size: 20px; }
+.board-score strong { font-size: 14px; }
+.board-score small { font-size: 10px; line-height: 1.2; }
 
 .stack { display: grid; gap: 18px; }
 .section-card { padding: 16px; }
@@ -176,13 +253,27 @@ p { line-height: 1.55; }
 
 .value-label {
   fill: var(--ink);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.tag-label {
+  fill: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #0b7893;
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
 
 .date-label {
   fill: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .table-wrap {
@@ -195,7 +286,7 @@ table {
   width: 100%;
   min-width: 760px;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 th, td {
@@ -272,7 +363,7 @@ th {
 
 .editor-path {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 @media (max-width: 900px) {
@@ -289,3 +380,4 @@ th {
   .badges { justify-content: flex-start; }
   .stock-form { grid-template-columns: 1fr; }
 }
+

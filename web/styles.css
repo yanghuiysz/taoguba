@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light;
   --ink: #172126;
   --muted: #5f6f78;
@@ -300,6 +300,10 @@ input {
   fill: var(--ink);
   font-size: 12px;
   font-weight: 700;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 
 .date-label {
@@ -369,3 +373,4 @@ input {
     width: 100%;
   }
 }
+
