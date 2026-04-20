@@ -6,9 +6,9 @@
       "path": "./data/kpl/history/20260420.json",
       "summary": {
         "plateCount": 268,
-        "linkedPlateCount": 20,
-        "limitUpStockCount": 22,
-        "strongStockCount": 32
+        "linkedPlateCount": 26,
+        "limitUpStockCount": 16,
+        "strongStockCount": 41
       }
     },
     {
