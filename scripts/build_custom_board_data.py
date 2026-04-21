@@ -105,6 +105,7 @@ def normalize_price_history(code: str, df: Any) -> list[dict[str, Any]]:
     previous_close: float | None = None
     for _, row in df.iterrows():
         close = number_or_none(row.get("close"))
+        volume_lots = number_or_none(row.get("amount"))
         change_percent = None
         if close is not None and previous_close not in (None, 0):
             change_percent = round((close - previous_close) / previous_close * 100, 4)
@@ -117,7 +118,7 @@ def normalize_price_history(code: str, df: Any) -> list[dict[str, Any]]:
                 "high": number_or_none(row.get("high")),
                 "low": number_or_none(row.get("low")),
                 "changePercent": change_percent,
-                "amount": number_or_none(row.get("amount")),
+                "amount": round(volume_lots * close * 100, 2) if volume_lots is not None and close is not None else None,
                 "turnoverRate": None,
             }
         )
