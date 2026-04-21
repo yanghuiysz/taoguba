@@ -15,7 +15,7 @@
 * { box-sizing: border-box; }
 
 html {
-  zoom: 0.85;
+  zoom: 0.96;
 }
 
 body {
@@ -23,7 +23,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0;
 }
 
@@ -67,6 +67,12 @@ body {
   padding: 2px;
 }
 
+.sort-status {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 0 4px 2px;
+}
+
 .sort-mode-group {
   display: inline-flex;
   border: 1px solid var(--line);
@@ -82,7 +88,7 @@ body {
   background: #ffffff;
   color: var(--muted);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   padding: 0 10px;
   cursor: pointer;
 }
@@ -104,7 +110,7 @@ body {
 
 .sort-date-label span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .sort-date-label select {
@@ -115,7 +121,7 @@ body {
   background: #ffffff;
   color: var(--ink);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   padding: 0 8px;
 }
 
@@ -126,7 +132,7 @@ body {
   border-radius: 6px;
   background: #ffffff;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -138,8 +144,8 @@ body {
 }
 
 h1, h2 { margin: 0; line-height: 1.2; }
-h1 { font-size: 24px; }
-h2 { font-size: 18px; }
+h1 { font-size: 26px; }
+h2 { font-size: 20px; }
 p { line-height: 1.55; }
 .muted { color: var(--muted); }
 
@@ -184,11 +190,11 @@ p { line-height: 1.55; }
 
 .board-button.active { box-shadow: inset 3px 0 0 #0b7893; }
 .board-button strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.board-button strong { font-size: 16px; line-height: 1.1; }
-.board-button small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+.board-button strong { font-size: 17px; line-height: 1.16; }
+.board-button small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
 .board-score { text-align: right; }
-.board-score strong { font-size: 14px; }
-.board-score small { font-size: 10px; line-height: 1.2; }
+.board-score strong { font-size: 16px; }
+.board-score small { font-size: 12px; line-height: 1.25; }
 
 .stack { display: grid; gap: 18px; }
 .section-card { padding: 16px; }
@@ -226,15 +232,32 @@ p { line-height: 1.55; }
   padding: 18px;
 }
 
+.amount-chart-box {
+  min-height: 240px;
+  margin-top: 12px;
+}
+
 .trend-svg {
   width: 100%;
   height: 280px;
+}
+
+.amount-svg {
+  width: 100%;
+  height: 220px;
 }
 
 .zero-line {
   stroke: #b9c8c5;
   stroke-dasharray: 5 5;
   stroke-width: 1;
+}
+
+.selected-date-band {
+  fill: #f0f7f6;
+  stroke: #78aaa2;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
 }
 
 .trend-line {
@@ -253,7 +276,7 @@ p { line-height: 1.55; }
 
 .value-label {
   fill: var(--ink);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   paint-order: stroke;
   stroke: #ffffff;
@@ -263,7 +286,7 @@ p { line-height: 1.55; }
 
 .tag-label {
   fill: #ffffff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   paint-order: stroke;
   stroke: #0b7893;
@@ -273,7 +296,51 @@ p { line-height: 1.55; }
 
 .date-label {
   fill: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
+}
+
+.amount-bar {
+  opacity: 0.82;
+}
+
+.rise-bar {
+  fill: var(--red);
+}
+
+.fall-bar {
+  fill: var(--green);
+}
+
+.amount-bar.missing {
+  stroke: #b65b17;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+.amount-label {
+  fill: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.missing-label {
+  fill: #b65b17;
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.missing-mark {
+  stroke: #b65b17;
+  stroke-width: 3;
+  stroke-linecap: round;
 }
 
 .table-wrap {
@@ -284,9 +351,9 @@ p { line-height: 1.55; }
 
 table {
   width: 100%;
-  min-width: 760px;
+  min-width: 860px;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 th, td {
@@ -363,7 +430,7 @@ th {
 
 .editor-path {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 @media (max-width: 900px) {

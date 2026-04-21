@@ -16,6 +16,15 @@ const number = (value, digits = 2) => {
   return Number(value).toFixed(digits);
 };
 
+const amountText = (value) => {
+  const parsed = Number(value);
+  if (value === null || value === undefined || Number.isNaN(parsed)) return '暂无';
+  const abs = Math.abs(parsed);
+  if (abs >= 100000000) return `${number(parsed / 100000000)}亿`;
+  if (abs >= 10000) return `${number(parsed / 10000)}万`;
+  return number(parsed, 0);
+};
+
 const shortDate = (date) => (date ? String(date).slice(5) : '暂无');
 
 const signedClass = (value) => (Number(value) >= 0 ? 'rise' : 'fall');
@@ -67,10 +76,10 @@ function sortedBoards() {
         const limitDiff = limitUpCountByDate(b, state.sortDate) - limitUpCountByDate(a, state.sortDate);
         if (limitDiff !== 0) return limitDiff;
       } else {
-        const avgDiff = sortChangeValue(b.latestAverageChange) - sortChangeValue(a.latestAverageChange);
+        const avgDiff = sortChangeValue(averageChangeByDate(b, state.sortDate)) - sortChangeValue(averageChangeByDate(a, state.sortDate));
         if (avgDiff !== 0) return avgDiff;
       }
-      return sortChangeValue(b.latestAverageChange) - sortChangeValue(a.latestAverageChange);
+      return sortChangeValue(averageChangeByDate(b, state.sortDate)) - sortChangeValue(averageChangeByDate(a, state.sortDate));
     },
   );
 }
@@ -78,6 +87,10 @@ function sortedBoards() {
 function activeBoard() {
   const boards = sortedBoards();
   return boards.find((board) => board.code === state.selectedCode) || boards[0];
+}
+
+function selectTopBoard() {
+  state.selectedCode = sortedBoards()[0]?.code || null;
 }
 
 function trendValues(board) {
@@ -124,6 +137,12 @@ function limitUpCountByDate(board, date) {
   return (row.stocks || []).filter(isLimitUp).length;
 }
 
+function averageChangeByDate(board, date) {
+  if (!date) return board?.latestAverageChange;
+  const row = (board?.trend || []).find((item) => item.date === date);
+  return row?.averageChange ?? board?.latestAverageChange;
+}
+
 function limitUpSeries(board) {
   const trend = trendValues(board);
   return trend.map((row) => ({
@@ -136,6 +155,11 @@ function stockSnapshotByDate(board, date) {
   const row = (board?.trend || []).find((item) => item.date === date);
   if (!row) return new Map();
   return new Map((row.stocks || []).map((item) => [String(item.code || ''), item]));
+}
+
+function trendSnapshotByDate(board, date) {
+  if (!date) return null;
+  return (board?.trend || []).find((item) => item.date === date) || null;
 }
 
 function boardHasDateSnapshot(board, date) {
@@ -186,6 +210,7 @@ function renderTrendChart(board) {
       ...item,
       change,
       limitUpCount,
+      selected: item.date === state.sortDate,
       x,
       yAvg,
       yLimit,
@@ -201,19 +226,92 @@ function renderTrendChart(board) {
 
   return `
     <svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 近15日平均涨跌幅与涨停家数走势">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
+      `).join('')}
       <line class="zero-line" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
       <line class="zero-line" x1="${pad.left}" y1="${zeroY}" x2="${width - pad.right}" y2="${zeroY}"></line>
       <polyline points="${avgLine}" style="fill:none;stroke:#0b7893;stroke-linecap:round;stroke-width:3;"></polyline>
       <polyline points="${limitLine}" style="fill:none;stroke:#d9480f;stroke-linecap:round;stroke-width:3;"></polyline>
       ${points.map((point) => `
         <g>
-          <circle cx="${point.x}" cy="${point.yAvg}" r="4.5" style="fill:#fff;stroke:#0b7893;stroke-width:2.2;"></circle>
-          <circle cx="${point.x}" cy="${point.yLimit}" r="4.5" style="fill:#fff;stroke:#d9480f;stroke-width:2.2;"></circle>
+          <circle cx="${point.x}" cy="${point.yAvg}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#0b7893;stroke-width:${point.selected ? 3 : 2.2};"></circle>
+          <circle cx="${point.x}" cy="${point.yLimit}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#d9480f;stroke-width:${point.selected ? 3 : 2.2};"></circle>
           <text x="${point.x}" y="${point.yAvgLabel}" text-anchor="middle" class="value-label">${number(point.change)}%</text>
           <text x="${point.x}" y="${point.yLimitLabel}" text-anchor="middle" class="value-label">${point.limitUpCount}</text>
           ${point.tag ? `<text x="${point.x}" y="${point.yAvg - 26}" text-anchor="middle" class="tag-label">${point.tag}</text>` : ''}
           <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
           <title>${point.date} 平均涨跌幅 ${number(point.change)}% | 涨停家数 ${point.limitUpCount} 家 | 有效股票 ${point.stockCount}</title>
+        </g>
+      `).join('')}
+    </svg>
+  `;
+}
+
+function renderAmountBarChart(board) {
+  const trend = trendValues(board);
+  if (!trend.length) {
+    return `
+      <div>
+        <strong>暂无成交额</strong>
+        <p>这个板块最近没有可用成交额数据。</p>
+      </div>
+    `;
+  }
+
+  const width = 760;
+  const height = 220;
+  const pad = { top: 30, right: 34, bottom: 44, left: 64 };
+  const plotWidth = width - pad.left - pad.right;
+  const plotHeight = height - pad.top - pad.bottom;
+  const amounts = trend.map((item) => Number(item.totalAmount) || 0);
+  const maxAmount = Math.max(...amounts, 1);
+  const step = trend.length === 1 ? plotWidth : plotWidth / (trend.length - 1);
+  const barWidth = Math.max(12, Math.min(28, step * 0.52));
+  const axisBottom = height - pad.bottom;
+  const yMaxLabel = amountText(maxAmount);
+  const points = trend.map((item, index) => {
+    const totalAmount = Number(item.totalAmount) || 0;
+    const amountStockCount = Number(item.amountStockCount) || 0;
+    const missing = Math.max(0, Number(board.stockCount || 0) - amountStockCount);
+    const averageChange = Number(item.averageChange);
+    const x = pad.left + (trend.length === 1 ? plotWidth / 2 : index * step);
+    const barHeight = totalAmount ? Math.max(3, (totalAmount / maxAmount) * plotHeight) : 0;
+    const y = axisBottom - barHeight;
+    const labelLevel = index % 3;
+    const labelY = Math.max(15, y - 7 - labelLevel * 14 - (missing ? 11 : 0));
+    const missingY = Math.max(26, y - 5 - labelLevel * 14);
+    const selected = item.date === state.sortDate;
+    return { ...item, totalAmount, amountStockCount, missing, averageChange, selected, x, y, barHeight, labelY, missingY };
+  });
+
+  return `
+    <svg class="amount-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 近15日每日总成交额">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 10}" width="36" height="${plotHeight + 20}" rx="8"></rect>
+      `).join('')}
+      <line class="zero-line" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
+      <line class="zero-line" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="date-label">${yMaxLabel}</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="date-label">0</text>
+      ${points.map((point) => `
+        <g>
+          ${point.barHeight ? `
+            <rect
+              class="amount-bar ${point.averageChange >= 0 ? 'rise-bar' : 'fall-bar'}${point.missing ? ' missing' : ''}"
+              x="${point.x - (point.selected ? barWidth + 4 : barWidth) / 2}"
+              y="${point.y}"
+              width="${point.selected ? barWidth + 4 : barWidth}"
+              height="${point.barHeight}"
+              rx="4"
+            ></rect>
+          ` : `
+            <line class="missing-mark" x1="${point.x - barWidth / 2}" y1="${axisBottom - 4}" x2="${point.x + barWidth / 2}" y2="${axisBottom - 4}"></line>
+          `}
+          <text x="${point.x}" y="${point.labelY}" text-anchor="middle" class="amount-label">${amountText(point.totalAmount)}</text>
+          ${point.missing ? `<text x="${point.x}" y="${point.missingY}" text-anchor="middle" class="missing-label">缺 ${point.missing}</text>` : ''}
+          <text x="${point.x}" y="${height - 14}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
+          <title>${point.date} 总成交额 ${amountText(point.totalAmount)} | 已统计 ${point.amountStockCount}/${board.stockCount} 只${point.missing ? ` | 缺失 ${point.missing} 只` : ''}</title>
         </g>
       `).join('')}
     </svg>
@@ -267,6 +365,7 @@ function renderStocksTable(board) {
         displayDate: useDateSnapshot ? state.sortDate : stock.latestDate,
         displayClose: useDateSnapshot ? (current?.close ?? null) : stock.latestClose,
         displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock.latestChangePercent,
+        displayAmount: useDateSnapshot ? (current?.amount ?? null) : stock.latestAmount,
       };
     })
     .sort((a, b) => sortChangeValue(b.displayChangePercent) - sortChangeValue(a.displayChangePercent));
@@ -289,6 +388,7 @@ function renderStocksTable(board) {
               <th>最新日期</th>
               <th>收盘价</th>
               <th>涨跌幅</th>
+              <th>成交额</th>
               <th>可用天数</th>
               ${actionColumn}
             </tr>
@@ -301,10 +401,11 @@ function renderStocksTable(board) {
                 <td>${stock.displayDate || '暂无'}</td>
                 <td>${number(stock.displayClose)}</td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
+                <td>${amountText(stock.displayAmount)}</td>
                 <td>${stock.availableDays ?? 0}</td>
                 ${state.editable ? `<td><button class="remove-stock" data-code="${stock.code}" data-name="${stock.name}" ${state.busy ? 'disabled' : ''}>删除</button></td>` : ''}
               </tr>
-            `).join('') : `<tr><td colspan="${state.editable ? 7 : 6}" class="empty">该板块暂无已配置个股</td></tr>`}
+            `).join('') : `<tr><td colspan="${state.editable ? 8 : 7}" class="empty">该板块暂无已配置个股</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -316,6 +417,7 @@ function renderDetail(board) {
   if (!board) {
     return '<div class="card section-card empty">暂无自定义板块数据</div>';
   }
+  const selectedRow = trendSnapshotByDate(board, state.sortDate);
 
   return `
     <div class="stack">
@@ -323,14 +425,16 @@ function renderDetail(board) {
         <div class="section-head">
           <div>
             <h2>${board.name} · 近15日平均涨跌幅与涨停家数</h2>
-            <p class="muted">横轴为交易日日期，左轴为平均涨跌幅(%)，右轴为涨停家数(家)。</p>
+            <p class="muted">当前日期 ${state.sortDate || '最新'}：涨幅 ${number(selectedRow?.averageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(selectedRow?.totalAmount)}。</p>
           </div>
           <div class="badges">
             <span class="badge">蓝线：平均涨跌幅</span>
             <span class="badge">橙线：涨停家数</span>
+            <span class="badge">柱：总成交额</span>
           </div>
         </div>
         <div class="chart-box">${renderTrendChart(board)}</div>
+        <div class="chart-box amount-chart-box">${renderAmountBarChart(board)}</div>
       </section>
 
       ${renderStocksTable(board)}
@@ -362,19 +466,24 @@ function render() {
             <button class="date-nav-btn" id="sortDateNextBtn" type="button" ${nextDate ? '' : 'disabled'} aria-label="后一天">▶</button>
           </label>
         </div>
+        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'limit_up' ? '涨停数' : '平均涨幅'} 排序</div>
         <div class="board-list">
-          ${boards.map((item) => `
+          ${boards.map((item) => {
+            const selectedAverageChange = averageChangeByDate(item, state.sortDate);
+            return `
             <button class="board-button${item.code === board?.code ? ' active' : ''}" data-code="${item.code}">
               <span>
                 <strong>${item.name}</strong>
                 <small>${item.availableStockCount}/${item.stockCount} 只有最新行情</small>
               </span>
               <span class="board-score">
-                <small>涨停(${shortDate(state.sortDate)}) ${limitUpCountByDate(item, state.sortDate)} | 均值</small>
-                <strong class="${signedClass(item.latestAverageChange)}">${number(item.latestAverageChange)}%</strong>
+                <small>涨停 ${limitUpCountByDate(item, state.sortDate)}</small>
+                <strong class="${signedClass(selectedAverageChange)}">${number(selectedAverageChange)}%</strong>
+                <small>涨幅</small>
               </span>
             </button>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
       </aside>
       <main class="detail-pane">${renderDetail(board)}</main>
@@ -391,22 +500,26 @@ function render() {
   document.querySelectorAll('.sort-mode-btn').forEach((button) => {
     button.addEventListener('click', () => {
       state.sortMode = button.dataset.mode;
+      selectTopBoard();
       render();
     });
   });
 
   document.querySelector('#sortDateSelect')?.addEventListener('change', (event) => {
     state.sortDate = event.target.value;
+    selectTopBoard();
     render();
   });
   document.querySelector('#sortDatePrevBtn')?.addEventListener('click', () => {
     if (!prevDate) return;
     state.sortDate = prevDate;
+    selectTopBoard();
     render();
   });
   document.querySelector('#sortDateNextBtn')?.addEventListener('click', () => {
     if (!nextDate) return;
     state.sortDate = nextDate;
+    selectTopBoard();
     render();
   });
 
@@ -433,10 +546,10 @@ function render() {
 
 async function boot() {
   await detectEditingApi();
-  const response = await fetch('./data/custom_boards.json');
+  const response = await fetch(`./data/custom_boards.json?v=${Date.now()}`, { cache: 'no-store' });
   state.data = await response.json();
   try {
-    const labelResponse = await fetch('./data/custom_board_labels.json');
+    const labelResponse = await fetch(`./data/custom_board_labels.json?v=${Date.now()}`, { cache: 'no-store' });
     const labelPayload = await labelResponse.json();
     const rawLabels = Array.isArray(labelPayload.labels) ? labelPayload.labels : [];
     const today = state.data?.date;
@@ -451,7 +564,7 @@ async function boot() {
   }
   const dates = availableTrendDates();
   state.sortDate = dates[0] || state.data.date || null;
-  state.selectedCode = sortedBoards()[0]?.code || null;
+  selectTopBoard();
   render();
 }
 

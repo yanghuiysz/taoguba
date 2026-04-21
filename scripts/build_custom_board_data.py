@@ -158,6 +158,7 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                 "latestDate": latest.get("date") if latest else None,
                 "latestClose": latest.get("close") if latest else None,
                 "latestChangePercent": latest.get("changePercent") if latest else None,
+                "latestAmount": latest.get("amount") if latest else None,
                 "availableDays": sum(1 for row in rows if row.get("date") in dates and row.get("changePercent") is not None),
             }
         )
@@ -166,17 +167,22 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
     for date in dates:
         daily_stocks = []
         values = []
+        amounts = []
         for stock in stocks:
             row = stock_rows_by_code.get(stock["code"], {}).get(date)
             change = row.get("changePercent") if row else None
             if change is not None:
                 values.append(float(change))
+            amount = row.get("amount") if row else None
+            if amount is not None:
+                amounts.append(float(amount))
             daily_stocks.append(
                 {
                     "code": stock["code"],
                     "name": stock["name"],
                     "changePercent": change,
                     "close": row.get("close") if row else None,
+                    "amount": amount,
                 }
             )
         daily_stocks = sorted(daily_stocks, key=lambda row: sort_change_value(row.get("changePercent")), reverse=True)
@@ -184,7 +190,9 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
             {
                 "date": date,
                 "averageChange": round(sum(values) / len(values), 4) if values else None,
+                "totalAmount": round(sum(amounts), 2) if amounts else None,
                 "stockCount": len(values),
+                "amountStockCount": len(amounts),
                 "stocks": daily_stocks,
             }
         )
@@ -196,6 +204,7 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
         "stockCount": len(stocks),
         "availableStockCount": latest_trend.get("stockCount") if latest_trend else 0,
         "latestAverageChange": latest_trend.get("averageChange") if latest_trend else None,
+        "latestTotalAmount": latest_trend.get("totalAmount") if latest_trend else None,
         "stocks": sorted(stocks, key=lambda row: sort_change_value(row.get("latestChangePercent")), reverse=True),
         "trend": trend,
     }
