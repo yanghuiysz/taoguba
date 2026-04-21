@@ -1,0 +1,165 @@
+{
+  "overrides": [
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "603083",
+      "stockName": "剑桥科技",
+      "status": "pure_core",
+      "label": "正宗核心",
+      "note": "官网产品包含 LPO、CPO 光引擎，高速光模块/CPO 主链。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "300308",
+      "stockName": "中际旭创",
+      "status": "pure_core",
+      "label": "正宗核心",
+      "note": "高速光模块核心标的，AI 数据中心 800G/1.6T 主链。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "300502",
+      "stockName": "新易盛",
+      "status": "pure_core",
+      "label": "正宗核心",
+      "note": "高速光模块核心标的，800G/1.6T 方向正宗。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "300394",
+      "stockName": "天孚通信",
+      "status": "pure_core",
+      "label": "正宗核心",
+      "note": "光器件、光引擎、FAU 等关键环节，CPO 链条正宗。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "002281",
+      "stockName": "光迅科技",
+      "status": "pure_core",
+      "label": "正宗核心",
+      "note": "光芯片、光器件、光模块一体化，属于光通信核心供应链。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "000988",
+      "stockName": "华工科技",
+      "status": "pure_elastic",
+      "label": "正宗弹性",
+      "note": "光芯片、光模块和先进封装均相关，业务更宽但正宗度较高。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "600105",
+      "stockName": "永鼎股份",
+      "status": "pure_elastic",
+      "label": "正宗弹性",
+      "note": "光通信全产业链延伸到光芯片、光器件、光模块，原光纤光缆底色较重。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "600487",
+      "stockName": "亨通光电",
+      "status": "pure_elastic",
+      "label": "正宗弹性",
+      "note": "光棒、光纤、光缆到光模块全产业链，CPO 受益但纯度弱于光模块核心。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "600703",
+      "stockName": "三安光电",
+      "status": "supply_chain",
+      "label": "产业配套",
+      "note": "光芯片/化合物半导体上游，属于核心零部件配套，不是光模块整机。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "603773",
+      "stockName": "沃格光电",
+      "status": "supply_chain",
+      "label": "产业配套",
+      "note": "TGV 玻璃基板/先进封装材料，偏 CPO 封装配套。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "603228",
+      "stockName": "景旺电子",
+      "status": "supply_chain",
+      "label": "产业配套",
+      "note": "光模块 PCB/高速板配套，属于 CPO/光模块产业链支撑环节。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "002579",
+      "stockName": "中京电子",
+      "status": "supply_chain",
+      "label": "产业配套",
+      "note": "PCB/基板环节，偏光模块配套与补涨属性。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "600330",
+      "stockName": "天通股份",
+      "status": "supply_chain",
+      "label": "产业配套",
+      "note": "晶体/材料端逻辑，偏上游材料配套。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "603306",
+      "stockName": "华懋科技",
+      "status": "supply_chain",
+      "label": "产业配套",
+      "note": "通过封装、载板、并购预案等切入光模块/CPO 相关环节，偏间接配套。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "605058",
+      "stockName": "澳弘电子",
+      "status": "theme_edge",
+      "label": "题材沾边",
+      "note": "PCB 少量用于光模块，题材相关但业务占比和正宗度偏弱。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "000070",
+      "stockName": "特发信息",
+      "status": "theme_edge",
+      "label": "题材沾边",
+      "note": "光纤光缆/通信设备相关，CPO 正宗度一般。"
+    },
+    {
+      "boardCode": "cpo",
+      "boardName": "CPO",
+      "stockCode": "600246",
+      "stockName": "万通发展",
+      "status": "suspect",
+      "label": "存疑",
+      "note": "主要是索尔思光电股权/资本运作逻辑，原主业不纯，建议单独观察。"
+    }
+  ],
+  "statusGuide": {
+    "pure_core": "正宗核心：主营或关键产品直接处在该题材主链，优先作为板块锚点。",
+    "pure_elastic": "正宗弹性：业务确实相关，但容量或纯度略低，更适合观察弹性与补涨。",
+    "supply_chain": "产业配套：上游、材料、PCB、封装、设备等链条支撑环节。",
+    "theme_edge": "题材沾边：有相关业务或概念，但占比、纯度、持续性不足。",
+    "suspect": "存疑：主驱动不清或原主业不纯，建议复盘后决定是否剔除。",
+    "pending": "待确认：尚未完成正宗度调研。"
+  }
+}

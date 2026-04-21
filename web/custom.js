@@ -3,8 +3,9 @@
 const state = {
   data: null,
   labels: [],
+  membership: { overrides: [] },
   selectedCode: null,
-  sortMode: 'limit_up',
+  sortMode: 'pattern',
   sortDate: null,
   editable: false,
   busy: false,
@@ -34,9 +35,20 @@ const sortChangeValue = (value) => {
   return Number.isNaN(parsed) ? -999999 : parsed;
 };
 
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+const percentText = (value) => {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '暂无';
+  return `${number(value)}%`;
+};
+
 async function detectEditingApi() {
   try {
     const response = await fetch('/api/custom-boards/status', { cache: 'no-store' });
+    if (!response.ok) {
+      state.editable = false;
+      return;
+    }
     const payload = await response.json();
     state.editable = Boolean(payload.editable);
   } catch {
@@ -72,7 +84,10 @@ async function updateStock(action, boardCode, code, name = '') {
 function sortedBoards() {
   return [...(state.data?.boards || [])].sort(
     (a, b) => {
-      if (state.sortMode === 'limit_up') {
+      if (state.sortMode === 'pattern') {
+        const patternDiff = setupScore(b, state.sortDate) - setupScore(a, state.sortDate);
+        if (patternDiff !== 0) return patternDiff;
+      } else if (state.sortMode === 'limit_up') {
         const limitDiff = limitUpCountByDate(b, state.sortDate) - limitUpCountByDate(a, state.sortDate);
         if (limitDiff !== 0) return limitDiff;
       } else {
@@ -149,6 +164,312 @@ function limitUpSeries(board) {
     date: row.date,
     limitUpCount: (row.stocks || []).filter(isLimitUp).length,
   }));
+}
+
+function trendIndexByDate(board, date) {
+  return trendValues(board).findIndex((item) => item.date === date);
+}
+
+function trendRowAt(board, date, offset = 0) {
+  const trend = trendValues(board);
+  const index = trend.findIndex((item) => item.date === date);
+  if (index < 0) return null;
+  return trend[index + offset] || null;
+}
+
+function rowLimitUpCount(row) {
+  return (row?.stocks || []).filter(isLimitUp).length;
+}
+
+function rowRedRate(row) {
+  const stocks = (row?.stocks || []).filter((stock) => stock.changePercent !== null && stock.changePercent !== undefined);
+  if (!stocks.length) return null;
+  return stocks.filter((stock) => Number(stock.changePercent) > 0).length / stocks.length * 100;
+}
+
+function rowCoreStocks(row, size = 5) {
+  return [...(row?.stocks || [])]
+    .filter((stock) => Number.isFinite(Number(stock.amount)) && stock.changePercent !== null && stock.changePercent !== undefined)
+    .sort((a, b) => Number(b.amount) - Number(a.amount))
+    .slice(0, size);
+}
+
+function rowCoreAverage(row) {
+  const core = rowCoreStocks(row);
+  if (!core.length) return null;
+  return core.reduce((sum, stock) => sum + Number(stock.changePercent || 0), 0) / core.length;
+}
+
+function amountRatio(row, previousRow) {
+  const current = Number(row?.totalAmount);
+  const previous = Number(previousRow?.totalAmount);
+  if (!Number.isFinite(current) || !Number.isFinite(previous) || previous <= 0) return null;
+  return current / previous;
+}
+
+function rowStats(row, previousRow = null) {
+  if (!row) return null;
+  return {
+    row,
+    averageChange: Number(row.averageChange),
+    limitUpCount: rowLimitUpCount(row),
+    redRate: rowRedRate(row),
+    coreAverage: rowCoreAverage(row),
+    amountRatio: amountRatio(row, previousRow),
+  };
+}
+
+function isStrongDay(stats) {
+  if (!stats) return false;
+  return stats.averageChange >= 2 || stats.limitUpCount >= 2 || (stats.averageChange >= 1.2 && stats.redRate >= 55);
+}
+
+function isConstructiveDivergence(stats, previousStats) {
+  if (!stats || !previousStats) return false;
+  const averageOk = stats.averageChange >= -2.8 && stats.averageChange <= 1.4;
+  const limitOk = stats.limitUpCount >= 1 || stats.limitUpCount >= previousStats.limitUpCount - 1;
+  const breadthOk = (stats.redRate ?? 0) >= 30;
+  const coreOk = (stats.coreAverage ?? -99) >= -2.2;
+  const amountOk = stats.amountRatio === null || stats.amountRatio <= 1.65;
+  return averageOk && limitOk && breadthOk && coreOk && amountOk;
+}
+
+function isTurningStrong(stats, previousStats) {
+  if (!stats || !previousStats) return false;
+  const strengthOk = stats.averageChange >= 1.3 || stats.limitUpCount > previousStats.limitUpCount || stats.redRate >= 60;
+  const coreOk = (stats.coreAverage ?? -99) >= 0;
+  const amountOk = stats.amountRatio === null || stats.amountRatio >= 0.82;
+  return strengthOk && coreOk && amountOk;
+}
+
+function boardSetup(board, date) {
+  const today = trendRowAt(board, date);
+  const d1 = trendRowAt(board, date, -1);
+  const d2 = trendRowAt(board, date, -2);
+  const todayStats = rowStats(today, d1);
+  const d1Stats = rowStats(d1, d2);
+  const d2Stats = rowStats(d2, trendRowAt(board, date, -3));
+  const strongToday = isStrongDay(todayStats);
+  const strongD1 = isStrongDay(d1Stats);
+  const strongD2 = isStrongDay(d2Stats);
+  const divergenceToday = isConstructiveDivergence(todayStats, d1Stats);
+  const divergenceD1 = isConstructiveDivergence(d1Stats, d2Stats);
+  const turn2 = strongD1 && isTurningStrong(todayStats, d1Stats);
+  const turn3 = strongD2 && divergenceD1 && isTurningStrong(todayStats, d1Stats);
+  const risk = strongToday && todayStats?.amountRatio !== null && todayStats.amountRatio >= 2.2 && (todayStats.coreAverage ?? 0) < todayStats.averageChange;
+  let label = '观察';
+  let tone = 'watch';
+  let priority = 10;
+  if (turn2) {
+    label = '二日转强';
+    tone = 'hot';
+    priority = 100;
+  } else if (turn3) {
+    label = '三日转强';
+    tone = 'turn';
+    priority = 92;
+  } else if (strongD1 && divergenceToday) {
+    label = '分歧观察';
+    tone = 'test';
+    priority = 78;
+  } else if (risk) {
+    label = '高潮风险';
+    tone = 'risk';
+    priority = 56;
+  } else if (strongToday) {
+    label = '强1';
+    tone = 'strong';
+    priority = 64;
+  } else if (todayStats && todayStats.averageChange < -3.2 && (todayStats.redRate ?? 100) < 25) {
+    label = '转弱';
+    tone = 'weak';
+    priority = 18;
+  }
+  const divergenceScore = divergenceToday || divergenceD1
+    ? clamp(
+      50
+        + (todayStats?.coreAverage ?? 0) * 8
+        + ((todayStats?.redRate ?? 0) - 40) * 0.6
+        + (todayStats?.limitUpCount ?? 0) * 7
+        - Math.max(0, ((todayStats?.amountRatio ?? 1) - 1.45) * 30),
+      0,
+      100,
+    )
+    : null;
+  const coreRank = rowCoreStocks(today, 5);
+  return {
+    label,
+    tone,
+    priority,
+    today,
+    d1,
+    d2,
+    todayStats,
+    d1Stats,
+    d2Stats,
+    turn2,
+    turn3,
+    divergenceToday,
+    divergenceD1,
+    risk,
+    divergenceScore,
+    coreRank,
+  };
+}
+
+function setupScore(board, date) {
+  const setup = boardSetup(board, date);
+  const stats = setup.todayStats;
+  return setup.priority
+    + (stats?.limitUpCount || 0) * 3
+    + (stats?.averageChange || 0)
+    + ((stats?.coreAverage || 0) * 0.8);
+}
+
+function setupPools(date) {
+  const boards = state.data?.boards || [];
+  const enriched = boards.map((board) => ({ board, setup: boardSetup(board, date) }));
+  const byScore = (a, b) => setupScore(b.board, date) - setupScore(a.board, date);
+  return {
+    turn2: enriched.filter((item) => item.setup.turn2).sort(byScore).slice(0, 5),
+    divergence: enriched.filter((item) => item.setup.divergenceToday && !item.setup.turn2).sort(byScore).slice(0, 5),
+    turn3: enriched.filter((item) => item.setup.turn3).sort(byScore).slice(0, 5),
+    risk: enriched.filter((item) => item.setup.risk).sort(byScore).slice(0, 5),
+  };
+}
+
+function membershipOverride(board, stock) {
+  const overrides = Array.isArray(state.membership?.overrides) ? state.membership.overrides : [];
+  return overrides.find((item) =>
+    String(item.boardCode || '') === String(board?.code || '')
+    && String(item.stockCode || '') === String(stock?.code || ''));
+}
+
+function stockBoardNames(stockCode) {
+  const names = [];
+  for (const board of state.data?.boards || []) {
+    if ((board.stocks || []).some((stock) => String(stock.code || '') === String(stockCode || ''))) {
+      names.push(board.name);
+    }
+  }
+  return names;
+}
+
+function stockRowsInBoard(board, stockCode) {
+  return trendValues(board)
+    .map((row) => (row.stocks || []).find((stock) => String(stock.code || '') === String(stockCode || '')))
+    .filter(Boolean);
+}
+
+function stockFollowScore(board, stockCode) {
+  const rows = stockRowsInBoard(board, stockCode);
+  const boardRows = trendValues(board);
+  if (!rows.length || rows.length !== boardRows.length) return null;
+  let aligned = 0;
+  let weakWhenBoardStrong = 0;
+  for (let index = 0; index < rows.length; index += 1) {
+    const stockChange = Number(rows[index].changePercent);
+    const boardChange = Number(boardRows[index].averageChange);
+    if (!Number.isFinite(stockChange) || !Number.isFinite(boardChange)) continue;
+    if ((stockChange >= 0 && boardChange >= 0) || (stockChange < 0 && boardChange < 0)) aligned += 1;
+    if (boardChange >= 1.5 && stockChange < 0) weakWhenBoardStrong += 1;
+  }
+  return {
+    alignedRate: rows.length ? aligned / rows.length * 100 : null,
+    weakWhenBoardStrong,
+  };
+}
+
+function membershipAssessment(board, stock, date) {
+  const override = membershipOverride(board, stock);
+  const snapshot = trendSnapshotByDate(board, date);
+  const row = (snapshot?.stocks || []).find((item) => String(item.code || '') === String(stock.code || ''));
+  const amountRank = [...(snapshot?.stocks || [])]
+    .filter((item) => Number.isFinite(Number(item.amount)))
+    .sort((a, b) => Number(b.amount) - Number(a.amount))
+    .findIndex((item) => String(item.code || '') === String(stock.code || '')) + 1;
+  const changeRank = [...(snapshot?.stocks || [])]
+    .filter((item) => Number.isFinite(Number(item.changePercent)))
+    .sort((a, b) => Number(b.changePercent) - Number(a.changePercent))
+    .findIndex((item) => String(item.code || '') === String(stock.code || '')) + 1;
+  const boards = stockBoardNames(stock.code);
+  const follow = stockFollowScore(board, stock.code);
+
+  if (override) {
+    return {
+      status: override.status || 'manual',
+      label: override.label || override.status || '手工',
+      tone: override.status || 'manual',
+      reason: override.note || '来自手工标注',
+      boards,
+    };
+  }
+  if (amountRank > 0 && amountRank <= 5) {
+    return {
+      status: 'core',
+      label: '容量核心',
+      tone: 'core',
+      reason: `成交额第 ${amountRank}，短线看板优先跟踪`,
+      boards,
+    };
+  }
+  if (changeRank > 0 && changeRank <= 3 && Number(row?.changePercent) > 0) {
+    return {
+      status: 'active',
+      label: '弹性前排',
+      tone: 'active',
+      reason: `涨幅第 ${changeRank}，适合观察是否成为补涨/先锋`,
+      boards,
+    };
+  }
+  if (boards.length >= 3) {
+    return {
+      status: 'overlap',
+      label: '多题材',
+      tone: 'overlap',
+      reason: `同时在 ${boards.slice(0, 3).join('、')}${boards.length > 3 ? '等' : ''}`,
+      boards,
+    };
+  }
+  if (follow && follow.alignedRate !== null && follow.alignedRate < 42 && follow.weakWhenBoardStrong >= 2) {
+    return {
+      status: 'suspect',
+      label: '存疑',
+      tone: 'suspect',
+      reason: `跟随率 ${number(follow.alignedRate, 0)}%，板块强时逆势 ${follow.weakWhenBoardStrong} 次`,
+      boards,
+    };
+  }
+  return {
+    status: 'pending',
+    label: '待确认',
+    tone: 'pending',
+    reason: follow?.alignedRate === null ? '缺少足够走势验证' : `跟随率 ${number(follow.alignedRate, 0)}%`,
+    boards,
+  };
+}
+
+function membershipSummary(board, date) {
+  const stats = {
+    pure_core: 0,
+    pure_elastic: 0,
+    supply_chain: 0,
+    theme_edge: 0,
+    suspect: 0,
+    pending: 0,
+    core: 0,
+    active: 0,
+    overlap: 0,
+    manual: 0,
+  };
+  const assessments = (board?.stocks || []).map((stock) => ({
+    stock,
+    assessment: membershipAssessment(board, stock, date),
+  }));
+  for (const item of assessments) {
+    stats[item.assessment.status] = (stats[item.assessment.status] || 0) + 1;
+  }
+  return { stats, assessments };
 }
 
 function stockSnapshotByDate(board, date) {
@@ -318,6 +639,118 @@ function renderAmountBarChart(board) {
   `;
 }
 
+function renderPoolItems(items, emptyText) {
+  if (!items.length) return `<div class="pool-empty">${emptyText}</div>`;
+  return items.map(({ board, setup }) => {
+    const stats = setup.todayStats;
+    return `
+      <button class="pool-item" type="button" data-code="${board.code}">
+        <span>
+          <strong>${board.name}</strong>
+          <small>${setup.label} · 核心 ${percentText(stats?.coreAverage)} · 红盘 ${number(stats?.redRate, 0)}%</small>
+        </span>
+        <span class="pool-score ${setup.tone}">${number(stats?.averageChange)}%</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function renderSetupPools() {
+  const pools = setupPools(state.sortDate);
+  return `
+    <section class="setup-pools">
+      <div class="pool-card primary">
+        <div class="pool-title"><span>主模式</span><strong>二日转强</strong></div>
+        ${renderPoolItems(pools.turn2, '暂无二日转强')}
+      </div>
+      <div class="pool-card">
+        <div class="pool-title"><span>观察</span><strong>分歧检验</strong></div>
+        ${renderPoolItems(pools.divergence, '暂无良性分歧')}
+      </div>
+      <div class="pool-card">
+        <div class="pool-title"><span>副模式</span><strong>三日转强</strong></div>
+        ${renderPoolItems(pools.turn3, '暂无三日转强')}
+      </div>
+      <div class="pool-card risk">
+        <div class="pool-title"><span>风控</span><strong>高潮风险</strong></div>
+        ${renderPoolItems(pools.risk, '暂无高潮风险')}
+      </div>
+    </section>
+  `;
+}
+
+function renderSetupBadge(setup) {
+  return `<span class="setup-badge ${setup.tone}">${setup.label}</span>`;
+}
+
+function renderSetupSummary(board) {
+  const setup = boardSetup(board, state.sortDate);
+  const stats = setup.todayStats;
+  const d1 = setup.d1Stats;
+  const d2 = setup.d2Stats;
+  const membership = membershipSummary(board, state.sortDate);
+  const suspectList = membership.assessments
+    .filter((item) => item.assessment.status === 'suspect' || item.assessment.status === 'overlap')
+    .slice(0, 5);
+  return `
+    <section class="card section-card setup-card">
+      <div class="section-head">
+        <div>
+          <h2>${board.name} · 模式观察</h2>
+          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.label}，分歧质量 ${setup.divergenceScore === null ? '暂无' : number(setup.divergenceScore, 0)}。</p>
+        </div>
+        ${renderSetupBadge(setup)}
+      </div>
+      <div class="setup-grid">
+        <div class="setup-metric">
+          <span>今日强度</span>
+          <strong class="${signedClass(stats?.averageChange)}">${percentText(stats?.averageChange)}</strong>
+          <small>涨停 ${stats?.limitUpCount ?? 0} · 红盘 ${number(stats?.redRate, 0)}%</small>
+        </div>
+        <div class="setup-metric">
+          <span>核心股</span>
+          <strong class="${signedClass(stats?.coreAverage)}">${percentText(stats?.coreAverage)}</strong>
+          <small>成交额前 5 只均值</small>
+        </div>
+        <div class="setup-metric">
+          <span>量能变化</span>
+          <strong>${stats?.amountRatio === null ? '暂无' : `${number(stats.amountRatio, 2)}x`}</strong>
+          <small>对比前一交易日</small>
+        </div>
+        <div class="setup-metric">
+          <span>三日结构</span>
+          <strong>${shortDate(setup.d2?.date)} → ${shortDate(setup.d1?.date)} → ${shortDate(setup.today?.date)}</strong>
+          <small>${percentText(d2?.averageChange)} / ${percentText(d1?.averageChange)} / ${percentText(stats?.averageChange)}</small>
+        </div>
+      </div>
+      <div class="core-strip">
+        ${setup.coreRank.map((stock, index) => `
+          <div class="core-chip">
+            <span>${index + 1}. ${stock.name}</span>
+            <strong class="${signedClass(stock.changePercent)}">${percentText(stock.changePercent)}</strong>
+            <small>${amountText(stock.amount)}</small>
+          </div>
+        `).join('')}
+      </div>
+      <div class="membership-strip">
+        <div class="membership-count pure_core">正宗核心 ${membership.stats.pure_core || 0}</div>
+        <div class="membership-count pure_elastic">正宗弹性 ${membership.stats.pure_elastic || 0}</div>
+        <div class="membership-count supply_chain">产业配套 ${membership.stats.supply_chain || 0}</div>
+        <div class="membership-count theme_edge">题材沾边 ${membership.stats.theme_edge || 0}</div>
+        <div class="membership-count overlap">多题材 ${membership.stats.overlap || 0}</div>
+        <div class="membership-count suspect">存疑 ${membership.stats.suspect || 0}</div>
+        <div class="membership-count pending">待确认 ${membership.stats.pending || 0}</div>
+      </div>
+      ${suspectList.length ? `
+        <div class="membership-alert">
+          <strong>归属复盘：</strong>
+          ${suspectList.map((item) => `${item.stock.name}（${item.assessment.label}）`).join('、')}
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
 function renderEditor(board) {
   if (!state.editable) {
     return `
@@ -366,6 +799,7 @@ function renderStocksTable(board) {
         displayClose: useDateSnapshot ? (current?.close ?? null) : stock.latestClose,
         displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock.latestChangePercent,
         displayAmount: useDateSnapshot ? (current?.amount ?? null) : stock.latestAmount,
+        membership: membershipAssessment(board, stock, state.sortDate),
       };
     })
     .sort((a, b) => sortChangeValue(b.displayChangePercent) - sortChangeValue(a.displayChangePercent));
@@ -385,10 +819,12 @@ function renderStocksTable(board) {
             <tr>
               <th>代码</th>
               <th>名称</th>
+              <th>归属</th>
               <th>最新日期</th>
               <th>收盘价</th>
               <th>涨跌幅</th>
               <th>成交额</th>
+              <th>依据</th>
               <th>可用天数</th>
               ${actionColumn}
             </tr>
@@ -398,14 +834,16 @@ function renderStocksTable(board) {
               <tr>
                 <td class="code">${stock.code}</td>
                 <td><strong>${stock.name}</strong></td>
+                <td><span class="membership-badge ${stock.membership.tone}">${stock.membership.label}</span></td>
                 <td>${stock.displayDate || '暂无'}</td>
                 <td>${number(stock.displayClose)}</td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
                 <td>${amountText(stock.displayAmount)}</td>
+                <td class="membership-reason">${stock.membership.reason}</td>
                 <td>${stock.availableDays ?? 0}</td>
                 ${state.editable ? `<td><button class="remove-stock" data-code="${stock.code}" data-name="${stock.name}" ${state.busy ? 'disabled' : ''}>删除</button></td>` : ''}
               </tr>
-            `).join('') : `<tr><td colspan="${state.editable ? 8 : 7}" class="empty">该板块暂无已配置个股</td></tr>`}
+            `).join('') : `<tr><td colspan="${state.editable ? 10 : 9}" class="empty">该板块暂无已配置个股</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -421,6 +859,7 @@ function renderDetail(board) {
 
   return `
     <div class="stack">
+      ${renderSetupSummary(board)}
       <section class="card section-card">
         <div class="section-head">
           <div>
@@ -454,6 +893,7 @@ function render() {
       <aside class="card sidebar-card">
         <div class="sort-inline">
           <div class="sort-mode-group" role="group" aria-label="排序方式">
+            <button class="sort-mode-btn${state.sortMode === 'pattern' ? ' active' : ''}" type="button" data-mode="pattern">模式</button>
             <button class="sort-mode-btn${state.sortMode === 'limit_up' ? ' active' : ''}" type="button" data-mode="limit_up">涨停</button>
             <button class="sort-mode-btn${state.sortMode === 'avg_change' ? ' active' : ''}" type="button" data-mode="avg_change">均值</button>
           </div>
@@ -466,15 +906,16 @@ function render() {
             <button class="date-nav-btn" id="sortDateNextBtn" type="button" ${nextDate ? '' : 'disabled'} aria-label="后一天">▶</button>
           </label>
         </div>
-        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'limit_up' ? '涨停数' : '平均涨幅'} 排序</div>
+        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'pattern' ? '模式优先级' : state.sortMode === 'limit_up' ? '涨停数' : '平均涨幅'} 排序</div>
         <div class="board-list">
           ${boards.map((item) => {
             const selectedAverageChange = averageChangeByDate(item, state.sortDate);
+            const setup = boardSetup(item, state.sortDate);
             return `
             <button class="board-button${item.code === board?.code ? ' active' : ''}" data-code="${item.code}">
               <span>
                 <strong>${item.name}</strong>
-                <small>${item.availableStockCount}/${item.stockCount} 只有最新行情</small>
+                <small>${setup.label} · 核心 ${percentText(setup.todayStats?.coreAverage)}</small>
               </span>
               <span class="board-score">
                 <small>涨停 ${limitUpCountByDate(item, state.sortDate)}</small>
@@ -486,11 +927,21 @@ function render() {
           }).join('')}
         </div>
       </aside>
-      <main class="detail-pane">${renderDetail(board)}</main>
+      <main class="detail-pane">
+        ${renderSetupPools()}
+        ${renderDetail(board)}
+      </main>
     </div>
   `;
 
   document.querySelectorAll('.board-button').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedCode = button.dataset.code;
+      render();
+    });
+  });
+
+  document.querySelectorAll('.pool-item').forEach((button) => {
     button.addEventListener('click', () => {
       state.selectedCode = button.dataset.code;
       render();
@@ -561,6 +1012,12 @@ async function boot() {
     });
   } catch {
     state.labels = [];
+  }
+  try {
+    const membershipResponse = await fetch(`./data/custom_board_membership.json?v=${Date.now()}`, { cache: 'no-store' });
+    state.membership = membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
+  } catch {
+    state.membership = { overrides: [] };
   }
   const dates = availableTrendDates();
   state.sortDate = dates[0] || state.data.date || null;
