@@ -738,7 +738,7 @@ function renderSetupSummary(board) {
         <div class="membership-count supply_chain">产业配套 ${membership.stats.supply_chain || 0}</div>
         <div class="membership-count theme_edge">题材沾边 ${membership.stats.theme_edge || 0}</div>
         <div class="membership-count overlap">多题材 ${membership.stats.overlap || 0}</div>
-        <div class="membership-count suspect">存疑 ${membership.stats.suspect || 0}</div>
+        <div class="membership-count suspect">存疑/剔除 ${membership.stats.suspect || 0}</div>
         <div class="membership-count pending">待确认 ${membership.stats.pending || 0}</div>
       </div>
       ${suspectList.length ? `
@@ -820,12 +820,9 @@ function renderStocksTable(board) {
               <th>代码</th>
               <th>名称</th>
               <th>归属</th>
-              <th>最新日期</th>
-              <th>收盘价</th>
               <th>涨跌幅</th>
               <th>成交额</th>
               <th>依据</th>
-              <th>可用天数</th>
               ${actionColumn}
             </tr>
           </thead>
@@ -835,15 +832,12 @@ function renderStocksTable(board) {
                 <td class="code">${stock.code}</td>
                 <td><strong>${stock.name}</strong></td>
                 <td><span class="membership-badge ${stock.membership.tone}">${stock.membership.label}</span></td>
-                <td>${stock.displayDate || '暂无'}</td>
-                <td>${number(stock.displayClose)}</td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
                 <td>${amountText(stock.displayAmount)}</td>
                 <td class="membership-reason">${stock.membership.reason}</td>
-                <td>${stock.availableDays ?? 0}</td>
                 ${state.editable ? `<td><button class="remove-stock" data-code="${stock.code}" data-name="${stock.name}" ${state.busy ? 'disabled' : ''}>删除</button></td>` : ''}
               </tr>
-            `).join('') : `<tr><td colspan="${state.editable ? 10 : 9}" class="empty">该板块暂无已配置个股</td></tr>`}
+            `).join('') : `<tr><td colspan="${state.editable ? 7 : 6}" class="empty">该板块暂无已配置个股</td></tr>`}
           </tbody>
         </table>
       </div>
