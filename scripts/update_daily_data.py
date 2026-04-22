@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import subprocess
 import sys
 from datetime import datetime
@@ -12,12 +13,47 @@ PYTHON = sys.executable
 
 KPL_DASHBOARD = ROOT / "web/data/kpl_dashboard.json"
 KPL_HISTORY_DIR = ROOT / "web/data/kpl/history"
+CUSTOM_DASHBOARD = ROOT / "web/data/custom_boards.json"
 
 
 def run_script(args: list[str]) -> None:
     command = [PYTHON, *args]
-    print(f"\n> {' '.join(command)}")
+    print(f"\n> {' '.join(command)}", flush=True)
     subprocess.run(command, cwd=ROOT, check=True)
+
+
+def has_module(name: str) -> bool:
+    return importlib.util.find_spec(name) is not None
+
+
+def missing_modules(names: list[str]) -> list[str]:
+    return [name for name in names if not has_module(name)]
+
+
+def run_optional(args: list[str], output_path: Path | None = None) -> bool:
+    try:
+        run_script(args)
+        return True
+    except subprocess.CalledProcessError as exc:
+        print(f"\nWARNING: optional step failed with exit code {exc.returncode}: {' '.join(args)}", file=sys.stderr, flush=True)
+        if output_path and output_path.exists():
+            print(f"Keeping existing data file: {output_path}", file=sys.stderr, flush=True)
+            return False
+        raise
+
+
+def skip_optional_for_missing_modules(step_name: str, modules: list[str], output_path: Path) -> bool:
+    missing = missing_modules(modules)
+    if not missing:
+        return False
+    print(
+        f"\nWARNING: skipping optional {step_name}; missing Python module(s): {', '.join(missing)}",
+        file=sys.stderr,
+        flush=True,
+    )
+    if output_path.exists():
+        print(f"Keeping existing data file: {output_path}", file=sys.stderr, flush=True)
+    return True
 
 
 def compact_date(value: str) -> str:
@@ -45,6 +81,9 @@ def main() -> None:
     parser.add_argument("--skip-external", action="store_true", help="Skip Tonghuashun/Eastmoney external mapping.")
     parser.add_argument("--skip-custom", action="store_true", help="Skip custom board average history update.")
     parser.add_argument("--intraday-custom", action="store_true", help="Overlay realtime spot quotes into custom board data.")
+    parser.add_argument("--custom-sleep", type=float, default=0.2, help="Delay between custom stock history requests.")
+    parser.add_argument("--strict-external", action="store_true", help="Fail the run when optional external mapping fails.")
+    parser.add_argument("--strict-custom", action="store_true", help="Fail the run when custom board rebuild fails.")
     parser.add_argument("--sort-by", default="strength", help="Kaipanla plate sort key.")
     args = parser.parse_args()
 
@@ -53,14 +92,25 @@ def main() -> None:
         run_script(["scripts/build_kpl_plate_stock_links.py", "--date", args.date, "--sort-by", args.sort_by])
         run_script(["scripts/build_kpl_web_data.py", "--date", args.date])
         if not args.skip_external:
-            run_script(["scripts/build_ths_limit_mapping.py", "--date", args.date])
+            external_args = ["scripts/build_ths_limit_mapping.py", "--date", args.date]
+            if args.strict_external:
+                run_script(external_args)
+            elif not skip_optional_for_missing_modules("external limit-up mapping", ["akshare", "bs4", "requests"], KPL_DASHBOARD):
+                run_optional(external_args, KPL_DASHBOARD)
         verify_kpl_history(args.date)
 
     if not args.skip_custom:
-        custom_args = ["scripts/build_custom_board_data.py", "--date", args.date]
+        custom_args = ["scripts/build_custom_board_data.py", "--date", args.date, "--sleep", str(args.custom_sleep)]
         if args.intraday_custom:
             custom_args.append("--intraday")
-        run_script(custom_args)
+        if args.strict_custom:
+            run_script(custom_args)
+        elif not skip_optional_for_missing_modules("custom board rebuild", ["akshare"], CUSTOM_DASHBOARD):
+            run_optional(custom_args, CUSTOM_DASHBOARD)
+    elif not CUSTOM_DASHBOARD.exists():
+        raise FileNotFoundError(f"Custom dashboard data is missing: {CUSTOM_DASHBOARD}")
+
+    run_script(["scripts/validate_web_data.py"])
 
     print("\nDaily data update complete.")
 

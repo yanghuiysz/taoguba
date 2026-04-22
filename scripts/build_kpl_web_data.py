@@ -73,6 +73,31 @@ def attach_plate_trends(payload: dict[str, Any], history_items: list[dict[str, A
         plate["trend"] = trend_map.get(plate.get("plateCode"), [])
 
 
+def preserve_external_enrichment(payload: dict[str, Any], previous: dict[str, Any] | None) -> None:
+    if not previous:
+        return
+    external_sources = previous.get("externalSources")
+    if external_sources and not payload.get("externalSources"):
+        payload["externalSources"] = external_sources
+
+    previous_summary = previous.get("summary", {})
+    payload_summary = payload.setdefault("summary", {})
+    for key in ("externalLimitUpStockCount", "externalLimitUpMappingCount"):
+        if key in previous_summary and key not in payload_summary:
+            payload_summary[key] = previous_summary[key]
+
+    previous_plates = {
+        plate.get("plateCode"): plate
+        for plate in previous.get("plates", [])
+        if plate.get("plateCode")
+    }
+    for plate in payload.get("plates", []):
+        previous_plate = previous_plates.get(plate.get("plateCode"))
+        mapping = previous_plate.get("externalLimitMapping") if previous_plate else None
+        if mapping and not plate.get("externalLimitMapping"):
+            plate["externalLimitMapping"] = mapping
+
+
 def build_payload(linked: dict[str, Any]) -> dict[str, Any]:
     plates = linked.get("plates", [])
     return {
@@ -127,6 +152,11 @@ def main() -> None:
     linked = load_linked(linked_path)
     payload = build_payload(linked)
     history_items = load_existing_history(args.history_dir)
+    previous_same_date = next(
+        (item for item in history_items if compact_date(str(item.get("date", ""))) == compact_date(payload["date"])),
+        None,
+    )
+    preserve_external_enrichment(payload, previous_same_date)
     attach_plate_trends(payload, history_items)
 
     args.out.parent.mkdir(parents=True, exist_ok=True)

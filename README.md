@@ -20,16 +20,27 @@ pip install -r requirements.txt
 Refresh Kaipanla data, rebuild plate-stock links, enrich with the Tonghuashun/Eastmoney limit-up mapping, and rebuild custom board data:
 
 ```powershell
-python .\scripts\update_daily_data.py --date 20260421
+python .\scripts\update_daily_data.py --date 20260422
 ```
 
 Useful switches:
 
 ```powershell
-python .\scripts\update_daily_data.py --date 20260421 --skip-kpl
-python .\scripts\update_daily_data.py --date 20260421 --skip-external
-python .\scripts\update_daily_data.py --date 20260421 --skip-custom
+python .\scripts\update_daily_data.py --date 20260422 --skip-kpl
+python .\scripts\update_daily_data.py --date 20260422 --skip-external
+python .\scripts\update_daily_data.py --date 20260422 --skip-custom
+python .\scripts\update_daily_data.py --date 20260422 --strict-external
+python .\scripts\update_daily_data.py --date 20260422 --strict-custom
 ```
+
+By default, optional enrichment steps keep the dashboard loadable if a third-party
+package or source is unavailable:
+
+- `build_ths_limit_mapping.py` is optional; KPL data still loads without it.
+- `build_custom_board_data.py` is optional when an existing
+  `web/data/custom_boards.json` is present.
+- `scripts/validate_web_data.py` runs at the end and fails if required frontend
+  JSON files are missing or invalid.
 
 Daily web snapshots are saved here:
 
@@ -49,6 +60,7 @@ scripts/build_kpl_plate_stock_links.py    # inferred KPL plate/stock links -> da
 scripts/build_kpl_web_data.py             # KPL dashboard JSON + dated history snapshot
 scripts/build_ths_limit_mapping.py        # Tonghuashun concepts x Eastmoney limit-up pool enrichment
 scripts/build_custom_board_data.py        # custom board average history -> web/data/custom_boards.json
+scripts/validate_web_data.py              # validate required web/data JSON files
 scripts/serve_custom_boards.py            # editable local server for custom board definitions
 ```
 
@@ -78,7 +90,7 @@ web/data/custom_boards_config.json
 Build the custom board data:
 
 ```powershell
-python .\scripts\build_custom_board_data.py --date 20260421
+python .\scripts\build_custom_board_data.py --date 20260422
 ```
 
 To edit custom boards from the page, run the editable local server instead of the static server:

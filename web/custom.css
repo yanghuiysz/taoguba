@@ -166,6 +166,8 @@ p { line-height: 1.55; }
 
 .pool-card {
   min-height: 142px;
+  max-height: 360px;
+  overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
@@ -174,6 +176,15 @@ p { line-height: 1.55; }
   align-content: start;
   gap: 7px;
   box-shadow: var(--shadow);
+}
+
+.pool-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pool-card::-webkit-scrollbar-thumb {
+  background: #c9d8d5;
+  border-radius: 999px;
 }
 
 .pool-card.primary { border-color: #d7b66a; }
@@ -878,6 +889,9 @@ th {
   .setup-grid,
   .core-strip {
     grid-template-columns: 1fr;
+  }
+  .pool-card {
+    max-height: none;
   }
   .sidebar-card {
     position: static;

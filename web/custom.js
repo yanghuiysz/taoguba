@@ -5,7 +5,7 @@ const state = {
   labels: [],
   membership: { overrides: [] },
   selectedCode: null,
-  sortMode: 'pattern',
+  sortMode: 'avg_change',
   sortDate: null,
   editable: false,
   busy: false,
@@ -397,7 +397,6 @@ function labelTone(label) {
   return {
     强: 'strong',
     弱分歧: 'test',
-    弱两天: 'test',
     强分歧: 'turn',
     弱势: 'weak',
   }[label] || 'watch';
@@ -407,7 +406,6 @@ function labelPriority(label) {
   return {
     强: 82,
     弱分歧: 70,
-    弱两天: 66,
     强分歧: 58,
     弱势: 20,
   }[label] || 10;
@@ -445,19 +443,6 @@ function assignDailyLabel(metric, previousLabel = '') {
   return { label: '弱势', reason: '弱势：兜底规则，正宗股平均涨幅为负' };
 }
 
-function isSecondWeakWatch(metric, previousEntry) {
-  if (!metric || previousEntry?.label !== '弱分歧') return false;
-  const q = metric.Q_t;
-  const volumeOk = q === null || q === undefined || Number.isNaN(Number(q)) || q <= 1.6;
-  const noPanic = !(q !== null && q !== undefined && q > 1.8 && metric.A_t < 0);
-  return metric.A_t >= -1.5
-    && metric.R_t >= 0.3
-    && metric.C_t >= -1.5
-    && volumeOk
-    && noPanic
-    && previousEntry.weakWatchDays < 2;
-}
-
 function riskFlags(metric, previousMetric = null) {
   const flags = [];
   if ((metric?.B_t ?? 0) > 1.2) flags.push('core_weaker_than_group');
@@ -474,7 +459,6 @@ function boardLabelSeries(board) {
   const rows = [];
   let previousLabel = '';
   let previousMetric = null;
-  let previousEntry = null;
   for (let index = 0; index < trend.length; index += 1) {
     const row = trend[index];
     const previousRow = trend[index - 1] || null;
@@ -485,16 +469,9 @@ function boardLabelSeries(board) {
     const labelInfo = assignDailyLabel(metric, previousLabel);
     let label = labelInfo.label;
     let reason = labelInfo.reason;
-    const secondWeakWatch = label === '弱势' && isSecondWeakWatch(metric, previousEntry);
-    if (secondWeakWatch) {
-      label = '弱两天';
-      reason = '弱两天：强后第二天仍弱，但跌幅、红盘率、核心和量能仍可观察';
-    }
     const weakWatchDays = label === '弱分歧'
       ? 1
-      : label === '弱两天'
-        ? (previousEntry?.weakWatchDays || 1) + 1
-        : 0;
+      : 0;
     const entry = {
       date: row.date,
       row,
@@ -511,13 +488,27 @@ function boardLabelSeries(board) {
     rows.push(entry);
     previousLabel = label;
     previousMetric = metric;
-    previousEntry = entry;
   }
   return rows;
 }
 
 function boardLabelFor(board, date) {
   return boardLabelSeries(board).find((item) => item.date === date) || null;
+}
+
+function daysSinceLastStrong(board, date) {
+  const labels = boardLabelSeries(board);
+  const currentIndex = labels.findIndex((item) => item.date === date);
+  if (currentIndex < 0) return null;
+  for (let index = currentIndex - 1; index >= 0; index -= 1) {
+    if (labels[index].label === '强') {
+      return {
+        days: currentIndex - index,
+        date: labels[index].date,
+      };
+    }
+  }
+  return null;
 }
 
 function boardSetup(board, date) {
@@ -530,6 +521,7 @@ function boardSetup(board, date) {
   const dailyLabel = boardLabelFor(board, date);
   const label = dailyLabel?.displayLabel || '弱势';
   const coreRank = rowCoreStocks(today, 5);
+  const lastStrong = daysSinceLastStrong(board, date);
   return {
     label,
     rawLabel: dailyLabel?.label || label,
@@ -544,13 +536,14 @@ function boardSetup(board, date) {
     turn2: dailyLabel?.label === '强',
     turn3: dailyLabel?.label === '强分歧',
     divergenceToday: dailyLabel?.label === '弱分歧',
-    divergenceD1: ['弱分歧', '弱两天'].includes(boardLabelFor(board, d1?.date)?.label),
+    divergenceD1: boardLabelFor(board, d1?.date)?.label === '弱分歧',
     risk: dailyLabel?.label === '弱势',
     divergenceScore: dailyLabel?.metric?.divergence_score ?? null,
     strengthScore: dailyLabel?.metric?.strength_score ?? null,
     labelReason: dailyLabel?.reason || '',
     riskFlags: dailyLabel?.riskFlags || [],
     dailyLabel,
+    lastStrong,
     coreRank,
   };
 }
@@ -569,10 +562,10 @@ function setupPools(date) {
   const enriched = boards.map((board) => ({ board, setup: boardSetup(board, date) }));
   const byScore = (a, b) => setupScore(b.board, date) - setupScore(a.board, date);
   return {
-    strong: enriched.filter((item) => item.setup.rawLabel === '强').sort(byScore).slice(0, 5),
-    weakDivergence: enriched.filter((item) => item.setup.rawLabel === '弱分歧').sort(byScore).slice(0, 5),
-    strongDivergence: enriched.filter((item) => item.setup.rawLabel === '强分歧').sort(byScore).slice(0, 5),
-    weakTwoDays: enriched.filter((item) => item.setup.rawLabel === '弱两天').sort(byScore).slice(0, 5),
+    strong: enriched.filter((item) => item.setup.rawLabel === '强').sort(byScore),
+    weakDivergence: enriched.filter((item) => item.setup.rawLabel === '弱分歧').sort(byScore),
+    strongDivergence: enriched.filter((item) => item.setup.rawLabel === '强分歧').sort(byScore),
+    weak: enriched.filter((item) => item.setup.rawLabel === '弱势').sort(byScore),
   };
 }
 
@@ -974,15 +967,20 @@ function renderAmountBarChart(board) {
   `;
 }
 
+function renderPoolTitle(label, count) {
+  return `<div class="pool-title"><strong>${label}</strong><span>${count}</span></div>`;
+}
+
 function renderPoolItems(items, emptyText) {
   if (!items.length) return `<div class="pool-empty">${emptyText}</div>`;
   return items.map(({ board, setup }) => {
     const stats = setup.todayStats;
+    const daysText = setup.lastStrong ? `距强 ${setup.lastStrong.days} 天` : '距强 暂无';
     return `
       <button class="pool-item" type="button" data-code="${board.code}">
         <span>
           <strong>${board.name}</strong>
-          <small>${setup.rawLabel} · 正宗 ${percentText(stats?.averageChange)} · 强度 ${setup.strengthScore === null ? '暂无' : number(setup.strengthScore, 0)}</small>
+          <small>${daysText}</small>
         </span>
         <span class="pool-score ${setup.tone}">${number(stats?.averageChange)}%</span>
       </button>
@@ -995,20 +993,20 @@ function renderSetupPools() {
   return `
     <section class="setup-pools">
       <div class="pool-card primary">
-        <div class="pool-title"><strong>强势</strong></div>
+        ${renderPoolTitle('强势', pools.strong.length)}
         ${renderPoolItems(pools.strong, '暂无强势板块')}
       </div>
       <div class="pool-card">
-        <div class="pool-title"><strong>弱分歧</strong></div>
+        ${renderPoolTitle('弱分歧', pools.weakDivergence.length)}
         ${renderPoolItems(pools.weakDivergence, '暂无弱分歧')}
       </div>
       <div class="pool-card">
-        <div class="pool-title"><strong>强分歧</strong></div>
+        ${renderPoolTitle('强分歧', pools.strongDivergence.length)}
         ${renderPoolItems(pools.strongDivergence, '暂无强分歧')}
       </div>
-      <div class="pool-card">
-        <div class="pool-title"><strong>弱两天</strong></div>
-        ${renderPoolItems(pools.weakTwoDays, '暂无弱两天')}
+      <div class="pool-card risk">
+        ${renderPoolTitle('弱势', pools.weak.length)}
+        ${renderPoolItems(pools.weak, '暂无弱势板块')}
       </div>
     </section>
   `;
@@ -1051,9 +1049,9 @@ function renderSetupSummary(board) {
           <small>B=${metric?.B_t === null || metric?.B_t === undefined ? '暂无' : number(metric.B_t)} · 分化 ${metric?.D_t === null || metric?.D_t === undefined ? '暂无' : number(metric.D_t)}</small>
         </div>
         <div class="setup-metric">
-          <span>量能变化</span>
-          <strong>${metric?.Q_t === null || metric?.Q_t === undefined ? '暂无' : `${number(metric.Q_t, 2)}x`}</strong>
-          <small>正宗股成交额 ${amountText(metric?.M_t)}</small>
+          <span>距上次强势</span>
+          <strong>${setup.lastStrong ? `${setup.lastStrong.days} 天` : '暂无'}</strong>
+          <small>${setup.lastStrong ? `上次强势 ${shortDate(setup.lastStrong.date)}` : '历史区间无强势'}</small>
         </div>
         <div class="setup-metric">
           <span>三日结构</span>
@@ -1243,9 +1241,8 @@ function render() {
       <aside class="card sidebar-card">
         <div class="sort-inline">
           <div class="sort-mode-group" role="group" aria-label="排序方式">
-            <button class="sort-mode-btn${state.sortMode === 'pattern' ? ' active' : ''}" type="button" data-mode="pattern">模式</button>
+            <button class="sort-mode-btn${state.sortMode === 'avg_change' ? ' active' : ''}" type="button" data-mode="avg_change">涨幅</button>
             <button class="sort-mode-btn${state.sortMode === 'limit_up' ? ' active' : ''}" type="button" data-mode="limit_up">涨停</button>
-            <button class="sort-mode-btn${state.sortMode === 'avg_change' ? ' active' : ''}" type="button" data-mode="avg_change">均值</button>
           </div>
           <label class="sort-date-label">
             <span>日期</span>
@@ -1256,7 +1253,7 @@ function render() {
             <button class="date-nav-btn" id="sortDateNextBtn" type="button" ${nextDate ? '' : 'disabled'} aria-label="后一天">▶</button>
           </label>
         </div>
-        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'pattern' ? '模式优先级' : state.sortMode === 'limit_up' ? '涨停数' : '正宗股涨幅'} 排序</div>
+        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'limit_up' ? '涨停数' : '正宗股涨幅'} 排序</div>
         <div class="board-list">
           ${boards.map((item) => {
             const selectedAverageChange = averageChangeByDate(item, state.sortDate);

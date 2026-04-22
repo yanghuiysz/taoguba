@@ -8,7 +8,9 @@
         "plateCount": 268,
         "linkedPlateCount": 23,
         "limitUpStockCount": 9,
-        "strongStockCount": 44
+        "strongStockCount": 44,
+        "externalLimitUpStockCount": 52,
+        "externalLimitUpMappingCount": 275
       }
     },
     {
