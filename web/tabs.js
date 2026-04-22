@@ -4,7 +4,7 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260422-core-chart-v11",
+  custom: "./custom.html?v=20260422-label-v7",
 };
 
 function resizeFrame(frame) {

@@ -42,6 +42,18 @@ const percentText = (value) => {
   return `${number(value)}%`;
 };
 
+const stockTurnover = (stock) => {
+  const value = stock?.turnover ?? stock?.amount;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const rowTotalTurnover = (row) => {
+  const value = row?.totalTurnover ?? row?.totalAmount;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 async function detectEditingApi() {
   try {
     const response = await fetch('/api/custom-boards/status', { cache: 'no-store' });
@@ -190,8 +202,8 @@ function rowRedRate(row) {
 
 function rowCoreStocks(row, size = 5) {
   return [...(row?.stocks || [])]
-    .filter((stock) => Number.isFinite(Number(stock.amount)) && stock.changePercent !== null && stock.changePercent !== undefined)
-    .sort((a, b) => Number(b.amount) - Number(a.amount))
+    .filter((stock) => stockTurnover(stock) !== null && stock.changePercent !== null && stock.changePercent !== undefined)
+    .sort((a, b) => stockTurnover(b) - stockTurnover(a))
     .slice(0, size);
 }
 
@@ -248,9 +260,9 @@ function pureCoreSeries(board) {
   const coreCodes = pureStockCodes(board);
   return trendValues(board).map((row) => {
     const stocks = (row.stocks || []).filter((stock) => coreCodes.has(String(stock.code || '')));
-    const amountStocks = stocks.filter((stock) => Number.isFinite(Number(stock.amount)));
+    const amountStocks = stocks.filter((stock) => stockTurnover(stock) !== null);
     const changeStocks = stocks.filter((stock) => Number.isFinite(Number(stock.changePercent)));
-    const totalAmount = amountStocks.reduce((sum, stock) => sum + Number(stock.amount || 0), 0);
+    const totalAmount = amountStocks.reduce((sum, stock) => sum + stockTurnover(stock), 0);
     const averageChange = changeStocks.length
       ? changeStocks.reduce((sum, stock) => sum + Number(stock.changePercent || 0), 0) / changeStocks.length
       : null;
@@ -282,49 +294,230 @@ function pureChangeSeries(board) {
 }
 
 function amountRatio(row, previousRow) {
-  const current = Number(row?.totalAmount);
-  const previous = Number(previousRow?.totalAmount);
+  const current = rowTotalTurnover(row);
+  const previous = rowTotalTurnover(previousRow);
   if (!Number.isFinite(current) || !Number.isFinite(previous) || previous <= 0) return null;
   return current / previous;
 }
 
 function rowStats(board, row, previousRow = null) {
   if (!row) return null;
+  const metric = rowLabelMetrics(board, row, previousRow);
   const orthodoxAverage = rowDisplayAverageChange(board, row);
   return {
     row,
     averageChange: orthodoxAverage,
     limitUpCount: rowLimitUpCount(row),
-    redRate: rowRedRate(row),
-    coreAverage: orthodoxAverage,
-    amountRatio: amountRatio(row, previousRow),
+    redRate: metric?.R_t === null || metric?.R_t === undefined ? rowRedRate(row) : metric.R_t * 100,
+    coreAverage: metric?.C_t ?? orthodoxAverage,
+    amountRatio: metric?.Q_t ?? amountRatio(row, previousRow),
   };
 }
 
-function isStrongDay(stats) {
-  if (!stats) return false;
-  if (stats.averageChange === null || Number.isNaN(Number(stats.averageChange))) return false;
-  return stats.averageChange >= 2 || stats.limitUpCount >= 2 || (stats.averageChange >= 1.2 && stats.redRate >= 55);
+function rowStocksByCodes(row, codes) {
+  return (row?.stocks || []).filter((stock) =>
+    codes.has(String(stock.code || '')) && Number.isFinite(Number(stock.changePercent)));
 }
 
-function isConstructiveDivergence(stats, previousStats) {
-  if (!stats || !previousStats) return false;
-  if (stats.averageChange === null || previousStats.averageChange === null) return false;
-  const averageOk = stats.averageChange >= -2.8 && stats.averageChange <= 1.4;
-  const limitOk = stats.limitUpCount >= 1 || stats.limitUpCount >= previousStats.limitUpCount - 1;
-  const breadthOk = (stats.redRate ?? 0) >= 30;
-  const coreOk = (stats.coreAverage ?? -99) >= -2.2;
-  const amountOk = stats.amountRatio === null || stats.amountRatio <= 1.65;
-  return averageOk && limitOk && breadthOk && coreOk && amountOk;
+function rowPureMetricInput(board, row) {
+  const pureCodes = pureStockCodes(board);
+  const coreCodes = pureCoreStockCodes(board);
+  const pureStocks = rowStocksByCodes(row, pureCodes);
+  const coreStocks = rowStocksByCodes(row, coreCodes);
+  const amountStocks = pureStocks.filter((stock) => stockTurnover(stock) !== null);
+  const changes = pureStocks.map((stock) => Number(stock.changePercent));
+  const coreChanges = coreStocks.map((stock) => Number(stock.changePercent));
+  const average = changes.length ? changes.reduce((sum, value) => sum + value, 0) / changes.length : null;
+  const coreAverage = coreChanges.length ? coreChanges.reduce((sum, value) => sum + value, 0) / coreChanges.length : average;
+  const variance = changes.length >= 2
+    ? changes.reduce((sum, value) => sum + (value - average) ** 2, 0) / changes.length
+    : 0;
+  const limitUpCount = pureStocks.filter(isLimitUp).length;
+  return {
+    pure_stock_count: pureStocks.length,
+    core_stock_count: coreStocks.length,
+    A_t: average,
+    R_t: changes.length ? changes.filter((value) => value > 0).length / changes.length : null,
+    L_t: pureStocks.length ? limitUpCount / pureStocks.length : null,
+    raw_limit_up_count_t: limitUpCount,
+    M_t: amountStocks.reduce((sum, stock) => sum + stockTurnover(stock), 0),
+    C_t: coreAverage,
+    B_t: average !== null && coreAverage !== null ? average - coreAverage : null,
+    D_t: Math.sqrt(variance),
+  };
 }
 
-function isTurningStrong(stats, previousStats) {
-  if (!stats || !previousStats) return false;
-  if (stats.averageChange === null || previousStats.averageChange === null) return false;
-  const strengthOk = stats.averageChange >= 1.3 || stats.limitUpCount > previousStats.limitUpCount || stats.redRate >= 60;
-  const coreOk = (stats.coreAverage ?? -99) >= 0;
-  const amountOk = stats.amountRatio === null || stats.amountRatio >= 0.82;
-  return strengthOk && coreOk && amountOk;
+function rowLabelMetrics(board, row, previousRow = null) {
+  if (!row) return null;
+  const current = rowPureMetricInput(board, row);
+  const previous = previousRow ? rowPureMetricInput(board, previousRow) : null;
+  const q = previous && Number(previous.M_t) > 0 ? current.M_t / previous.M_t : null;
+  return { ...current, Q_t: q };
+}
+
+function qStrengthScore(q) {
+  if (q === null || q === undefined || Number.isNaN(Number(q))) return 70;
+  if (q >= 0.9 && q <= 1.4) return 100;
+  if ((q >= 0.75 && q < 0.9) || (q > 1.4 && q <= 1.8)) return 70;
+  if ((q >= 0.6 && q < 0.75) || (q > 1.8 && q <= 2.2)) return 30;
+  return 0;
+}
+
+function qAbnormalScore(q) {
+  if (q === null || q === undefined || Number.isNaN(Number(q))) return 20;
+  if (q >= 0.85 && q <= 1.35) return 0;
+  if ((q >= 0.7 && q < 0.85) || (q > 1.35 && q <= 1.7)) return 40;
+  if ((q >= 0.55 && q < 0.7) || (q > 1.7 && q <= 2.2)) return 80;
+  return 100;
+}
+
+function calcStrengthScore(metric) {
+  if (!metric || metric.A_t === null || metric.R_t === null || metric.L_t === null || metric.C_t === null) return 0;
+  const scoreA = clamp((metric.A_t - (-2)) / (4 - (-2)) * 100, 0, 100);
+  const scoreR = clamp((metric.R_t - 0.3) / (0.9 - 0.3) * 100, 0, 100);
+  const scoreL = clamp(metric.L_t / 0.2 * 100, 0, 100);
+  const scoreC = clamp((metric.C_t - (-2)) / (5 - (-2)) * 100, 0, 100);
+  const scoreQ = qStrengthScore(metric.Q_t);
+  return 0.35 * scoreA + 0.25 * scoreR + 0.15 * scoreL + 0.15 * scoreC + 0.1 * scoreQ;
+}
+
+function calcDivergenceScore(metric, previousMetric = null) {
+  if (!metric || metric.D_t === null || metric.B_t === null || metric.R_t === null || metric.L_t === null) return 0;
+  const rDrop = Math.max(0, (previousMetric?.R_t ?? metric.R_t) - metric.R_t);
+  const lDrop = Math.max(0, (previousMetric?.L_t ?? metric.L_t) - metric.L_t);
+  const scoreD = clamp((metric.D_t - 1.5) / (5.5 - 1.5) * 100, 0, 100);
+  const scoreB = clamp(Math.max(0, metric.B_t) / 3 * 100, 0, 100);
+  const scoreRDrop = clamp(rDrop / 0.5 * 100, 0, 100);
+  const scoreLDrop = clamp(lDrop / 0.15 * 100, 0, 100);
+  const scoreQ = qAbnormalScore(metric.Q_t);
+  return 0.35 * scoreD + 0.25 * scoreB + 0.15 * scoreRDrop + 0.1 * scoreLDrop + 0.15 * scoreQ;
+}
+
+function labelTone(label) {
+  return {
+    强: 'strong',
+    弱分歧: 'test',
+    弱两天: 'test',
+    强分歧: 'turn',
+    弱势: 'weak',
+  }[label] || 'watch';
+}
+
+function labelPriority(label) {
+  return {
+    强: 82,
+    弱分歧: 70,
+    弱两天: 66,
+    强分歧: 58,
+    弱势: 20,
+  }[label] || 10;
+}
+
+function assignDailyLabel(metric, previousLabel = '') {
+  if (!metric || metric.A_t === null || metric.R_t === null) {
+    return { label: '弱势', reason: '弱势：缺少有效正宗股数据' };
+  }
+  const s = metric.strength_score;
+  const f = metric.divergence_score;
+  const a = metric.A_t;
+  const r = metric.R_t;
+  const q = metric.Q_t;
+  const c = metric.C_t ?? a;
+  const b = metric.B_t ?? 0;
+  const d = metric.D_t ?? 0;
+  const qOk = q === null || q === undefined || Number.isNaN(Number(q)) || (q >= 0.75 && q <= 1.4);
+  if (s >= 70 && f < 40 && a >= 2 && r >= 0.67 && b <= 0.8) {
+    return { label: '强', reason: '强：平均涨幅高、红盘率高、分歧低' };
+  }
+  if ((previousLabel === '强' || previousLabel === '弱分歧') && s >= 45 && s < 70 && f >= 40 && f < 65 && a >= 0 && r >= 0.4 && b <= 1 && qOk) {
+    return { label: '弱分歧', reason: '弱分歧：前强后分歧，但核心未明显走坏' };
+  }
+  const strongDivergenceTrigger = b > 1.2 || r < 0.5 || (q !== null && q !== undefined && q > 1.4) || d >= 4;
+  if ((previousLabel === '强' || previousLabel === '弱分歧') && s >= 55 && f >= 65 && a >= 0 && strongDivergenceTrigger) {
+    return { label: '强分歧', reason: '强分歧：板块表面仍强，但核心弱于整体或分化放大' };
+  }
+  if (a < 0 && r < 0.4 && (c < 0 || b > 1.5)) {
+    return { label: '弱势', reason: '弱势：平均涨幅转负且红盘率过低' };
+  }
+  if (a >= 1.5 && r >= 0.6) return { label: '强', reason: '强：兜底规则，涨幅与红盘率同步较强' };
+  if (a >= 0 && r >= 0.4) return { label: '弱分歧', reason: '弱分歧：兜底规则，仍有承接但强度不足' };
+  if (a >= 0) return { label: '强分歧', reason: '强分歧：兜底规则，指数为正但扩散不足' };
+  return { label: '弱势', reason: '弱势：兜底规则，正宗股平均涨幅为负' };
+}
+
+function isSecondWeakWatch(metric, previousEntry) {
+  if (!metric || previousEntry?.label !== '弱分歧') return false;
+  const q = metric.Q_t;
+  const volumeOk = q === null || q === undefined || Number.isNaN(Number(q)) || q <= 1.6;
+  const noPanic = !(q !== null && q !== undefined && q > 1.8 && metric.A_t < 0);
+  return metric.A_t >= -1.5
+    && metric.R_t >= 0.3
+    && metric.C_t >= -1.5
+    && volumeOk
+    && noPanic
+    && previousEntry.weakWatchDays < 2;
+}
+
+function riskFlags(metric, previousMetric = null) {
+  const flags = [];
+  if ((metric?.B_t ?? 0) > 1.2) flags.push('core_weaker_than_group');
+  if ((metric?.R_t ?? 1) < 0.4) flags.push('low_red_rate');
+  if (metric?.Q_t !== null && metric?.Q_t !== undefined && (metric.Q_t < 0.75 || metric.Q_t > 1.7)) flags.push('abnormal_volume');
+  if ((metric?.D_t ?? 0) >= 4) flags.push('high_dispersion');
+  if (!previousMetric) flags.push('no_prev_day_data');
+  if (previousMetric && previousMetric.L_t - metric.L_t >= 0.15) flags.push('limit_up_drop');
+  return flags;
+}
+
+function boardLabelSeries(board) {
+  const trend = trendValues(board);
+  const rows = [];
+  let previousLabel = '';
+  let previousMetric = null;
+  let previousEntry = null;
+  for (let index = 0; index < trend.length; index += 1) {
+    const row = trend[index];
+    const previousRow = trend[index - 1] || null;
+    const metric = rowLabelMetrics(board, row, previousRow);
+    if (!metric) continue;
+    metric.strength_score = calcStrengthScore(metric);
+    metric.divergence_score = calcDivergenceScore(metric, previousMetric);
+    const labelInfo = assignDailyLabel(metric, previousLabel);
+    let label = labelInfo.label;
+    let reason = labelInfo.reason;
+    const secondWeakWatch = label === '弱势' && isSecondWeakWatch(metric, previousEntry);
+    if (secondWeakWatch) {
+      label = '弱两天';
+      reason = '弱两天：强后第二天仍弱，但跌幅、红盘率、核心和量能仍可观察';
+    }
+    const weakWatchDays = label === '弱分歧'
+      ? 1
+      : label === '弱两天'
+        ? (previousEntry?.weakWatchDays || 1) + 1
+        : 0;
+    const entry = {
+      date: row.date,
+      row,
+      metric,
+      prevLabel: previousLabel,
+      label,
+      displayLabel: label,
+      reason,
+      weakWatchDays,
+      riskFlags: riskFlags(metric, previousMetric),
+      tone: labelTone(label),
+      priority: labelPriority(label),
+    };
+    rows.push(entry);
+    previousLabel = label;
+    previousMetric = metric;
+    previousEntry = entry;
+  }
+  return rows;
+}
+
+function boardLabelFor(board, date) {
+  return boardLabelSeries(board).find((item) => item.date === date) || null;
 }
 
 function boardSetup(board, date) {
@@ -334,70 +527,30 @@ function boardSetup(board, date) {
   const todayStats = rowStats(board, today, d1);
   const d1Stats = rowStats(board, d1, d2);
   const d2Stats = rowStats(board, d2, trendRowAt(board, date, -3));
-  const strongToday = isStrongDay(todayStats);
-  const strongD1 = isStrongDay(d1Stats);
-  const strongD2 = isStrongDay(d2Stats);
-  const divergenceToday = isConstructiveDivergence(todayStats, d1Stats);
-  const divergenceD1 = isConstructiveDivergence(d1Stats, d2Stats);
-  const turn2 = strongD1 && isTurningStrong(todayStats, d1Stats);
-  const turn3 = strongD2 && divergenceD1 && isTurningStrong(todayStats, d1Stats);
-  const risk = strongToday && todayStats?.amountRatio !== null && todayStats.amountRatio >= 2.2 && (todayStats.averageChange ?? 0) < 1.2;
-  let label = '观察';
-  let tone = 'watch';
-  let priority = 10;
-  if (turn2) {
-    label = '二日转强';
-    tone = 'hot';
-    priority = 100;
-  } else if (turn3) {
-    label = '三日转强';
-    tone = 'turn';
-    priority = 92;
-  } else if (strongD1 && divergenceToday) {
-    label = '分歧观察';
-    tone = 'test';
-    priority = 78;
-  } else if (risk) {
-    label = '高潮风险';
-    tone = 'risk';
-    priority = 56;
-  } else if (strongToday) {
-    label = '强1';
-    tone = 'strong';
-    priority = 64;
-  } else if (todayStats && todayStats.averageChange !== null && todayStats.averageChange < -3.2 && (todayStats.redRate ?? 100) < 25) {
-    label = '转弱';
-    tone = 'weak';
-    priority = 18;
-  }
-  const divergenceScore = divergenceToday || divergenceD1
-    ? clamp(
-      50
-        + (todayStats?.averageChange ?? 0) * 8
-        + ((todayStats?.redRate ?? 0) - 40) * 0.6
-        + (todayStats?.limitUpCount ?? 0) * 7
-        - Math.max(0, ((todayStats?.amountRatio ?? 1) - 1.45) * 30),
-      0,
-      100,
-    )
-    : null;
+  const dailyLabel = boardLabelFor(board, date);
+  const label = dailyLabel?.displayLabel || '弱势';
   const coreRank = rowCoreStocks(today, 5);
   return {
     label,
-    tone,
-    priority,
+    rawLabel: dailyLabel?.label || label,
+    tone: dailyLabel?.tone || 'watch',
+    priority: dailyLabel?.priority || 10,
     today,
     d1,
     d2,
     todayStats,
     d1Stats,
     d2Stats,
-    turn2,
-    turn3,
-    divergenceToday,
-    divergenceD1,
-    risk,
-    divergenceScore,
+    turn2: dailyLabel?.label === '强',
+    turn3: dailyLabel?.label === '强分歧',
+    divergenceToday: dailyLabel?.label === '弱分歧',
+    divergenceD1: ['弱分歧', '弱两天'].includes(boardLabelFor(board, d1?.date)?.label),
+    risk: dailyLabel?.label === '弱势',
+    divergenceScore: dailyLabel?.metric?.divergence_score ?? null,
+    strengthScore: dailyLabel?.metric?.strength_score ?? null,
+    labelReason: dailyLabel?.reason || '',
+    riskFlags: dailyLabel?.riskFlags || [],
+    dailyLabel,
     coreRank,
   };
 }
@@ -406,9 +559,9 @@ function setupScore(board, date) {
   const setup = boardSetup(board, date);
   const stats = setup.todayStats;
   return setup.priority
-    + (stats?.limitUpCount || 0) * 3
     + (stats?.averageChange || 0)
-    + ((stats?.coreAverage || 0) * 0.8);
+    + ((setup.strengthScore || 0) * 0.05)
+    - ((setup.divergenceScore || 0) * 0.02);
 }
 
 function setupPools(date) {
@@ -416,10 +569,10 @@ function setupPools(date) {
   const enriched = boards.map((board) => ({ board, setup: boardSetup(board, date) }));
   const byScore = (a, b) => setupScore(b.board, date) - setupScore(a.board, date);
   return {
-    turn2: enriched.filter((item) => item.setup.turn2).sort(byScore).slice(0, 5),
-    divergence: enriched.filter((item) => item.setup.divergenceToday && !item.setup.turn2).sort(byScore).slice(0, 5),
-    turn3: enriched.filter((item) => item.setup.turn3).sort(byScore).slice(0, 5),
-    risk: enriched.filter((item) => item.setup.risk).sort(byScore).slice(0, 5),
+    strong: enriched.filter((item) => item.setup.rawLabel === '强').sort(byScore).slice(0, 5),
+    weakDivergence: enriched.filter((item) => item.setup.rawLabel === '弱分歧').sort(byScore).slice(0, 5),
+    strongDivergence: enriched.filter((item) => item.setup.rawLabel === '强分歧').sort(byScore).slice(0, 5),
+    weakTwoDays: enriched.filter((item) => item.setup.rawLabel === '弱两天').sort(byScore).slice(0, 5),
   };
 }
 
@@ -470,8 +623,8 @@ function membershipAssessment(board, stock, date) {
   const snapshot = trendSnapshotByDate(board, date);
   const row = (snapshot?.stocks || []).find((item) => String(item.code || '') === String(stock.code || ''));
   const amountRank = [...(snapshot?.stocks || [])]
-    .filter((item) => Number.isFinite(Number(item.amount)))
-    .sort((a, b) => Number(b.amount) - Number(a.amount))
+    .filter((item) => stockTurnover(item) !== null)
+    .sort((a, b) => stockTurnover(b) - stockTurnover(a))
     .findIndex((item) => String(item.code || '') === String(stock.code || '')) + 1;
   const changeRank = [...(snapshot?.stocks || [])]
     .filter((item) => Number.isFinite(Number(item.changePercent)))
@@ -612,7 +765,7 @@ function renderTrendChart(board) {
     const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
     const yAvg = pad.top + ((avgMax - change) / avgRange) * plotHeight;
     const yLimit = pad.top + ((limitMax - limitUpCount) / limitMax) * plotHeight;
-    const label = labelFor(board, item.date);
+    const label = boardLabelFor(board, item.date) || labelFor(board, item.date);
     const close = Math.abs(yAvg - yLimit) < 16;
     return {
       ...item,
@@ -624,7 +777,7 @@ function renderTrendChart(board) {
       yLimit,
       yAvgLabel: close ? yAvg - 14 : yAvg - 10,
       yLimitLabel: close ? yLimit + 16 : yLimit - 10,
-      tag: label?.label || null,
+      tag: label?.displayLabel || label?.label || null,
     };
   });
   const avgLine = points.map((point) => `${point.x},${point.yAvg}`).join(' ');
@@ -647,7 +800,7 @@ function renderTrendChart(board) {
           <circle cx="${point.x}" cy="${point.yLimit}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#d9480f;stroke-width:${point.selected ? 3 : 2.2};"></circle>
           <text x="${point.x}" y="${point.yAvgLabel}" text-anchor="middle" class="value-label">${number(point.change)}%</text>
           <text x="${point.x}" y="${point.yLimitLabel}" text-anchor="middle" class="value-label">${point.limitUpCount}</text>
-          ${point.tag ? `<text x="${point.x}" y="${point.yAvg - 26}" text-anchor="middle" class="tag-label">${point.tag}</text>` : ''}
+          ${point.tag ? `<text x="${point.x}" y="${height - 30}" text-anchor="middle" class="tag-label">${point.tag}</text>` : ''}
           <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
           <title>${point.date} 平均涨跌幅 ${number(point.change)}% | 涨停家数 ${point.limitUpCount} 家 | 有效股票 ${point.stockCount}</title>
         </g>
@@ -767,15 +920,15 @@ function renderAmountBarChart(board) {
   const pad = { top: 30, right: 34, bottom: 44, left: 64 };
   const plotWidth = width - pad.left - pad.right;
   const plotHeight = height - pad.top - pad.bottom;
-  const amounts = trend.map((item) => Number(item.totalAmount) || 0);
+  const amounts = trend.map((item) => rowTotalTurnover(item) || 0);
   const maxAmount = Math.max(...amounts, 1);
   const step = trend.length === 1 ? plotWidth : plotWidth / (trend.length - 1);
   const barWidth = Math.max(12, Math.min(28, step * 0.52));
   const axisBottom = height - pad.bottom;
   const yMaxLabel = amountText(maxAmount);
   const points = trend.map((item, index) => {
-    const totalAmount = Number(item.totalAmount) || 0;
-    const amountStockCount = Number(item.amountStockCount) || 0;
+    const totalAmount = rowTotalTurnover(item) || 0;
+    const amountStockCount = Number(item.turnoverStockCount ?? item.amountStockCount) || 0;
     const missing = Math.max(0, Number(board.stockCount || 0) - amountStockCount);
     const averageChange = Number(item.averageChange);
     const x = pad.left + (trend.length === 1 ? plotWidth / 2 : index * step);
@@ -829,7 +982,7 @@ function renderPoolItems(items, emptyText) {
       <button class="pool-item" type="button" data-code="${board.code}">
         <span>
           <strong>${board.name}</strong>
-          <small>${setup.label} · 正宗 ${percentText(stats?.averageChange)} · 红盘 ${number(stats?.redRate, 0)}%</small>
+          <small>${setup.rawLabel} · 正宗 ${percentText(stats?.averageChange)} · 强度 ${setup.strengthScore === null ? '暂无' : number(setup.strengthScore, 0)}</small>
         </span>
         <span class="pool-score ${setup.tone}">${number(stats?.averageChange)}%</span>
       </button>
@@ -842,20 +995,20 @@ function renderSetupPools() {
   return `
     <section class="setup-pools">
       <div class="pool-card primary">
-        <div class="pool-title"><span>主模式</span><strong>二日转强</strong></div>
-        ${renderPoolItems(pools.turn2, '暂无二日转强')}
+        <div class="pool-title"><strong>强势</strong></div>
+        ${renderPoolItems(pools.strong, '暂无强势板块')}
       </div>
       <div class="pool-card">
-        <div class="pool-title"><span>观察</span><strong>分歧检验</strong></div>
-        ${renderPoolItems(pools.divergence, '暂无良性分歧')}
+        <div class="pool-title"><strong>弱分歧</strong></div>
+        ${renderPoolItems(pools.weakDivergence, '暂无弱分歧')}
       </div>
       <div class="pool-card">
-        <div class="pool-title"><span>副模式</span><strong>三日转强</strong></div>
-        ${renderPoolItems(pools.turn3, '暂无三日转强')}
+        <div class="pool-title"><strong>强分歧</strong></div>
+        ${renderPoolItems(pools.strongDivergence, '暂无强分歧')}
       </div>
-      <div class="pool-card risk">
-        <div class="pool-title"><span>风控</span><strong>高潮风险</strong></div>
-        ${renderPoolItems(pools.risk, '暂无高潮风险')}
+      <div class="pool-card">
+        <div class="pool-title"><strong>弱两天</strong></div>
+        ${renderPoolItems(pools.weakTwoDays, '暂无弱两天')}
       </div>
     </section>
   `;
@@ -870,6 +1023,9 @@ function renderSetupSummary(board) {
   const stats = setup.todayStats;
   const d1 = setup.d1Stats;
   const d2 = setup.d2Stats;
+  const metric = setup.dailyLabel?.metric;
+  const d1Label = boardLabelFor(board, setup.d1?.date);
+  const d2Label = boardLabelFor(board, setup.d2?.date);
   const membership = membershipSummary(board, state.sortDate);
   const suspectList = membership.assessments
     .filter((item) => item.assessment.status === 'suspect' || item.assessment.status === 'overlap')
@@ -879,7 +1035,7 @@ function renderSetupSummary(board) {
       <div class="section-head">
         <div>
           <h2>${board.name} · 模式观察</h2>
-          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.label}，分歧质量 ${setup.divergenceScore === null ? '暂无' : number(setup.divergenceScore, 0)}。</p>
+          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.rawLabel}，强度分 ${setup.strengthScore === null ? '暂无' : number(setup.strengthScore, 0)}，分歧分 ${setup.divergenceScore === null ? '暂无' : number(setup.divergenceScore, 0)}。</p>
         </div>
         ${renderSetupBadge(setup)}
       </div>
@@ -887,30 +1043,34 @@ function renderSetupSummary(board) {
         <div class="setup-metric">
           <span>今日强度</span>
           <strong class="${signedClass(stats?.averageChange)}">${percentText(stats?.averageChange)}</strong>
-          <small>涨停 ${stats?.limitUpCount ?? 0} · 红盘 ${number(stats?.redRate, 0)}%</small>
+          <small>正宗涨停 ${metric?.raw_limit_up_count_t ?? 0} · 红盘 ${metric?.R_t === null || metric?.R_t === undefined ? '暂无' : number(metric.R_t * 100, 0)}%</small>
         </div>
         <div class="setup-metric">
-          <span>正宗股</span>
-          <strong class="${signedClass(stats?.coreAverage)}">${percentText(stats?.coreAverage)}</strong>
-          <small>正宗核心 + 正宗弹性</small>
+          <span>核心表现</span>
+          <strong class="${signedClass(metric?.C_t)}">${percentText(metric?.C_t)}</strong>
+          <small>B=${metric?.B_t === null || metric?.B_t === undefined ? '暂无' : number(metric.B_t)} · 分化 ${metric?.D_t === null || metric?.D_t === undefined ? '暂无' : number(metric.D_t)}</small>
         </div>
         <div class="setup-metric">
           <span>量能变化</span>
-          <strong>${stats?.amountRatio === null ? '暂无' : `${number(stats.amountRatio, 2)}x`}</strong>
-          <small>对比前一交易日</small>
+          <strong>${metric?.Q_t === null || metric?.Q_t === undefined ? '暂无' : `${number(metric.Q_t, 2)}x`}</strong>
+          <small>正宗股成交额 ${amountText(metric?.M_t)}</small>
         </div>
         <div class="setup-metric">
           <span>三日结构</span>
-          <strong>${shortDate(setup.d2?.date)} → ${shortDate(setup.d1?.date)} → ${shortDate(setup.today?.date)}</strong>
-          <small>${percentText(d2?.averageChange)} / ${percentText(d1?.averageChange)} / ${percentText(stats?.averageChange)}</small>
+          <strong>${d2Label?.label || '暂无'} → ${d1Label?.label || '暂无'} → ${setup.rawLabel}</strong>
+          <small>${shortDate(setup.d2?.date)} / ${shortDate(setup.d1?.date)} / ${shortDate(setup.today?.date)}</small>
         </div>
+      </div>
+      <div class="membership-alert">
+        <strong>标签依据：</strong>
+        ${setup.labelReason || '暂无'}${setup.riskFlags.length ? `；风险标记：${setup.riskFlags.join('、')}` : ''}
       </div>
       <div class="core-strip">
         ${setup.coreRank.map((stock, index) => `
           <div class="core-chip">
             <span>${index + 1}. ${stock.name}</span>
             <strong class="${signedClass(stock.changePercent)}">${percentText(stock.changePercent)}</strong>
-            <small>${amountText(stock.amount)}</small>
+            <small>${amountText(stockTurnover(stock))}</small>
           </div>
         `).join('')}
       </div>
@@ -980,7 +1140,7 @@ function renderStocksTable(board) {
         displayDate: useDateSnapshot ? state.sortDate : stock.latestDate,
         displayClose: useDateSnapshot ? (current?.close ?? null) : stock.latestClose,
         displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock.latestChangePercent,
-        displayAmount: useDateSnapshot ? (current?.amount ?? null) : stock.latestAmount,
+        displayAmount: useDateSnapshot ? stockTurnover(current) : (stock.latestTurnover ?? stock.latestAmount),
         membership: membershipAssessment(board, stock, state.sortDate),
       };
     })
@@ -1041,7 +1201,7 @@ function renderDetail(board) {
         <div class="section-head">
           <div>
             <h2>${board.name} · 趋势曲线</h2>
-            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(selectedRow?.totalAmount)}。</p>
+            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}。</p>
           </div>
           <div class="badges">
             <span class="badge">蓝线：平均涨跌幅</span>

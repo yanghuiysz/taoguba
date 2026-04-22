@@ -84,6 +84,8 @@ def write_cached_history(cache_dir: Path, code: str, end_date: str, lookback_day
 def normalize_eastmoney_history(code: str, df: Any) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for _, row in df.iterrows():
+        volume = number_or_none(row.get("成交量"))
+        turnover = number_or_none(row.get("成交额"))
         rows.append(
             {
                 "date": format_date(str(row.get("日期", ""))),
@@ -93,7 +95,9 @@ def normalize_eastmoney_history(code: str, df: Any) -> list[dict[str, Any]]:
                 "high": number_or_none(row.get("最高")),
                 "low": number_or_none(row.get("最低")),
                 "changePercent": number_or_none(row.get("涨跌幅")),
-                "amount": number_or_none(row.get("成交额")),
+                "volume": volume,
+                "turnover": turnover,
+                "amount": turnover,
                 "turnoverRate": number_or_none(row.get("换手率")),
             }
         )
@@ -106,6 +110,8 @@ def normalize_price_history(code: str, df: Any) -> list[dict[str, Any]]:
     for _, row in df.iterrows():
         close = number_or_none(row.get("close"))
         volume_lots = number_or_none(row.get("amount"))
+        volume = round(volume_lots * 100, 2) if volume_lots is not None else None
+        turnover = round(volume_lots * close * 100, 2) if volume_lots is not None and close is not None else None
         change_percent = None
         if close is not None and previous_close not in (None, 0):
             change_percent = round((close - previous_close) / previous_close * 100, 4)
@@ -118,7 +124,9 @@ def normalize_price_history(code: str, df: Any) -> list[dict[str, Any]]:
                 "high": number_or_none(row.get("high")),
                 "low": number_or_none(row.get("low")),
                 "changePercent": change_percent,
-                "amount": round(volume_lots * close * 100, 2) if volume_lots is not None and close is not None else None,
+                "volume": volume,
+                "turnover": turnover,
+                "amount": turnover,
                 "turnoverRate": None,
             }
         )
@@ -151,6 +159,8 @@ def normalize_spot_rows(df: Any, codes: set[str], date: str) -> dict[str, dict[s
         previous_close = number_or_none(first_present(row, ("昨收", "previousClose", "f18"), 12))
         if change_percent is None and close is not None and previous_close not in (None, 0):
             change_percent = round((close - previous_close) / previous_close * 100, 4)
+        volume = number_or_none(first_present(row, ("成交量", "volume", "f5"), 6))
+        turnover = number_or_none(first_present(row, ("成交额", "amount", "f6"), 7))
         rows[code] = {
             "date": format_date(date),
             "code": code,
@@ -159,16 +169,52 @@ def normalize_spot_rows(df: Any, codes: set[str], date: str) -> dict[str, dict[s
             "high": number_or_none(first_present(row, ("最高", "high", "f15"), 9)),
             "low": number_or_none(first_present(row, ("最低", "low", "f16"), 10)),
             "changePercent": change_percent,
-            "amount": number_or_none(first_present(row, ("成交额", "amount", "f6"), 7)),
+            "volume": volume,
+            "turnover": turnover,
+            "amount": turnover,
             "turnoverRate": number_or_none(first_present(row, ("换手率", "turnoverRate", "f8"), 14)),
             "source": "intraday_spot",
         }
     return rows
 
 
+def normalize_sina_spot_rows(df: Any, codes: set[str], date: str) -> dict[str, dict[str, Any]]:
+    rows: dict[str, dict[str, Any]] = {}
+    for _, row in df.iterrows():
+        code = normalize_stock_code(row.iloc[0])
+        if code not in codes:
+            continue
+        volume = number_or_none(row.iloc[11]) if len(row) > 11 else None
+        turnover = number_or_none(row.iloc[12]) if len(row) > 12 else None
+        rows[code] = {
+            "date": format_date(date),
+            "code": code,
+            "name": str(row.iloc[1]) if len(row) > 1 else code,
+            "open": number_or_none(row.iloc[8]) if len(row) > 8 else None,
+            "close": number_or_none(row.iloc[2]) if len(row) > 2 else None,
+            "high": number_or_none(row.iloc[9]) if len(row) > 9 else None,
+            "low": number_or_none(row.iloc[10]) if len(row) > 10 else None,
+            "changePercent": number_or_none(row.iloc[4]) if len(row) > 4 else None,
+            "volume": volume,
+            "turnover": turnover,
+            "amount": turnover,
+            "turnoverRate": None,
+            "source": "intraday_spot_sina",
+            "timestamp": str(row.iloc[13]) if len(row) > 13 else "",
+        }
+    return rows
+
+
 def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
-    df = ak.stock_zh_a_spot_em()
-    return normalize_spot_rows(df, codes, date)
+    try:
+        df = ak.stock_zh_a_spot_em()
+        rows = normalize_spot_rows(df, codes, date)
+        if rows:
+            return rows
+    except Exception as exc:  # noqa: BLE001 - fall back to Sina realtime quotes.
+        print(f"Eastmoney spot failed, falling back to Sina spot: {exc}")
+    df = ak.stock_zh_a_spot()
+    return normalize_sina_spot_rows(df, codes, date)
 
 
 def merge_intraday_rows(
@@ -199,6 +245,31 @@ def sort_change_value(value: Any) -> float:
     return number if number is not None else -999999.0
 
 
+def row_volume(row: dict[str, Any] | None) -> float | None:
+    if not row:
+        return None
+    volume = number_or_none(row.get("volume"))
+    if volume is not None:
+        return volume
+    legacy_amount = number_or_none(row.get("amount"))
+    if legacy_amount is None:
+        return None
+    return round(legacy_amount * 100, 2)
+
+
+def row_turnover(row: dict[str, Any] | None) -> float | None:
+    if not row:
+        return None
+    turnover = number_or_none(row.get("turnover"))
+    if turnover is not None:
+        return turnover
+    close = number_or_none(row.get("close"))
+    legacy_amount = number_or_none(row.get("amount"))
+    if legacy_amount is not None and close is not None:
+        return round(legacy_amount * close * 100, 2)
+    return legacy_amount
+
+
 def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str, Any]]], dates: list[str]) -> dict[str, Any]:
     stocks = []
     stock_rows_by_code: dict[str, dict[str, dict[str, Any]]] = {}
@@ -216,7 +287,9 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                 "latestDate": latest.get("date") if latest else None,
                 "latestClose": latest.get("close") if latest else None,
                 "latestChangePercent": latest.get("changePercent") if latest else None,
-                "latestAmount": latest.get("amount") if latest else None,
+                "latestVolume": row_volume(latest),
+                "latestTurnover": row_turnover(latest),
+                "latestAmount": row_turnover(latest),
                 "availableDays": sum(1 for row in rows if row.get("date") in dates and row.get("changePercent") is not None),
             }
         )
@@ -225,22 +298,28 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
     for date in dates:
         daily_stocks = []
         values = []
-        amounts = []
+        volumes = []
+        turnovers = []
         for stock in stocks:
             row = stock_rows_by_code.get(stock["code"], {}).get(date)
             change = row.get("changePercent") if row else None
             if change is not None:
                 values.append(float(change))
-            amount = row.get("amount") if row else None
-            if amount is not None:
-                amounts.append(float(amount))
+            volume = row_volume(row)
+            turnover = row_turnover(row)
+            if volume is not None:
+                volumes.append(float(volume))
+            if turnover is not None:
+                turnovers.append(float(turnover))
             daily_stocks.append(
                 {
                     "code": stock["code"],
                     "name": stock["name"],
                     "changePercent": change,
                     "close": row.get("close") if row else None,
-                    "amount": amount,
+                    "volume": volume,
+                    "turnover": turnover,
+                    "amount": turnover,
                 }
             )
         daily_stocks = sorted(daily_stocks, key=lambda row: sort_change_value(row.get("changePercent")), reverse=True)
@@ -248,9 +327,13 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
             {
                 "date": date,
                 "averageChange": round(sum(values) / len(values), 4) if values else None,
-                "totalAmount": round(sum(amounts), 2) if amounts else None,
+                "totalVolume": round(sum(volumes), 2) if volumes else None,
+                "totalTurnover": round(sum(turnovers), 2) if turnovers else None,
+                "totalAmount": round(sum(turnovers), 2) if turnovers else None,
                 "stockCount": len(values),
-                "amountStockCount": len(amounts),
+                "volumeStockCount": len(volumes),
+                "turnoverStockCount": len(turnovers),
+                "amountStockCount": len(turnovers),
                 "stocks": daily_stocks,
             }
         )
@@ -262,6 +345,8 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
         "stockCount": len(stocks),
         "availableStockCount": latest_trend.get("stockCount") if latest_trend else 0,
         "latestAverageChange": latest_trend.get("averageChange") if latest_trend else None,
+        "latestTotalVolume": latest_trend.get("totalVolume") if latest_trend else None,
+        "latestTotalTurnover": latest_trend.get("totalTurnover") if latest_trend else None,
         "latestTotalAmount": latest_trend.get("totalAmount") if latest_trend else None,
         "stocks": sorted(stocks, key=lambda row: sort_change_value(row.get("latestChangePercent")), reverse=True),
         "trend": trend,
@@ -331,6 +416,8 @@ def main() -> None:
             "name": "AkShare stock_zh_a_hist" + (" + stock_zh_a_spot_em" if args.intraday else ""),
             "kind": "A-share daily price history" + (" with realtime spot overlay" if args.intraday else ""),
             "note": "Custom board lines use member stock change percent; --intraday overlays today's realtime spot quote row when available.",
+            "amountUnit": "turnover_yuan",
+            "amountNote": "amount is kept for compatibility and equals turnover. Use volume for share volume and turnover for turnover amount in yuan.",
         },
         "boards": built_boards,
         "errors": errors,
