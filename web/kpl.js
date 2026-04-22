@@ -495,7 +495,7 @@ function renderListPage() {
 
 function notifyParentResize() {
   if (window.parent && window.parent !== window) {
-    window.parent.postMessage({ type: 'taoguba:resize' }, '*');
+    window.parent.postMessage({ type: 'dashboard:resize' }, '*');
   }
 }
 

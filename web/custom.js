@@ -153,9 +153,10 @@ function limitUpCountByDate(board, date) {
 }
 
 function averageChangeByDate(board, date) {
-  if (!date) return board?.latestAverageChange;
-  const row = (board?.trend || []).find((item) => item.date === date);
-  return row?.averageChange ?? board?.latestAverageChange;
+  const row = date
+    ? (board?.trend || []).find((item) => item.date === date)
+    : trendValues(board).at(-1);
+  return rowDisplayAverageChange(board, row);
 }
 
 function limitUpSeries(board) {
@@ -200,6 +201,86 @@ function rowCoreAverage(row) {
   return core.reduce((sum, stock) => sum + Number(stock.changePercent || 0), 0) / core.length;
 }
 
+function pureStockCodesByStatus(board, status) {
+  const manualCodes = (state.membership?.overrides || [])
+    .filter((item) =>
+      String(item.boardCode || '') === String(board?.code || '')
+      && item.status === status)
+    .map((item) => String(item.stockCode || ''))
+    .filter(Boolean);
+  if (manualCodes.length) return new Set(manualCodes);
+
+  return new Set(
+    (board?.stocks || [])
+      .filter((stock) => membershipAssessment(board, stock, state.sortDate).status === status)
+      .map((stock) => String(stock.code || ''))
+      .filter(Boolean),
+  );
+}
+
+function pureCoreStockCodes(board) {
+  return pureStockCodesByStatus(board, 'pure_core');
+}
+
+function pureStockCodes(board) {
+  return new Set([
+    ...pureStockCodesByStatus(board, 'pure_core'),
+    ...pureStockCodesByStatus(board, 'pure_elastic'),
+  ]);
+}
+
+function rowPureAverageChange(board, row) {
+  if (!row) return null;
+  const codes = pureStockCodes(board);
+  if (!codes.size) return null;
+  const stocks = (row.stocks || []).filter((stock) =>
+    codes.has(String(stock.code || ''))
+    && Number.isFinite(Number(stock.changePercent)));
+  if (!stocks.length) return null;
+  return stocks.reduce((sum, stock) => sum + Number(stock.changePercent || 0), 0) / stocks.length;
+}
+
+function rowDisplayAverageChange(board, row) {
+  return rowPureAverageChange(board, row);
+}
+
+function pureCoreSeries(board) {
+  const coreCodes = pureStockCodes(board);
+  return trendValues(board).map((row) => {
+    const stocks = (row.stocks || []).filter((stock) => coreCodes.has(String(stock.code || '')));
+    const amountStocks = stocks.filter((stock) => Number.isFinite(Number(stock.amount)));
+    const changeStocks = stocks.filter((stock) => Number.isFinite(Number(stock.changePercent)));
+    const totalAmount = amountStocks.reduce((sum, stock) => sum + Number(stock.amount || 0), 0);
+    const averageChange = changeStocks.length
+      ? changeStocks.reduce((sum, stock) => sum + Number(stock.changePercent || 0), 0) / changeStocks.length
+      : null;
+    return {
+      date: row.date,
+      stocks,
+      count: stocks.length,
+      totalAmount,
+      averageChange,
+    };
+  });
+}
+
+function pureChangeSeries(board) {
+  const codes = pureStockCodes(board);
+  return trendValues(board).map((row) => {
+    const stocks = (row.stocks || []).filter((stock) => codes.has(String(stock.code || '')));
+    const changeStocks = stocks.filter((stock) => Number.isFinite(Number(stock.changePercent)));
+    const averageChange = changeStocks.length
+      ? changeStocks.reduce((sum, stock) => sum + Number(stock.changePercent || 0), 0) / changeStocks.length
+      : null;
+    return {
+      date: row.date,
+      stocks,
+      count: stocks.length,
+      averageChange,
+    };
+  });
+}
+
 function amountRatio(row, previousRow) {
   const current = Number(row?.totalAmount);
   const previous = Number(previousRow?.totalAmount);
@@ -207,11 +288,11 @@ function amountRatio(row, previousRow) {
   return current / previous;
 }
 
-function rowStats(row, previousRow = null) {
+function rowStats(board, row, previousRow = null) {
   if (!row) return null;
   return {
     row,
-    averageChange: Number(row.averageChange),
+    averageChange: rowDisplayAverageChange(board, row),
     limitUpCount: rowLimitUpCount(row),
     redRate: rowRedRate(row),
     coreAverage: rowCoreAverage(row),
@@ -221,11 +302,13 @@ function rowStats(row, previousRow = null) {
 
 function isStrongDay(stats) {
   if (!stats) return false;
+  if (stats.averageChange === null || Number.isNaN(Number(stats.averageChange))) return false;
   return stats.averageChange >= 2 || stats.limitUpCount >= 2 || (stats.averageChange >= 1.2 && stats.redRate >= 55);
 }
 
 function isConstructiveDivergence(stats, previousStats) {
   if (!stats || !previousStats) return false;
+  if (stats.averageChange === null || previousStats.averageChange === null) return false;
   const averageOk = stats.averageChange >= -2.8 && stats.averageChange <= 1.4;
   const limitOk = stats.limitUpCount >= 1 || stats.limitUpCount >= previousStats.limitUpCount - 1;
   const breadthOk = (stats.redRate ?? 0) >= 30;
@@ -236,6 +319,7 @@ function isConstructiveDivergence(stats, previousStats) {
 
 function isTurningStrong(stats, previousStats) {
   if (!stats || !previousStats) return false;
+  if (stats.averageChange === null || previousStats.averageChange === null) return false;
   const strengthOk = stats.averageChange >= 1.3 || stats.limitUpCount > previousStats.limitUpCount || stats.redRate >= 60;
   const coreOk = (stats.coreAverage ?? -99) >= 0;
   const amountOk = stats.amountRatio === null || stats.amountRatio >= 0.82;
@@ -246,9 +330,9 @@ function boardSetup(board, date) {
   const today = trendRowAt(board, date);
   const d1 = trendRowAt(board, date, -1);
   const d2 = trendRowAt(board, date, -2);
-  const todayStats = rowStats(today, d1);
-  const d1Stats = rowStats(d1, d2);
-  const d2Stats = rowStats(d2, trendRowAt(board, date, -3));
+  const todayStats = rowStats(board, today, d1);
+  const d1Stats = rowStats(board, d1, d2);
+  const d2Stats = rowStats(board, d2, trendRowAt(board, date, -3));
   const strongToday = isStrongDay(todayStats);
   const strongD1 = isStrongDay(d1Stats);
   const strongD2 = isStrongDay(d2Stats);
@@ -256,7 +340,7 @@ function boardSetup(board, date) {
   const divergenceD1 = isConstructiveDivergence(d1Stats, d2Stats);
   const turn2 = strongD1 && isTurningStrong(todayStats, d1Stats);
   const turn3 = strongD2 && divergenceD1 && isTurningStrong(todayStats, d1Stats);
-  const risk = strongToday && todayStats?.amountRatio !== null && todayStats.amountRatio >= 2.2 && (todayStats.coreAverage ?? 0) < todayStats.averageChange;
+  const risk = strongToday && todayStats?.amountRatio !== null && todayStats.amountRatio >= 2.2 && (todayStats.coreAverage ?? 0) < (todayStats.averageChange ?? 0);
   let label = '观察';
   let tone = 'watch';
   let priority = 10;
@@ -280,7 +364,7 @@ function boardSetup(board, date) {
     label = '强1';
     tone = 'strong';
     priority = 64;
-  } else if (todayStats && todayStats.averageChange < -3.2 && (todayStats.redRate ?? 100) < 25) {
+  } else if (todayStats && todayStats.averageChange !== null && todayStats.averageChange < -3.2 && (todayStats.redRate ?? 100) < 25) {
     label = '转弱';
     tone = 'weak';
     priority = 18;
@@ -498,7 +582,9 @@ function labelFor(board, date) {
 }
 
 function renderTrendChart(board) {
-  const trend = trendValues(board);
+  const trend = trendValues(board)
+    .map((item) => ({ ...item, displayAverageChange: rowDisplayAverageChange(board, item) }))
+    .filter((item) => item.displayAverageChange !== null && item.displayAverageChange !== undefined);
   if (!trend.length) {
     return `
       <div>
@@ -511,16 +597,16 @@ function renderTrendChart(board) {
   const width = 760;
   const height = 240;
   const pad = { top: 30, right: 48, bottom: 46, left: 52 };
-  const avgValues = trend.map((item) => Number(item.averageChange));
+  const avgValues = trend.map((item) => Number(item.displayAverageChange));
   const avgMax = Math.max(...avgValues, 1);
   const avgMin = Math.min(...avgValues, -1);
   const avgRange = avgMax - avgMin || 1;
-  const limitValues = limitUpSeries(board).map((item) => Number(item.limitUpCount) || 0);
+  const limitValues = trend.map((item) => rowLimitUpCount(item));
   const limitMax = Math.max(...limitValues, 1);
   const plotWidth = width - pad.left - pad.right;
   const plotHeight = height - pad.top - pad.bottom;
   const points = trend.map((item, index) => {
-    const change = Number(item.averageChange) || 0;
+    const change = Number(item.displayAverageChange) || 0;
     const limitUpCount = limitValues[index] ?? 0;
     const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
     const yAvg = pad.top + ((avgMax - change) / avgRange) * plotHeight;
@@ -565,6 +651,101 @@ function renderTrendChart(board) {
           <title>${point.date} 平均涨跌幅 ${number(point.change)}% | 涨停家数 ${point.limitUpCount} 家 | 有效股票 ${point.stockCount}</title>
         </g>
       `).join('')}
+    </svg>
+  `;
+}
+
+function pureCoreChartScaffold(board) {
+  const series = pureCoreSeries(board);
+  const usable = series.filter((item) => item.count && item.averageChange !== null);
+  if (!usable.length) {
+    return null;
+  }
+
+  const width = 760;
+  const height = 230;
+  const pad = { top: 34, right: 58, bottom: 44, left: 58 };
+  const plotWidth = width - pad.left - pad.right;
+  const axisBottom = height - pad.bottom;
+  const plotHeight = axisBottom - pad.top;
+  const changes = usable.map((item) => Number(item.averageChange));
+  const amounts = usable.map((item) => Number(item.totalAmount) || 0);
+  const rawChangeMax = Math.max(...changes, 1);
+  const rawChangeMin = Math.min(...changes, -1);
+  const changePadding = Math.max(0.8, (rawChangeMax - rawChangeMin) * 0.16);
+  const changeMax = rawChangeMax + changePadding;
+  const changeMin = rawChangeMin - changePadding;
+  const changeRange = changeMax - changeMin || 1;
+  const amountMax = Math.max(...amounts, 1);
+  const zeroY = pad.top + ((changeMax - 0) / changeRange) * plotHeight;
+  const points = series.map((item, index) => {
+    const change = item.averageChange === null ? null : Number(item.averageChange);
+    const amount = Number(item.totalAmount) || 0;
+    const x = pad.left + (series.length === 1 ? plotWidth / 2 : (index / (series.length - 1)) * plotWidth);
+    const yChange = change === null ? null : pad.top + ((changeMax - change) / changeRange) * plotHeight;
+    const barHeight = amount ? Math.max(3, (amount / amountMax) * plotHeight) : 0;
+    const yAmount = axisBottom - barHeight;
+    return {
+      ...item,
+      change,
+      amount,
+      x,
+      yChange,
+      yAmount,
+      barHeight,
+      selected: item.date === state.sortDate,
+    };
+  });
+  return {
+    width,
+    height,
+    pad,
+    points,
+    axisBottom,
+    plotHeight,
+    changeMax,
+    changeMin,
+    amountMax,
+    zeroY,
+  };
+}
+
+function renderPureCoreAmountChart(board) {
+  const chart = pureCoreChartScaffold(board);
+  if (!chart) {
+    return `
+      <div>
+        <strong>暂无正宗核心成交额</strong>
+        <p>这个板块还没有标注正宗核心，或核心股缺少可用行情数据。</p>
+      </div>
+    `;
+  }
+  const { width, height, pad, points, axisBottom, amountMax } = chart;
+  const step = points.length === 1 ? (width - pad.left - pad.right) : (width - pad.left - pad.right) / (points.length - 1);
+  const barWidth = Math.max(12, Math.min(30, step * 0.52));
+
+  return `
+    <svg class="core-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 正宗核心成交额走势">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${chart.plotHeight + 24}" rx="8"></rect>
+      `).join('')}
+      <line class="chart-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
+      <line class="chart-axis" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${amountText(amountMax)}</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">0</text>
+      ${points.map((point, index) => {
+        const labelLevel = index % 2;
+        const amountLabelY = Math.max(pad.top + 12, point.yAmount - 7 - labelLevel * 12);
+        const tone = Number(point.change) >= 0 ? 'rise' : 'fall';
+        return `
+          <g>
+            ${point.barHeight ? `<rect class="core-amount-bar ${tone}" x="${point.x - barWidth / 2}" y="${point.yAmount}" width="${barWidth}" height="${point.barHeight}" rx="4"></rect>` : ''}
+            <text x="${point.x}" y="${amountLabelY}" text-anchor="middle" class="core-amount-label ${tone}">${amountText(point.amount)}</text>
+            <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
+            <title>${point.date} | 正宗核心 ${point.count} 只 | 成交额 ${amountText(point.amount)} | 平均涨跌幅 ${point.change === null ? '暂无' : `${number(point.change)}%`} | ${point.stocks.map((stock) => stock.name).join('、')}</title>
+          </g>
+        `;
+      }).join('')}
     </svg>
   `;
 }
@@ -830,7 +1011,7 @@ function renderStocksTable(board) {
             ${stocks.length ? stocks.map((stock) => `
               <tr>
                 <td class="code">${stock.code}</td>
-                <td><strong>${stock.name}</strong></td>
+                <td class="stock-name-nowrap"><strong title="${stock.name || ''}">${stock.name}</strong></td>
                 <td><span class="membership-badge ${stock.membership.tone}">${stock.membership.label}</span></td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
                 <td>${amountText(stock.displayAmount)}</td>
@@ -850,6 +1031,7 @@ function renderDetail(board) {
     return '<div class="card section-card empty">暂无自定义板块数据</div>';
   }
   const selectedRow = trendSnapshotByDate(board, state.sortDate);
+  const selectedAverageChange = rowDisplayAverageChange(board, selectedRow);
 
   return `
     <div class="stack">
@@ -857,17 +1039,30 @@ function renderDetail(board) {
       <section class="card section-card">
         <div class="section-head">
           <div>
-            <h2>${board.name} · 近15日平均涨跌幅与涨停家数</h2>
-            <p class="muted">当前日期 ${state.sortDate || '最新'}：涨幅 ${number(selectedRow?.averageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(selectedRow?.totalAmount)}。</p>
+            <h2>${board.name} · 趋势曲线</h2>
+            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(selectedRow?.totalAmount)}。</p>
           </div>
           <div class="badges">
             <span class="badge">蓝线：平均涨跌幅</span>
             <span class="badge">橙线：涨停家数</span>
-            <span class="badge">柱：总成交额</span>
           </div>
         </div>
-        <div class="chart-box">${renderTrendChart(board)}</div>
-        <div class="chart-box amount-chart-box">${renderAmountBarChart(board)}</div>
+        <div class="chart-grid">
+          <div class="chart-panel">
+            <div class="chart-panel-head">
+              <strong>正宗股强度</strong>
+              <span>正宗股平均涨跌幅 / 涨停家数</span>
+            </div>
+            <div class="chart-box">${renderTrendChart(board)}</div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-panel-head">
+              <strong>正宗股成交额</strong>
+              <span>合计成交额</span>
+            </div>
+            <div class="chart-box core-chart-box">${renderPureCoreAmountChart(board)}</div>
+          </div>
+        </div>
       </section>
 
       ${renderStocksTable(board)}
@@ -900,7 +1095,7 @@ function render() {
             <button class="date-nav-btn" id="sortDateNextBtn" type="button" ${nextDate ? '' : 'disabled'} aria-label="后一天">▶</button>
           </label>
         </div>
-        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'pattern' ? '模式优先级' : state.sortMode === 'limit_up' ? '涨停数' : '平均涨幅'} 排序</div>
+        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'pattern' ? '模式优先级' : state.sortMode === 'limit_up' ? '涨停数' : '正宗股涨幅'} 排序</div>
         <div class="board-list">
           ${boards.map((item) => {
             const selectedAverageChange = averageChangeByDate(item, state.sortDate);
@@ -984,8 +1179,8 @@ function render() {
   });
 
   if (window.parent && window.parent !== window) {
-    window.parent.postMessage({ type: 'taoguba:resize' }, '*');
-    setTimeout(() => window.parent.postMessage({ type: 'taoguba:resize' }, '*'), 80);
+    window.parent.postMessage({ type: 'dashboard:resize' }, '*');
+    setTimeout(() => window.parent.postMessage({ type: 'dashboard:resize' }, '*'), 80);
   }
 }
 

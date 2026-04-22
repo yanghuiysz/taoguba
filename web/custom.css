@@ -507,20 +507,52 @@ p { line-height: 1.55; }
   line-height: 1.45;
 }
 
-.chart-box {
-  min-height: 320px;
+.chart-grid {
   display: grid;
-  place-items: center;
-  border: 1px dashed #c9d6d9;
-  border-radius: 8px;
-  background: #fbfdfc;
-  color: var(--muted);
-  padding: 18px;
+  gap: 12px;
 }
 
-.amount-chart-box {
-  min-height: 240px;
-  margin-top: 12px;
+.chart-panel {
+  border: 1px solid #dce7e5;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
+  overflow: hidden;
+}
+
+.chart-panel-head {
+  min-height: 46px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid #edf2f1;
+  padding: 10px 12px;
+}
+
+.chart-panel-head strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.chart-panel-head span {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.chart-box {
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(#f3f7f6 1px, transparent 1px) 0 0 / 100% 25%,
+    #fbfdfc;
+  color: var(--muted);
+  padding: 14px;
+}
+
+.core-chart-box {
+  min-height: 310px;
 }
 
 .trend-svg {
@@ -528,9 +560,23 @@ p { line-height: 1.55; }
   height: 280px;
 }
 
+.core-svg {
+  width: 100%;
+  height: 290px;
+}
+
 .amount-svg {
   width: 100%;
   height: 220px;
+}
+
+.chart-axis {
+  stroke: #c6d4d1;
+  stroke-width: 1;
+}
+
+.core-volume-divider {
+  stroke-dasharray: 4 4;
 }
 
 .zero-line {
@@ -583,6 +629,105 @@ p { line-height: 1.55; }
 .date-label {
   fill: var(--muted);
   font-size: 12px;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.core-change-line,
+.pure-core-line,
+.pure-elastic-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.core-change-line,
+.pure-core-line {
+  stroke: #0b7893;
+}
+
+.pure-elastic-line {
+  stroke: #7c3aed;
+}
+
+.core-change-dot,
+.pure-core-dot,
+.pure-elastic-dot {
+  fill: #ffffff;
+  stroke-width: 2.5;
+}
+
+.core-change-dot,
+.pure-core-dot {
+  stroke: #0b7893;
+}
+
+.pure-elastic-dot {
+  stroke: #7c3aed;
+}
+
+.core-amount-bar {
+  fill: #f08c3a;
+  opacity: 0.74;
+}
+
+.core-amount-bar.rise {
+  fill: var(--red);
+}
+
+.core-amount-bar.fall {
+  fill: var(--green);
+}
+
+.core-change-dot.rise {
+  stroke: var(--red);
+}
+
+.core-change-dot.fall {
+  stroke: var(--green);
+}
+
+.core-change-label,
+.core-amount-label,
+.pure-core-label,
+.pure-elastic-label {
+  font-size: 11px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-linejoin: round;
+  stroke-width: 3px;
+}
+
+.core-change-label,
+.pure-core-label {
+  fill: #0b7893;
+}
+
+.pure-elastic-label {
+  fill: #6d28d9;
+}
+
+.core-amount-label {
+  fill: #b84008;
+}
+
+.core-change-label.rise,
+.pure-core-label.rise,
+.pure-elastic-label.rise,
+.core-amount-label.rise {
+  fill: var(--red);
+}
+
+.core-change-label.fall,
+.pure-core-label.fall,
+.pure-elastic-label.fall,
+.core-amount-label.fall {
+  fill: var(--green);
 }
 
 .amount-bar {
@@ -656,6 +801,14 @@ th {
 }
 
 .code { font-family: Consolas, "Courier New", monospace; color: var(--muted); }
+.stock-name-nowrap strong {
+  display: inline-block;
+  max-width: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
 .rise { color: var(--red); font-weight: 700; }
 .fall { color: var(--green); font-weight: 700; }
 .empty { padding: 22px; color: var(--muted); text-align: center; }

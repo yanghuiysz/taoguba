@@ -5,3 +5,4 @@ __pycache__/
 .idea/
 .codebuddy/
 .workbuddy/
+.codex-http-*.log

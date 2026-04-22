@@ -4,7 +4,7 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html",
+  custom: "./custom.html?v=20260422-core-chart-v10",
 };
 
 function resizeFrame(frame) {
@@ -52,7 +52,7 @@ window.addEventListener("resize", () => {
 
 window.addEventListener("message", (event) => {
   if (event.origin !== window.location.origin) return;
-  if (event.data?.type !== "taoguba:resize") return;
+  if (event.data?.type !== "dashboard:resize") return;
   const activePanel = document.querySelector(".panel.active");
   const activeFrame = activePanel?.querySelector("iframe");
   if (activeFrame) resizeFrame(activeFrame);
