@@ -127,6 +127,63 @@ def normalize_price_history(code: str, df: Any) -> list[dict[str, Any]]:
     return rows
 
 
+def first_present(row: Any, names: tuple[str, ...], index: int | None = None) -> Any:
+    for name in names:
+        if name in row:
+            return row.get(name)
+    if index is not None:
+        try:
+            return row.iloc[index]
+        except (AttributeError, IndexError):
+            return None
+    return None
+
+
+def normalize_spot_rows(df: Any, codes: set[str], date: str) -> dict[str, dict[str, Any]]:
+    rows: dict[str, dict[str, Any]] = {}
+    for _, row in df.iterrows():
+        code = normalize_stock_code(first_present(row, ("代码", "code", "f12"), 1))
+        if code not in codes:
+            continue
+        close = number_or_none(first_present(row, ("最新价", "最新", "latest", "latestPrice", "f2"), 2))
+        change_percent = number_or_none(first_present(row, ("涨跌幅", "changePercent", "f3"), 3))
+        open_price = number_or_none(first_present(row, ("今开", "open", "f17"), 11))
+        previous_close = number_or_none(first_present(row, ("昨收", "previousClose", "f18"), 12))
+        if change_percent is None and close is not None and previous_close not in (None, 0):
+            change_percent = round((close - previous_close) / previous_close * 100, 4)
+        rows[code] = {
+            "date": format_date(date),
+            "code": code,
+            "open": open_price,
+            "close": close,
+            "high": number_or_none(first_present(row, ("最高", "high", "f15"), 9)),
+            "low": number_or_none(first_present(row, ("最低", "low", "f16"), 10)),
+            "changePercent": change_percent,
+            "amount": number_or_none(first_present(row, ("成交额", "amount", "f6"), 7)),
+            "turnoverRate": number_or_none(first_present(row, ("换手率", "turnoverRate", "f8"), 14)),
+            "source": "intraday_spot",
+        }
+    return rows
+
+
+def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
+    df = ak.stock_zh_a_spot_em()
+    return normalize_spot_rows(df, codes, date)
+
+
+def merge_intraday_rows(
+    stock_histories: dict[str, list[dict[str, Any]]],
+    spot_rows: dict[str, dict[str, Any]],
+    date: str,
+) -> None:
+    formatted_date = format_date(date)
+    for code, spot_row in spot_rows.items():
+        rows = stock_histories.setdefault(code, [])
+        rows[:] = [row for row in rows if row.get("date") != formatted_date]
+        rows.append(spot_row)
+        rows.sort(key=lambda row: str(row.get("date") or ""))
+
+
 def latest_trading_dates(stock_histories: dict[str, list[dict[str, Any]]], days: int) -> list[str]:
     dates = {
         row["date"]
@@ -221,6 +278,7 @@ def main() -> None:
     parser.add_argument("--sleep", type=float, default=0.2)
     parser.add_argument("--cache-dir", type=Path, default=CACHE_DIR)
     parser.add_argument("--refresh", action="store_true", help="Ignore cached stock histories and fetch all codes again.")
+    parser.add_argument("--intraday", action="store_true", help="Overlay today's realtime spot quotes into the latest custom board row.")
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -253,6 +311,16 @@ def main() -> None:
         if args.sleep and index < len(codes):
             time.sleep(args.sleep)
 
+    intraday_rows: dict[str, dict[str, Any]] = {}
+    if args.intraday:
+        try:
+            intraday_rows = fetch_intraday_spot(set(codes), args.date)
+            merge_intraday_rows(stock_histories, intraday_rows, args.date)
+            print(f"Intraday rows: {len(intraday_rows)}/{len(codes)} for {format_date(args.date)}")
+        except Exception as exc:  # noqa: BLE001 - keep historical build available when realtime source is unavailable.
+            errors.append({"code": "intraday", "error": str(exc)})
+            print(f"Failed intraday spot overlay: {exc}")
+
     dates = latest_trading_dates(stock_histories, args.days)
     built_boards = [build_board(board, stock_histories, dates) for board in boards]
     built_boards = sorted(built_boards, key=lambda board: sort_change_value(board.get("latestAverageChange")), reverse=True)
@@ -260,9 +328,9 @@ def main() -> None:
         "date": format_date(args.date),
         "days": args.days,
         "source": {
-            "name": "AkShare stock_zh_a_hist",
-            "kind": "A-share daily price history",
-            "note": "Custom board lines are the arithmetic mean of member stock daily change percent.",
+            "name": "AkShare stock_zh_a_hist" + (" + stock_zh_a_spot_em" if args.intraday else ""),
+            "kind": "A-share daily price history" + (" with realtime spot overlay" if args.intraday else ""),
+            "note": "Custom board lines use member stock change percent; --intraday overlays today's realtime spot quote row when available.",
         },
         "boards": built_boards,
         "errors": errors,

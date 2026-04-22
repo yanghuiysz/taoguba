@@ -18,6 +18,7 @@ CONFIG_PATH = ROOT / "web/data/custom_boards_config.json"
 DATA_PATH = ROOT / "web/data/custom_boards.json"
 BUILDER = ROOT / "scripts/build_custom_board_data.py"
 BUILD_LOCK = threading.Lock()
+USE_INTRADAY = False
 
 
 def compact_date(value: str) -> str:
@@ -65,6 +66,8 @@ def rebuild_data(date: str) -> str:
         "--sleep",
         "0.02",
     ]
+    if USE_INTRADAY:
+        command.append("--intraday")
     completed = subprocess.run(
         command,
         cwd=ROOT,
@@ -161,14 +164,17 @@ class CustomBoardHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
+    global USE_INTRADAY
     parser = argparse.ArgumentParser(description="Serve the dashboard with custom-board editing APIs.")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--intraday", action="store_true", help="Use realtime spot quotes when rebuilding custom board data.")
     args = parser.parse_args()
+    USE_INTRADAY = args.intraday
 
     server = ThreadingHTTPServer((args.host, args.port), CustomBoardHandler)
     print(f"Serving dashboard at http://{args.host}:{args.port}/web/index.html")
-    print("Custom board editing API is enabled.")
+    print(f"Custom board editing API is enabled. Intraday rebuild: {'on' if USE_INTRADAY else 'off'}.")
     server.serve_forever()
 
 

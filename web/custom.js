@@ -290,12 +290,13 @@ function amountRatio(row, previousRow) {
 
 function rowStats(board, row, previousRow = null) {
   if (!row) return null;
+  const orthodoxAverage = rowDisplayAverageChange(board, row);
   return {
     row,
-    averageChange: rowDisplayAverageChange(board, row),
+    averageChange: orthodoxAverage,
     limitUpCount: rowLimitUpCount(row),
     redRate: rowRedRate(row),
-    coreAverage: rowCoreAverage(row),
+    coreAverage: orthodoxAverage,
     amountRatio: amountRatio(row, previousRow),
   };
 }
@@ -340,7 +341,7 @@ function boardSetup(board, date) {
   const divergenceD1 = isConstructiveDivergence(d1Stats, d2Stats);
   const turn2 = strongD1 && isTurningStrong(todayStats, d1Stats);
   const turn3 = strongD2 && divergenceD1 && isTurningStrong(todayStats, d1Stats);
-  const risk = strongToday && todayStats?.amountRatio !== null && todayStats.amountRatio >= 2.2 && (todayStats.coreAverage ?? 0) < (todayStats.averageChange ?? 0);
+  const risk = strongToday && todayStats?.amountRatio !== null && todayStats.amountRatio >= 2.2 && (todayStats.averageChange ?? 0) < 1.2;
   let label = '观察';
   let tone = 'watch';
   let priority = 10;
@@ -372,7 +373,7 @@ function boardSetup(board, date) {
   const divergenceScore = divergenceToday || divergenceD1
     ? clamp(
       50
-        + (todayStats?.coreAverage ?? 0) * 8
+        + (todayStats?.averageChange ?? 0) * 8
         + ((todayStats?.redRate ?? 0) - 40) * 0.6
         + (todayStats?.limitUpCount ?? 0) * 7
         - Math.max(0, ((todayStats?.amountRatio ?? 1) - 1.45) * 30),
@@ -828,7 +829,7 @@ function renderPoolItems(items, emptyText) {
       <button class="pool-item" type="button" data-code="${board.code}">
         <span>
           <strong>${board.name}</strong>
-          <small>${setup.label} · 核心 ${percentText(stats?.coreAverage)} · 红盘 ${number(stats?.redRate, 0)}%</small>
+          <small>${setup.label} · 正宗 ${percentText(stats?.averageChange)} · 红盘 ${number(stats?.redRate, 0)}%</small>
         </span>
         <span class="pool-score ${setup.tone}">${number(stats?.averageChange)}%</span>
       </button>
@@ -889,9 +890,9 @@ function renderSetupSummary(board) {
           <small>涨停 ${stats?.limitUpCount ?? 0} · 红盘 ${number(stats?.redRate, 0)}%</small>
         </div>
         <div class="setup-metric">
-          <span>核心股</span>
+          <span>正宗股</span>
           <strong class="${signedClass(stats?.coreAverage)}">${percentText(stats?.coreAverage)}</strong>
-          <small>成交额前 5 只均值</small>
+          <small>正宗核心 + 正宗弹性</small>
         </div>
         <div class="setup-metric">
           <span>量能变化</span>
@@ -1104,7 +1105,7 @@ function render() {
             <button class="board-button${item.code === board?.code ? ' active' : ''}" data-code="${item.code}">
               <span>
                 <strong>${item.name}</strong>
-                <small>${setup.label} · 核心 ${percentText(setup.todayStats?.coreAverage)}</small>
+                <small>${setup.label} · 正宗 ${percentText(setup.todayStats?.averageChange)}</small>
               </span>
               <span class="board-score">
                 <small>涨停 ${limitUpCountByDate(item, state.sortDate)}</small>

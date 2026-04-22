@@ -44,6 +44,7 @@ def main() -> None:
     parser.add_argument("--skip-kpl", action="store_true", help="Skip Kaipanla public endpoint update.")
     parser.add_argument("--skip-external", action="store_true", help="Skip Tonghuashun/Eastmoney external mapping.")
     parser.add_argument("--skip-custom", action="store_true", help="Skip custom board average history update.")
+    parser.add_argument("--intraday-custom", action="store_true", help="Overlay realtime spot quotes into custom board data.")
     parser.add_argument("--sort-by", default="strength", help="Kaipanla plate sort key.")
     args = parser.parse_args()
 
@@ -56,7 +57,10 @@ def main() -> None:
         verify_kpl_history(args.date)
 
     if not args.skip_custom:
-        run_script(["scripts/build_custom_board_data.py", "--date", args.date])
+        custom_args = ["scripts/build_custom_board_data.py", "--date", args.date]
+        if args.intraday_custom:
+            custom_args.append("--intraday")
+        run_script(custom_args)
 
     print("\nDaily data update complete.")
 
