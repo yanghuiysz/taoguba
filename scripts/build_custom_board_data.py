@@ -7,6 +7,8 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
+from urllib.request import urlopen
 
 import akshare as ak
 
@@ -205,6 +207,73 @@ def normalize_sina_spot_rows(df: Any, codes: set[str], date: str) -> dict[str, d
     return rows
 
 
+def normalize_tencent_spot_payload(text: str, codes: set[str], date: str) -> dict[str, dict[str, Any]]:
+    rows: dict[str, dict[str, Any]] = {}
+    for raw_line in text.split(";"):
+        line = raw_line.strip()
+        if not line or "=" not in line:
+            continue
+        _, payload = line.split("=", 1)
+        payload = payload.strip().strip('"')
+        if not payload:
+            continue
+        parts = payload.split("~")
+        code = normalize_stock_code(parts[2] if len(parts) > 2 else "")
+        if code not in codes:
+            continue
+        close = number_or_none(parts[3] if len(parts) > 3 else None)
+        prev_close = number_or_none(parts[4] if len(parts) > 4 else None)
+        open_price = number_or_none(parts[5] if len(parts) > 5 else None)
+        change_percent = number_or_none(parts[32] if len(parts) > 32 else None)
+        high = number_or_none(parts[33] if len(parts) > 33 else None)
+        low = number_or_none(parts[34] if len(parts) > 34 else None)
+        volume = None
+        turnover = None
+        if len(parts) > 35 and parts[35]:
+            snapshot = parts[35].split("/")
+            if len(snapshot) >= 2:
+                lots = number_or_none(snapshot[1])
+                volume = round(lots * 100, 2) if lots is not None else None
+            if len(snapshot) >= 3:
+                turnover = number_or_none(snapshot[2])
+        if turnover is None and len(parts) > 57:
+            amount_wan = number_or_none(parts[57])
+            turnover = round(amount_wan * 10000, 2) if amount_wan is not None else None
+        rows[code] = {
+            "date": format_date(date),
+            "code": code,
+            "name": parts[1] if len(parts) > 1 else code,
+            "open": open_price,
+            "close": close,
+            "high": high,
+            "low": low,
+            "changePercent": change_percent,
+            "volume": volume,
+            "turnover": turnover,
+            "amount": turnover,
+            "turnoverRate": number_or_none(parts[38] if len(parts) > 38 else None),
+            "source": "intraday_spot_tencent",
+            "previousClose": prev_close,
+            "timestamp": parts[30] if len(parts) > 30 else "",
+        }
+    return rows
+
+
+def fetch_tencent_spot(codes: set[str], date: str, batch_size: int = 60) -> dict[str, dict[str, Any]]:
+    prefixed = [
+        ("sh" if code.startswith(("6", "9")) else "sz") + code
+        for code in sorted(codes)
+    ]
+    rows: dict[str, dict[str, Any]] = {}
+    for start in range(0, len(prefixed), batch_size):
+        batch = prefixed[start:start + batch_size]
+        url = f"https://qt.gtimg.cn/q={quote(','.join(batch))}"
+        with urlopen(url, timeout=15) as response:
+            payload = response.read().decode("gbk", errors="replace")
+        rows.update(normalize_tencent_spot_payload(payload, codes, date))
+    return rows
+
+
 def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
     try:
         df = ak.stock_zh_a_spot_em()
@@ -213,8 +282,14 @@ def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]
             return rows
     except Exception as exc:  # noqa: BLE001 - fall back to Sina realtime quotes.
         print(f"Eastmoney spot failed, falling back to Sina spot: {exc}")
-    df = ak.stock_zh_a_spot()
-    return normalize_sina_spot_rows(df, codes, date)
+    try:
+        df = ak.stock_zh_a_spot()
+        rows = normalize_sina_spot_rows(df, codes, date)
+        if rows:
+            return rows
+    except Exception as exc:  # noqa: BLE001 - use Tencent batched quotes as a final fallback.
+        print(f"Sina spot failed, falling back to Tencent spot: {exc}")
+    return fetch_tencent_spot(codes, date)
 
 
 def merge_intraday_rows(
