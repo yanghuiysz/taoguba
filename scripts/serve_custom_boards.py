@@ -18,7 +18,7 @@ CONFIG_PATH = ROOT / "web/data/custom_boards_config.json"
 DATA_PATH = ROOT / "web/data/custom_boards.json"
 BUILDER = ROOT / "scripts/build_custom_board_data.py"
 BUILD_LOCK = threading.Lock()
-USE_INTRADAY = False
+USE_INTRADAY = True
 
 
 def compact_date(value: str) -> str:
@@ -58,27 +58,35 @@ def current_data_date() -> str:
 
 
 def rebuild_data(date: str) -> str:
-    command = [
-        sys.executable,
-        str(BUILDER),
-        "--date",
-        date,
-        "--sleep",
-        "0.02",
-    ]
-    if USE_INTRADAY:
-        command.append("--intraday")
-    completed = subprocess.run(
-        command,
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        timeout=600,
-    )
-    return "\n".join(part for part in [completed.stdout, completed.stderr] if part)
+    attempts = 3 if USE_INTRADAY else 1
+    logs: list[str] = []
+    for attempt in range(1, attempts + 1):
+        command = [
+            sys.executable,
+            str(BUILDER),
+            "--date",
+            date,
+            "--sleep",
+            "0.02",
+        ]
+        if USE_INTRADAY:
+            command.append("--intraday")
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=600,
+        )
+        logs.append(f"[attempt {attempt}/{attempts}]")
+        logs.extend(part for part in [completed.stdout, completed.stderr] if part)
+        data = load_json(DATA_PATH, {})
+        if not data.get("errors"):
+            break
+    return "\n".join(logs)
 
 
 def update_stock(payload: dict[str, Any]) -> dict[str, Any]:
@@ -94,6 +102,7 @@ def update_stock(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("请输入 6 位股票代码")
 
     with BUILD_LOCK:
+        previous_data = load_json(DATA_PATH, {"boards": []})
         config = load_json(CONFIG_PATH, {"boards": []})
         board = find_board(config, board_code)
         stocks = board.setdefault("stocks", [])
@@ -114,6 +123,10 @@ def update_stock(payload: dict[str, Any]) -> dict[str, Any]:
         write_json(CONFIG_PATH, config)
         log = rebuild_data(current_data_date())
         data = load_json(DATA_PATH, {"boards": []})
+        if USE_INTRADAY and data.get("errors") and not previous_data.get("errors"):
+            write_json(DATA_PATH, previous_data)
+            data = previous_data
+            log = f"{log}\n[restore] Intraday rebuild returned errors; kept previous dashboard data."
     return {"ok": True, "data": data, "log": log}
 
 
@@ -168,7 +181,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Serve the dashboard with custom-board editing APIs.")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
-    parser.add_argument("--intraday", action="store_true", help="Use realtime spot quotes when rebuilding custom board data.")
+    parser.add_argument("--intraday", action="store_true", default=True, help="Use realtime spot quotes when rebuilding custom board data.")
+    parser.add_argument("--no-intraday", dest="intraday", action="store_false", help="Disable realtime spot quotes when rebuilding custom board data.")
     args = parser.parse_args()
     USE_INTRADAY = args.intraday
 
