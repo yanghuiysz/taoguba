@@ -16,6 +16,8 @@ import akshare as ak
 CONFIG_PATH = Path("web/data/custom_boards_config.json")
 OUT_PATH = Path("web/data/custom_boards.json")
 CACHE_DIR = Path("data/custom_stock_history")
+MARKET_INDEX_SYMBOL = "sh000001"
+MARKET_INDEX_NAME = "上证指数"
 
 
 def compact_date(value: str) -> str:
@@ -345,6 +347,99 @@ def row_turnover(row: dict[str, Any] | None) -> float | None:
     return legacy_amount
 
 
+def volume_price_state(change: Any, current_turnover: Any, previous_turnover: Any) -> dict[str, Any]:
+    parsed_change = number_or_none(change)
+    current = number_or_none(current_turnover)
+    previous = number_or_none(previous_turnover)
+    if parsed_change is None or current is None or previous in (None, 0):
+        return {
+            "label": None,
+            "priceDirection": None,
+            "amountDirection": None,
+        }
+    price_direction = "rise" if parsed_change >= 0 else "fall"
+    amount_direction = "expand" if current >= previous else "contract"
+    labels = {
+        ("rise", "expand"): "放量上涨",
+        ("rise", "contract"): "缩量上涨",
+        ("fall", "expand"): "放量下跌",
+        ("fall", "contract"): "缩量下跌",
+    }
+    return {
+        "label": labels[(price_direction, amount_direction)],
+        "priceDirection": price_direction,
+        "amountDirection": amount_direction,
+    }
+
+
+def fetch_market_index_history(symbol: str, end_date: str, lookback_days: int) -> list[dict[str, Any]]:
+    start_date = (datetime.strptime(end_date, "%Y%m%d") - timedelta(days=lookback_days + 20)).strftime("%Y%m%d")
+    df = ak.stock_zh_index_daily(symbol=symbol)
+    rows: list[dict[str, Any]] = []
+    previous_close: float | None = None
+    for _, row in df.iterrows():
+        date = format_date(str(row.get("date", "")))
+        compact = compact_date(date)
+        close = number_or_none(row.get("close"))
+        change_percent = None
+        if close is not None and previous_close not in (None, 0):
+            change_percent = round((close - previous_close) / previous_close * 100, 4)
+        item = {
+            "date": date,
+            "open": number_or_none(row.get("open")),
+            "close": close,
+            "high": number_or_none(row.get("high")),
+            "low": number_or_none(row.get("low")),
+            "changePercent": change_percent,
+            "volume": number_or_none(row.get("volume")),
+            "turnover": None,
+            "amount": None,
+        }
+        if start_date <= compact <= end_date:
+            rows.append(item)
+        if close is not None:
+            previous_close = close
+    return rows
+
+
+def build_market_index(rows: list[dict[str, Any]], dates: list[str]) -> dict[str, Any]:
+    rows_by_date = {str(row.get("date")): row for row in rows if row.get("date")}
+    trend: list[dict[str, Any]] = []
+    previous_volume: float | None = None
+    for date in dates:
+        row = rows_by_date.get(date)
+        if not row:
+            continue
+        item = {
+            "date": date,
+            "open": row.get("open"),
+            "close": row.get("close"),
+            "high": row.get("high"),
+            "low": row.get("low"),
+            "changePercent": row.get("changePercent"),
+            "volume": row.get("volume"),
+            "turnover": row.get("turnover"),
+            "amount": row.get("amount"),
+        }
+        item.update(volume_price_state(item.get("changePercent"), item.get("volume"), previous_volume))
+        trend.append(item)
+        volume = number_or_none(item.get("volume"))
+        if volume is not None:
+            previous_volume = volume
+
+    latest = trend[-1] if trend else None
+    return {
+        "code": MARKET_INDEX_SYMBOL,
+        "name": MARKET_INDEX_NAME,
+        "trend": trend,
+        "latestDate": latest.get("date") if latest else None,
+        "latestClose": latest.get("close") if latest else None,
+        "latestChangePercent": latest.get("changePercent") if latest else None,
+        "latestVolume": latest.get("volume") if latest else None,
+        "latestState": latest.get("label") if latest else None,
+    }
+
+
 def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str, Any]]], dates: list[str]) -> dict[str, Any]:
     stocks = []
     stock_rows_by_code: dict[str, dict[str, dict[str, Any]]] = {}
@@ -484,6 +579,12 @@ def main() -> None:
     dates = latest_trading_dates(stock_histories, args.days)
     built_boards = [build_board(board, stock_histories, dates) for board in boards]
     built_boards = sorted(built_boards, key=lambda board: sort_change_value(board.get("latestAverageChange")), reverse=True)
+    market_index = None
+    try:
+        market_index = build_market_index(fetch_market_index_history(MARKET_INDEX_SYMBOL, args.date, args.lookback_days), dates)
+    except Exception as exc:  # noqa: BLE001 - keep custom board build available even when index source is unavailable.
+        errors.append({"code": "market_index", "error": str(exc)})
+        print(f"Failed market index fetch: {exc}")
     payload = {
         "date": format_date(args.date),
         "days": args.days,
@@ -494,6 +595,7 @@ def main() -> None:
             "amountUnit": "turnover_yuan",
             "amountNote": "amount is kept for compatibility and equals turnover. Use volume for share volume and turnover for turnover amount in yuan.",
         },
+        "marketIndex": market_index,
         "boards": built_boards,
         "errors": errors,
     }

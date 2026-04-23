@@ -26,6 +26,15 @@ const amountText = (value) => {
   return number(parsed, 0);
 };
 
+const volumeText = (value) => {
+  const parsed = Number(value);
+  if (value === null || value === undefined || Number.isNaN(parsed)) return '暂无';
+  const abs = Math.abs(parsed);
+  if (abs >= 100000000) return `${number(parsed / 100000000)}亿股`;
+  if (abs >= 10000) return `${number(parsed / 10000)}万股`;
+  return `${number(parsed, 0)}股`;
+};
+
 const shortDate = (date) => (date ? String(date).slice(5) : '暂无');
 
 const signedClass = (value) => (Number(value) >= 0 ? 'rise' : 'fall');
@@ -53,6 +62,70 @@ const rowTotalTurnover = (row) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
+
+function volumePriceState(change, currentTurnover, previousTurnover) {
+  const parsedChange = Number(change);
+  const current = Number(currentTurnover);
+  const previous = Number(previousTurnover);
+  if (Number.isNaN(parsedChange) || Number.isNaN(current) || Number.isNaN(previous) || previous <= 0) {
+    return null;
+  }
+  const priceDirection = parsedChange >= 0 ? 'rise' : 'fall';
+  const amountDirection = current >= previous ? 'expand' : 'contract';
+  const labels = {
+    rise_expand: '放量上涨',
+    rise_contract: '缩量上涨',
+    fall_expand: '放量下跌',
+    fall_contract: '缩量下跌',
+  };
+  return {
+    label: labels[`${priceDirection}_${amountDirection}`],
+    priceDirection,
+    amountDirection,
+  };
+}
+
+function marketIndexTrend() {
+  return state.data?.marketIndex?.trend || [];
+}
+
+function marketIndexRowByDate(date) {
+  if (!date) return marketIndexTrend().at(-1) || null;
+  return marketIndexTrend().find((item) => item.date === date) || null;
+}
+
+function boardVolumePriceState(board, date) {
+  const row = date ? trendSnapshotByDate(board, date) : trendValues(board).at(-1);
+  if (!row) return null;
+  const previous = row?.date ? trendRowAt(board, row.date, -1) : null;
+  return volumePriceState(rowDisplayAverageChange(board, row), rowTotalTurnover(row), rowTotalTurnover(previous));
+}
+
+function marketVolumePriceState(date) {
+  const row = marketIndexRowByDate(date);
+  if (!row) return null;
+  if (row.label && row.priceDirection && row.amountDirection) return row;
+  const trend = marketIndexTrend();
+  const index = trend.findIndex((item) => item.date === row.date);
+  const previous = index > 0 ? trend[index - 1] : null;
+  return volumePriceState(row.changePercent, row.volume, previous?.volume);
+}
+
+function boardMarketResonance(board, date) {
+  const boardState = boardVolumePriceState(board, date);
+  const marketState = marketVolumePriceState(date);
+  if (!boardState || !marketState) return null;
+  if (boardState.priceDirection === marketState.priceDirection && boardState.amountDirection === marketState.amountDirection) {
+    return { label: '共振', tone: 'resonance', detail: `${boardState.label} / ${marketState.label}` };
+  }
+  if (boardState.priceDirection === marketState.priceDirection) {
+    return { label: '同向不同量', tone: 'mixed', detail: `${boardState.label} / ${marketState.label}` };
+  }
+  if (boardState.amountDirection === marketState.amountDirection) {
+    return { label: '反向同量', tone: 'mixed', detail: `${boardState.label} / ${marketState.label}` };
+  }
+  return { label: '背离', tone: 'divergence', detail: `${boardState.label} / ${marketState.label}` };
+}
 
 async function detectEditingApi() {
   try {
@@ -477,16 +550,15 @@ function boardLabelSeries(board) {
       row,
       metric,
       prevLabel: previousLabel,
-      label,
-      displayLabel: label,
-      reason,
-      weakWatchDays,
+      label: labelInfo.label,
+      displayLabel: labelInfo.label,
+      reason: labelInfo.reason,
       riskFlags: riskFlags(metric, previousMetric),
-      tone: labelTone(label),
-      priority: labelPriority(label),
+      tone: labelTone(labelInfo.label),
+      priority: labelPriority(labelInfo.label),
     };
     rows.push(entry);
-    previousLabel = label;
+    previousLabel = labelInfo.label;
     previousMetric = metric;
   }
   return rows;
@@ -802,6 +874,88 @@ function renderTrendChart(board) {
   `;
 }
 
+function renderMarketIndexChart() {
+  const trend = marketIndexTrend().filter((item) => item.changePercent !== null && item.changePercent !== undefined);
+  if (!trend.length) {
+    return `
+      <div>
+        <strong>暂无指数走势</strong>
+        <p>当前没有可用的指数历史数据。</p>
+      </div>
+    `;
+  }
+
+  const width = 760;
+  const height = 280;
+  const pad = { top: 30, right: 52, bottom: 48, left: 58 };
+  const plotWidth = width - pad.left - pad.right;
+  const axisBottom = height - pad.bottom;
+  const plotHeight = axisBottom - pad.top;
+  const changes = trend.map((item) => Number(item.changePercent) || 0);
+  const volumes = trend.map((item) => Number(item.volume) || 0);
+  const rawMax = Math.max(...changes, 0.8);
+  const rawMin = Math.min(...changes, -0.8);
+  const changePadding = Math.max(0.35, (rawMax - rawMin) * 0.16);
+  const changeMax = rawMax + changePadding;
+  const changeMin = rawMin - changePadding;
+  const changeRange = changeMax - changeMin || 1;
+  const volumeMax = Math.max(...volumes, 1);
+  const zeroY = pad.top + ((changeMax - 0) / changeRange) * plotHeight;
+  const step = trend.length === 1 ? plotWidth : plotWidth / (trend.length - 1);
+  const barWidth = Math.max(12, Math.min(28, step * 0.5));
+  const points = trend.map((item, index) => {
+    const change = Number(item.changePercent) || 0;
+    const volume = Number(item.volume) || 0;
+    const x = pad.left + (trend.length === 1 ? plotWidth / 2 : index * step);
+    const y = pad.top + ((changeMax - change) / changeRange) * plotHeight;
+    const barHeight = volume ? Math.max(4, (volume / volumeMax) * plotHeight * 0.42) : 0;
+    const barY = axisBottom - barHeight;
+    const tone = change >= 0 ? 'rise' : 'fall';
+    return {
+      ...item,
+      change,
+      volume,
+      x,
+      y,
+      barHeight,
+      barY,
+      tone,
+      selected: item.date === state.sortDate,
+    };
+  });
+  const line = points.map((point) => `${point.x},${point.y}`).join(' ');
+
+  return `
+    <svg class="index-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="上证指数近15日涨跌幅与量能走势">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
+      `).join('')}
+      <line class="chart-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
+      <line class="chart-axis" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
+      <line class="zero-line" x1="${pad.left}" y1="${zeroY}" x2="${width - pad.right}" y2="${zeroY}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${number(changeMax)}%</text>
+      <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0%</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${number(changeMin)}%</text>
+      <polyline class="index-change-line" points="${line}"></polyline>
+      ${points.map((point, index) => {
+        const labelLevel = index % 2;
+        const changeLabelY = point.y - 10 - labelLevel * 12;
+        const volumeLabelY = Math.max(pad.top + 12, point.barY - 6 - (index % 3) * 11);
+        return `
+          <g>
+            ${point.barHeight ? `<rect class="index-volume-bar ${point.tone}" x="${point.x - barWidth / 2}" y="${point.barY}" width="${barWidth}" height="${point.barHeight}" rx="4"></rect>` : ''}
+            <circle class="index-change-dot ${point.tone}" cx="${point.x}" cy="${point.y}" r="${point.selected ? 6 : 4.6}"></circle>
+            <text x="${point.x}" y="${changeLabelY}" text-anchor="middle" class="index-change-label ${point.tone}">${number(point.change)}%</text>
+            <text x="${point.x}" y="${volumeLabelY}" text-anchor="middle" class="index-volume-label ${point.tone}">${volumeText(point.volume)}</text>
+            <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
+            <title>${point.date} | 指数涨跌幅 ${number(point.change)}% | 成交量 ${volumeText(point.volume)} | ${point.label || '暂无量价标签'}</title>
+          </g>
+        `;
+      }).join('')}
+    </svg>
+  `;
+}
+
 function pureCoreChartScaffold(board) {
   const series = pureCoreSeries(board);
   const usable = series.filter((item) => item.count && item.averageChange !== null);
@@ -1028,6 +1182,10 @@ function renderSetupSummary(board) {
   const suspectList = membership.assessments
     .filter((item) => item.assessment.status === 'suspect' || item.assessment.status === 'overlap')
     .slice(0, 5);
+  const boardFlow = boardVolumePriceState(board, state.sortDate);
+  const marketRow = marketIndexRowByDate(state.sortDate);
+  const marketFlow = marketVolumePriceState(state.sortDate);
+  const resonance = boardMarketResonance(board, state.sortDate);
   return `
     <section class="card section-card setup-card">
       <div class="section-head">
@@ -1057,6 +1215,21 @@ function renderSetupSummary(board) {
           <span>三日结构</span>
           <strong>${d2Label?.label || '暂无'} → ${d1Label?.label || '暂无'} → ${setup.rawLabel}</strong>
           <small>${shortDate(setup.d2?.date)} / ${shortDate(setup.d1?.date)} / ${shortDate(setup.today?.date)}</small>
+        </div>
+        <div class="setup-metric">
+          <span>板块量价</span>
+          <strong class="state-chip ${boardFlow?.priceDirection || ''} ${boardFlow?.amountDirection || ''}">${boardFlow?.label || '暂无'}</strong>
+          <small>${boardFlow ? `板块均涨 ${percentText(stats?.averageChange)} · 成交额 ${amountText(rowTotalTurnover(setup.today))}` : '缺少上一交易日对比'}</small>
+        </div>
+        <div class="setup-metric">
+          <span>${state.data?.marketIndex?.name || '指数'}量价</span>
+          <strong class="state-chip ${marketFlow?.priceDirection || ''} ${marketFlow?.amountDirection || ''}">${marketFlow?.label || '暂无'}</strong>
+          <small>${marketRow ? `指数涨跌 ${percentText(marketRow.changePercent)} · 成交量 ${volumeText(marketRow.volume)}` : '缺少指数数据'}</small>
+        </div>
+        <div class="setup-metric">
+          <span>与指数关系</span>
+          <strong class="state-chip ${resonance?.tone || ''}">${resonance?.label || '暂无'}</strong>
+          <small>${resonance?.detail || '缺少足够数据判断'}</small>
         </div>
       </div>
       <div class="membership-alert">
@@ -1191,6 +1364,9 @@ function renderDetail(board) {
   }
   const selectedRow = trendSnapshotByDate(board, state.sortDate);
   const selectedAverageChange = rowDisplayAverageChange(board, selectedRow);
+  const boardFlow = boardVolumePriceState(board, state.sortDate);
+  const marketFlow = marketVolumePriceState(state.sortDate);
+  const resonance = boardMarketResonance(board, state.sortDate);
 
   return `
     <div class="stack">
@@ -1199,7 +1375,7 @@ function renderDetail(board) {
         <div class="section-head">
           <div>
             <h2>${board.name} · 趋势曲线</h2>
-            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}。</p>
+            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}。板块 ${boardFlow?.label || '暂无'}，指数 ${marketFlow?.label || '暂无'}，${resonance?.label || '暂无判断'}。</p>
           </div>
           <div class="badges">
             <span class="badge">蓝线：平均涨跌幅</span>
@@ -1220,6 +1396,13 @@ function renderDetail(board) {
               <span>合计成交额</span>
             </div>
             <div class="chart-box core-chart-box">${renderPureCoreAmountChart(board)}</div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-panel-head">
+              <strong>${state.data?.marketIndex?.name || '指数'}折线</strong>
+              <span>涨跌幅折线 / 量能柱</span>
+            </div>
+            <div class="chart-box core-chart-box">${renderMarketIndexChart()}</div>
           </div>
         </div>
       </section>

@@ -160,7 +160,7 @@ p { line-height: 1.55; }
 
 .setup-pools {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -410,6 +410,41 @@ p { line-height: 1.55; }
   overflow-wrap: anywhere;
 }
 
+.state-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef3f2;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.state-chip.rise.expand,
+.state-chip.resonance {
+  background: #fdeeee;
+  color: var(--red);
+}
+
+.state-chip.rise.contract {
+  background: #fff2e8;
+  color: #b65b17;
+}
+
+.state-chip.fall.expand,
+.state-chip.divergence {
+  background: #eef8f4;
+  color: var(--green);
+}
+
+.state-chip.fall.contract,
+.state-chip.mixed {
+  background: #eef3f2;
+  color: #48616a;
+}
+
 .core-strip {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -576,6 +611,11 @@ p { line-height: 1.55; }
   height: 290px;
 }
 
+.index-svg {
+  width: 100%;
+  height: 300px;
+}
+
 .amount-svg {
   width: 100%;
   height: 220px;
@@ -738,6 +778,59 @@ p { line-height: 1.55; }
 .pure-core-label.fall,
 .pure-elastic-label.fall,
 .core-amount-label.fall {
+  fill: var(--green);
+}
+
+.index-change-line {
+  fill: none;
+  stroke: #0b7893;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.index-change-dot {
+  fill: #ffffff;
+  stroke-width: 2.5;
+}
+
+.index-change-dot.rise {
+  stroke: var(--red);
+}
+
+.index-change-dot.fall {
+  stroke: var(--green);
+}
+
+.index-volume-bar {
+  opacity: 0.8;
+}
+
+.index-volume-bar.rise {
+  fill: #f2b3b3;
+}
+
+.index-volume-bar.fall {
+  fill: #9ed5c0;
+}
+
+.index-change-label,
+.index-volume-label {
+  font-size: 11px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-linejoin: round;
+  stroke-width: 3px;
+}
+
+.index-change-label.rise,
+.index-volume-label.rise {
+  fill: var(--red);
+}
+
+.index-change-label.fall,
+.index-volume-label.fall {
   fill: var(--green);
 }
 
