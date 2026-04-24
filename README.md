@@ -17,20 +17,25 @@ pip install -r requirements.txt
 
 ## Daily Update
 
-Refresh Kaipanla data, rebuild plate-stock links, enrich with the Tonghuashun/Eastmoney limit-up mapping, and rebuild custom board data:
+Start each update from the latest remote code, then refresh the current trading
+day. The `--intraday-custom` switch overlays realtime quotes for custom-board
+stocks and the Shanghai Composite index, so same-day rows do not wait on the
+daily history source to finish publishing.
 
 ```powershell
-python .\scripts\update_daily_data.py --date 20260422
+git pull --ff-only origin main
+$date = Get-Date -Format yyyyMMdd
+python .\scripts\update_daily_data.py --date $date --intraday-custom
 ```
 
 Useful switches:
 
 ```powershell
-python .\scripts\update_daily_data.py --date 20260422 --skip-kpl
-python .\scripts\update_daily_data.py --date 20260422 --skip-external
-python .\scripts\update_daily_data.py --date 20260422 --skip-custom
-python .\scripts\update_daily_data.py --date 20260422 --strict-external
-python .\scripts\update_daily_data.py --date 20260422 --strict-custom
+python .\scripts\update_daily_data.py --date $date --intraday-custom --skip-kpl
+python .\scripts\update_daily_data.py --date $date --skip-external --intraday-custom
+python .\scripts\update_daily_data.py --date $date --skip-custom
+python .\scripts\update_daily_data.py --date $date --strict-external --intraday-custom
+python .\scripts\update_daily_data.py --date $date --strict-custom --intraday-custom
 ```
 
 By default, optional enrichment steps keep the dashboard loadable if a third-party
@@ -51,6 +56,15 @@ web/data/kpl_dashboard.json
 web/data/custom_boards.json
 ```
 
+After checking the generated data, commit and push the changed JSON files:
+
+```powershell
+git status --short
+git add web/data/kpl_dashboard.json web/data/kpl/index.json web/data/kpl/history/$date.json web/data/custom_boards.json
+git commit -m "Update daily data for $date"
+git push origin main
+```
+
 ## Scripts
 
 ```text
@@ -59,7 +73,7 @@ scripts/fetch_kpl_probe.py                # Kaipanla public plate and stock endp
 scripts/build_kpl_plate_stock_links.py    # inferred KPL plate/stock links -> data/kpl_linked/YYYYMMDD
 scripts/build_kpl_web_data.py             # KPL dashboard JSON + dated history snapshot
 scripts/build_ths_limit_mapping.py        # Tonghuashun concepts x Eastmoney limit-up pool enrichment
-scripts/build_custom_board_data.py        # custom board average history -> web/data/custom_boards.json
+scripts/build_custom_board_data.py        # custom board history plus optional realtime stock/index overlay
 scripts/validate_web_data.py              # validate required web/data JSON files
 scripts/serve_custom_boards.py            # editable local server for custom board definitions
 ```
@@ -90,8 +104,12 @@ web/data/custom_boards_config.json
 Build the custom board data:
 
 ```powershell
-python .\scripts\build_custom_board_data.py --date 20260422
+python .\scripts\build_custom_board_data.py --date $date --intraday
 ```
+
+Use `--intraday` during trading days or shortly after close. It keeps the latest
+custom-board stock rows and `marketIndex` current even when the daily history
+API has not published every same-day record yet.
 
 To edit custom boards from the page, run the editable local server instead of the static server:
 
