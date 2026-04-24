@@ -7,7 +7,7 @@ const state = {
   selectedCode: null,
   sortMode: 'avg_change',
   sortDate: null,
-  detailTab: 'trend',
+  detailTab: 'overview',
   editable: false,
   busy: false,
   message: '',
@@ -1371,17 +1371,22 @@ function renderDetail(board) {
   const boardFlow = boardVolumePriceState(board, state.sortDate);
   const marketFlow = marketVolumePriceState(state.sortDate);
   const resonance = boardMarketResonance(board, state.sortDate);
+  const isOverviewTab = state.detailTab === 'overview';
   const isTrendTab = state.detailTab === 'trend';
 
   return `
     <div class="stack">
-      ${renderSetupSummary(board)}
       <section class="card section-card detail-tabs-card">
         <div class="detail-tabs" role="tablist" aria-label="详情页签">
+          <button class="detail-tab-btn${isOverviewTab ? ' active' : ''}" type="button" data-detail-tab="overview" role="tab" aria-selected="${isOverviewTab}">概览</button>
           <button class="detail-tab-btn${isTrendTab ? ' active' : ''}" type="button" data-detail-tab="trend" role="tab" aria-selected="${isTrendTab}">趋势曲线</button>
-          <button class="detail-tab-btn${!isTrendTab ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${!isTrendTab}">板块个股</button>
+          <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
         </div>
       </section>
+      ${isOverviewTab ? `
+      ${renderSetupPools()}
+      ${renderSetupSummary(board)}
+      ` : ''}
       ${isTrendTab ? `
       <section class="card section-card">
         <div class="section-head">
@@ -1418,7 +1423,8 @@ function renderDetail(board) {
           </div>
         </div>
       </section>
-      ` : renderStocksTable(board)}
+      ` : ''}
+      ${state.detailTab === 'stocks' ? renderStocksTable(board) : ''}
     </div>
   `;
 }
@@ -1469,7 +1475,6 @@ function render() {
         </div>
       </aside>
       <main class="detail-pane">
-        ${renderSetupPools()}
         ${renderDetail(board)}
       </main>
     </div>
