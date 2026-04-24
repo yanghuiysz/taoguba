@@ -352,6 +352,40 @@ p { line-height: 1.55; }
   gap: 16px;
 }
 
+.detail-tabs-card {
+  padding: 10px 12px;
+}
+
+.detail-tabs {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.detail-tab-btn {
+  min-width: 88px;
+  height: 34px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.detail-tab-btn:last-child {
+  border-right: 0;
+}
+
+.detail-tab-btn.active {
+  background: #0b7893;
+  color: #ffffff;
+}
+
 .stack { display: grid; gap: 18px; }
 .section-card { padding: 16px; }
 .detail-head {

@@ -7,6 +7,7 @@ const state = {
   selectedCode: null,
   sortMode: 'avg_change',
   sortDate: null,
+  detailTab: 'trend',
   editable: false,
   busy: false,
   message: '',
@@ -921,6 +922,7 @@ function renderMarketIndexChart() {
       barY,
       tone,
       selected: item.date === state.sortDate,
+      latest: index === trend.length - 1,
     };
   });
   const line = points.map((point) => `${point.x},${point.y}`).join(' ');
@@ -936,25 +938,27 @@ function renderMarketIndexChart() {
       <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${number(changeMax)}%</text>
       <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0%</text>
       <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${number(changeMin)}%</text>
-      <polyline class="index-change-line" points="${line}"></polyline>
-      ${points.map((point, index) => {
-        const labelLevel = index % 2;
-        const changeLabelY = point.y - 10 - labelLevel * 12;
-        const volumeLabelY = Math.max(pad.top + 12, point.barY - 6 - (index % 3) * 11);
+      <text x="${width - pad.right}" y="${pad.top - 10}" text-anchor="end" class="axis-label">红线：上证指数  柱：量能</text>
+      <polyline class="index-change-line" points="${line}" style="fill:none;stroke:#c74343;stroke-linecap:round;stroke-linejoin:round;stroke-width:3.2;"></polyline>
+      ${points.map((point) => {
+        const showLabels = point.selected || point.latest;
+        const changeLabelY = point.y - 10;
+        const volumeLabelY = Math.max(pad.top + 12, point.barY - 6);
         return `
           <g>
             ${point.barHeight ? `<rect class="index-volume-bar ${point.tone}" x="${point.x - barWidth / 2}" y="${point.barY}" width="${barWidth}" height="${point.barHeight}" rx="4"></rect>` : ''}
-            <circle class="index-change-dot ${point.tone}" cx="${point.x}" cy="${point.y}" r="${point.selected ? 6 : 4.6}"></circle>
-            <text x="${point.x}" y="${changeLabelY}" text-anchor="middle" class="index-change-label ${point.tone}">${number(point.change)}%</text>
-            <text x="${point.x}" y="${volumeLabelY}" text-anchor="middle" class="index-volume-label ${point.tone}">${volumeText(point.volume)}</text>
+            <circle class="index-change-dot ${point.tone}" cx="${point.x}" cy="${point.y}" r="${point.selected || point.latest ? 6 : 4.2}"></circle>
+            ${showLabels ? `<text x="${point.x}" y="${changeLabelY}" text-anchor="middle" class="index-change-label ${point.tone}">${number(point.change)}%</text>` : ''}
+            ${point.latest ? `<text x="${point.x}" y="${volumeLabelY}" text-anchor="middle" class="index-volume-label ${point.tone}">${volumeText(point.volume)}</text>` : ''}
             <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
-            <title>${point.date} | 指数涨跌幅 ${number(point.change)}% | 成交量 ${volumeText(point.volume)} | ${point.label || '暂无量价标签'}</title>
+            <title>${point.date} | 指数 ${number(point.change)}% | 成交量 ${volumeText(point.volume)} | ${point.label || '暂无量价标签'}</title>
           </g>
         `;
       }).join('')}
     </svg>
   `;
 }
+
 
 function pureCoreChartScaffold(board) {
   const series = pureCoreSeries(board);
@@ -1367,10 +1371,18 @@ function renderDetail(board) {
   const boardFlow = boardVolumePriceState(board, state.sortDate);
   const marketFlow = marketVolumePriceState(state.sortDate);
   const resonance = boardMarketResonance(board, state.sortDate);
+  const isTrendTab = state.detailTab === 'trend';
 
   return `
     <div class="stack">
       ${renderSetupSummary(board)}
+      <section class="card section-card detail-tabs-card">
+        <div class="detail-tabs" role="tablist" aria-label="详情页签">
+          <button class="detail-tab-btn${isTrendTab ? ' active' : ''}" type="button" data-detail-tab="trend" role="tab" aria-selected="${isTrendTab}">趋势曲线</button>
+          <button class="detail-tab-btn${!isTrendTab ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${!isTrendTab}">板块个股</button>
+        </div>
+      </section>
+      ${isTrendTab ? `
       <section class="card section-card">
         <div class="section-head">
           <div>
@@ -1400,14 +1412,13 @@ function renderDetail(board) {
           <div class="chart-panel">
             <div class="chart-panel-head">
               <strong>${state.data?.marketIndex?.name || '指数'}折线</strong>
-              <span>涨跌幅折线 / 量能柱</span>
+              <span>上证指数 / 量能柱</span>
             </div>
             <div class="chart-box core-chart-box">${renderMarketIndexChart()}</div>
           </div>
         </div>
       </section>
-
-      ${renderStocksTable(board)}
+      ` : renderStocksTable(board)}
     </div>
   `;
 }
@@ -1502,6 +1513,12 @@ function render() {
     state.sortDate = nextDate;
     selectTopBoard();
     render();
+  });
+  document.querySelectorAll('.detail-tab-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.detailTab = button.dataset.detailTab;
+      render();
+    });
   });
 
   document.querySelector('#addStockForm')?.addEventListener('submit', (event) => {
