@@ -1,0 +1,62 @@
+/* 2026-04-24: overview layout + scroll/click hotfix */
+html,
+body {
+  min-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: auto;
+}
+
+body {
+  scrollbar-gutter: stable both-edges;
+}
+
+.detail-pane {
+  min-width: 0;
+}
+
+.setup-pools.setup-pools-merged-divergence {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.setup-pools.setup-pools-merged-divergence .merged-divergence-card {
+  border-color: #c7d8e8;
+}
+
+.setup-pools.setup-pools-merged-divergence .pool-item {
+  user-select: none;
+}
+
+.divergence-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  margin-right: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: 1px;
+}
+
+.divergence-kind.weak {
+  background: #fff5cc;
+  color: #8b6500;
+}
+
+.divergence-kind.strong {
+  background: #e4f1ff;
+  color: #1166a6;
+}
+
+.swing-board-jump,
+.pool-item {
+  touch-action: manipulation;
+}
+
+@media (max-width: 900px) {
+  .setup-pools.setup-pools-merged-divergence {
+    grid-template-columns: 1fr;
+  }
+}
