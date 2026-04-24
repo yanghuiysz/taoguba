@@ -32,7 +32,14 @@
   background: #f0f8f7;
 }
 
-.decision-mode .swing-overview-panel .pool-card,
+/* Decision mode keeps only the simplified decision panels. */
+.decision-mode .swing-overview-panel,
+.decision-mode .swing-panel,
+.decision-mode .swing-plus-panel,
+.decision-mode .resonance-panel {
+  display: none !important;
+}
+
 .decision-mode .decision-overview-panel .pool-card {
   max-height: 320px;
   overflow-y: auto;
@@ -40,8 +47,15 @@
   padding-right: 8px;
 }
 
+.decision-mode .decision-board-item {
+  cursor: pointer;
+}
+
+.decision-mode .decision-board-item:active {
+  transform: translateY(1px);
+}
+
 @media (min-width: 1300px) {
-  .decision-mode .swing-overview-panel .pool-card,
   .decision-mode .decision-overview-panel .pool-card {
     max-height: 380px;
   }
