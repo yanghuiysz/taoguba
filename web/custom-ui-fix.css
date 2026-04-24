@@ -1,0 +1,48 @@
+/* Interaction polish for board pool cards */
+.pool-card {
+  overscroll-behavior: contain;
+  scrollbar-width: auto;
+  scrollbar-color: #97bab5 #eef3f2;
+}
+
+.pool-card::-webkit-scrollbar {
+  width: 9px;
+}
+
+.pool-card::-webkit-scrollbar-track {
+  background: #eef3f2;
+  border-radius: 999px;
+}
+
+.pool-card::-webkit-scrollbar-thumb {
+  background: #97bab5;
+  border-radius: 999px;
+}
+
+.pool-card .pool-item,
+.pool-card .decision-board-item,
+.pool-card .swing-board-jump {
+  cursor: pointer;
+}
+
+.pool-card .pool-item:hover,
+.pool-card .decision-board-item:hover,
+.pool-card .swing-board-jump:hover {
+  border-color: #0b7893;
+  background: #f0f8f7;
+}
+
+.decision-mode .swing-overview-panel .pool-card,
+.decision-mode .decision-overview-panel .pool-card {
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+}
+
+@media (min-width: 1300px) {
+  .decision-mode .swing-overview-panel .pool-card,
+  .decision-mode .decision-overview-panel .pool-card {
+    max-height: 380px;
+  }
+}
