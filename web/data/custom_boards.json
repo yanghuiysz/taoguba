@@ -207,13 +207,27 @@
         "label": "放量下跌",
         "priceDirection": "fall",
         "amountDirection": "expand"
+      },
+      {
+        "date": "2026-04-24",
+        "open": 4081.0326,
+        "close": 4079.9004,
+        "high": 4092.6131,
+        "low": 4061.1453,
+        "changePercent": -0.326,
+        "volume": 605031798.0,
+        "turnover": 1143000195131.0,
+        "amount": 1143000195131.0,
+        "label": "缩量下跌",
+        "priceDirection": "fall",
+        "amountDirection": "contract"
       }
     ],
-    "latestDate": "2026-04-23",
-    "latestClose": 4093.25,
-    "latestChangePercent": -0.3168,
-    "latestVolume": 67116609200.0,
-    "latestState": "放量下跌"
+    "latestDate": "2026-04-24",
+    "latestClose": 4079.9004,
+    "latestChangePercent": -0.326,
+    "latestVolume": 605031798.0,
+    "latestState": "缩量下跌"
   },
   "boards": [
     {

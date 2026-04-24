@@ -307,6 +307,83 @@ def merge_intraday_rows(
         rows.sort(key=lambda row: str(row.get("date") or ""))
 
 
+def normalize_market_index_spot_row(row: Any, symbol: str, date: str) -> dict[str, Any] | None:
+    code = str(first_present(row, ("代码", "code", "f12"), 0) or "").lower()
+    if code != symbol.lower():
+        return None
+    turnover = number_or_none(first_present(row, ("成交额", "amount", "f6"), 10))
+    return {
+        "date": format_date(date),
+        "open": number_or_none(first_present(row, ("今开", "open", "f17"), 6)),
+        "close": number_or_none(first_present(row, ("最新价", "最新", "latest", "f2"), 2)),
+        "high": number_or_none(first_present(row, ("最高", "high", "f15"), 7)),
+        "low": number_or_none(first_present(row, ("最低", "low", "f16"), 8)),
+        "changePercent": number_or_none(first_present(row, ("涨跌幅", "changePercent", "f3"), 4)),
+        "volume": number_or_none(first_present(row, ("成交量", "volume", "f5"), 9)),
+        "turnover": turnover,
+        "amount": turnover,
+        "source": "intraday_index_spot",
+    }
+
+
+def normalize_tencent_market_index_payload(text: str, symbol: str, date: str) -> dict[str, Any] | None:
+    payload = text.strip()
+    if "=" not in payload:
+        return None
+    _, raw_value = payload.split("=", 1)
+    parts = raw_value.strip().strip('";').split("~")
+    code = f"sh{parts[2]}" if len(parts) > 2 else ""
+    if code.lower() != symbol.lower():
+        return None
+    turnover = None
+    volume = None
+    if len(parts) > 35 and parts[35]:
+        snapshot = parts[35].split("/")
+        if len(snapshot) >= 2:
+            volume = number_or_none(snapshot[1])
+        if len(snapshot) >= 3:
+            turnover = number_or_none(snapshot[2])
+    return {
+        "date": format_date(date),
+        "open": number_or_none(parts[5] if len(parts) > 5 else None),
+        "close": number_or_none(parts[3] if len(parts) > 3 else None),
+        "high": number_or_none(parts[33] if len(parts) > 33 else None),
+        "low": number_or_none(parts[34] if len(parts) > 34 else None),
+        "changePercent": number_or_none(parts[32] if len(parts) > 32 else None),
+        "volume": volume,
+        "turnover": turnover,
+        "amount": turnover,
+        "source": "intraday_index_spot_tencent",
+        "timestamp": parts[30] if len(parts) > 30 else "",
+    }
+
+
+def fetch_market_index_intraday(symbol: str, date: str) -> dict[str, Any] | None:
+    for source_name in ("stock_zh_index_spot_em", "stock_zh_index_spot_sina"):
+        try:
+            df = getattr(ak, source_name)()
+            for _, row in df.iterrows():
+                item = normalize_market_index_spot_row(row, symbol, date)
+                if item:
+                    item["source"] = f"intraday_index_{source_name}"
+                    return item
+        except Exception as exc:  # noqa: BLE001 - fall through to the next public quote source.
+            print(f"{source_name} failed for market index overlay: {exc}")
+    url = f"https://qt.gtimg.cn/q={quote(symbol)}"
+    with urlopen(url, timeout=15) as response:
+        payload = response.read().decode("gbk", errors="replace")
+    return normalize_tencent_market_index_payload(payload, symbol, date)
+
+
+def merge_market_index_intraday(rows: list[dict[str, Any]], spot_row: dict[str, Any] | None, date: str) -> None:
+    if not spot_row:
+        return
+    formatted_date = format_date(date)
+    rows[:] = [row for row in rows if row.get("date") != formatted_date]
+    rows.append(spot_row)
+    rows.sort(key=lambda row: str(row.get("date") or ""))
+
+
 def latest_trading_dates(stock_histories: dict[str, list[dict[str, Any]]], days: int) -> list[str]:
     dates = {
         row["date"]
@@ -581,7 +658,13 @@ def main() -> None:
     built_boards = sorted(built_boards, key=lambda board: sort_change_value(board.get("latestAverageChange")), reverse=True)
     market_index = None
     try:
-        market_index = build_market_index(fetch_market_index_history(MARKET_INDEX_SYMBOL, args.date, args.lookback_days), dates)
+        market_rows = fetch_market_index_history(MARKET_INDEX_SYMBOL, args.date, args.lookback_days)
+        if args.intraday:
+            market_spot = fetch_market_index_intraday(MARKET_INDEX_SYMBOL, args.date)
+            merge_market_index_intraday(market_rows, market_spot, args.date)
+            if market_spot:
+                print(f"Intraday market index row: {MARKET_INDEX_SYMBOL} for {format_date(args.date)}")
+        market_index = build_market_index(market_rows, dates)
     except Exception as exc:  # noqa: BLE001 - keep custom board build available even when index source is unavailable.
         errors.append({"code": "market_index", "error": str(exc)})
         print(f"Failed market index fetch: {exc}")
