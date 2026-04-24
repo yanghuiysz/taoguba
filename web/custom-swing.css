@@ -1,5 +1,6 @@
 .swing-panel {
   border-color: #cbdedb;
+  min-width: 0;
 }
 
 .swing-metrics {
@@ -88,12 +89,38 @@
   color: #923939;
 }
 
+.swing-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .swing-table-wrap table {
-  min-width: 1080px;
+  min-width: 920px;
+  font-size: 13px;
+}
+
+.swing-table-wrap th,
+.swing-table-wrap td {
+  padding: 9px 9px;
+  white-space: nowrap;
+}
+
+.swing-table-wrap th:nth-child(2),
+.swing-table-wrap td:nth-child(2) {
+  min-width: 92px;
+}
+
+.swing-table-wrap th:last-child,
+.swing-table-wrap td:last-child {
+  min-width: 74px;
 }
 
 .swing-overview-panel {
   border-color: #d7b66a;
+  min-width: 0;
 }
 
 .swing-pools {
@@ -107,6 +134,16 @@
 @media (max-width: 1100px) {
   .swing-metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .swing-table-wrap table {
+    min-width: 860px;
+    font-size: 12px;
+  }
+
+  .swing-table-wrap th,
+  .swing-table-wrap td {
+    padding: 8px 7px;
   }
 }
 
