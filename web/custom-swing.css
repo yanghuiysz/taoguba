@@ -1,3 +1,32 @@
+@media (min-width: 901px) {
+  .app-shell {
+    width: min(1680px, calc(100vw - 12px));
+    max-width: none;
+  }
+
+  .workspace-layout {
+    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .detail-pane,
+  .sidebar-card,
+  .section-card,
+  .table-wrap {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1500px) {
+  .app-shell {
+    width: min(1760px, calc(100vw - 20px));
+  }
+
+  .workspace-layout {
+    grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+  }
+}
+
 .swing-panel {
   border-color: #cbdedb;
   min-width: 0;
