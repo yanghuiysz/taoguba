@@ -1,0 +1,245 @@
+.detail-tab-btn[data-detail-tab="resonance"] {
+  display: none !important;
+}
+
+.detail-tab-btn[data-detail-tab="swing"] {
+  min-width: 96px;
+}
+
+.decision-panel,
+.decision-overview-panel {
+  border-color: #bfd8d3;
+  min-width: 0;
+}
+
+.decision-score-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid #dce7e5;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.decision-score-card h2 {
+  margin: 0 0 6px;
+}
+
+.decision-score-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.decision-score-number {
+  min-width: 92px;
+  min-height: 92px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: #eef7f5;
+  color: #0b7893;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.decision-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.decision-badge,
+.decision-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.decision-badge.strong,
+.decision-action.strong {
+  background: #ffe3e3;
+  color: var(--red);
+}
+
+.decision-badge.test,
+.decision-action.test {
+  background: #fff5cc;
+  color: #8b6500;
+}
+
+.decision-badge.turn,
+.decision-action.turn {
+  background: #e4f1ff;
+  color: #1166a6;
+}
+
+.decision-badge.watch,
+.decision-action.watch {
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.decision-badge.weak,
+.decision-action.weak {
+  background: #dff1ea;
+  color: var(--green);
+}
+
+.decision-badge.risk,
+.decision-action.risk,
+.decision-badge.divergence,
+.decision-action.divergence {
+  background: #f5dfdf;
+  color: #923939;
+}
+
+.decision-metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.decision-metric {
+  min-height: 86px;
+  border: 1px solid #edf2f1;
+  border-radius: 9px;
+  background: #fbfdfc;
+  padding: 10px 11px;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+}
+
+.decision-metric span,
+.decision-metric small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.decision-metric strong {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.decision-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 6px 0 10px;
+  padding: 0 4px;
+}
+
+.decision-section-title span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.decision-stock-table table {
+  min-width: 920px;
+  font-size: 13px;
+}
+
+.decision-stock-table th,
+.decision-stock-table td {
+  padding: 9px 9px;
+  white-space: nowrap;
+}
+
+.decision-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.decision-board-item {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #edf2f1;
+  border-radius: 8px;
+  background: #fbfdfc;
+  color: var(--ink);
+  text-align: left;
+  padding: 8px 9px;
+  cursor: pointer;
+}
+
+.decision-board-item:hover {
+  border-color: #97bab5;
+}
+
+.decision-board-item strong,
+.decision-board-item small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decision-board-item small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.decision-fold {
+  margin-top: 14px;
+  border: 1px solid #edf2f1;
+  border-radius: 9px;
+  background: #fbfdfc;
+  padding: 10px 12px;
+}
+
+.decision-fold summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.decision-fold p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+@media (max-width: 1200px) {
+  .decision-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .decision-score-card,
+  .decision-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .decision-score-number {
+    min-width: 100%;
+  }
+
+  .decision-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .decision-section-title {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
