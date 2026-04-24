@@ -1,0 +1,123 @@
+.swing-panel {
+  border-color: #cbdedb;
+}
+
+.swing-metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.swing-current-note {
+  margin: 2px 0 16px;
+  border: 1px solid #dce7e5;
+  border-radius: 8px;
+  background: #fbfdfc;
+  color: var(--ink);
+  padding: 11px 12px;
+  line-height: 1.55;
+}
+
+.swing-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 4px 0 10px;
+  padding: 0 4px;
+}
+
+.swing-section-title span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.swing-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.swing-badge.strong,
+.pool-score.strong {
+  background: #ffe3e3;
+  color: var(--red);
+}
+
+.swing-badge.test,
+.pool-score.test {
+  background: #fff5cc;
+  color: #8b6500;
+}
+
+.swing-badge.turn,
+.pool-score.turn {
+  background: #e4f1ff;
+  color: #1166a6;
+}
+
+.swing-badge.watch,
+.pool-score.watch {
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.swing-badge.mixed,
+.pool-score.mixed {
+  background: #eef3f2;
+  color: #48616a;
+}
+
+.swing-badge.weak,
+.pool-score.weak {
+  background: #dff1ea;
+  color: var(--green);
+}
+
+.swing-badge.divergence,
+.pool-score.divergence {
+  background: #f5dfdf;
+  color: #923939;
+}
+
+.swing-table-wrap table {
+  min-width: 1080px;
+}
+
+.swing-overview-panel {
+  border-color: #d7b66a;
+}
+
+.swing-pools {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.swing-board-jump {
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .swing-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .swing-metrics,
+  .swing-pools {
+    grid-template-columns: 1fr;
+  }
+
+  .swing-section-title {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
