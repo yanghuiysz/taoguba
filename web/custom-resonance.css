@@ -1,0 +1,120 @@
+.resonance-panel {
+  border-color: #cbdedb;
+}
+
+.resonance-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.resonance-current-note {
+  margin: 2px 0 14px;
+  border: 1px solid #dce7e5;
+  border-radius: 8px;
+  background: #fbfdfc;
+  color: var(--ink);
+  padding: 11px 12px;
+  line-height: 1.55;
+}
+
+.resonance-score-parts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.resonance-score-part {
+  border: 1px solid #edf2f1;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.resonance-score-part span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resonance-score-part strong {
+  font-size: 15px;
+}
+
+.resonance-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.resonance-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.resonance-badge.strong,
+.resonance-summary-pill.strong {
+  background: #ffe3e3;
+  color: var(--red);
+}
+
+.resonance-badge.test,
+.resonance-summary-pill.test {
+  background: #fff5cc;
+  color: #8b6500;
+}
+
+.resonance-badge.turn,
+.resonance-summary-pill.turn {
+  background: #e4f1ff;
+  color: #1166a6;
+}
+
+.resonance-badge.mixed,
+.resonance-summary-pill.mixed {
+  background: #eef3f2;
+  color: #48616a;
+}
+
+.resonance-badge.divergence,
+.resonance-summary-pill.divergence {
+  background: #f5dfdf;
+  color: #923939;
+}
+
+.resonance-badge.weak,
+.resonance-summary-pill.weak {
+  background: #dff1ea;
+  color: var(--green);
+}
+
+.resonance-table-wrap table {
+  min-width: 1120px;
+}
+
+.resonance-conclusion-cell {
+  min-width: 220px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .resonance-metrics,
+  .resonance-score-parts {
+    grid-template-columns: 1fr;
+  }
+}
