@@ -645,6 +645,11 @@ p { line-height: 1.55; }
   height: 280px;
 }
 
+.new-high-svg {
+  width: 100%;
+  height: 290px;
+}
+
 .core-svg {
   width: 100%;
   height: 290px;
@@ -694,6 +699,79 @@ p { line-height: 1.55; }
   fill: #ffffff;
   stroke: #0b7893;
   stroke-width: 2.5;
+}
+
+.new-high-card {
+  border-color: #cbdedb;
+}
+
+.new-high-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.new-high-chart-panel {
+  margin-top: 4px;
+}
+
+.new-high-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.new-high-line.average,
+.new-high-dot.average {
+  stroke: #0b7893;
+}
+
+.new-high-line.high,
+.new-high-dot.high {
+  stroke: var(--red);
+}
+
+.new-high-line.near,
+.new-high-dot.near {
+  stroke: #f08c3a;
+}
+
+.new-high-dot {
+  fill: #ffffff;
+  stroke-width: 2.5;
+}
+
+.new-high-point {
+  cursor: pointer;
+}
+
+.chart-hitbox {
+  fill: transparent;
+}
+
+.new-high-legend {
+  position: relative;
+  padding-left: 22px;
+}
+
+.new-high-legend::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: #0b7893;
+}
+
+.new-high-legend.high::before {
+  background: var(--red);
+}
+
+.new-high-legend.near::before {
+  background: #f08c3a;
 }
 
 .value-label {
@@ -925,7 +1003,7 @@ p { line-height: 1.55; }
 
 table {
   width: 100%;
-  min-width: 860px;
+  min-width: 1160px;
   border-collapse: collapse;
   font-size: 14px;
 }

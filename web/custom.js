@@ -52,6 +52,16 @@ const percentText = (value) => {
   return `${number(value)}%`;
 };
 
+const boolText = (value) => (value === true ? '是' : (value === false ? '否' : '暂无'));
+
+const highStatusTone = (status) => {
+  if (status === '百日新高') return 'strong';
+  if (status === '近高位') return 'hot';
+  if (status === '高位震荡') return 'test';
+  if (status === '距离较远') return 'weak';
+  return 'watch';
+};
+
 const stockTurnover = (stock) => {
   const value = stock?.turnover ?? stock?.amount;
   const parsed = Number(value);
@@ -949,6 +959,42 @@ function trendSnapshotByDate(board, date) {
   return (board?.trend || []).find((item) => item.date === date) || null;
 }
 
+function newHighTrendRows(board) {
+  const rows = Array.isArray(board?.boardNewHighTrend) && board.boardNewHighTrend.length
+    ? board.boardNewHighTrend
+    : (board?.trend || []);
+  return rows.filter((item) => item?.date && item.high100Rate !== null && item.high100Rate !== undefined);
+}
+
+function newHighRowByDate(board, date) {
+  if (!date) return newHighTrendRows(board).at(-1) || null;
+  return newHighTrendRows(board).find((item) => item.date === date) || null;
+}
+
+function diffusionLabel(row) {
+  const highRate = Number(row?.high100Rate);
+  const nearRate = Number(row?.nearHigh100Rate);
+  if (Number.isNaN(highRate) || Number.isNaN(nearRate)) return { label: '暂无', tone: 'watch' };
+  if (highRate >= 25 || nearRate >= 60) return { label: '强', tone: 'strong' };
+  if (highRate >= 10 || nearRate >= 40) return { label: '中', tone: 'test' };
+  return { label: '弱', tone: 'weak' };
+}
+
+function diffusionTrendLabel(today, yesterday) {
+  if (!today || !yesterday) return { label: '暂无', tone: 'watch' };
+  const highToday = Number(today.high100Rate);
+  const highYesterday = Number(yesterday.high100Rate);
+  const nearToday = Number(today.nearHigh100Rate);
+  const nearYesterday = Number(yesterday.nearHigh100Rate);
+  if ([highToday, highYesterday, nearToday, nearYesterday].some((value) => Number.isNaN(value))) {
+    return { label: '暂无', tone: 'watch' };
+  }
+  if (highToday > highYesterday) return { label: '扩散增强', tone: 'strong' };
+  if (highToday < highYesterday) return { label: '扩散减弱', tone: 'weak' };
+  if (nearToday >= nearYesterday) return { label: '高位维持', tone: 'test' };
+  return { label: '扩散减弱', tone: 'weak' };
+}
+
 function boardHasDateSnapshot(board, date) {
   if (!date) return false;
   return (board?.trend || []).some((item) => item.date === date);
@@ -1220,6 +1266,118 @@ function renderAmountBarChart(board) {
   `;
 }
 
+function renderNewHighTrendChart(board) {
+  const trend = newHighTrendRows(board).slice(-15);
+  if (!trend.length) {
+    return `
+      <div>
+        <strong>暂无百日新高扩散数据</strong>
+        <p>需要至少 100 个有效交易日行情后才能计算。</p>
+      </div>
+    `;
+  }
+
+  const width = 760;
+  const height = 250;
+  const pad = { top: 30, right: 48, bottom: 46, left: 52 };
+  const plotWidth = width - pad.left - pad.right;
+  const plotHeight = height - pad.top - pad.bottom;
+  const values = trend.flatMap((item) => [
+    Number(item.averageChange),
+    Number(item.high100Rate),
+    Number(item.nearHigh100Rate),
+  ]).filter((value) => Number.isFinite(value));
+  const rawMax = Math.max(...values, 1);
+  const rawMin = Math.min(...values, -1);
+  const valuePadding = Math.max(1, (rawMax - rawMin) * 0.12);
+  const valueMax = rawMax + valuePadding;
+  const valueMin = rawMin - valuePadding;
+  const valueRange = valueMax - valueMin || 1;
+  const yFor = (value) => pad.top + ((valueMax - value) / valueRange) * plotHeight;
+  const xFor = (index) => pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
+  const points = trend.map((item, index) => {
+    const averageChange = Number(item.averageChange);
+    const high100Rate = Number(item.high100Rate);
+    const nearHigh100Rate = Number(item.nearHigh100Rate);
+    return {
+      ...item,
+      x: xFor(index),
+      averageChange,
+      high100Rate,
+      nearHigh100Rate,
+      yAverage: yFor(Number.isFinite(averageChange) ? averageChange : 0),
+      yHigh: yFor(Number.isFinite(high100Rate) ? high100Rate : 0),
+      yNear: yFor(Number.isFinite(nearHigh100Rate) ? nearHigh100Rate : 0),
+      selected: item.date === state.sortDate,
+    };
+  });
+  const line = (key) => points.map((point) => `${point.x},${point[key]}`).join(' ');
+  const zeroY = yFor(0);
+  const axisBottom = height - pad.bottom;
+
+  return `
+    <svg class="new-high-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 百日新高扩散趋势">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
+      `).join('')}
+      <line class="zero-line" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
+      <line class="zero-line" x1="${pad.left}" y1="${zeroY}" x2="${width - pad.right}" y2="${zeroY}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${number(valueMax)}%</text>
+      <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0%</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${number(valueMin)}%</text>
+      <polyline class="new-high-line average" points="${line('yAverage')}"></polyline>
+      <polyline class="new-high-line high" points="${line('yHigh')}"></polyline>
+      <polyline class="new-high-line near" points="${line('yNear')}"></polyline>
+      ${points.map((point) => `
+        <g class="new-high-point" data-high-date="${point.date}" tabindex="0" role="button" aria-label="${point.date} 百日新高扩散">
+          <rect class="chart-hitbox" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}"></rect>
+          <circle class="new-high-dot average" cx="${point.x}" cy="${point.yAverage}" r="${point.selected ? 5.8 : 4.3}"></circle>
+          <circle class="new-high-dot high" cx="${point.x}" cy="${point.yHigh}" r="${point.selected ? 5.8 : 4.3}"></circle>
+          <circle class="new-high-dot near" cx="${point.x}" cy="${point.yNear}" r="${point.selected ? 5.8 : 4.3}"></circle>
+          <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
+          <title>${point.date} | 板块平均涨幅 ${number(point.averageChange)}% | 百日新高 ${point.high100Count}/${point.stockCount} | 近高位 ${point.nearHigh100Count}/${point.stockCount} | 百日新高率 ${number(point.high100Rate)}% | 近高位率 ${number(point.nearHigh100Rate)}%</title>
+        </g>
+      `).join('')}
+    </svg>
+  `;
+}
+
+function renderNewHighTrendPanel(board) {
+  const rows = newHighTrendRows(board);
+  const current = newHighRowByDate(board, state.sortDate) || rows.at(-1);
+  const index = rows.findIndex((item) => item.date === current?.date);
+  const previous = index > 0 ? rows[index - 1] : null;
+  const diffusion = diffusionLabel(current);
+  const trend = diffusionTrendLabel(current, previous);
+  const stockCount = current?.stockCount ?? 0;
+  return `
+    <section class="card section-card new-high-card">
+      <div class="section-head">
+        <div>
+          <h2>百日新高扩散趋势</h2>
+          <p class="muted">当前日期 ${shortDate(current?.date || state.sortDate)}：百日新高 ${current?.high100Count ?? 0}/${stockCount}，近高位 ${current?.nearHigh100Count ?? 0}/${stockCount}。</p>
+        </div>
+        <div class="badges">
+          <span class="badge new-high-legend average">板块平均涨幅</span>
+          <span class="badge new-high-legend high">百日新高率</span>
+          <span class="badge new-high-legend near">近高位率</span>
+        </div>
+      </div>
+      <div class="setup-grid new-high-summary">
+        <div class="setup-metric"><span>百日新高扩散</span><strong class="state-chip ${diffusion.tone}">${diffusion.label}</strong><small>强 ≥25% 或近高位 ≥60%</small></div>
+        <div class="setup-metric"><span>趋势变化</span><strong class="state-chip ${trend.tone}">${trend.label}</strong><small>${previous ? `对比 ${shortDate(previous.date)}` : '缺少上一交易日'}</small></div>
+        <div class="setup-metric"><span>今日百日新高</span><strong>${current?.high100Count ?? 0}/${stockCount}</strong><small>百日新高率 ${percentText(current?.high100Rate)}</small></div>
+        <div class="setup-metric"><span>今日近高位</span><strong>${current?.nearHigh100Count ?? 0}/${stockCount}</strong><small>近高位率 ${percentText(current?.nearHigh100Rate)}</small></div>
+        <div class="setup-metric"><span>平均距新高</span><strong class="${signedClass(current?.avgDistanceToHigh100)}">${percentText(current?.avgDistanceToHigh100)}</strong><small>越接近 0 越贴近百日高点</small></div>
+        <div class="setup-metric"><span>平均百日位置</span><strong>${current?.avgPosition100 === null || current?.avgPosition100 === undefined ? '暂无' : number(Number(current.avgPosition100) * 100)}%</strong><small>近100日区间位置</small></div>
+      </div>
+      <div class="chart-panel new-high-chart-panel">
+        <div class="chart-box">${renderNewHighTrendChart(board)}</div>
+      </div>
+    </section>
+  `;
+}
+
 function renderPoolTitle(label, count) {
   return `<div class="pool-title"><strong>${label}</strong><span>${count}</span></div>`;
 }
@@ -1429,6 +1587,11 @@ function renderStocksTable(board) {
         displayClose: useDateSnapshot ? (current?.close ?? null) : stock.latestClose,
         displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock.latestChangePercent,
         displayAmount: useDateSnapshot ? stockTurnover(current) : (stock.latestTurnover ?? stock.latestAmount),
+        displayDistanceToHigh100: useDateSnapshot ? (current?.distanceToHigh100 ?? null) : stock.latestDistanceToHigh100,
+        displayIsHigh100: useDateSnapshot ? (current?.isHigh100 ?? null) : stock.latestIsHigh100,
+        displayIsNearHigh100: useDateSnapshot ? (current?.isNearHigh100 ?? null) : stock.latestIsNearHigh100,
+        displayPosition100: useDateSnapshot ? (current?.position100 ?? null) : stock.latestPosition100,
+        displayHighStatus: useDateSnapshot ? (current?.highStatus ?? null) : stock.latestHighStatus,
         membership: membershipAssessment(board, stock, state.sortDate),
       };
     })
@@ -1452,6 +1615,11 @@ function renderStocksTable(board) {
               <th>归属</th>
               <th>涨跌幅</th>
               <th>成交额</th>
+              <th>距百日新高</th>
+              <th>百日新高</th>
+              <th>近高位</th>
+              <th>百日位置</th>
+              <th>新高状态</th>
               <th>依据</th>
               ${actionColumn}
             </tr>
@@ -1464,10 +1632,15 @@ function renderStocksTable(board) {
                 <td><span class="membership-badge ${stock.membership.tone}">${stock.membership.label}</span></td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
                 <td>${amountText(stock.displayAmount)}</td>
+                <td class="${signedClass(stock.displayDistanceToHigh100)}">${percentText(stock.displayDistanceToHigh100)}</td>
+                <td>${boolText(stock.displayIsHigh100)}</td>
+                <td>${boolText(stock.displayIsNearHigh100)}</td>
+                <td>${stock.displayPosition100 === null || stock.displayPosition100 === undefined ? '暂无' : `${number(Number(stock.displayPosition100) * 100)}%`}</td>
+                <td><span class="setup-badge ${highStatusTone(stock.displayHighStatus)}">${stock.displayHighStatus || '暂无'}</span></td>
                 <td class="membership-reason">${stock.membership.reason}</td>
                 ${state.editable ? `<td><button class="remove-stock" data-code="${stock.code}" data-name="${stock.name}" ${state.busy ? 'disabled' : ''}>删除</button></td>` : ''}
               </tr>
-            `).join('') : `<tr><td colspan="${state.editable ? 7 : 6}" class="empty">该板块暂无已配置个股</td></tr>`}
+            `).join('') : `<tr><td colspan="${state.editable ? 12 : 11}" class="empty">该板块暂无已配置个股</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -1496,6 +1669,7 @@ function renderDetail(board) {
           <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
         </div>
       </section>
+      ${renderNewHighTrendPanel(board)}
       ${isOverviewTab ? `
       ${renderSetupSummary(board)}
       ` : ''}
@@ -1629,6 +1803,21 @@ function render() {
     button.addEventListener('click', () => {
       state.detailTab = button.dataset.detailTab;
       render();
+    });
+  });
+  document.querySelectorAll('.new-high-point').forEach((point) => {
+    const selectDate = () => {
+      if (!point.dataset.highDate) return;
+      state.sortDate = point.dataset.highDate;
+      state.detailTab = 'stocks';
+      render();
+    };
+    point.addEventListener('click', selectDate);
+    point.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectDate();
+      }
     });
   });
 

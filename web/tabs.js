@@ -4,7 +4,7 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260427-swing-pointer-v1",
+  custom: "./custom.html?v=20260427-new-high-v1",
 };
 
 function resizeFrame(frame) {
