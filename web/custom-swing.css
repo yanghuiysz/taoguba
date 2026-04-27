@@ -156,6 +156,13 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.swing-pools .pool-card {
+  max-height: 294px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+}
+
 .swing-board-jump {
   cursor: pointer;
 }

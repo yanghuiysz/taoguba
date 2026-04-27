@@ -308,7 +308,7 @@
     if (!pane) return;
     enhancing = true;
     try {
-      pane.querySelectorAll('.swing-plus-panel').forEach((node) => node.remove());
+      if (pane.querySelector('.swing-plus-panel')) return;
       const board = typeof activeBoard === 'function' ? activeBoard() : null;
       if (board) pane.insertAdjacentHTML('beforeend', renderPanel(board));
     } finally {

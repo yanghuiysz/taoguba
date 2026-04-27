@@ -634,10 +634,12 @@ function setupPools(date) {
   const boards = state.data?.boards || [];
   const enriched = boards.map((board) => ({ board, setup: boardSetup(board, date) }));
   const byScore = (a, b) => setupScore(b.board, date) - setupScore(a.board, date);
+  const divergence = enriched
+    .filter((item) => item.setup.rawLabel === '弱分歧' || item.setup.rawLabel === '强分歧')
+    .sort(byScore);
   return {
     strong: enriched.filter((item) => item.setup.rawLabel === '强').sort(byScore),
-    weakDivergence: enriched.filter((item) => item.setup.rawLabel === '弱分歧').sort(byScore),
-    strongDivergence: enriched.filter((item) => item.setup.rawLabel === '强分歧').sort(byScore),
+    divergence,
     weak: enriched.filter((item) => item.setup.rawLabel === '弱势').sort(byScore),
   };
 }
@@ -1134,10 +1136,14 @@ function renderPoolItems(items, emptyText) {
   return items.map(({ board, setup }) => {
     const stats = setup.todayStats;
     const daysText = setup.lastStrong ? `距强 ${setup.lastStrong.days} 天` : '距强 暂无';
+    const divergenceKind = setup.rawLabel === '强分歧' ? 'strong' : 'weak';
+    const divergenceBadge = setup.rawLabel === '弱分歧' || setup.rawLabel === '强分歧'
+      ? `<i class="divergence-kind ${divergenceKind}">${setup.rawLabel}</i>`
+      : '';
     return `
       <button class="pool-item" type="button" data-code="${board.code}">
         <span>
-          <strong>${board.name}</strong>
+          <strong>${divergenceBadge}${board.name}</strong>
           <small>${daysText}</small>
         </span>
         <span class="pool-score ${setup.tone}">${number(stats?.averageChange)}%</span>
@@ -1149,18 +1155,14 @@ function renderPoolItems(items, emptyText) {
 function renderSetupPools() {
   const pools = setupPools(state.sortDate);
   return `
-    <section class="setup-pools">
+    <section class="setup-pools setup-pools-merged-divergence">
       <div class="pool-card primary">
         ${renderPoolTitle('强势', pools.strong.length)}
         ${renderPoolItems(pools.strong, '暂无强势板块')}
       </div>
-      <div class="pool-card">
-        ${renderPoolTitle('弱分歧', pools.weakDivergence.length)}
-        ${renderPoolItems(pools.weakDivergence, '暂无弱分歧')}
-      </div>
-      <div class="pool-card">
-        ${renderPoolTitle('强分歧', pools.strongDivergence.length)}
-        ${renderPoolItems(pools.strongDivergence, '暂无强分歧')}
+      <div class="pool-card merged-divergence-card">
+        ${renderPoolTitle('分歧', pools.divergence.length)}
+        ${renderPoolItems(pools.divergence, '暂无分歧板块')}
       </div>
       <div class="pool-card risk">
         ${renderPoolTitle('弱势', pools.weak.length)}
@@ -1489,7 +1491,8 @@ function render() {
 
   document.querySelectorAll('.pool-item').forEach((button) => {
     button.addEventListener('click', () => {
-      state.selectedCode = button.dataset.code;
+      state.selectedCode = button.dataset.code || button.dataset.boardCode;
+      if (button.dataset.targetTab) state.detailTab = button.dataset.targetTab;
       render();
     });
   });

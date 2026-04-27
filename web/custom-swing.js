@@ -434,8 +434,8 @@
 
   function renderBoardMiniList(items) {
     if (!items.length) return '<div class="pool-empty">暂无匹配板块</div>';
-    return items.slice(0, 6).map((metric) => `
-      <button class="pool-item swing-board-jump" data-board-code="${metric.board.code}" data-target-tab="swing" type="button">
+    return items.map((metric) => `
+      <button class="pool-item swing-board-jump" data-code="${metric.board.code}" data-board-code="${metric.board.code}" data-target-tab="swing" type="button">
         <span>
           <strong>${metric.board.name}</strong>
           <small>${metric.status} · 5日 ${fmtPercent(metric.return5)} · 10日超额 ${fmtPercent(metric.excess10)}</small>
@@ -511,9 +511,10 @@
   function ensurePanel() {
     const pane = document.querySelector('.detail-pane');
     if (!pane) return;
-    pane.querySelectorAll('.swing-panel, .swing-overview-panel').forEach((node) => node.remove());
 
     if (state?.detailTab === 'overview') {
+      if (pane.querySelector('.swing-overview-panel')) return;
+      pane.querySelectorAll('.swing-panel').forEach((node) => node.remove());
       const anchor = pane.querySelector('.detail-tabs-card');
       const html = renderOverviewPanel();
       if (anchor) {
@@ -524,7 +525,12 @@
       return;
     }
 
-    if (state?.detailTab !== SWING_TAB) return;
+    if (state?.detailTab !== SWING_TAB) {
+      pane.querySelectorAll('.swing-panel, .swing-overview-panel').forEach((node) => node.remove());
+      return;
+    }
+    if (pane.querySelector('.swing-panel')) return;
+    pane.querySelectorAll('.swing-overview-panel').forEach((node) => node.remove());
     const board = typeof activeBoard === 'function' ? activeBoard() : null;
     if (!board) return;
     pane.insertAdjacentHTML('beforeend', renderSwingPanel(board));
@@ -551,6 +557,22 @@
     });
   }
 
+  function jumpToSwingBoard(jump) {
+    if (!jump || typeof state === 'undefined') return;
+    state.selectedCode = jump.dataset.boardCode || jump.dataset.code || state.selectedCode;
+    state.detailTab = jump.dataset.targetTab || SWING_TAB;
+    if (typeof render === 'function') render();
+    scheduleEnhance();
+  }
+
+  document.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch' || event.button !== 0) return;
+    const jump = event.target.closest?.('.swing-board-jump');
+    if (!jump) return;
+    event.preventDefault();
+    jumpToSwingBoard(jump);
+  }, true);
+
   document.addEventListener('click', (event) => {
     const tab = event.target.closest?.(`[data-detail-tab="${SWING_TAB}"]`);
     if (tab && typeof state !== 'undefined') {
@@ -561,12 +583,7 @@
     }
 
     const jump = event.target.closest?.('.swing-board-jump');
-    if (jump && typeof state !== 'undefined') {
-      state.selectedCode = jump.dataset.boardCode || state.selectedCode;
-      state.detailTab = jump.dataset.targetTab || SWING_TAB;
-      if (typeof render === 'function') render();
-      scheduleEnhance();
-    }
+    if (jump) jumpToSwingBoard(jump);
   }, true);
 
   const startObserver = () => {
