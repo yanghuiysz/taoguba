@@ -128,6 +128,163 @@ function boardMarketResonance(board, date) {
   return { label: '背离', tone: 'divergence', detail: `${boardState.label} / ${marketState.label}` };
 }
 
+function indexResonanceTone(label) {
+  return {
+    强共振: 'strong',
+    弱共振: 'test',
+    逆势强: 'turn',
+    被动跟随: 'mixed',
+    负背离: 'divergence',
+    共振杀跌: 'weak',
+    无明显共振: 'watch',
+  }[label] || 'watch';
+}
+
+function indexResonanceConclusion(label) {
+  if (label === '强共振') return '指数放量支持，板块主动跑赢，接近主线确认节点。';
+  if (label === '弱共振') return '指数和板块同向修复，仍要看后续超额能否延续。';
+  if (label === '逆势强') return '板块先于指数走强，可作为主线候选观察。';
+  if (label === '被动跟随') return '板块跟随指数上涨，但主动性不足。';
+  if (label === '负背离') return '指数修复时板块没有跟随，资金认可度不足。';
+  if (label === '共振杀跌') return '指数和板块同步走弱，短线风险偏高。';
+  return '板块与指数之间没有形成清晰共振。';
+}
+
+function buildIndexResonanceItem(board, row) {
+  if (!board || !row?.date) return null;
+  const indexRow = marketIndexRowByDate(row.date);
+  const boardPct = Number(rowDisplayAverageChange(board, row));
+  const indexPct = Number(indexRow?.changePercent);
+  if (Number.isNaN(boardPct) || Number.isNaN(indexPct)) return null;
+
+  const boardState = boardVolumePriceState(board, row.date);
+  const marketState = marketVolumePriceState(row.date);
+  const redRate = rowRedRate(row);
+  const excessPct = boardPct - indexPct;
+  const indexVolumeExpanded = marketState?.amountDirection === 'expand';
+  const directionScore = indexPct >= 0 && boardPct >= 0 ? 25 : (indexPct < 0 && boardPct >= 0 ? 16 : 0);
+  const excessScore = excessPct >= 2 ? 30 : (excessPct >= 1 ? 22 : (excessPct >= 0 ? 12 : 0));
+  const indexEnvScore = indexPct >= 1 ? 15 : (indexPct >= 0.3 ? 11 : (indexPct >= 0 ? 7 : 0));
+  const volumeScore = indexVolumeExpanded && indexPct >= 0 && boardPct >= 0 ? 20 : (indexVolumeExpanded ? 8 : 0);
+  const diffusionScore = redRate === null ? 0 : (redRate >= 75 ? 10 : (redRate >= 60 ? 7 : (redRate >= 50 ? 4 : 0)));
+  const score = directionScore + excessScore + indexEnvScore + volumeScore + diffusionScore;
+  let label = '无明显共振';
+  if (indexPct >= 0 && boardPct >= 0 && excessPct >= 1 && indexVolumeExpanded && score >= 70) label = '强共振';
+  else if (indexPct >= 0 && boardPct >= 0 && excessPct >= 0) label = '弱共振';
+  else if (indexPct < 0 && boardPct > 0 && excessPct >= 1) label = '逆势强';
+  else if (indexPct >= 0 && boardPct >= 0 && excessPct < 0) label = '被动跟随';
+  else if (indexPct >= 0 && boardPct < 0) label = '负背离';
+  else if (indexPct < 0 && boardPct < 0) label = '共振杀跌';
+
+  return {
+    date: row.date,
+    boardPct,
+    indexPct,
+    excessPct,
+    redRate,
+    directionScore,
+    excessScore,
+    indexEnvScore,
+    volumeScore,
+    diffusionScore,
+    score,
+    resonanceScore: score,
+    indexVolumeExpanded,
+    boardState,
+    marketState,
+    label,
+    tone: indexResonanceTone(label),
+    conclusion: indexResonanceConclusion(label),
+  };
+}
+
+function indexResonanceSeries(board) {
+  return trendValues(board).map((row) => buildIndexResonanceItem(board, row)).filter(Boolean);
+}
+
+function recentIndexResonance(board, date, windowSize = 5) {
+  const series = indexResonanceSeries(board);
+  const currentIndex = series.findIndex((item) => item.date === date);
+  const endIndex = currentIndex >= 0 ? currentIndex + 1 : series.length;
+  const rows = series.slice(Math.max(0, endIndex - windowSize), endIndex);
+  if (!rows.length) {
+    return {
+      label: '暂无',
+      tone: 'watch',
+      detail: `近${windowSize}日缺少共振数据`,
+      rows,
+      confirmed: false,
+      avgExcess: null,
+      best: null,
+      lastConfirmed: null,
+    };
+  }
+  const confirmedRows = rows.filter((item) =>
+    item.indexVolumeExpanded
+    && item.indexPct >= 0
+    && item.boardPct >= 0
+    && item.excessPct >= 0.8
+    && item.score >= 65
+  );
+  const avgExcess = rows.reduce((sum, item) => sum + item.excessPct, 0) / rows.length;
+  const best = rows.reduce((winner, item) => (!winner || item.score > winner.score ? item : winner), null);
+  const lastConfirmed = confirmedRows.at(-1) || null;
+  const weakRows = rows.filter((item) => item.excessPct < 0 || item.boardPct < 0);
+  let label = '待确认';
+  let tone = 'watch';
+  if (lastConfirmed && avgExcess >= 0) {
+    label = '已确认';
+    tone = 'resonance';
+  } else if (weakRows.length >= 3 && avgExcess < 0) {
+    label = '确认不足';
+    tone = 'divergence';
+  } else if (best?.label === '逆势强' && avgExcess >= 0) {
+    label = '候选观察';
+    tone = 'mixed';
+  }
+  const detail = lastConfirmed
+    ? `近${windowSize}日 ${shortDate(lastConfirmed.date)} 出现放量共振，窗口超额 ${percentText(avgExcess)}`
+    : `近${windowSize}日暂无放量共振，窗口超额 ${percentText(avgExcess)}`;
+  return {
+    label,
+    tone,
+    detail,
+    rows,
+    confirmed: Boolean(lastConfirmed && avgExcess >= 0),
+    avgExcess,
+    best,
+    lastConfirmed,
+  };
+}
+
+function classifyMainline(board, date, dailyLabel, todayStats) {
+  const recent = recentIndexResonance(board, date, 5);
+  const metric = dailyLabel?.metric;
+  const strength = metric?.strength_score ?? 0;
+  const todayChange = Number(todayStats?.averageChange);
+  const avgExcess = recent.avgExcess ?? 0;
+  const rawLabel = dailyLabel?.label || '弱势';
+  const hasHeat = strength >= 65 || rawLabel === '强' || (!Number.isNaN(todayChange) && todayChange >= 2);
+  const keepsExcess = avgExcess >= 0.3 || recent.rows.slice(-3).some((item) => item.excessPct >= 1);
+  const softPullback = (rawLabel === '弱分歧' || rawLabel === '强分歧')
+    && recent.confirmed
+    && avgExcess >= 0
+    && (Number.isNaN(todayChange) || todayChange >= -2);
+  if ((rawLabel === '弱势' && avgExcess < 0) || recent.rows.slice(-3).filter((item) => item.excessPct < 0).length >= 3) {
+    return { label: '风险/退潮', tone: 'weak', detail: '短线走弱且窗口超额不足', recent };
+  }
+  if (softPullback) {
+    return { label: '良性回踩', tone: 'test', detail: '近5日有确认，当前分歧但超额未破坏', recent };
+  }
+  if (hasHeat && keepsExcess && recent.confirmed) {
+    return { label: '主线确认', tone: 'strong', detail: '板块强度和窗口放量共振同时满足', recent };
+  }
+  if (hasHeat && keepsExcess) {
+    return { label: '主线候选', tone: 'turn', detail: '板块强度够，等待指数放量共振确认', recent };
+  }
+  return { label: '观察', tone: 'watch', detail: '强度或超额暂未达到主线标准', recent };
+}
+
 async function detectEditingApi() {
   try {
     const response = await fetch('/api/custom-boards/status', { cache: 'no-store' });
@@ -595,6 +752,7 @@ function boardSetup(board, date) {
   const label = dailyLabel?.displayLabel || '弱势';
   const coreRank = rowCoreStocks(today, 5);
   const lastStrong = daysSinceLastStrong(board, date);
+  const mainline = classifyMainline(board, date, dailyLabel, todayStats);
   return {
     label,
     rawLabel: dailyLabel?.label || label,
@@ -617,6 +775,8 @@ function boardSetup(board, date) {
     riskFlags: dailyLabel?.riskFlags || [],
     dailyLabel,
     lastStrong,
+    mainline,
+    recentResonance: mainline.recent,
     coreRank,
   };
 }
@@ -805,13 +965,25 @@ function labelFor(board, date) {
 
 function renderTrendChart(board) {
   const trend = trendValues(board)
-    .map((item) => ({ ...item, displayAverageChange: rowDisplayAverageChange(board, item) }))
-    .filter((item) => item.displayAverageChange !== null && item.displayAverageChange !== undefined);
+    .map((item) => {
+      const indexRow = marketIndexRowByDate(item.date);
+      return {
+        ...item,
+        displayAverageChange: rowDisplayAverageChange(board, item),
+        indexChange: indexRow?.changePercent ?? null,
+      };
+    })
+    .filter((item) =>
+      item.displayAverageChange !== null
+      && item.displayAverageChange !== undefined
+      && item.indexChange !== null
+      && item.indexChange !== undefined
+    );
   if (!trend.length) {
     return `
       <div>
         <strong>暂无走势</strong>
-        <p>这个板块最近没有可用行情数据。</p>
+        <p>这个板块最近没有可用行情或指数数据。</p>
       </div>
     `;
   }
@@ -820,147 +992,68 @@ function renderTrendChart(board) {
   const height = 240;
   const pad = { top: 30, right: 48, bottom: 46, left: 52 };
   const avgValues = trend.map((item) => Number(item.displayAverageChange));
-  const avgMax = Math.max(...avgValues, 1);
-  const avgMin = Math.min(...avgValues, -1);
-  const avgRange = avgMax - avgMin || 1;
-  const limitValues = trend.map((item) => rowLimitUpCount(item));
-  const limitMax = Math.max(...limitValues, 1);
+  const indexValues = trend.map((item) => Number(item.indexChange));
+  const allValues = [...avgValues, ...indexValues];
+  const rawMax = Math.max(...allValues, 1);
+  const rawMin = Math.min(...allValues, -1);
+  const valuePadding = Math.max(0.35, (rawMax - rawMin) * 0.14);
+  const valueMax = rawMax + valuePadding;
+  const valueMin = rawMin - valuePadding;
+  const valueRange = valueMax - valueMin || 1;
   const plotWidth = width - pad.left - pad.right;
   const plotHeight = height - pad.top - pad.bottom;
   const points = trend.map((item, index) => {
     const change = Number(item.displayAverageChange) || 0;
-    const limitUpCount = limitValues[index] ?? 0;
+    const indexChange = Number(item.indexChange) || 0;
     const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
-    const yAvg = pad.top + ((avgMax - change) / avgRange) * plotHeight;
-    const yLimit = pad.top + ((limitMax - limitUpCount) / limitMax) * plotHeight;
+    const yAvg = pad.top + ((valueMax - change) / valueRange) * plotHeight;
+    const yIndex = pad.top + ((valueMax - indexChange) / valueRange) * plotHeight;
     const label = boardLabelFor(board, item.date) || labelFor(board, item.date);
-    const close = Math.abs(yAvg - yLimit) < 16;
+    const close = Math.abs(yAvg - yIndex) < 16;
     return {
       ...item,
       change,
-      limitUpCount,
+      indexChange,
       selected: item.date === state.sortDate,
       x,
       yAvg,
-      yLimit,
+      yIndex,
       yAvgLabel: close ? yAvg - 14 : yAvg - 10,
-      yLimitLabel: close ? yLimit + 16 : yLimit - 10,
+      yIndexLabel: close ? yIndex + 16 : yIndex - 10,
       tag: label?.displayLabel || label?.label || null,
     };
   });
   const avgLine = points.map((point) => `${point.x},${point.yAvg}`).join(' ');
-  const limitLine = points.map((point) => `${point.x},${point.yLimit}`).join(' ');
-  const zeroY = pad.top + ((avgMax - 0) / avgRange) * plotHeight;
+  const indexLine = points.map((point) => `${point.x},${point.yIndex}`).join(' ');
+  const zeroY = pad.top + ((valueMax - 0) / valueRange) * plotHeight;
   const axisBottom = height - pad.bottom;
 
   return `
-    <svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 近15日平均涨跌幅与涨停家数走势">
+    <svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 近15日平均涨跌幅与指数涨跌幅走势">
       ${points.filter((point) => point.selected).map((point) => `
         <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
       `).join('')}
       <line class="zero-line" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
       <line class="zero-line" x1="${pad.left}" y1="${zeroY}" x2="${width - pad.right}" y2="${zeroY}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${number(valueMax)}%</text>
+      <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0%</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${number(valueMin)}%</text>
       <polyline points="${avgLine}" style="fill:none;stroke:#0b7893;stroke-linecap:round;stroke-width:3;"></polyline>
-      <polyline points="${limitLine}" style="fill:none;stroke:#d9480f;stroke-linecap:round;stroke-width:3;"></polyline>
+      <polyline points="${indexLine}" style="fill:none;stroke:#c74343;stroke-linecap:round;stroke-width:3;"></polyline>
       ${points.map((point) => `
         <g>
           <circle cx="${point.x}" cy="${point.yAvg}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#0b7893;stroke-width:${point.selected ? 3 : 2.2};"></circle>
-          <circle cx="${point.x}" cy="${point.yLimit}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#d9480f;stroke-width:${point.selected ? 3 : 2.2};"></circle>
+          <circle cx="${point.x}" cy="${point.yIndex}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#c74343;stroke-width:${point.selected ? 3 : 2.2};"></circle>
           <text x="${point.x}" y="${point.yAvgLabel}" text-anchor="middle" class="value-label">${number(point.change)}%</text>
-          <text x="${point.x}" y="${point.yLimitLabel}" text-anchor="middle" class="value-label">${point.limitUpCount}</text>
+          <text x="${point.x}" y="${point.yIndexLabel}" text-anchor="middle" class="value-label">${number(point.indexChange)}%</text>
           ${point.tag ? `<text x="${point.x}" y="${height - 30}" text-anchor="middle" class="tag-label">${point.tag}</text>` : ''}
           <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
-          <title>${point.date} 平均涨跌幅 ${number(point.change)}% | 涨停家数 ${point.limitUpCount} 家 | 有效股票 ${point.stockCount}</title>
+          <title>${point.date} 板块平均涨跌幅 ${number(point.change)}% | 指数涨跌幅 ${number(point.indexChange)}% | 有效股票 ${point.stockCount}</title>
         </g>
       `).join('')}
     </svg>
   `;
 }
-
-function renderMarketIndexChart() {
-  const trend = marketIndexTrend().filter((item) => item.changePercent !== null && item.changePercent !== undefined);
-  if (!trend.length) {
-    return `
-      <div>
-        <strong>暂无指数走势</strong>
-        <p>当前没有可用的指数历史数据。</p>
-      </div>
-    `;
-  }
-
-  const width = 760;
-  const height = 280;
-  const pad = { top: 30, right: 52, bottom: 48, left: 58 };
-  const plotWidth = width - pad.left - pad.right;
-  const axisBottom = height - pad.bottom;
-  const plotHeight = axisBottom - pad.top;
-  const changes = trend.map((item) => Number(item.changePercent) || 0);
-  const volumes = trend.map((item) => Number(item.volume) || 0);
-  const rawMax = Math.max(...changes, 0.8);
-  const rawMin = Math.min(...changes, -0.8);
-  const changePadding = Math.max(0.35, (rawMax - rawMin) * 0.16);
-  const changeMax = rawMax + changePadding;
-  const changeMin = rawMin - changePadding;
-  const changeRange = changeMax - changeMin || 1;
-  const volumeMax = Math.max(...volumes, 1);
-  const zeroY = pad.top + ((changeMax - 0) / changeRange) * plotHeight;
-  const step = trend.length === 1 ? plotWidth : plotWidth / (trend.length - 1);
-  const barWidth = Math.max(12, Math.min(28, step * 0.5));
-  const points = trend.map((item, index) => {
-    const change = Number(item.changePercent) || 0;
-    const volume = Number(item.volume) || 0;
-    const x = pad.left + (trend.length === 1 ? plotWidth / 2 : index * step);
-    const y = pad.top + ((changeMax - change) / changeRange) * plotHeight;
-    const barHeight = volume ? Math.max(4, (volume / volumeMax) * plotHeight * 0.42) : 0;
-    const barY = axisBottom - barHeight;
-    const tone = change >= 0 ? 'rise' : 'fall';
-    return {
-      ...item,
-      change,
-      volume,
-      x,
-      y,
-      barHeight,
-      barY,
-      tone,
-      selected: item.date === state.sortDate,
-      latest: index === trend.length - 1,
-    };
-  });
-  const line = points.map((point) => `${point.x},${point.y}`).join(' ');
-
-  return `
-    <svg class="index-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="上证指数近15日涨跌幅与量能走势">
-      ${points.filter((point) => point.selected).map((point) => `
-        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
-      `).join('')}
-      <line class="chart-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
-      <line class="chart-axis" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
-      <line class="zero-line" x1="${pad.left}" y1="${zeroY}" x2="${width - pad.right}" y2="${zeroY}"></line>
-      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${number(changeMax)}%</text>
-      <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0%</text>
-      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${number(changeMin)}%</text>
-      <text x="${width - pad.right}" y="${pad.top - 10}" text-anchor="end" class="axis-label">红线：上证指数  柱：量能</text>
-      <polyline class="index-change-line" points="${line}" style="fill:none;stroke:#c74343;stroke-linecap:round;stroke-linejoin:round;stroke-width:3.2;"></polyline>
-      ${points.map((point) => {
-        const showLabels = point.selected || point.latest;
-        const changeLabelY = point.y - 10;
-        const volumeLabelY = Math.max(pad.top + 12, point.barY - 6);
-        return `
-          <g>
-            ${point.barHeight ? `<rect class="index-volume-bar ${point.tone}" x="${point.x - barWidth / 2}" y="${point.barY}" width="${barWidth}" height="${point.barHeight}" rx="4"></rect>` : ''}
-            <circle class="index-change-dot ${point.tone}" cx="${point.x}" cy="${point.y}" r="${point.selected || point.latest ? 6 : 4.2}"></circle>
-            ${showLabels ? `<text x="${point.x}" y="${changeLabelY}" text-anchor="middle" class="index-change-label ${point.tone}">${number(point.change)}%</text>` : ''}
-            ${point.latest ? `<text x="${point.x}" y="${volumeLabelY}" text-anchor="middle" class="index-volume-label ${point.tone}">${volumeText(point.volume)}</text>` : ''}
-            <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
-            <title>${point.date} | 指数 ${number(point.change)}% | 成交量 ${volumeText(point.volume)} | ${point.label || '暂无量价标签'}</title>
-          </g>
-        `;
-      }).join('')}
-    </svg>
-  `;
-}
-
 
 function pureCoreChartScaffold(board) {
   const series = pureCoreSeries(board);
@@ -1192,16 +1285,34 @@ function renderSetupSummary(board) {
   const marketRow = marketIndexRowByDate(state.sortDate);
   const marketFlow = marketVolumePriceState(state.sortDate);
   const resonance = boardMarketResonance(board, state.sortDate);
+  const todayResonance = buildIndexResonanceItem(board, setup.today);
+  const recentResonance = setup.recentResonance;
+  const mainline = setup.mainline;
   return `
     <section class="card section-card setup-card">
       <div class="section-head">
         <div>
           <h2>${board.name} · 模式观察</h2>
-          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.rawLabel}，强度分 ${setup.strengthScore === null ? '暂无' : number(setup.strengthScore, 0)}，分歧分 ${setup.divergenceScore === null ? '暂无' : number(setup.divergenceScore, 0)}。</p>
+          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.rawLabel}，主线状态 ${mainline.label}，强度分 ${setup.strengthScore === null ? '暂无' : number(setup.strengthScore, 0)}，分歧分 ${setup.divergenceScore === null ? '暂无' : number(setup.divergenceScore, 0)}。</p>
         </div>
-        ${renderSetupBadge(setup)}
+        <span class="setup-badge ${mainline.tone}">${mainline.label}</span>
       </div>
       <div class="setup-grid">
+        <div class="setup-metric">
+          <span>主线状态</span>
+          <strong class="state-chip ${mainline.tone}">${mainline.label}</strong>
+          <small>${mainline.detail}</small>
+        </div>
+        <div class="setup-metric">
+          <span>近5日确认</span>
+          <strong class="state-chip ${recentResonance?.tone || 'watch'}">${recentResonance?.label || '暂无'}</strong>
+          <small>${recentResonance?.detail || '缺少窗口共振数据'}</small>
+        </div>
+        <div class="setup-metric">
+          <span>今日共振分</span>
+          <strong class="state-chip ${todayResonance?.tone || 'watch'}">${todayResonance ? `${number(todayResonance.score, 0)} · ${todayResonance.label}` : '暂无'}</strong>
+          <small>${todayResonance ? `超额 ${percentText(todayResonance.excessPct)} · ${todayResonance.indexVolumeExpanded ? '指数放量' : '指数未放量'}` : '缺少指数数据'}</small>
+        </div>
         <div class="setup-metric">
           <span>今日强度</span>
           <strong class="${signedClass(stats?.averageChange)}">${percentText(stats?.averageChange)}</strong>
@@ -1386,7 +1497,6 @@ function renderDetail(board) {
         </div>
       </section>
       ${isOverviewTab ? `
-      ${renderSetupPools()}
       ${renderSetupSummary(board)}
       ` : ''}
       ${isTrendTab ? `
@@ -1397,15 +1507,15 @@ function renderDetail(board) {
             <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}。板块 ${boardFlow?.label || '暂无'}，指数 ${marketFlow?.label || '暂无'}，${resonance?.label || '暂无判断'}。</p>
           </div>
           <div class="badges">
-            <span class="badge">蓝线：平均涨跌幅</span>
-            <span class="badge">橙线：涨停家数</span>
+            <span class="badge">蓝线：板块涨幅</span>
+            <span class="badge">红线：指数涨幅</span>
           </div>
         </div>
         <div class="chart-grid">
           <div class="chart-panel">
             <div class="chart-panel-head">
-              <strong>正宗股强度</strong>
-              <span>正宗股平均涨跌幅 / 涨停家数</span>
+              <strong>板块与指数</strong>
+              <span>正宗股平均涨跌幅 / ${state.data?.marketIndex?.name || '指数'}涨跌幅</span>
             </div>
             <div class="chart-box">${renderTrendChart(board)}</div>
           </div>
@@ -1415,13 +1525,6 @@ function renderDetail(board) {
               <span>合计成交额</span>
             </div>
             <div class="chart-box core-chart-box">${renderPureCoreAmountChart(board)}</div>
-          </div>
-          <div class="chart-panel">
-            <div class="chart-panel-head">
-              <strong>${state.data?.marketIndex?.name || '指数'}折线</strong>
-              <span>上证指数 / 量能柱</span>
-            </div>
-            <div class="chart-box core-chart-box">${renderMarketIndexChart()}</div>
           </div>
         </div>
       </section>

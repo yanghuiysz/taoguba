@@ -128,6 +128,10 @@
   }
 
   function buildResonanceItem(board, row) {
+    if (typeof buildIndexResonanceItem === 'function') {
+      const item = buildIndexResonanceItem(board, row);
+      return item ? { ...item, boardLabel: getBoardLabel(board, row.date) } : null;
+    }
     if (!board || !row?.date) return null;
     const indexRow = getIndexRow(row.date);
     const boardPct = getBoardChange(board, row);
@@ -152,8 +156,10 @@
       directionScore,
       excessScore,
       indexEnvScore,
+      volumeScore: 0,
       diffusionScore,
       score,
+      resonanceScore: score,
       label,
       tone: toneFor(label),
       boardLabel: getBoardLabel(board, row.date),
@@ -162,6 +168,12 @@
   }
 
   function resonanceSeries(board) {
+    if (typeof indexResonanceSeries === 'function') {
+      return indexResonanceSeries(board).map((item) => ({
+        ...item,
+        boardLabel: getBoardLabel(board, item.date),
+      }));
+    }
     return getTrendRows(board)
       .map((row) => buildResonanceItem(board, row))
       .filter(Boolean);
@@ -182,10 +194,11 @@
 
   function renderScoreParts(item) {
     const parts = [
-      ['方向', item.directionScore, 30],
+      ['方向', item.directionScore, 25],
       ['超额', item.excessScore, 30],
-      ['指数', item.indexEnvScore, 20],
-      ['扩散', item.diffusionScore, 20],
+      ['指数', item.indexEnvScore, 15],
+      ['量能', item.volumeScore ?? 0, 20],
+      ['扩散', item.diffusionScore, 10],
     ];
     return `
       <div class="resonance-score-parts">
@@ -242,6 +255,9 @@
     const series = resonanceSeries(board);
     const current = currentItem(series);
     const indexName = state?.data?.marketIndex?.name || '指数';
+    const setup = typeof boardSetup === 'function' ? boardSetup(board, state?.sortDate) : null;
+    const mainline = setup?.mainline || null;
+    const recent = setup?.recentResonance || (typeof recentIndexResonance === 'function' ? recentIndexResonance(board, state?.sortDate, 5) : null);
 
     if (!current) {
       return `
@@ -263,13 +279,28 @@
           <div>
             <h2>${board.name} · 指数共振</h2>
             <p class="muted">
-              对比指数：${indexName}。核心看超额强度 = 板块涨幅 - 指数涨幅，判断板块是主动强、被动跟随，还是与指数背离。
+              对比指数：${indexName}。核心看今日共振分、近5日放量确认和窗口超额，避免要求每天都必须共振。
             </p>
           </div>
-          <span class="resonance-badge ${current.tone}">${current.label} · ${fmt(current.score, 0)}分</span>
+          <span class="resonance-badge ${mainline?.tone || current.tone}">${mainline?.label || current.label}</span>
         </div>
 
         <div class="resonance-metrics">
+          <div class="setup-metric">
+            <span>主线状态</span>
+            <strong class="state-chip ${mainline?.tone || 'watch'}">${mainline?.label || '暂无'}</strong>
+            <small>${mainline?.detail || '缺少主线状态判断'}</small>
+          </div>
+          <div class="setup-metric">
+            <span>近5日确认</span>
+            <strong class="state-chip ${recent?.tone || 'watch'}">${recent?.label || '暂无'}</strong>
+            <small>${recent?.detail || '缺少窗口共振数据'}</small>
+          </div>
+          <div class="setup-metric">
+            <span>今日共振分</span>
+            <strong class="state-chip ${current.tone}">${fmt(current.score, 0)} · ${current.label}</strong>
+            <small>${current.indexVolumeExpanded ? '指数放量' : '指数未放量'} · 超额 ${fmtPercent(current.excessPct)}</small>
+          </div>
           <div class="setup-metric">
             <span>板块涨幅</span>
             <strong class="${changeClass(current.boardPct)}">${fmtPercent(current.boardPct)}</strong>

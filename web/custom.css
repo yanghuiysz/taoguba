@@ -457,24 +457,29 @@ p { line-height: 1.55; }
 }
 
 .state-chip.rise.expand,
-.state-chip.resonance {
+.state-chip.resonance,
+.state-chip.strong {
   background: #fdeeee;
   color: var(--red);
 }
 
-.state-chip.rise.contract {
+.state-chip.rise.contract,
+.state-chip.test {
   background: #fff2e8;
   color: #b65b17;
 }
 
 .state-chip.fall.expand,
-.state-chip.divergence {
+.state-chip.divergence,
+.state-chip.weak {
   background: #eef8f4;
   color: var(--green);
 }
 
 .state-chip.fall.contract,
-.state-chip.mixed {
+.state-chip.mixed,
+.state-chip.turn,
+.state-chip.watch {
   background: #eef3f2;
   color: #48616a;
 }
