@@ -1,6 +1,16 @@
 {
-  "latest": "2026-04-24",
+  "latest": "2026-04-27",
   "items": [
+    {
+      "date": "2026-04-27",
+      "path": "./data/kpl/history/20260427.json",
+      "summary": {
+        "plateCount": 268,
+        "linkedPlateCount": 28,
+        "limitUpStockCount": 22,
+        "strongStockCount": 46
+      }
+    },
     {
       "date": "2026-04-24",
       "path": "./data/kpl/history/20260424.json",
@@ -8,7 +18,9 @@
         "plateCount": 268,
         "linkedPlateCount": 25,
         "limitUpStockCount": 30,
-        "strongStockCount": 44
+        "strongStockCount": 44,
+        "externalLimitUpStockCount": 53,
+        "externalLimitUpMappingCount": 312
       }
     },
     {
