@@ -1106,6 +1106,8 @@ def build_board(
                     "volume": volume,
                     "turnover": turnover,
                     "amount": turnover,
+                    "source": row.get("source") if row else None,
+                    "timestamp": row.get("timestamp") if row else None,
                     "high100": row.get("high100") if row else None,
                     "low100": row.get("low100") if row else None,
                     "isHigh100": row.get("isHigh100") if row else None,

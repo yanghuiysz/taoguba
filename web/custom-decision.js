@@ -184,9 +184,9 @@
 
     let status = '趋势走弱';
     if (heatScore >= 76 && (excess5 ?? 0) >= 1.5 && (return5 ?? 0) >= 3 && (redRate5 ?? 0) >= 60) status = '主升';
-    else if (heatScore >= 62 && (latestChange ?? 0) < 0 && (excess10 ?? 0) > 1 && (redRate5 ?? 0) >= 45 && drawdown10 <= 9) status = '良性回踩';
+    else if (heatScore >= 55 && (latestChange ?? 0) < 0 && (excess10 ?? 0) > 1 && (redRate5 ?? 0) >= 45 && drawdown10 <= 9) status = '良性回踩';
     else if (heatScore >= 60 && (latestChange ?? 0) > 0 && drawdown10 >= 3 && (excess10 ?? 0) > 1) status = '二波观察';
-    else if (heatScore >= 55 && (return5 ?? 0) > 0 && (excess5 ?? 0) >= 0) status = '启动';
+    else if (heatScore >= 55 && (latestChange ?? 0) >= 0 && (return5 ?? 0) > 0 && (excess5 ?? 0) >= 0) status = '启动';
     else if (heatScore >= 45 && drawdown10 >= 8) status = '高位震荡';
     else if (heatScore < 35 || ((excess5 ?? 0) < -1 && (latestChange ?? 0) < 0)) status = '热度退潮';
 

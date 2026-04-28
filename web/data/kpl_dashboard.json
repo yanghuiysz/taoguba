@@ -28,11 +28,11 @@
   ],
   "summary": {
     "plateCount": 269,
-    "linkedPlateCount": 22,
+    "linkedPlateCount": 21,
     "limitUpStockCount": 20,
     "strongStockCount": 40,
     "externalLimitUpStockCount": 58,
-    "externalLimitUpMappingCount": 308
+    "externalLimitUpMappingCount": 300
   },
   "plates": [
     {
@@ -40,12 +40,12 @@
       "sourceRank": 1,
       "plateCode": "801571",
       "plateName": "一季报增长",
-      "strength": 16452.0,
-      "speed": -0.412,
-      "changePercent": 0.483,
-      "amount": 1083116727292.0,
-      "mainNetAmount": 4423420445.0,
-      "largeOrderNetAmount": 4720129369.0,
+      "strength": 17455.0,
+      "speed": -0.397,
+      "changePercent": 0.481,
+      "amount": 1086320799103.0,
+      "mainNetAmount": 4875180178.0,
+      "largeOrderNetAmount": 5023385511.0,
       "limitUpStocks": [
         {
           "rank": 1,
@@ -257,8 +257,8 @@
         },
         {
           "date": "2026-04-28",
-          "change": 0.483,
-          "strength": 16452.0,
+          "change": 0.481,
+          "strength": 17455.0,
           "limitUps": 4
         }
       ]
@@ -268,12 +268,12 @@
       "sourceRank": 2,
       "plateCode": "801001",
       "plateName": "芯片",
-      "strength": 7941.0,
-      "speed": -1.424,
-      "changePercent": 0.792,
-      "amount": 999561590593.0,
-      "mainNetAmount": -16358858741.0,
-      "largeOrderNetAmount": -7116674831.0,
+      "strength": 8442.0,
+      "speed": -1.412,
+      "changePercent": 0.789,
+      "amount": 999912961129.0,
+      "mainNetAmount": -16232999989.0,
+      "largeOrderNetAmount": -7016497861.0,
       "limitUpStocks": [
         {
           "rank": 3,
@@ -298,6 +298,19 @@
           "changePercent": 17.73,
           "amount": 1621501076.0,
           "turnoverRate": 46.91,
+          "industry": "芯片",
+          "matchType": "industry_or_reason_tag"
+        },
+        {
+          "rank": 20,
+          "code": "600248",
+          "name": "陕建股份",
+          "boardLabel": "首板",
+          "reasonTags": "基础建设、电子气体",
+          "latestPrice": 3.7,
+          "changePercent": 10.12,
+          "amount": 351370536.0,
+          "turnoverRate": 8.2,
           "industry": "芯片",
           "matchType": "industry_or_reason_tag"
         },
@@ -353,6 +366,19 @@
           "amount": 1402774093.0,
           "turnoverRate": 24.47,
           "industry": "一季报增长",
+          "matchType": "industry_or_concept"
+        },
+        {
+          "rank": 20,
+          "code": "600248",
+          "name": "陕建股份",
+          "boardLabel": "首板",
+          "reasonTags": "基础建设、电子气体",
+          "latestPrice": 3.7,
+          "changePercent": 10.12,
+          "amount": 351370536.0,
+          "turnoverRate": 8.2,
+          "industry": "芯片",
           "matchType": "industry_or_concept"
         },
         {
@@ -549,9 +575,9 @@
             "changePercent": 10.00971794128418,
             "latestPrice": 45.28,
             "amount": 660484400.0,
-            "freeMarketCap": 4333083727.36,
+            "freeMarketCap": 4382669312.0,
             "totalMarketCap": 5869148320.0,
-            "turnoverRate": 15.686102867126465,
+            "turnoverRate": 15.50862979888916,
             "sealAmount": 96830963.0,
             "firstSealTime": "100006",
             "lastSealTime": "100006",
@@ -635,9 +661,9 @@
         },
         {
           "date": "2026-04-28",
-          "change": 0.792,
-          "strength": 7941.0,
-          "limitUps": 3
+          "change": 0.789,
+          "strength": 8442.0,
+          "limitUps": 4
         }
       ]
     },
@@ -828,7 +854,7 @@
               },
               {
                 "concept": "算力租赁",
-                "rank": 6,
+                "rank": 7,
                 "changePercent": 10.0
               },
               {
@@ -857,12 +883,22 @@
             "industry": "环保设备",
             "matchedConcepts": [
               {
+                "name": "算力租赁",
+                "code": "309068",
+                "matchType": "alias"
+              },
+              {
                 "name": "云计算",
                 "code": "300419",
                 "matchType": "alias"
               }
             ],
             "thsRanks": [
+              {
+                "concept": "算力租赁",
+                "rank": 5,
+                "changePercent": 10.01
+              },
               {
                 "concept": "云计算",
                 "rank": 2,
@@ -907,7 +943,7 @@
               },
               {
                 "concept": "算力租赁",
-                "rank": 5,
+                "rank": 6,
                 "changePercent": 10.01
               }
             ],
@@ -981,7 +1017,7 @@
               },
               {
                 "concept": "算力租赁",
-                "rank": 7,
+                "rank": 8,
                 "changePercent": 9.97
               }
             ],
@@ -2801,11 +2837,11 @@
       "plateCode": "801120",
       "plateName": "电力",
       "strength": 726.0,
-      "speed": -0.424,
+      "speed": -0.395,
       "changePercent": 0.204,
-      "amount": 186310162398.0,
-      "mainNetAmount": -583480383.0,
-      "largeOrderNetAmount": 382566671.0,
+      "amount": 188194100079.0,
+      "mainNetAmount": -791469046.0,
+      "largeOrderNetAmount": 207518937.0,
       "limitUpStocks": [
         {
           "rank": 25,
@@ -2857,6 +2893,38 @@
           }
         ],
         "limitUpStocks": [
+          {
+            "code": "603318",
+            "name": "水发燃气",
+            "changePercent": 9.976058006286621,
+            "latestPrice": 13.78,
+            "amount": 1883937680.0,
+            "freeMarketCap": 6325997332.719999,
+            "totalMarketCap": 7643396916.48,
+            "turnoverRate": 30.67868423461914,
+            "sealAmount": 81561477.0,
+            "firstSealTime": "093103",
+            "lastSealTime": "130500",
+            "openCount": 3,
+            "limitStats": "7/6",
+            "consecutiveBoards": 5,
+            "industry": "燃气Ⅱ",
+            "matchedConcepts": [
+              {
+                "name": "绿色电力",
+                "code": "308760",
+                "matchType": "alias"
+              }
+            ],
+            "thsRanks": [
+              {
+                "concept": "绿色电力",
+                "rank": 6,
+                "changePercent": 9.98
+              }
+            ],
+            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
+          },
           {
             "code": "600726",
             "name": "华电能源",
@@ -2925,7 +2993,7 @@
             "thsRanks": [
               {
                 "concept": "绿色电力",
-                "rank": 6,
+                "rank": 7,
                 "changePercent": 9.85
               }
             ],
@@ -3339,36 +3407,8 @@
       "amount": 54860628719.0,
       "mainNetAmount": -668252961.0,
       "largeOrderNetAmount": -515042005.0,
-      "limitUpStocks": [
-        {
-          "rank": 20,
-          "code": "600248",
-          "name": "陕建股份",
-          "boardLabel": "首板",
-          "reasonTags": "基础建设、天然气",
-          "latestPrice": 3.7,
-          "changePercent": 10.12,
-          "amount": 351370536.0,
-          "turnoverRate": 8.2,
-          "industry": "基础建设",
-          "matchType": "industry_or_reason_tag"
-        }
-      ],
-      "strongStocks": [
-        {
-          "rank": 20,
-          "code": "600248",
-          "name": "陕建股份",
-          "boardLabel": "首板",
-          "reasonTags": "基础建设、天然气",
-          "latestPrice": 3.7,
-          "changePercent": 10.12,
-          "amount": 351370536.0,
-          "turnoverRate": 8.2,
-          "industry": "基础建设",
-          "matchType": "industry_or_concept"
-        }
-      ],
+      "limitUpStocks": [],
+      "strongStocks": [],
       "externalLimitMapping": {
         "source": "Tonghuashun concepts + Eastmoney limit-up pool",
         "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
@@ -3564,7 +3604,7 @@
           "date": "2026-04-28",
           "change": 0.231,
           "strength": 543.0,
-          "limitUps": 1
+          "limitUps": 0
         }
       ]
     },
@@ -8699,9 +8739,9 @@
             "changePercent": 9.932279586791992,
             "latestPrice": 4.87,
             "amount": 2224345808.0,
-            "freeMarketCap": 12879225809.43,
+            "freeMarketCap": 12877465182.68,
             "totalMarketCap": 12931426399.52,
-            "turnoverRate": 17.831144332885742,
+            "turnoverRate": 17.833581924438477,
             "sealAmount": 17609920.0,
             "firstSealTime": "095703",
             "lastSealTime": "144836",
@@ -10572,13 +10612,7 @@
       "externalLimitMapping": {
         "source": "Tonghuashun concepts + Eastmoney limit-up pool",
         "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
-        "matchedConcepts": [
-          {
-            "name": "华为数字能源",
-            "code": "309169",
-            "matchType": "name_contains"
-          }
-        ],
+        "matchedConcepts": [],
         "limitUpStocks": [],
         "errors": []
       },
@@ -11277,9 +11311,9 @@
             "changePercent": 10.00971794128418,
             "latestPrice": 45.28,
             "amount": 660484400.0,
-            "freeMarketCap": 4333083727.36,
+            "freeMarketCap": 4382669312.0,
             "totalMarketCap": 5869148320.0,
-            "turnoverRate": 15.686102867126465,
+            "turnoverRate": 15.50862979888916,
             "sealAmount": 96830963.0,
             "firstSealTime": "100006",
             "lastSealTime": "100006",
@@ -13175,9 +13209,9 @@
             "changePercent": 9.932279586791992,
             "latestPrice": 4.87,
             "amount": 2224345808.0,
-            "freeMarketCap": 12879225809.43,
+            "freeMarketCap": 12877465182.68,
             "totalMarketCap": 12931426399.52,
-            "turnoverRate": 17.831144332885742,
+            "turnoverRate": 17.833581924438477,
             "sealAmount": 17609920.0,
             "firstSealTime": "095703",
             "lastSealTime": "144836",
@@ -17859,271 +17893,8 @@
       "externalLimitMapping": {
         "source": "Tonghuashun concepts + Eastmoney limit-up pool",
         "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
-        "matchedConcepts": [
-          {
-            "name": "西部大开发",
-            "code": "309154",
-            "matchType": "exact"
-          }
-        ],
-        "limitUpStocks": [
-          {
-            "code": "000593",
-            "name": "德龙汇能",
-            "changePercent": 9.987030029296875,
-            "latestPrice": 25.44,
-            "amount": 1324219280.0,
-            "freeMarketCap": 9119811819.36,
-            "totalMarketCap": 9123572843.52,
-            "turnoverRate": 14.890450477600098,
-            "sealAmount": 84396920.0,
-            "firstSealTime": "112051",
-            "lastSealTime": "112051",
-            "openCount": 0,
-            "limitStats": "4/3",
-            "consecutiveBoards": 2,
-            "industry": "燃气Ⅱ",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 7,
-                "changePercent": 9.99
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "002175",
-            "name": "东方智造",
-            "changePercent": 9.885931968688965,
-            "latestPrice": 2.89,
-            "amount": 346688928.0,
-            "freeMarketCap": 3689896301.03,
-            "totalMarketCap": 3689896280.8,
-            "turnoverRate": 9.490400314331055,
-            "sealAmount": 24549683.0,
-            "firstSealTime": "093124",
-            "lastSealTime": "095445",
-            "openCount": 6,
-            "limitStats": "2/2",
-            "consecutiveBoards": 2,
-            "industry": "通用设备",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 8,
-                "changePercent": 9.89
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "605168",
-            "name": "三人行",
-            "changePercent": 10.004989624023438,
-            "latestPrice": 44.09,
-            "amount": 605589440.0,
-            "freeMarketCap": 9294920912.74,
-            "totalMarketCap": 9294920912.74,
-            "turnoverRate": 6.763989448547363,
-            "sealAmount": 119238186.0,
-            "firstSealTime": "105835",
-            "lastSealTime": "105835",
-            "openCount": 0,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "广告营销",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 5,
-                "changePercent": 10.01
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "600248",
-            "name": "陕建股份",
-            "changePercent": 10.119048118591309,
-            "latestPrice": 3.7,
-            "amount": 351370544.0,
-            "freeMarketCap": 13711235358.2,
-            "totalMarketCap": 13837020536.0,
-            "turnoverRate": 2.6209218502044678,
-            "sealAmount": 40984885.0,
-            "firstSealTime": "134904",
-            "lastSealTime": "134904",
-            "openCount": 0,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "房屋建设",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 2,
-                "changePercent": 10.12
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "600379",
-            "name": "宝光股份",
-            "changePercent": 10.0,
-            "latestPrice": 13.86,
-            "amount": 322324032.0,
-            "freeMarketCap": 4576593677.04,
-            "totalMarketCap": 4576593732.48,
-            "turnoverRate": 7.352842330932617,
-            "sealAmount": 40833777.0,
-            "firstSealTime": "130813",
-            "lastSealTime": "131343",
-            "openCount": 1,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "电网设备",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 6,
-                "changePercent": 10.0
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "600227",
-            "name": "赤天化",
-            "changePercent": 10.05434799194336,
-            "latestPrice": 4.05,
-            "amount": 1024346752.0,
-            "freeMarketCap": 5174279202.15,
-            "totalMarketCap": 6839347104.0,
-            "turnoverRate": 20.105396270751953,
-            "sealAmount": 33178005.0,
-            "firstSealTime": "093740",
-            "lastSealTime": "094458",
-            "openCount": 2,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "农化制品",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 3,
-                "changePercent": 10.05
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "300540",
-            "name": "蜀道装备",
-            "changePercent": 20.0,
-            "latestPrice": 36.12,
-            "amount": 1283952448.0,
-            "freeMarketCap": 7466986608.48,
-            "totalMarketCap": 8291675053.2,
-            "turnoverRate": 18.210948944091797,
-            "sealAmount": 25126733.0,
-            "firstSealTime": "131312",
-            "lastSealTime": "132048",
-            "openCount": 1,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "专用设备",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 1,
-                "changePercent": 20.0
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "603317",
-            "name": "天味食品",
-            "changePercent": 10.014005661010742,
-            "latestPrice": 15.71,
-            "amount": 400011648.0,
-            "freeMarketCap": 16726669413.740002,
-            "totalMarketCap": 16726669508.0,
-            "turnoverRate": 2.391493320465088,
-            "sealAmount": 24439654.0,
-            "firstSealTime": "092501",
-            "lastSealTime": "102046",
-            "openCount": 4,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "调味发酵",
-            "matchedConcepts": [
-              {
-                "name": "西部大开发",
-                "code": "309154",
-                "matchType": "exact"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "西部大开发",
-                "rank": 4,
-                "changePercent": 10.01
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          }
-        ],
+        "matchedConcepts": [],
+        "limitUpStocks": [],
         "errors": []
       },
       "trend": [
@@ -19206,7 +18977,13 @@
       "externalLimitMapping": {
         "source": "Tonghuashun concepts + Eastmoney limit-up pool",
         "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
-        "matchedConcepts": [],
+        "matchedConcepts": [
+          {
+            "name": "财税数字化",
+            "code": "309134",
+            "matchType": "exact"
+          }
+        ],
         "limitUpStocks": [],
         "errors": []
       },
@@ -24483,6 +24260,35 @@
     {
       "rank": 214,
       "sourceRank": 214,
+      "plateCode": "801573",
+      "plateName": "三季报增长",
+      "strength": -490.0,
+      "speed": -4.903,
+      "changePercent": 0.0,
+      "amount": 605186098.0,
+      "mainNetAmount": 0.0,
+      "largeOrderNetAmount": 0.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "externalLimitMapping": {
+        "source": "Tonghuashun concepts + Eastmoney limit-up pool",
+        "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
+        "matchedConcepts": [],
+        "limitUpStocks": [],
+        "errors": []
+      },
+      "trend": [
+        {
+          "date": "2026-04-28",
+          "change": 0.0,
+          "strength": -490.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 215,
+      "sourceRank": 215,
       "plateCode": "801379",
       "plateName": "碳纤维",
       "strength": -517.0,
@@ -24635,8 +24441,8 @@
       ]
     },
     {
-      "rank": 215,
-      "sourceRank": 215,
+      "rank": 216,
+      "sourceRank": 216,
       "plateCode": "801386",
       "plateName": "轨道交通",
       "strength": -518.0,
@@ -24712,8 +24518,8 @@
       ]
     },
     {
-      "rank": 216,
-      "sourceRank": 216,
+      "rank": 217,
+      "sourceRank": 217,
       "plateCode": "801177",
       "plateName": "无人机",
       "strength": -518.0,
@@ -24956,8 +24762,8 @@
       ]
     },
     {
-      "rank": 217,
-      "sourceRank": 217,
+      "rank": 218,
+      "sourceRank": 218,
       "plateCode": "801184",
       "plateName": "包装印刷",
       "strength": -537.0,
@@ -25033,8 +24839,8 @@
       ]
     },
     {
-      "rank": 218,
-      "sourceRank": 218,
+      "rank": 219,
+      "sourceRank": 219,
       "plateCode": "801649",
       "plateName": "两轮车",
       "strength": -543.0,
@@ -25149,8 +24955,8 @@
       ]
     },
     {
-      "rank": 219,
-      "sourceRank": 219,
+      "rank": 220,
+      "sourceRank": 220,
       "plateCode": "801196",
       "plateName": "LED",
       "strength": -548.0,
@@ -25302,8 +25108,8 @@
       ]
     },
     {
-      "rank": 220,
-      "sourceRank": 220,
+      "rank": 221,
+      "sourceRank": 221,
       "plateCode": "801399",
       "plateName": "智慧城市",
       "strength": -556.0,
@@ -25514,8 +25320,8 @@
       ]
     },
     {
-      "rank": 221,
-      "sourceRank": 221,
+      "rank": 222,
+      "sourceRank": 222,
       "plateCode": "801059",
       "plateName": "字节概念",
       "strength": -557.0,
@@ -25694,8 +25500,8 @@
       ]
     },
     {
-      "rank": 222,
-      "sourceRank": 222,
+      "rank": 223,
+      "sourceRank": 223,
       "plateCode": "801313",
       "plateName": "金融概念",
       "strength": -564.0,
@@ -25842,8 +25648,8 @@
       ]
     },
     {
-      "rank": 223,
-      "sourceRank": 223,
+      "rank": 224,
+      "sourceRank": 224,
       "plateCode": "801430",
       "plateName": "智能交通",
       "strength": -569.0,
@@ -25919,8 +25725,8 @@
       ]
     },
     {
-      "rank": 224,
-      "sourceRank": 224,
+      "rank": 225,
+      "sourceRank": 225,
       "plateCode": "801439",
       "plateName": "网红经济",
       "strength": -572.0,
@@ -26030,35 +25836,6 @@
           "date": "2026-04-28",
           "change": 0.347,
           "strength": -572.0,
-          "limitUps": 0
-        }
-      ]
-    },
-    {
-      "rank": 225,
-      "sourceRank": 225,
-      "plateCode": "801573",
-      "plateName": "三季报增长",
-      "strength": -591.0,
-      "speed": -5.91,
-      "changePercent": 0.0,
-      "amount": 164958421.0,
-      "mainNetAmount": 0.0,
-      "largeOrderNetAmount": 0.0,
-      "limitUpStocks": [],
-      "strongStocks": [],
-      "externalLimitMapping": {
-        "source": "Tonghuashun concepts + Eastmoney limit-up pool",
-        "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
-        "matchedConcepts": [],
-        "limitUpStocks": [],
-        "errors": []
-      },
-      "trend": [
-        {
-          "date": "2026-04-28",
-          "change": 0.0,
-          "strength": -591.0,
           "limitUps": 0
         }
       ]
@@ -26799,9 +26576,9 @@
             "changePercent": 9.932279586791992,
             "latestPrice": 4.87,
             "amount": 2224345808.0,
-            "freeMarketCap": 12879225809.43,
+            "freeMarketCap": 12877465182.68,
             "totalMarketCap": 12931426399.52,
-            "turnoverRate": 17.831144332885742,
+            "turnoverRate": 17.833581924438477,
             "sealAmount": 17609920.0,
             "firstSealTime": "095703",
             "lastSealTime": "144836",
@@ -27017,9 +26794,9 @@
             "changePercent": 10.00971794128418,
             "latestPrice": 45.28,
             "amount": 660484400.0,
-            "freeMarketCap": 4333083727.36,
+            "freeMarketCap": 4382669312.0,
             "totalMarketCap": 5869148320.0,
-            "turnoverRate": 15.686102867126465,
+            "turnoverRate": 15.50862979888916,
             "sealAmount": 96830963.0,
             "firstSealTime": "100006",
             "lastSealTime": "100006",
@@ -28621,11 +28398,6 @@
             "name": "AI PC",
             "code": "309121",
             "matchType": "alias"
-          },
-          {
-            "name": "AI眼镜",
-            "code": "309152",
-            "matchType": "alias"
           }
         ],
         "limitUpStocks": [
@@ -28778,22 +28550,12 @@
                 "name": "消费电子概念",
                 "code": "308384",
                 "matchType": "alias"
-              },
-              {
-                "name": "AI眼镜",
-                "code": "309152",
-                "matchType": "alias"
               }
             ],
             "thsRanks": [
               {
                 "concept": "消费电子概念",
                 "rank": 7,
-                "changePercent": 9.99
-              },
-              {
-                "concept": "AI眼镜",
-                "rank": 4,
                 "changePercent": 9.99
               }
             ],
@@ -28827,38 +28589,6 @@
                 "concept": "消费电子概念",
                 "rank": 8,
                 "changePercent": 9.97
-              }
-            ],
-            "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
-          },
-          {
-            "code": "603215",
-            "name": "比依股份",
-            "changePercent": 10.0,
-            "latestPrice": 22.22,
-            "amount": 470384800.0,
-            "freeMarketCap": 4160214603.6,
-            "totalMarketCap": 4176016823.22,
-            "turnoverRate": 11.475926399230957,
-            "sealAmount": 13671966.0,
-            "firstSealTime": "130213",
-            "lastSealTime": "134146",
-            "openCount": 3,
-            "limitStats": "1/1",
-            "consecutiveBoards": 1,
-            "industry": "小家电",
-            "matchedConcepts": [
-              {
-                "name": "AI眼镜",
-                "code": "309152",
-                "matchType": "alias"
-              }
-            ],
-            "thsRanks": [
-              {
-                "concept": "AI眼镜",
-                "rank": 3,
-                "changePercent": 10.0
               }
             ],
             "source": "Tonghuashun concept first page x Eastmoney limit-up pool"
@@ -29182,12 +28912,12 @@
           "code": "600248",
           "name": "陕建股份",
           "boardLabel": "首板",
-          "reasonTags": "基础建设、天然气",
+          "reasonTags": "基础建设、电子气体",
           "latestPrice": 3.7,
           "changePercent": 10.12,
           "amount": 351370536.0,
           "turnoverRate": 8.2,
-          "industry": "基础建设",
+          "industry": "芯片",
           "matchType": "industry_or_reason_tag"
         }
       ],
@@ -29197,12 +28927,12 @@
           "code": "600248",
           "name": "陕建股份",
           "boardLabel": "首板",
-          "reasonTags": "基础建设、天然气",
+          "reasonTags": "基础建设、电子气体",
           "latestPrice": 3.7,
           "changePercent": 10.12,
           "amount": 351370536.0,
           "turnoverRate": 8.2,
-          "industry": "基础建设",
+          "industry": "芯片",
           "matchType": "industry_or_concept"
         }
       ],
@@ -30039,89 +29769,6 @@
     {
       "rank": 254,
       "sourceRank": 254,
-      "plateCode": "801754",
-      "plateName": "江苏省",
-      "strength": -1565.0,
-      "speed": -0.99,
-      "changePercent": 0.358,
-      "amount": 315388624386.0,
-      "mainNetAmount": -23115612.0,
-      "largeOrderNetAmount": 356263965.0,
-      "limitUpStocks": [],
-      "strongStocks": [],
-      "externalLimitMapping": {
-        "source": "Tonghuashun concepts + Eastmoney limit-up pool",
-        "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
-        "matchedConcepts": [],
-        "limitUpStocks": [],
-        "errors": []
-      },
-      "trend": [
-        {
-          "date": "2026-04-15",
-          "change": 0.344,
-          "strength": -36.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-16",
-          "change": 0.246,
-          "strength": 132.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-17",
-          "change": 0.428,
-          "strength": 30.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-20",
-          "change": 0.378,
-          "strength": 54.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-21",
-          "change": 0.288,
-          "strength": 3604.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-22",
-          "change": 0.85,
-          "strength": 1956.0,
-          "limitUps": 1
-        },
-        {
-          "date": "2026-04-23",
-          "change": 0.507,
-          "strength": 1789.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-24",
-          "change": 0.368,
-          "strength": 6233.0,
-          "limitUps": 2
-        },
-        {
-          "date": "2026-04-27",
-          "change": 0.339,
-          "strength": -2829.0,
-          "limitUps": 0
-        },
-        {
-          "date": "2026-04-28",
-          "change": 0.358,
-          "strength": -1565.0,
-          "limitUps": 0
-        }
-      ]
-    },
-    {
-      "rank": 255,
-      "sourceRank": 255,
       "plateCode": "801218",
       "plateName": "华为概念",
       "strength": -1843.0,
@@ -30495,8 +30142,8 @@
       ]
     },
     {
-      "rank": 256,
-      "sourceRank": 256,
+      "rank": 255,
+      "sourceRank": 255,
       "plateCode": "801178",
       "plateName": "储能",
       "strength": -1848.0,
@@ -30771,8 +30418,8 @@
       ]
     },
     {
-      "rank": 257,
-      "sourceRank": 257,
+      "rank": 256,
+      "sourceRank": 256,
       "plateCode": "801519",
       "plateName": "汽车类",
       "strength": -1933.0,
@@ -30848,8 +30495,8 @@
       ]
     },
     {
-      "rank": 258,
-      "sourceRank": 258,
+      "rank": 257,
+      "sourceRank": 257,
       "plateCode": "801346",
       "plateName": "智能电网",
       "strength": -2050.0,
@@ -31039,8 +30686,8 @@
       ]
     },
     {
-      "rank": 259,
-      "sourceRank": 259,
+      "rank": 258,
+      "sourceRank": 258,
       "plateCode": "801070",
       "plateName": "光伏",
       "strength": -2061.0,
@@ -31246,6 +30893,89 @@
           "date": "2026-04-28",
           "change": 0.768,
           "strength": -2061.0,
+          "limitUps": 0
+        }
+      ]
+    },
+    {
+      "rank": 259,
+      "sourceRank": 259,
+      "plateCode": "801754",
+      "plateName": "江苏省",
+      "strength": -2067.0,
+      "speed": -0.99,
+      "changePercent": 0.356,
+      "amount": 315388624386.0,
+      "mainNetAmount": -349177763.0,
+      "largeOrderNetAmount": 109849968.0,
+      "limitUpStocks": [],
+      "strongStocks": [],
+      "externalLimitMapping": {
+        "source": "Tonghuashun concepts + Eastmoney limit-up pool",
+        "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
+        "matchedConcepts": [],
+        "limitUpStocks": [],
+        "errors": []
+      },
+      "trend": [
+        {
+          "date": "2026-04-15",
+          "change": 0.344,
+          "strength": -36.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-16",
+          "change": 0.246,
+          "strength": 132.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-17",
+          "change": 0.428,
+          "strength": 30.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-20",
+          "change": 0.378,
+          "strength": 54.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-21",
+          "change": 0.288,
+          "strength": 3604.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-22",
+          "change": 0.85,
+          "strength": 1956.0,
+          "limitUps": 1
+        },
+        {
+          "date": "2026-04-23",
+          "change": 0.507,
+          "strength": 1789.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-24",
+          "change": 0.368,
+          "strength": 6233.0,
+          "limitUps": 2
+        },
+        {
+          "date": "2026-04-27",
+          "change": 0.339,
+          "strength": -2829.0,
+          "limitUps": 0
+        },
+        {
+          "date": "2026-04-28",
+          "change": 0.356,
+          "strength": -2067.0,
           "limitUps": 0
         }
       ]
@@ -33148,6 +32878,11 @@
     }
   ],
   "externalSources": [
+    {
+      "name": "Tonghuashun concepts + Eastmoney limit-up pool",
+      "date": "20260428",
+      "note": "Maps Kaipanla plates to Tonghuashun concepts, then intersects first-page concept constituents with Eastmoney limit-up pool."
+    },
     {
       "name": "Tonghuashun concepts + Eastmoney limit-up pool",
       "date": "20260428",

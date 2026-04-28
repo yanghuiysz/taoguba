@@ -153,9 +153,9 @@
     const drawdown10 = metric.drawdown10 ?? 0;
 
     if (metric.heatScore >= 76 && excess5 >= 1.5 && r5 >= 3 && redRate >= 60) return '主升';
-    if (metric.heatScore >= 62 && latestChange < 0 && excess10 > 1 && redRate >= 45 && drawdown10 <= 9) return '良性回踩';
+    if (metric.heatScore >= 55 && latestChange < 0 && excess10 > 1 && redRate >= 45 && drawdown10 <= 9) return '良性回踩';
     if (metric.heatScore >= 60 && latestChange > 0 && drawdown10 >= 3 && excess10 > 1) return '二波观察';
-    if (metric.heatScore >= 55 && r5 > 0 && excess5 >= 0) return '启动';
+    if (metric.heatScore >= 55 && latestChange >= 0 && r5 > 0 && excess5 >= 0) return '启动';
     if (metric.heatScore >= 45 && drawdown10 >= 8) return '高位震荡';
     if (metric.heatScore < 35 || (excess5 < -1 && latestChange < 0)) return '热度退潮';
     return '趋势走弱';
@@ -328,6 +328,7 @@
       return {
         code: stock.code,
         name: stock.name || stock.code,
+        latest,
         ret5,
         ret10,
         rel5,
@@ -338,6 +339,7 @@
         latestChange,
         macdLabel,
         macdScore,
+        highStatus: latest?.highStatus || stock.latestHighStatus || '',
         score: clampValue(score, 0, 100),
         status: score >= 78 ? '韧性强' : score >= 65 ? '可观察' : score >= 50 ? '一般' : '偏弱',
         boardStatus: boardMetric.status,
@@ -461,6 +463,97 @@
     `).join('');
   }
 
+  function intradayOpportunityRows(metrics) {
+    const candidateStatuses = new Set(['启动', '良性回踩']);
+    return metrics
+      .filter((metric) => candidateStatuses.has(metric.status))
+      .flatMap((metric) => stockResilienceRows(metric.board).slice(0, 8).map((stock) => {
+        const stockScore = safeNumber(stock.score) ?? 0;
+        const rel5 = safeNumber(stock.rel5) ?? 0;
+        const rel10 = safeNumber(stock.rel10) ?? 0;
+        const latestChange = safeNumber(stock.latestChange) ?? 0;
+        const macdScore = safeNumber(stock.macdScore) ?? 50;
+        const boardPullback = metric.status === '良性回踩';
+        const reboundInPullback = boardPullback && latestChange >= 0 && rel5 >= 0;
+        const strongInStart = metric.status === '启动' && latestChange >= 1 && rel5 >= 0;
+        const opportunityScore = clampValue(
+          0.38 * stockScore
+          + 0.20 * scoreRange(rel5, -2, 6)
+          + 0.14 * scoreRange(rel10, -4, 10)
+          + 0.12 * scoreRange(latestChange, -2, 6)
+          + 0.10 * macdScore
+          + 0.06 * metric.heatScore,
+          0,
+          100,
+        );
+        let signal = '观察';
+        if (reboundInPullback) signal = '回踩承接';
+        else if (strongInStart) signal = '启动前排';
+        else if (stockScore >= 78 && rel5 >= 0) signal = '韧性前排';
+        return {
+          board: metric.board,
+          boardMetric: metric,
+          stock,
+          signal,
+          opportunityScore,
+        };
+      }))
+      .filter((item) =>
+        item.opportunityScore >= 62
+        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel5 >= 1)
+        && !String(item.stock.macdLabel || '').includes('死叉'))
+      .sort((a, b) => b.opportunityScore - a.opportunityScore)
+      .slice(0, 12);
+  }
+
+  function renderIntradayOpportunityPanel(metrics) {
+    const rows = intradayOpportunityRows(metrics);
+    return `
+      <div class="swing-intraday-block">
+        <div class="swing-section-title">
+          <strong>盘中机会雷达</strong>
+          <span>只看启动/良性回踩板块内相对更强的个股</span>
+        </div>
+        ${rows.length ? `
+          <div class="table-wrap swing-intraday-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>板块</th>
+                  <th>状态</th>
+                  <th>个股</th>
+                  <th>当前涨幅</th>
+                  <th>5日相对</th>
+                  <th>MACD</th>
+                  <th>高位</th>
+                  <th>信号</th>
+                  <th>机会分</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map((item) => `
+                  <tr>
+                    <td>
+                      <button class="text-link swing-board-jump" type="button" data-code="${item.board.code}" data-board-code="${item.board.code}" data-target-tab="swing">${item.board.name}</button>
+                    </td>
+                    <td><span class="swing-badge ${item.boardMetric.tone}">${item.boardMetric.status}</span></td>
+                    <td><strong>${item.stock.name}</strong><br><span class="code">${item.stock.code}</span></td>
+                    <td class="${changeClass(item.stock.latestChange)}">${fmtPercent(item.stock.latestChange)}</td>
+                    <td class="${changeClass(item.stock.rel5)}">${fmtPercent(item.stock.rel5)}</td>
+                    <td><span class="swing-badge ${macdTone(item.stock.macdLabel, item.stock.macdScore)}">${item.stock.macdLabel}</span></td>
+                    <td>${item.stock.highStatus || '暂无'}</td>
+                    <td><span class="swing-badge ${item.signal === '回踩承接' ? 'test' : item.signal === '启动前排' ? 'strong' : 'watch'}">${item.signal}</span></td>
+                    <td><strong>${fmt(item.opportunityScore, 0)}</strong></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : '<div class="pool-empty">暂无盘中机会信号</div>'}
+      </div>
+    `;
+  }
+
   function renderOverviewPanel() {
     const metrics = allBoardSwingMetrics();
     const hot = [...metrics]
@@ -496,6 +589,7 @@
             ${renderBoardMiniList(risk)}
           </div>
         </div>
+        ${renderIntradayOpportunityPanel(metrics)}
       </section>
     `;
   }

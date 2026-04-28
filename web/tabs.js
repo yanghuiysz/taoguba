@@ -4,7 +4,7 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260428-new-high-tab-v1",
+  custom: "./custom.html?v=20260429-pullback-priority-v1",
 };
 const AUTO_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 const AUTO_REFRESH_STOP_HOUR = 15;
