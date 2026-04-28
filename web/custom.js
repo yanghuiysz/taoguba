@@ -1659,6 +1659,7 @@ function renderDetail(board) {
   const resonance = boardMarketResonance(board, state.sortDate);
   const isOverviewTab = state.detailTab === 'overview';
   const isTrendTab = state.detailTab === 'trend';
+  const isNewHighTab = state.detailTab === 'new-high';
 
   return `
     <div class="stack">
@@ -1666,10 +1667,11 @@ function renderDetail(board) {
         <div class="detail-tabs" role="tablist" aria-label="详情页签">
           <button class="detail-tab-btn${isOverviewTab ? ' active' : ''}" type="button" data-detail-tab="overview" role="tab" aria-selected="${isOverviewTab}">概览</button>
           <button class="detail-tab-btn${isTrendTab ? ' active' : ''}" type="button" data-detail-tab="trend" role="tab" aria-selected="${isTrendTab}">趋势曲线</button>
+          <button class="detail-tab-btn${isNewHighTab ? ' active' : ''}" type="button" data-detail-tab="new-high" role="tab" aria-selected="${isNewHighTab}">百日新高</button>
           <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
         </div>
       </section>
-      ${renderNewHighTrendPanel(board)}
+      ${isNewHighTab ? renderNewHighTrendPanel(board) : ''}
       ${isOverviewTab ? `
       ${renderSetupSummary(board)}
       ` : ''}

@@ -4,8 +4,22 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260427-new-high-v1",
+  custom: "./custom.html?v=20260428-new-high-tab-v1",
 };
+const AUTO_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
+const AUTO_REFRESH_STOP_HOUR = 15;
+const AUTO_REFRESH_STOP_MINUTE = 5;
+
+function withCacheBust(src) {
+  const separator = src.includes("?") ? "&" : "?";
+  return `${src}${separator}auto=${Date.now()}`;
+}
+
+function isAfterTradingRefreshWindow(now = new Date()) {
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  return hour > AUTO_REFRESH_STOP_HOUR || (hour === AUTO_REFRESH_STOP_HOUR && minute >= AUTO_REFRESH_STOP_MINUTE);
+}
 
 function resizeFrame(frame) {
   try {
@@ -27,12 +41,22 @@ function activate(target) {
     if (name === target) {
       const frame = panel.querySelector("iframe");
       const expected = frameSrc[name];
-      if (frame && expected && frame.getAttribute("src") !== expected) {
+      if (frame && expected && !String(frame.getAttribute("src") || "").startsWith(expected)) {
         frame.setAttribute("src", expected);
       }
       resizeFrame(frame);
     }
   });
+}
+
+function refreshActiveFrame() {
+  if (isAfterTradingRefreshWindow()) return;
+  const activePanel = document.querySelector(".panel.active");
+  const activeName = activePanel?.id?.replace("panel-", "");
+  const activeFrame = activePanel?.querySelector("iframe");
+  const expected = frameSrc[activeName];
+  if (!activeFrame || !expected) return;
+  activeFrame.setAttribute("src", withCacheBust(expected));
 }
 
 tabs.forEach((tab) => {
@@ -59,3 +83,4 @@ window.addEventListener("message", (event) => {
 });
 
 activate(document.querySelector(".tab.active")?.dataset.target || tabs[0]?.dataset.target);
+window.setInterval(refreshActiveFrame, AUTO_REFRESH_INTERVAL_MS);

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import time
 from datetime import datetime, timedelta
@@ -43,9 +44,20 @@ def number_or_none(value: Any) -> float | None:
     try:
         if value is None:
             return None
-        return float(value)
+        number = float(value)
+        return number if math.isfinite(number) else None
     except (TypeError, ValueError):
         return None
+
+
+def sanitize_json_value(value: Any) -> Any:
+    if isinstance(value, float):
+        return value if math.isfinite(value) else None
+    if isinstance(value, list):
+        return [sanitize_json_value(item) for item in value]
+    if isinstance(value, dict):
+        return {key: sanitize_json_value(item) for key, item in value.items()}
+    return value
 
 
 def load_config(path: Path) -> dict[str, Any]:
@@ -780,8 +792,9 @@ def main() -> None:
         "errors": errors,
     }
 
+    payload = sanitize_json_value(payload)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
     print(f"Wrote {args.out}")
     print(f"Boards: {len(payload['boards'])}, stocks: {len(codes)}, dates: {len(dates)}, errors: {len(errors)}")
 
