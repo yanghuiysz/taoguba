@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
 import time
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -20,6 +22,47 @@ CACHE_DIR = Path("data/custom_stock_history")
 HIGH100_WINDOW = 100
 MARKET_INDEX_SYMBOL = "sh000001"
 MARKET_INDEX_NAME = "上证指数"
+PROXY_ENV_KEYS = (
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "ALL_PROXY",
+    "http_proxy",
+    "https_proxy",
+    "all_proxy",
+)
+
+
+@contextmanager
+def without_proxy_env() -> Any:
+    previous = {key: os.environ.get(key) for key in (*PROXY_ENV_KEYS, "NO_PROXY", "no_proxy")}
+    try:
+        for key in PROXY_ENV_KEYS:
+            os.environ.pop(key, None)
+        os.environ["NO_PROXY"] = "*"
+        os.environ["no_proxy"] = "*"
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
+def looks_like_proxy_failure(exc: BaseException) -> bool:
+    message = str(exc)
+    return any(
+        marker in message
+        for marker in (
+            "ProxyError",
+            "127.0.0.1",
+            "localhost",
+            "WinError 10061",
+            "Cannot connect to proxy",
+            "Failed to establish a new connection",
+            "Remote end closed connection without response",
+        )
+    )
 
 
 def compact_date(value: str) -> str:
@@ -289,7 +332,7 @@ def fetch_tencent_spot(codes: set[str], date: str, batch_size: int = 60) -> dict
     return rows
 
 
-def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
+def fetch_intraday_spot_once(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
     try:
         df = ak.stock_zh_a_spot_em()
         rows = normalize_spot_rows(df, codes, date)
@@ -305,6 +348,17 @@ def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]
     except Exception as exc:  # noqa: BLE001 - use Tencent batched quotes as a final fallback.
         print(f"Sina spot failed, falling back to Tencent spot: {exc}")
     return fetch_tencent_spot(codes, date)
+
+
+def fetch_intraday_spot(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
+    try:
+        return fetch_intraday_spot_once(codes, date)
+    except Exception as exc:
+        if not looks_like_proxy_failure(exc):
+            raise
+        print(f"Intraday spot failed through proxy, retrying without proxy: {exc}")
+        with without_proxy_env():
+            return fetch_intraday_spot_once(codes, date)
 
 
 def merge_intraday_rows(
@@ -371,7 +425,7 @@ def normalize_tencent_market_index_payload(text: str, symbol: str, date: str) ->
     }
 
 
-def fetch_market_index_intraday(symbol: str, date: str) -> dict[str, Any] | None:
+def fetch_market_index_intraday_once(symbol: str, date: str) -> dict[str, Any] | None:
     for source_name in ("stock_zh_index_spot_em", "stock_zh_index_spot_sina"):
         try:
             df = getattr(ak, source_name)()
@@ -386,6 +440,17 @@ def fetch_market_index_intraday(symbol: str, date: str) -> dict[str, Any] | None
     with urlopen(url, timeout=15) as response:
         payload = response.read().decode("gbk", errors="replace")
     return normalize_tencent_market_index_payload(payload, symbol, date)
+
+
+def fetch_market_index_intraday(symbol: str, date: str) -> dict[str, Any] | None:
+    try:
+        return fetch_market_index_intraday_once(symbol, date)
+    except Exception as exc:
+        if not looks_like_proxy_failure(exc):
+            raise
+        print(f"Market index intraday failed through proxy, retrying without proxy: {exc}")
+        with without_proxy_env():
+            return fetch_market_index_intraday_once(symbol, date)
 
 
 def merge_market_index_intraday(rows: list[dict[str, Any]], spot_row: dict[str, Any] | None, date: str) -> None:
