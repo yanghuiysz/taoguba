@@ -1720,21 +1720,23 @@ function render() {
   app.innerHTML = `
     <div class="workspace-layout">
       <aside class="card sidebar-card">
-        <div class="sort-inline">
-          <div class="sort-mode-group" role="group" aria-label="排序方式">
-            <button class="sort-mode-btn${state.sortMode === 'avg_change' ? ' active' : ''}" type="button" data-mode="avg_change">涨幅</button>
-            <button class="sort-mode-btn${state.sortMode === 'limit_up' ? ' active' : ''}" type="button" data-mode="limit_up">涨停</button>
+        <div class="sidebar-head">
+          <div class="sort-inline">
+            <div class="sort-mode-group" role="group" aria-label="排序方式">
+              <button class="sort-mode-btn${state.sortMode === 'avg_change' ? ' active' : ''}" type="button" data-mode="avg_change">涨幅</button>
+              <button class="sort-mode-btn${state.sortMode === 'limit_up' ? ' active' : ''}" type="button" data-mode="limit_up">涨停</button>
+            </div>
+            <label class="sort-date-label">
+              <span>日期</span>
+              <button class="date-nav-btn" id="sortDatePrevBtn" type="button" ${prevDate ? '' : 'disabled'} aria-label="前一天">◀</button>
+              <select id="sortDateSelect">
+                ${availableTrendDates().map((date) => `<option value="${date}" ${date === state.sortDate ? 'selected' : ''}>${shortDate(date)}</option>`).join('')}
+              </select>
+              <button class="date-nav-btn" id="sortDateNextBtn" type="button" ${nextDate ? '' : 'disabled'} aria-label="后一天">▶</button>
+            </label>
           </div>
-          <label class="sort-date-label">
-            <span>日期</span>
-            <button class="date-nav-btn" id="sortDatePrevBtn" type="button" ${prevDate ? '' : 'disabled'} aria-label="前一天">◀</button>
-            <select id="sortDateSelect">
-              ${availableTrendDates().map((date) => `<option value="${date}" ${date === state.sortDate ? 'selected' : ''}>${shortDate(date)}</option>`).join('')}
-            </select>
-            <button class="date-nav-btn" id="sortDateNextBtn" type="button" ${nextDate ? '' : 'disabled'} aria-label="后一天">▶</button>
-          </label>
+          <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'limit_up' ? '涨停数' : '正宗股涨幅'} 排序</div>
         </div>
-        <div class="sort-status">按 ${shortDate(state.sortDate)} ${state.sortMode === 'limit_up' ? '涨停数' : '正宗股涨幅'} 排序</div>
         <div class="board-list">
           ${boards.map((item) => {
             const selectedAverageChange = averageChangeByDate(item, state.sortDate);
