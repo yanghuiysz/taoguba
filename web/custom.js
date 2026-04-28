@@ -52,6 +52,36 @@ const percentText = (value) => {
   return `${number(value)}%`;
 };
 
+const profitScoreValue = (stock) => {
+  const parsed = Number(stock?.profitScore);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const profitTone = (label, score) => {
+  if (label === '盈利加速' || label === '扭亏为盈' || Number(score) >= 80) return 'strong';
+  if (label === '盈利改善' || label === '稳定盈利' || label === '周期修复' || Number(score) >= 65) return 'test';
+  if (label === '盈利承压' || label === '亏损扩大' || label === '由盈转亏') return 'weak';
+  return 'watch';
+};
+
+const profitMetricText = (metrics, key, suffix = '%', digits = 1) => {
+  const value = metrics?.[key];
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '暂无';
+  return suffix ? `${number(value, digits)}${suffix}` : number(value, digits);
+};
+
+function boardProfitRank(board) {
+  const rows = Array.isArray(board?.profitRank) && board.profitRank.length ? board.profitRank : (board?.stocks || []);
+  return [...rows].sort((a, b) => {
+    const scoreA = profitScoreValue(a);
+    const scoreB = profitScoreValue(b);
+    if (scoreA === null && scoreB === null) return sortChangeValue(b.latestChangePercent) - sortChangeValue(a.latestChangePercent);
+    if (scoreA === null) return 1;
+    if (scoreB === null) return -1;
+    return scoreB - scoreA;
+  });
+}
+
 const boolText = (value) => (value === true ? '是' : (value === false ? '否' : '暂无'));
 
 const highStatusTone = (status) => {
@@ -1574,6 +1604,95 @@ function renderEditor(board) {
   `;
 }
 
+function renderProfitPanel(board) {
+  const stocks = boardProfitRank(board);
+  const topStock = stocks.find((stock) => profitScoreValue(stock) !== null) || stocks[0] || null;
+  const metrics = topStock?.profitMetrics || {};
+  const score = profitScoreValue(topStock);
+  const label = topStock?.profitLabel || '暂无评级';
+  const scoreParts = topStock?.profitScores || {};
+  return `
+    <section class="card section-card profit-card">
+      <div class="section-head">
+        <div>
+          <h2>${board.name} · 盈利评分</h2>
+          <p class="muted">按成长 40%、盈利能力 25%、盈利质量 20%、趋势改善 15% 排序；当前板块均分 ${board.latestAvgProfitScore === null || board.latestAvgProfitScore === undefined ? '暂无' : number(board.latestAvgProfitScore, 1)}。</p>
+        </div>
+        <span class="setup-badge ${profitTone(label, score)}">${label}</span>
+      </div>
+      ${topStock ? `
+        <div class="profit-hero">
+          <div class="profit-hero-main">
+            <div class="profit-stock-title">
+              <strong>${topStock.name}</strong>
+              <span class="code">${topStock.code}</span>
+            </div>
+            <div class="profit-score-block">
+              <span>盈利评分</span>
+              <strong>${score === null ? '暂无' : number(score, 0)}</strong>
+              <em>${label}</em>
+            </div>
+            <p>${topStock.profitConclusion || '财务字段不足，暂无法形成明确结论。'}</p>
+          </div>
+          <div class="profit-metrics-grid">
+            <div><span>最近一期</span><strong>${metrics.reportDate || '暂无'}</strong></div>
+            <div><span>营收同比</span><strong class="${signedClass(metrics.revenueYoY)}">${profitMetricText(metrics, 'revenueYoY')}</strong></div>
+            <div><span>净利润同比</span><strong class="${signedClass(metrics.netProfitYoY)}">${profitMetricText(metrics, 'netProfitYoY')}</strong></div>
+            <div><span>扣非同比</span><strong class="${signedClass(metrics.deductedNetProfitYoY)}">${profitMetricText(metrics, 'deductedNetProfitYoY')}</strong></div>
+            <div><span>毛利率</span><strong>${profitMetricText(metrics, 'grossMargin')}</strong></div>
+            <div><span>净利率</span><strong>${profitMetricText(metrics, 'netMargin')}</strong></div>
+            <div><span>ROE</span><strong>${profitMetricText(metrics, 'roe')}</strong></div>
+            <div><span>现金流/净利</span><strong>${profitMetricText(metrics, 'operatingCashFlowToNetProfit', '', 2)}</strong></div>
+          </div>
+        </div>
+        <div class="profit-score-strip">
+          <div><span>成长分</span><strong>${scoreParts.growth === null || scoreParts.growth === undefined ? '暂无' : number(scoreParts.growth, 1)}</strong></div>
+          <div><span>盈利能力</span><strong>${scoreParts.ability === null || scoreParts.ability === undefined ? '暂无' : number(scoreParts.ability, 1)}</strong></div>
+          <div><span>盈利质量</span><strong>${scoreParts.quality === null || scoreParts.quality === undefined ? '暂无' : number(scoreParts.quality, 1)}</strong></div>
+          <div><span>趋势改善</span><strong>${scoreParts.trend === null || scoreParts.trend === undefined ? '暂无' : number(scoreParts.trend, 1)}</strong></div>
+        </div>
+      ` : `<div class="empty">暂无个股</div>`}
+      <div class="table-wrap profit-table-wrap">
+        <table class="profit-table">
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>股票</th>
+              <th>盈利标签</th>
+              <th>盈利分</th>
+              <th>营收同比</th>
+              <th>净利同比</th>
+              <th>扣非同比</th>
+              <th>毛利率</th>
+              <th>现金流/净利</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${stocks.length ? stocks.map((stock, index) => {
+              const stockMetrics = stock.profitMetrics || {};
+              const stockScore = profitScoreValue(stock);
+              const stockLabel = stock.profitLabel || '暂无评级';
+              return `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td><strong>${stock.name}</strong> <span class="code">${stock.code}</span></td>
+                  <td><span class="setup-badge ${profitTone(stockLabel, stockScore)}">${stockLabel}</span></td>
+                  <td><strong>${stockScore === null ? '暂无' : number(stockScore, 0)}</strong></td>
+                  <td class="${signedClass(stockMetrics.revenueYoY)}">${profitMetricText(stockMetrics, 'revenueYoY', '%', 0)}</td>
+                  <td class="${signedClass(stockMetrics.netProfitYoY)}">${profitMetricText(stockMetrics, 'netProfitYoY', '%', 0)}</td>
+                  <td class="${signedClass(stockMetrics.deductedNetProfitYoY)}">${profitMetricText(stockMetrics, 'deductedNetProfitYoY', '%', 0)}</td>
+                  <td>${profitMetricText(stockMetrics, 'grossMargin', '%', 0)}</td>
+                  <td>${profitMetricText(stockMetrics, 'operatingCashFlowToNetProfit', '', 2)}</td>
+                </tr>
+              `;
+            }).join('') : '<tr><td colspan="9" class="empty">该板块暂无个股</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
 function renderStocksTable(board) {
   const snapshot = stockSnapshotByDate(board, state.sortDate);
   const hasDateSnapshot = boardHasDateSnapshot(board, state.sortDate);
@@ -1660,6 +1779,7 @@ function renderDetail(board) {
   const isOverviewTab = state.detailTab === 'overview';
   const isTrendTab = state.detailTab === 'trend';
   const isNewHighTab = state.detailTab === 'new-high';
+  const isProfitTab = state.detailTab === 'profit';
 
   return `
     <div class="stack">
@@ -1668,6 +1788,7 @@ function renderDetail(board) {
           <button class="detail-tab-btn${isOverviewTab ? ' active' : ''}" type="button" data-detail-tab="overview" role="tab" aria-selected="${isOverviewTab}">概览</button>
           <button class="detail-tab-btn${isTrendTab ? ' active' : ''}" type="button" data-detail-tab="trend" role="tab" aria-selected="${isTrendTab}">趋势曲线</button>
           <button class="detail-tab-btn${isNewHighTab ? ' active' : ''}" type="button" data-detail-tab="new-high" role="tab" aria-selected="${isNewHighTab}">百日新高</button>
+          <button class="detail-tab-btn${isProfitTab ? ' active' : ''}" type="button" data-detail-tab="profit" role="tab" aria-selected="${isProfitTab}">盈利评分</button>
           <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
         </div>
       </section>
@@ -1705,6 +1826,7 @@ function renderDetail(board) {
         </div>
       </section>
       ` : ''}
+      ${isProfitTab ? renderProfitPanel(board) : ''}
       ${state.detailTab === 'stocks' ? renderStocksTable(board) : ''}
     </div>
   `;

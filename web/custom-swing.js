@@ -284,6 +284,14 @@
     return scoreRange(rebound, -2, 5);
   }
 
+  function macdTone(label, score) {
+    const text = String(label || '');
+    if (text.includes('死叉') || text.includes('绿柱扩张') || score <= 35) return 'weak';
+    if (text.includes('金叉') || text.includes('红柱扩张') || text.includes('零轴上') || score >= 75) return 'strong';
+    if (text.includes('收敛') || score >= 55) return 'test';
+    return 'watch';
+  }
+
   function stockResilienceRows(board) {
     const stockList = board?.stocks || [];
     const boardMetric = swingMetric(board);
@@ -299,6 +307,9 @@
       const defenseScore = stockDefenseScore(board, items);
       const reboundScore = stockReboundScore(board, items);
       const latestChange = items.length ? safeNumber(items.at(-1).stock.changePercent) : null;
+      const latest = items.at(-1)?.stock || null;
+      const macdScore = safeNumber(latest?.macdScore) ?? 50;
+      const macdLabel = latest?.macdLabel || 'MACD暂无';
       const relScore = scoreRange(average([rel5, rel10]), -5, 10);
       const drawdownScore = 100 - scoreRange(drawdown, 4, 18);
       const trendScore = (
@@ -307,11 +318,12 @@
         + 0.20 * scoreRange(latestChange, -3, 5)
       );
       const score = (
-        0.38 * relScore
-        + 0.24 * drawdownScore
-        + 0.18 * defenseScore
-        + 0.10 * reboundScore
-        + 0.10 * trendScore
+        0.34 * relScore
+        + 0.22 * drawdownScore
+        + 0.16 * defenseScore
+        + 0.09 * reboundScore
+        + 0.09 * trendScore
+        + 0.10 * macdScore
       );
       return {
         code: stock.code,
@@ -324,6 +336,8 @@
         defenseScore,
         reboundScore,
         latestChange,
+        macdLabel,
+        macdScore,
         score: clampValue(score, 0, 100),
         status: score >= 78 ? '韧性强' : score >= 65 ? '可观察' : score >= 50 ? '一般' : '偏弱',
         boardStatus: boardMetric.status,
@@ -370,6 +384,7 @@
               <th>5日相对板块</th>
               <th>10日相对板块</th>
               <th>最大回撤</th>
+              <th>MACD</th>
               <th>韧性分</th>
               <th>状态</th>
             </tr>
@@ -387,6 +402,7 @@
                 <td class="${changeClass(item.rel5)}">${fmtPercent(item.rel5)}</td>
                 <td class="${changeClass(item.rel10)}">${fmtPercent(item.rel10)}</td>
                 <td>${fmtPercent(item.drawdown)}</td>
+                <td><span class="swing-badge ${macdTone(item.macdLabel, item.macdScore)}">${item.macdLabel}</span></td>
                 <td><strong>${fmt(item.score, 0)}</strong></td>
                 <td><span class="swing-badge ${item.score >= 78 ? 'strong' : item.score >= 65 ? 'test' : item.score >= 50 ? 'watch' : 'weak'}">${item.status}</span></td>
               </tr>

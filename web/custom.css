@@ -461,6 +461,106 @@ p { line-height: 1.55; }
   overflow-wrap: anywhere;
 }
 
+.profit-card {
+  display: grid;
+  gap: 14px;
+}
+
+.profit-hero {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.profit-hero-main,
+.profit-metrics-grid > div,
+.profit-score-strip > div {
+  border: 1px solid #edf2f1;
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.profit-hero-main {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.profit-stock-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.profit-stock-title strong {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.profit-score-block {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  align-items: end;
+}
+
+.profit-score-block span,
+.profit-score-block em,
+.profit-hero-main p,
+.profit-metrics-grid span,
+.profit-score-strip span {
+  color: var(--muted);
+}
+
+.profit-score-block strong {
+  grid-row: span 2;
+  font-size: 46px;
+  line-height: 0.95;
+}
+
+.profit-score-block em {
+  font-style: normal;
+}
+
+.profit-hero-main p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.profit-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profit-metrics-grid > div,
+.profit-score-strip > div {
+  display: grid;
+  gap: 5px;
+  min-height: 70px;
+  padding: 10px;
+}
+
+.profit-metrics-grid span,
+.profit-score-strip span {
+  font-size: 12px;
+}
+
+.profit-metrics-grid strong,
+.profit-score-strip strong {
+  font-size: 18px;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.profit-score-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .state-chip {
   display: inline-flex;
   align-items: center;
@@ -1025,6 +1125,10 @@ table {
   font-size: 14px;
 }
 
+.profit-table {
+  min-width: 980px;
+}
+
 th, td {
   padding: 11px 12px;
   border-bottom: 1px solid #edf2f1;
@@ -1114,6 +1218,9 @@ th {
   .workspace-layout { grid-template-columns: 1fr; }
   .setup-pools,
   .setup-grid,
+  .profit-hero,
+  .profit-metrics-grid,
+  .profit-score-strip,
   .core-strip {
     grid-template-columns: 1fr;
   }

@@ -19,6 +19,7 @@ import akshare as ak
 CONFIG_PATH = Path("web/data/custom_boards_config.json")
 OUT_PATH = Path("web/data/custom_boards.json")
 CACHE_DIR = Path("data/custom_stock_history")
+FINANCIAL_CACHE_DIR = Path("data/custom_financial_metrics")
 HIGH100_WINDOW = 100
 MARKET_INDEX_SYMBOL = "sh000001"
 MARKET_INDEX_NAME = "上证指数"
@@ -481,6 +482,391 @@ def round_or_none(value: float | None, digits: int = 4) -> float | None:
     return round(value, digits) if value is not None else None
 
 
+def ema(previous: float | None, value: float, span: int) -> float:
+    alpha = 2 / (span + 1)
+    return value if previous is None else alpha * value + (1 - alpha) * previous
+
+
+def macd_state(
+    dif: float | None,
+    dea: float | None,
+    hist: float | None,
+    previous_dif: float | None,
+    previous_dea: float | None,
+    previous_hist: float | None,
+) -> dict[str, Any]:
+    if dif is None or dea is None or hist is None:
+        return {"macdLabel": None, "macdScore": None}
+
+    crossed_up = (
+        previous_dif is not None
+        and previous_dea is not None
+        and previous_dif <= previous_dea
+        and dif > dea
+    )
+    crossed_down = (
+        previous_dif is not None
+        and previous_dea is not None
+        and previous_dif >= previous_dea
+        and dif < dea
+    )
+    hist_expanding = previous_hist is not None and abs(hist) > abs(previous_hist)
+    hist_contracting = previous_hist is not None and abs(hist) < abs(previous_hist)
+
+    if crossed_up:
+        label, score = "MACD金叉", 92.0
+    elif dif > 0 and dea > 0 and hist > 0:
+        label, score = ("零轴上红柱扩张", 88.0) if hist_expanding else ("零轴上多头", 78.0)
+    elif hist > 0:
+        label, score = ("红柱扩张", 82.0) if hist_expanding else ("红柱收敛", 68.0)
+    elif crossed_down:
+        label, score = "MACD死叉", 18.0
+    elif hist < 0 and hist_contracting:
+        label, score = "绿柱收敛", 54.0
+    elif hist < 0:
+        label, score = "绿柱扩张", 28.0
+    else:
+        label, score = "动能平衡", 50.0
+
+    return {"macdLabel": label, "macdScore": score}
+
+
+def enrich_macd_metrics(rows: list[dict[str, Any]]) -> None:
+    ema12: float | None = None
+    ema26: float | None = None
+    dea: float | None = None
+    previous_dif: float | None = None
+    previous_dea: float | None = None
+    previous_hist: float | None = None
+
+    for row in sorted(rows, key=lambda item: str(item.get("date") or "")):
+        close = number_or_none(row.get("close"))
+        if close is None:
+            row.update(
+                {
+                    "macdDif": None,
+                    "macdDea": None,
+                    "macdHist": None,
+                    "macdLabel": None,
+                    "macdScore": None,
+                }
+            )
+            continue
+
+        ema12 = ema(ema12, close, 12)
+        ema26 = ema(ema26, close, 26)
+        dif = ema12 - ema26
+        dea = ema(dea, dif, 9)
+        hist = 2 * (dif - dea)
+        state = macd_state(dif, dea, hist, previous_dif, previous_dea, previous_hist)
+        row.update(
+            {
+                "macdDif": round_or_none(dif),
+                "macdDea": round_or_none(dea),
+                "macdHist": round_or_none(hist),
+                "macdLabel": state["macdLabel"],
+                "macdScore": round_or_none(state["macdScore"], 1),
+            }
+        )
+        previous_dif = dif
+        previous_dea = dea
+        previous_hist = hist
+
+
+def score_yoy(value: Any) -> float | None:
+    parsed = number_or_none(value)
+    if parsed is None:
+        return None
+    if parsed >= 50:
+        return 100.0
+    if parsed >= 20:
+        return 78.0 + (parsed - 20) / 30 * 17
+    if parsed >= 0:
+        return 55.0 + parsed / 20 * 20
+    if parsed >= -20:
+        return 30.0 + (parsed + 20) / 20 * 20
+    return max(0.0, 30.0 + parsed)
+
+
+def score_ratio(value: Any, bands: tuple[tuple[float, float], ...]) -> float | None:
+    parsed = number_or_none(value)
+    if parsed is None:
+        return None
+    for threshold, score in bands:
+        if parsed >= threshold:
+            return score
+    return 20.0
+
+
+def weighted_average(parts: list[tuple[float | None, float]]) -> float | None:
+    usable = [(score, weight) for score, weight in parts if score is not None]
+    if not usable:
+        return None
+    total_weight = sum(weight for _, weight in usable)
+    if total_weight <= 0:
+        return None
+    return sum(float(score) * weight for score, weight in usable) / total_weight
+
+
+def score_improvement(latest: Any, previous: Any, weight: float = 8.0) -> float:
+    latest_number = number_or_none(latest)
+    previous_number = number_or_none(previous)
+    if latest_number is None or previous_number is None:
+        return 0.0
+    if latest_number > previous_number:
+        return weight
+    if latest_number == previous_number:
+        return weight * 0.35
+    return 0.0
+
+
+def find_first_value(row: dict[str, Any], candidates: tuple[str, ...]) -> Any:
+    for name in candidates:
+        if name in row:
+            return row.get(name)
+    for key, value in row.items():
+        normalized = re.sub(r"\s+", "", str(key)).lower()
+        if any(re.sub(r"\s+", "", candidate).lower() in normalized for candidate in candidates):
+            return value
+    return None
+
+
+def parse_financial_rows(df: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if df is None or getattr(df, "empty", True):
+        return rows
+    for _, raw in df.iterrows():
+        row = raw.to_dict()
+        report_date = find_first_value(row, ("日期", "报告期", "报告日期", "公告日期", "date"))
+        item = {
+            "reportDate": format_date(str(report_date or "")),
+            "revenueYoY": number_or_none(find_first_value(row, ("营业收入同比增长率", "营业总收入同比增长率", "主营业务收入增长率", "营收同比"))),
+            "netProfitYoY": number_or_none(find_first_value(row, ("净利润同比增长率", "归属净利润同比增长率", "净利润增长率"))),
+            "deductedNetProfitYoY": number_or_none(find_first_value(row, ("扣非净利润同比增长率", "扣除非经常性损益后的净利润增长率", "扣非净利润增长率"))),
+            "grossMargin": number_or_none(find_first_value(row, ("销售毛利率", "毛利率"))),
+            "netMargin": number_or_none(find_first_value(row, ("销售净利率", "净利率"))),
+            "roe": number_or_none(find_first_value(row, ("加权净资产收益率", "净资产收益率", "ROE"))),
+            "operatingCashFlowToNetProfit": number_or_none(find_first_value(row, ("经营现金流量净额/净利润", "经营现金流/净利润", "经营现金流净额与净利润的比率"))),
+            "receivableYoY": number_or_none(find_first_value(row, ("应收账款同比增长率", "应收账款增长率", "应收账款变化"))),
+            "inventoryYoY": number_or_none(find_first_value(row, ("存货同比增长率", "存货增长率", "存货变化"))),
+            "netProfit": number_or_none(find_first_value(row, ("净利润", "归属净利润", "归母净利润"))),
+        }
+        cash_per_share = number_or_none(find_first_value(row, ("每股经营性现金流", "每股经营现金流量净额")))
+        eps = number_or_none(find_first_value(row, ("每股收益", "基本每股收益", "摊薄每股收益")))
+        if item["operatingCashFlowToNetProfit"] is None and cash_per_share is not None and eps not in (None, 0):
+            item["operatingCashFlowToNetProfit"] = round(cash_per_share / eps, 4)
+        if any(value is not None for key, value in item.items() if key != "reportDate"):
+            rows.append(item)
+    return sorted(rows, key=lambda item: str(item.get("reportDate") or ""))
+
+
+def financial_cache_path(cache_dir: Path, code: str, end_date: str) -> Path:
+    return cache_dir / compact_date(format_date(end_date)) / f"{code}.json"
+
+
+def load_cached_financial(cache_dir: Path, code: str, end_date: str) -> dict[str, Any] | None:
+    path = financial_cache_path(cache_dir, code, end_date)
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def write_cached_financial(cache_dir: Path, code: str, end_date: str, payload: dict[str, Any]) -> None:
+    path = financial_cache_path(cache_dir, code, end_date)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(sanitize_json_value(payload), ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def fetch_financial_rows(code: str, end_date: str) -> list[dict[str, Any]]:
+    start_year = str(max(2000, int(compact_date(format_date(end_date))[:4]) - 3))
+    candidates = (
+        lambda: ak.stock_financial_analysis_indicator(symbol=code, start_year=start_year),
+        lambda: ak.stock_financial_analysis_indicator(symbol=code),
+    )
+    last_error: Exception | None = None
+    for getter in candidates:
+        try:
+            return parse_financial_rows(getter())
+        except Exception as exc:
+            last_error = exc
+    if last_error:
+        raise last_error
+    return []
+
+
+def compute_profit_label(latest: dict[str, Any], previous: dict[str, Any] | None, score: float | None) -> str:
+    revenue_yoy = number_or_none(latest.get("revenueYoY"))
+    net_yoy = number_or_none(latest.get("netProfitYoY"))
+    deducted_yoy = number_or_none(latest.get("deductedNetProfitYoY"))
+    gross_margin = number_or_none(latest.get("grossMargin"))
+    prev_gross_margin = number_or_none(previous.get("grossMargin")) if previous else None
+    net_profit = number_or_none(latest.get("netProfit"))
+    prev_net_profit = number_or_none(previous.get("netProfit")) if previous else None
+    if net_profit is not None and prev_net_profit is not None:
+        if prev_net_profit < 0 <= net_profit:
+            return "扭亏为盈"
+        if prev_net_profit >= 0 > net_profit:
+            return "由盈转亏"
+        if net_profit < 0 and net_profit < prev_net_profit:
+            return "亏损扩大"
+    if all(value is not None and value >= 20 for value in (revenue_yoy, net_yoy, deducted_yoy)) and (score or 0) >= 75:
+        return "盈利加速"
+    if (net_yoy is not None and net_yoy >= 0) and (
+        (deducted_yoy is not None and deducted_yoy >= 0)
+        or (gross_margin is not None and prev_gross_margin is not None and gross_margin > prev_gross_margin)
+    ):
+        return "盈利改善"
+    if net_yoy is not None and revenue_yoy is not None and net_yoy > 0 and revenue_yoy > 0:
+        return "稳定盈利"
+    previous_net_yoy = number_or_none(previous.get("netProfitYoY")) if previous else None
+    if previous_net_yoy is not None and net_yoy is not None and net_yoy > previous_net_yoy:
+        return "周期修复"
+    if (net_yoy is not None and net_yoy < 0) or (revenue_yoy is not None and revenue_yoy < 0):
+        return "盈利承压"
+    return "暂无评级"
+
+
+def compute_trend_score(rows: list[dict[str, Any]]) -> float | None:
+    recent = rows[-4:]
+    if len(recent) < 2:
+        return None
+    checks = (
+        "revenueYoY",
+        "netProfitYoY",
+        "deductedNetProfitYoY",
+        "grossMargin",
+    )
+    scores = []
+    for key in checks:
+        values = [number_or_none(row.get(key)) for row in recent]
+        values = [value for value in values if value is not None]
+        if len(values) < 2:
+            continue
+        improved = sum(1 for prev, current in zip(values, values[1:]) if current >= prev)
+        scores.append(improved / (len(values) - 1) * 100)
+    return sum(scores) / len(scores) if scores else None
+
+
+def build_profit_metrics(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    if not rows:
+        return None
+    latest = rows[-1]
+    previous = rows[-2] if len(rows) > 1 else None
+    growth_score = weighted_average(
+        [
+            (score_yoy(latest.get("revenueYoY")), 0.30),
+            (score_yoy(latest.get("netProfitYoY")), 0.35),
+            (score_yoy(latest.get("deductedNetProfitYoY")), 0.35),
+        ]
+    )
+    ability_base = weighted_average(
+        [
+            (score_ratio(latest.get("grossMargin"), ((45, 95), (30, 82), (20, 68), (10, 52))), 0.34),
+            (score_ratio(latest.get("netMargin"), ((20, 95), (12, 82), (6, 66), (2, 48))), 0.33),
+            (score_ratio(latest.get("roe"), ((20, 95), (15, 84), (10, 70), (5, 52))), 0.33),
+        ]
+    )
+    ability_score = None
+    if ability_base is not None:
+        ability_score = min(
+            100.0,
+            ability_base
+            + (score_improvement(latest.get("grossMargin"), previous.get("grossMargin")) if previous else 0)
+            + (score_improvement(latest.get("netMargin"), previous.get("netMargin")) if previous else 0)
+            + (score_improvement(latest.get("roe"), previous.get("roe")) if previous else 0),
+        )
+    cash_ratio = number_or_none(latest.get("operatingCashFlowToNetProfit"))
+    cash_score = None
+    if cash_ratio is not None:
+        if cash_ratio >= 1:
+            cash_score = 100.0
+        elif cash_ratio >= 0.6:
+            cash_score = 75.0
+        elif cash_ratio >= 0:
+            cash_score = 45.0
+        else:
+            cash_score = 5.0
+    quality_score = weighted_average(
+        [
+            (cash_score, 0.60),
+            (score_yoy(-number_or_none(latest.get("receivableYoY")) if number_or_none(latest.get("receivableYoY")) is not None else None), 0.20),
+            (score_yoy(-number_or_none(latest.get("inventoryYoY")) if number_or_none(latest.get("inventoryYoY")) is not None else None), 0.20),
+        ]
+    )
+    trend_score = compute_trend_score(rows)
+    total_score = weighted_average(
+        [
+            (growth_score, 0.40),
+            (ability_score, 0.25),
+            (quality_score, 0.20),
+            (trend_score, 0.15),
+        ]
+    )
+    score = round(total_score) if total_score is not None else None
+    return {
+        "profitScore": score,
+        "profitLabel": compute_profit_label(latest, previous, total_score),
+        "profitScores": {
+            "growth": round_or_none(growth_score, 1),
+            "ability": round_or_none(ability_score, 1),
+            "quality": round_or_none(quality_score, 1),
+            "trend": round_or_none(trend_score, 1),
+        },
+        "profitMetrics": latest,
+        "profitHistory": rows[-4:],
+        "profitConclusion": profit_conclusion(latest, previous, score),
+    }
+
+
+def profit_conclusion(latest: dict[str, Any], previous: dict[str, Any] | None, score: float | None) -> str:
+    revenue_yoy = number_or_none(latest.get("revenueYoY"))
+    net_yoy = number_or_none(latest.get("netProfitYoY"))
+    deducted_yoy = number_or_none(latest.get("deductedNetProfitYoY"))
+    cash_ratio = number_or_none(latest.get("operatingCashFlowToNetProfit"))
+    parts = []
+    if revenue_yoy is not None and net_yoy is not None:
+        if revenue_yoy > 0 and net_yoy > 0:
+            parts.append("最近一期收入和利润同步增长")
+        elif revenue_yoy < 0 or net_yoy < 0:
+            parts.append("最近一期收入或利润承压")
+    if deducted_yoy is not None and net_yoy is not None and deducted_yoy > net_yoy:
+        parts.append("扣非利润增速高于净利润")
+    if previous and number_or_none(latest.get("grossMargin")) is not None and number_or_none(previous.get("grossMargin")) is not None:
+        parts.append("毛利率改善" if latest["grossMargin"] > previous["grossMargin"] else "毛利率未改善")
+    if cash_ratio is not None and cash_ratio < 0:
+        parts.append("经营现金流为负，需要扣分观察")
+    elif cash_ratio is not None and cash_ratio >= 1:
+        parts.append("现金流覆盖利润较好")
+    if not parts:
+        return "财务字段不足，暂以已披露指标给出保守评分。"
+    return "，".join(parts) + ("，盈利趋势较强。" if score is not None and score >= 75 else "。")
+
+
+def build_financial_map(codes: set[str], end_date: str, cache_dir: Path, refresh: bool, sleep: float) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    financials: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
+    for code in sorted(codes):
+        cached = None if refresh else load_cached_financial(cache_dir, code, end_date)
+        if cached is not None:
+            financials[code] = cached
+            continue
+        try:
+            rows = fetch_financial_rows(code, end_date)
+            payload = build_profit_metrics(rows) or {"profitScore": None, "profitLabel": "暂无评级", "profitMetrics": None, "profitHistory": []}
+            write_cached_financial(cache_dir, code, end_date, payload)
+            financials[code] = payload
+            if sleep:
+                time.sleep(sleep)
+        except Exception as exc:
+            errors.append(f"{code}: financial fetch failed: {exc}")
+            financials[code] = {"profitScore": None, "profitLabel": "暂无评级", "profitMetrics": None, "profitHistory": []}
+    return financials, errors
+
+
 def enrich_high100_metrics(rows: list[dict[str, Any]], window: int = HIGH100_WINDOW) -> None:
     ordered = sorted(rows, key=lambda row: str(row.get("date") or ""))
     valid_rows: list[dict[str, Any]] = []
@@ -641,7 +1027,12 @@ def build_market_index(rows: list[dict[str, Any]], dates: list[str]) -> dict[str
     }
 
 
-def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str, Any]]], dates: list[str]) -> dict[str, Any]:
+def build_board(
+    board: dict[str, Any],
+    stock_histories: dict[str, list[dict[str, Any]]],
+    dates: list[str],
+    financials: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     stocks = []
     stock_rows_by_code: dict[str, dict[str, dict[str, Any]]] = {}
     for item in board.get("stocks", []):
@@ -650,8 +1041,10 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
             continue
         rows = stock_histories.get(code, [])
         enrich_high100_metrics(rows)
+        enrich_macd_metrics(rows)
         stock_rows_by_code[code] = {row["date"]: row for row in rows}
         latest = next((row for row in reversed(rows) if row.get("changePercent") is not None), None)
+        profit = (financials or {}).get(code) or {}
         stocks.append(
             {
                 "code": code,
@@ -669,7 +1062,18 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                 "latestIsNearHigh100": latest.get("isNearHigh100") if latest else None,
                 "latestPosition100": latest.get("position100") if latest else None,
                 "latestHighStatus": latest.get("highStatus") if latest else None,
+                "latestMacdDif": latest.get("macdDif") if latest else None,
+                "latestMacdDea": latest.get("macdDea") if latest else None,
+                "latestMacdHist": latest.get("macdHist") if latest else None,
+                "latestMacdLabel": latest.get("macdLabel") if latest else None,
+                "latestMacdScore": latest.get("macdScore") if latest else None,
                 "availableDays": sum(1 for row in rows if row.get("date") in dates and row.get("changePercent") is not None),
+                "profitScore": profit.get("profitScore"),
+                "profitLabel": profit.get("profitLabel") or "暂无评级",
+                "profitScores": profit.get("profitScores"),
+                "profitMetrics": profit.get("profitMetrics"),
+                "profitHistory": profit.get("profitHistory") or [],
+                "profitConclusion": profit.get("profitConclusion"),
             }
         )
 
@@ -709,6 +1113,14 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                     "isNearHigh100": row.get("isNearHigh100") if row else None,
                     "position100": row.get("position100") if row else None,
                     "highStatus": row.get("highStatus") if row else None,
+                    "macdDif": row.get("macdDif") if row else None,
+                    "macdDea": row.get("macdDea") if row else None,
+                    "macdHist": row.get("macdHist") if row else None,
+                    "macdLabel": row.get("macdLabel") if row else None,
+                    "macdScore": row.get("macdScore") if row else None,
+                    "profitScore": stock.get("profitScore"),
+                    "profitLabel": stock.get("profitLabel"),
+                    "profitMetrics": stock.get("profitMetrics"),
                 }
             )
         daily_stocks = sorted(daily_stocks, key=lambda row: sort_change_value(row.get("changePercent")), reverse=True)
@@ -752,6 +1164,12 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
         }
         for item in trend
     ]
+    profit_rank = sorted(
+        stocks,
+        key=lambda row: number_or_none(row.get("profitScore")) if number_or_none(row.get("profitScore")) is not None else -1,
+        reverse=True,
+    )
+    scored_profit_rank = [row for row in profit_rank if number_or_none(row.get("profitScore")) is not None]
     return {
         "code": board.get("code") or re.sub(r"\s+", "-", str(board.get("name") or "custom")).lower(),
         "name": board.get("name") or "自定义板块",
@@ -768,6 +1186,8 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
         "latestTotalVolume": latest_trend.get("totalVolume") if latest_trend else None,
         "latestTotalTurnover": latest_trend.get("totalTurnover") if latest_trend else None,
         "latestTotalAmount": latest_trend.get("totalAmount") if latest_trend else None,
+        "latestAvgProfitScore": round(sum(float(row["profitScore"]) for row in scored_profit_rank) / len(scored_profit_rank), 1) if scored_profit_rank else None,
+        "profitRank": profit_rank,
         "stocks": sorted(stocks, key=lambda row: sort_change_value(row.get("latestChangePercent")), reverse=True),
         "trend": trend,
         "boardNewHighTrend": board_new_high_trend,
@@ -783,7 +1203,10 @@ def main() -> None:
     parser.add_argument("--lookback-days", type=int, default=220)
     parser.add_argument("--sleep", type=float, default=0.2)
     parser.add_argument("--cache-dir", type=Path, default=CACHE_DIR)
+    parser.add_argument("--financial-cache-dir", type=Path, default=FINANCIAL_CACHE_DIR)
     parser.add_argument("--refresh", action="store_true", help="Ignore cached stock histories and fetch all codes again.")
+    parser.add_argument("--refresh-financial", action="store_true", help="Ignore cached financial metrics and fetch all codes again.")
+    parser.add_argument("--skip-financial", action="store_true", help="Skip optional profit score enrichment.")
     parser.add_argument("--intraday", action="store_true", help="Overlay today's realtime spot quotes into the latest custom board row.")
     args = parser.parse_args()
 
@@ -828,7 +1251,18 @@ def main() -> None:
             print(f"Failed intraday spot overlay: {exc}")
 
     dates = latest_trading_dates(stock_histories, args.days)
-    built_boards = [build_board(board, stock_histories, dates) for board in boards]
+    financials: dict[str, dict[str, Any]] = {}
+    if not args.skip_financial:
+        financials, financial_errors = build_financial_map(
+            set(codes),
+            args.date,
+            args.financial_cache_dir,
+            args.refresh_financial,
+            args.sleep,
+        )
+        errors.extend({"code": "financial", "error": error} for error in financial_errors)
+        print(f"Financial rows: {len(financials)}/{len(codes)}")
+    built_boards = [build_board(board, stock_histories, dates, financials) for board in boards]
     built_boards = sorted(built_boards, key=lambda board: sort_change_value(board.get("latestAverageChange")), reverse=True)
     market_index = None
     try:

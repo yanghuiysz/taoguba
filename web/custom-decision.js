@@ -233,6 +233,14 @@
     return { label: '普通观察', tone: 'watch' };
   }
 
+  function macdTone(label, score) {
+    const text = String(label || '');
+    if (text.includes('死叉') || text.includes('绿柱扩张') || score <= 35) return 'risk';
+    if (text.includes('金叉') || text.includes('红柱扩张') || text.includes('零轴上') || score >= 75) return 'strong';
+    if (text.includes('收敛') || score >= 55) return 'test';
+    return 'watch';
+  }
+
   function stockItems(board) {
     return (board?.stocks || []).map((stock) => {
       const items = rowsToSelected(board, 20).map((row) => {
@@ -269,11 +277,21 @@
       const pullback = pullbackMetric(safeNumber(latest?.changePercent), latestTurnover, prevTurnover);
       const relScore = scoreRange(average([rel5, rel10]), -5, 10);
       const drawdownScore = 100 - scoreRange(drawdown, 4, 18);
-      const resilienceScore = clampValue(0.45 * relScore + 0.25 * drawdownScore + 0.18 * trendScore + 0.12 * pullback.score, 0, 100);
+      const macdScore = safeNumber(latest?.macdScore) ?? 50;
+      const macdLabel = latest?.macdLabel || 'MACD暂无';
+      const resilienceScore = clampValue(
+        0.40 * relScore
+        + 0.23 * drawdownScore
+        + 0.16 * trendScore
+        + 0.11 * pullback.score
+        + 0.10 * macdScore,
+        0,
+        100,
+      );
       let action = '普通观察';
       if (resilienceScore >= 78 && ['均线多头', '趋势保持'].includes(trendLabel) && pullback.label !== '放量下跌') action = '优先观察';
       else if (resilienceScore >= 65 && pullback.label !== '放量下跌') action = '可观察';
-      else if (pullback.label === '放量下跌' || trendLabel === '趋势偏弱') action = '谨慎';
+      else if (pullback.label === '放量下跌' || trendLabel === '趋势偏弱' || macdScore <= 30) action = '谨慎';
       return {
         code: stock.code,
         name: stock.name || stock.code,
@@ -283,6 +301,8 @@
         trendLabel,
         trendScore,
         pullback,
+        macdLabel,
+        macdScore,
         resilienceScore,
         action,
       };
@@ -338,7 +358,7 @@
           <table>
             <thead>
               <tr>
-                <th>排名</th><th>股票</th><th>韧性分</th><th>5日相对板块</th><th>趋势</th><th>回踩</th><th>操作标签</th>
+                <th>排名</th><th>股票</th><th>韧性分</th><th>5日相对板块</th><th>趋势</th><th>MACD</th><th>回踩</th><th>操作标签</th>
               </tr>
             </thead>
             <tbody>
@@ -349,6 +369,7 @@
                   <td><strong>${fmt(item.resilienceScore, 0)}</strong></td>
                   <td class="${changeClass(item.rel5)}">${fmtPercent(item.rel5)}</td>
                   <td><span class="decision-badge ${toneFor(item.trendLabel, item.trendScore)}">${item.trendLabel}</span></td>
+                  <td><span class="decision-badge ${macdTone(item.macdLabel, item.macdScore)}">${item.macdLabel}</span></td>
                   <td><span class="decision-badge ${toneFor(item.pullback.label, item.pullback.score)}">${item.pullback.label}</span></td>
                   <td><span class="decision-action ${item.action === '优先观察' ? 'strong' : item.action === '可观察' ? 'test' : item.action === '谨慎' ? 'risk' : 'watch'}">${item.action}</span></td>
                 </tr>`).join('')}
