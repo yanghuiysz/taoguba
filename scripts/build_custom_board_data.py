@@ -16,6 +16,7 @@ import akshare as ak
 CONFIG_PATH = Path("web/data/custom_boards_config.json")
 OUT_PATH = Path("web/data/custom_boards.json")
 CACHE_DIR = Path("data/custom_stock_history")
+HIGH100_WINDOW = 100
 MARKET_INDEX_SYMBOL = "sh000001"
 MARKET_INDEX_NAME = "上证指数"
 
@@ -399,6 +400,52 @@ def sort_change_value(value: Any) -> float:
     return number if number is not None else -999999.0
 
 
+def round_or_none(value: float | None, digits: int = 4) -> float | None:
+    return round(value, digits) if value is not None else None
+
+
+def enrich_high100_metrics(rows: list[dict[str, Any]], window: int = HIGH100_WINDOW) -> None:
+    ordered = sorted(rows, key=lambda row: str(row.get("date") or ""))
+    valid_rows: list[dict[str, Any]] = []
+    for row in ordered:
+        close = number_or_none(row.get("close"))
+        high = number_or_none(row.get("high"))
+        low = number_or_none(row.get("low"))
+        if close is None or high is None or low is None:
+            continue
+        valid_rows.append(row)
+        recent = valid_rows[-window:]
+        if len(recent) < window:
+            row["high100"] = None
+            row["low100"] = None
+            row["isHigh100"] = None
+            row["distanceToHigh100"] = None
+            row["isNearHigh100"] = None
+            row["position100"] = None
+            row["highStatus"] = None
+            continue
+        high100 = max(float(item["high"]) for item in recent)
+        low100 = min(float(item["low"]) for item in recent)
+        distance = (close - high100) / high100 * 100 if high100 else None
+        position = 1.0 if high100 == low100 else (close - low100) / (high100 - low100)
+        is_high = close >= high100
+        is_near = close >= high100 * 0.97
+        row["high100"] = round(high100, 4)
+        row["low100"] = round(low100, 4)
+        row["isHigh100"] = is_high
+        row["distanceToHigh100"] = round_or_none(distance, 4)
+        row["isNearHigh100"] = is_near
+        row["position100"] = round(position, 4)
+        if is_high:
+            row["highStatus"] = "百日新高"
+        elif is_near:
+            row["highStatus"] = "近高位"
+        elif distance is not None and distance >= -8:
+            row["highStatus"] = "高位震荡"
+        else:
+            row["highStatus"] = "距离较远"
+
+
 def row_volume(row: dict[str, Any] | None) -> float | None:
     if not row:
         return None
@@ -525,6 +572,7 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
         if not code:
             continue
         rows = stock_histories.get(code, [])
+        enrich_high100_metrics(rows)
         stock_rows_by_code[code] = {row["date"]: row for row in rows}
         latest = next((row for row in reversed(rows) if row.get("changePercent") is not None), None)
         stocks.append(
@@ -537,6 +585,13 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                 "latestVolume": row_volume(latest),
                 "latestTurnover": row_turnover(latest),
                 "latestAmount": row_turnover(latest),
+                "latestHigh100": latest.get("high100") if latest else None,
+                "latestLow100": latest.get("low100") if latest else None,
+                "latestIsHigh100": latest.get("isHigh100") if latest else None,
+                "latestDistanceToHigh100": latest.get("distanceToHigh100") if latest else None,
+                "latestIsNearHigh100": latest.get("isNearHigh100") if latest else None,
+                "latestPosition100": latest.get("position100") if latest else None,
+                "latestHighStatus": latest.get("highStatus") if latest else None,
                 "availableDays": sum(1 for row in rows if row.get("date") in dates and row.get("changePercent") is not None),
             }
         )
@@ -547,6 +602,7 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
         values = []
         volumes = []
         turnovers = []
+        high_metrics = []
         for stock in stocks:
             row = stock_rows_by_code.get(stock["code"], {}).get(date)
             change = row.get("changePercent") if row else None
@@ -558,6 +614,8 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                 volumes.append(float(volume))
             if turnover is not None:
                 turnovers.append(float(turnover))
+            if row and row.get("high100") is not None and row.get("distanceToHigh100") is not None and row.get("position100") is not None:
+                high_metrics.append(row)
             daily_stocks.append(
                 {
                     "code": stock["code"],
@@ -567,9 +625,19 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                     "volume": volume,
                     "turnover": turnover,
                     "amount": turnover,
+                    "high100": row.get("high100") if row else None,
+                    "low100": row.get("low100") if row else None,
+                    "isHigh100": row.get("isHigh100") if row else None,
+                    "distanceToHigh100": row.get("distanceToHigh100") if row else None,
+                    "isNearHigh100": row.get("isNearHigh100") if row else None,
+                    "position100": row.get("position100") if row else None,
+                    "highStatus": row.get("highStatus") if row else None,
                 }
             )
         daily_stocks = sorted(daily_stocks, key=lambda row: sort_change_value(row.get("changePercent")), reverse=True)
+        high_stock_count = len(high_metrics)
+        high100_count = sum(1 for row in high_metrics if row.get("isHigh100") is True)
+        near_high100_count = sum(1 for row in high_metrics if row.get("isNearHigh100") is True)
         trend.append(
             {
                 "date": date,
@@ -581,22 +649,51 @@ def build_board(board: dict[str, Any], stock_histories: dict[str, list[dict[str,
                 "volumeStockCount": len(volumes),
                 "turnoverStockCount": len(turnovers),
                 "amountStockCount": len(turnovers),
+                "high100StockCount": high_stock_count,
+                "high100Count": high100_count,
+                "nearHigh100Count": near_high100_count,
+                "high100Rate": round(high100_count / high_stock_count * 100, 4) if high_stock_count else None,
+                "nearHigh100Rate": round(near_high100_count / high_stock_count * 100, 4) if high_stock_count else None,
+                "avgDistanceToHigh100": round(sum(float(row["distanceToHigh100"]) for row in high_metrics) / high_stock_count, 4) if high_stock_count else None,
+                "avgPosition100": round(sum(float(row["position100"]) for row in high_metrics) / high_stock_count, 4) if high_stock_count else None,
                 "stocks": daily_stocks,
             }
         )
 
     latest_trend = next((item for item in reversed(trend) if item.get("averageChange") is not None), None)
+    board_new_high_trend = [
+        {
+            "date": item.get("date"),
+            "stockCount": item.get("high100StockCount", 0),
+            "high100Count": item.get("high100Count", 0),
+            "nearHigh100Count": item.get("nearHigh100Count", 0),
+            "high100Rate": item.get("high100Rate"),
+            "nearHigh100Rate": item.get("nearHigh100Rate"),
+            "avgDistanceToHigh100": item.get("avgDistanceToHigh100"),
+            "avgPosition100": item.get("avgPosition100"),
+            "averageChange": item.get("averageChange"),
+        }
+        for item in trend
+    ]
     return {
         "code": board.get("code") or re.sub(r"\s+", "-", str(board.get("name") or "custom")).lower(),
         "name": board.get("name") or "自定义板块",
         "stockCount": len(stocks),
         "availableStockCount": latest_trend.get("stockCount") if latest_trend else 0,
+        "latestHigh100StockCount": latest_trend.get("high100StockCount") if latest_trend else 0,
+        "latestHigh100Count": latest_trend.get("high100Count") if latest_trend else 0,
+        "latestNearHigh100Count": latest_trend.get("nearHigh100Count") if latest_trend else 0,
+        "latestHigh100Rate": latest_trend.get("high100Rate") if latest_trend else None,
+        "latestNearHigh100Rate": latest_trend.get("nearHigh100Rate") if latest_trend else None,
+        "latestAvgDistanceToHigh100": latest_trend.get("avgDistanceToHigh100") if latest_trend else None,
+        "latestAvgPosition100": latest_trend.get("avgPosition100") if latest_trend else None,
         "latestAverageChange": latest_trend.get("averageChange") if latest_trend else None,
         "latestTotalVolume": latest_trend.get("totalVolume") if latest_trend else None,
         "latestTotalTurnover": latest_trend.get("totalTurnover") if latest_trend else None,
         "latestTotalAmount": latest_trend.get("totalAmount") if latest_trend else None,
         "stocks": sorted(stocks, key=lambda row: sort_change_value(row.get("latestChangePercent")), reverse=True),
         "trend": trend,
+        "boardNewHighTrend": board_new_high_trend,
     }
 
 
@@ -606,7 +703,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=OUT_PATH)
     parser.add_argument("--date", default=datetime.now().strftime("%Y%m%d"), help="End date such as 20260417.")
     parser.add_argument("--days", type=int, default=15)
-    parser.add_argument("--lookback-days", type=int, default=45)
+    parser.add_argument("--lookback-days", type=int, default=220)
     parser.add_argument("--sleep", type=float, default=0.2)
     parser.add_argument("--cache-dir", type=Path, default=CACHE_DIR)
     parser.add_argument("--refresh", action="store_true", help="Ignore cached stock histories and fetch all codes again.")
