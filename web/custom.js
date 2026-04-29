@@ -512,9 +512,21 @@ function pureStockCodes(board) {
   ]);
 }
 
+function displayStockCodes(board) {
+  const codes = pureStockCodes(board);
+  const boardCodes = new Set(
+    (board?.stocks || [])
+      .map((stock) => String(stock.code || ''))
+      .filter(Boolean),
+  );
+  const currentPureCodes = new Set([...codes].filter((code) => boardCodes.has(code)));
+  if (currentPureCodes.size) return currentPureCodes;
+  return boardCodes;
+}
+
 function rowPureAverageChange(board, row) {
   if (!row) return null;
-  const codes = pureStockCodes(board);
+  const codes = displayStockCodes(board);
   if (!codes.size) return null;
   const stocks = (row.stocks || []).filter((stock) =>
     codes.has(String(stock.code || ''))
@@ -528,7 +540,7 @@ function rowDisplayAverageChange(board, row) {
 }
 
 function pureCoreSeries(board) {
-  const coreCodes = pureStockCodes(board);
+  const coreCodes = displayStockCodes(board);
   return trendValues(board).map((row) => {
     const stocks = (row.stocks || []).filter((stock) => coreCodes.has(String(stock.code || '')));
     const amountStocks = stocks.filter((stock) => stockTurnover(stock) !== null);
@@ -548,7 +560,7 @@ function pureCoreSeries(board) {
 }
 
 function pureChangeSeries(board) {
-  const codes = pureStockCodes(board);
+  const codes = displayStockCodes(board);
   return trendValues(board).map((row) => {
     const stocks = (row.stocks || []).filter((stock) => codes.has(String(stock.code || '')));
     const changeStocks = stocks.filter((stock) => Number.isFinite(Number(stock.changePercent)));
@@ -591,8 +603,8 @@ function rowStocksByCodes(row, codes) {
 }
 
 function rowPureMetricInput(board, row) {
-  const pureCodes = pureStockCodes(board);
-  const coreCodes = pureCoreStockCodes(board);
+  const pureCodes = displayStockCodes(board);
+  const coreCodes = pureCoreStockCodes(board).size ? pureCoreStockCodes(board) : pureCodes;
   const pureStocks = rowStocksByCodes(row, pureCodes);
   const coreStocks = rowStocksByCodes(row, coreCodes);
   const amountStocks = pureStocks.filter((stock) => stockTurnover(stock) !== null);

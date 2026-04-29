@@ -463,6 +463,207 @@ def merge_market_index_intraday(rows: list[dict[str, Any]], spot_row: dict[str, 
     rows.sort(key=lambda row: str(row.get("date") or ""))
 
 
+def enrich_fast_intraday_stock_row(row: dict[str, Any], spot: dict[str, Any] | None, previous: dict[str, Any] | None) -> dict[str, Any]:
+    updated = dict(previous or row)
+    if spot:
+        updated.update(
+            {
+                "date": spot.get("date"),
+                "changePercent": spot.get("changePercent"),
+                "close": spot.get("close"),
+                "volume": row_volume(spot),
+                "turnover": row_turnover(spot),
+                "amount": row_turnover(spot),
+                "source": spot.get("source"),
+                "timestamp": spot.get("timestamp"),
+            }
+        )
+    for key in (
+        "high100",
+        "low100",
+        "isHigh100",
+        "distanceToHigh100",
+        "isNearHigh100",
+        "position100",
+        "highStatus",
+        "macdDif",
+        "macdDea",
+        "macdHist",
+        "macdLabel",
+        "macdScore",
+        "profitScore",
+        "profitLabel",
+        "profitMetrics",
+    ):
+        if updated.get(key) is None and previous:
+            updated[key] = previous.get(key)
+    return updated
+
+
+def summarize_fast_intraday_board_row(date: str, stocks: list[dict[str, Any]]) -> dict[str, Any]:
+    values = [float(value) for value in (number_or_none(stock.get("changePercent")) for stock in stocks) if value is not None]
+    volumes = [float(value) for value in (number_or_none(stock.get("volume")) for stock in stocks) if value is not None]
+    turnovers = [float(value) for value in (number_or_none(stock.get("turnover")) for stock in stocks) if value is not None]
+    high_metrics = [
+        stock for stock in stocks
+        if stock.get("high100") is not None
+        and stock.get("distanceToHigh100") is not None
+        and stock.get("position100") is not None
+    ]
+    high_stock_count = len(high_metrics)
+    high100_count = sum(1 for stock in high_metrics if stock.get("isHigh100") is True)
+    near_high100_count = sum(1 for stock in high_metrics if stock.get("isNearHigh100") is True)
+    return {
+        "date": date,
+        "averageChange": round(sum(values) / len(values), 4) if values else None,
+        "totalVolume": round(sum(volumes), 2) if volumes else None,
+        "totalTurnover": round(sum(turnovers), 2) if turnovers else None,
+        "totalAmount": round(sum(turnovers), 2) if turnovers else None,
+        "stockCount": len(values),
+        "volumeStockCount": len(volumes),
+        "turnoverStockCount": len(turnovers),
+        "amountStockCount": len(turnovers),
+        "high100StockCount": high_stock_count,
+        "high100Count": high100_count,
+        "nearHigh100Count": near_high100_count,
+        "high100Rate": round(high100_count / high_stock_count * 100, 4) if high_stock_count else None,
+        "nearHigh100Rate": round(near_high100_count / high_stock_count * 100, 4) if high_stock_count else None,
+        "avgDistanceToHigh100": round(sum(float(stock["distanceToHigh100"]) for stock in high_metrics) / high_stock_count, 4) if high_stock_count else None,
+        "avgPosition100": round(sum(float(stock["position100"]) for stock in high_metrics) / high_stock_count, 4) if high_stock_count else None,
+        "stocks": sorted(stocks, key=lambda stock: sort_change_value(stock.get("changePercent")), reverse=True),
+    }
+
+
+def sync_fast_intraday_board_latest(board: dict[str, Any], latest_row: dict[str, Any]) -> None:
+    board["availableStockCount"] = latest_row.get("stockCount")
+    board["latestHigh100StockCount"] = latest_row.get("high100StockCount")
+    board["latestHigh100Count"] = latest_row.get("high100Count")
+    board["latestNearHigh100Count"] = latest_row.get("nearHigh100Count")
+    board["latestHigh100Rate"] = latest_row.get("high100Rate")
+    board["latestNearHigh100Rate"] = latest_row.get("nearHigh100Rate")
+    board["latestAvgDistanceToHigh100"] = latest_row.get("avgDistanceToHigh100")
+    board["latestAvgPosition100"] = latest_row.get("avgPosition100")
+    board["latestAverageChange"] = latest_row.get("averageChange")
+    board["latestTotalVolume"] = latest_row.get("totalVolume")
+    board["latestTotalTurnover"] = latest_row.get("totalTurnover")
+    board["latestTotalAmount"] = latest_row.get("totalAmount")
+    stock_rows = {stock.get("code"): stock for stock in latest_row.get("stocks", [])}
+    for stock in board.get("stocks", []):
+        row = stock_rows.get(stock.get("code"))
+        if not row:
+            continue
+        stock["latestDate"] = latest_row.get("date")
+        stock["latestClose"] = row.get("close")
+        stock["latestChangePercent"] = row.get("changePercent")
+        stock["latestVolume"] = row.get("volume")
+        stock["latestTurnover"] = row.get("turnover")
+        stock["latestAmount"] = row.get("amount")
+        stock["latestHigh100"] = row.get("high100")
+        stock["latestLow100"] = row.get("low100")
+        stock["latestIsHigh100"] = row.get("isHigh100")
+        stock["latestDistanceToHigh100"] = row.get("distanceToHigh100")
+        stock["latestIsNearHigh100"] = row.get("isNearHigh100")
+        stock["latestPosition100"] = row.get("position100")
+        stock["latestHighStatus"] = row.get("highStatus")
+        stock["latestMacdDif"] = row.get("macdDif")
+        stock["latestMacdDea"] = row.get("macdDea")
+        stock["latestMacdHist"] = row.get("macdHist")
+        stock["latestMacdLabel"] = row.get("macdLabel")
+        stock["latestMacdScore"] = row.get("macdScore")
+
+
+def fast_intraday_refresh(config_path: Path, out_path: Path, date: str) -> None:
+    if not out_path.exists():
+        raise FileNotFoundError(f"Existing custom board data is required for --intraday-fast: {out_path}")
+    config = load_config(config_path)
+    payload = json.loads(out_path.read_text(encoding="utf-8"))
+    formatted_date = format_date(date)
+    days = int(payload.get("days") or 15)
+    codes = sorted(
+        {
+            normalize_stock_code(stock.get("code"))
+            for board in config.get("boards", [])
+            for stock in board.get("stocks", [])
+            if normalize_stock_code(stock.get("code"))
+        }
+    )
+    spot_rows = fetch_tencent_spot(set(codes), date)
+
+    for board in payload.get("boards", []):
+        trend = board.setdefault("trend", [])
+        previous_row = trend[-1] if trend else {}
+        previous_stocks = {stock.get("code"): stock for stock in previous_row.get("stocks", [])}
+        updated_stocks = []
+        for stock in board.get("stocks", []):
+            code = normalize_stock_code(stock.get("code"))
+            if not code:
+                continue
+            base = {
+                "code": code,
+                "name": stock.get("name") or code,
+                "profitScore": stock.get("profitScore"),
+                "profitLabel": stock.get("profitLabel"),
+                "profitMetrics": stock.get("profitMetrics"),
+            }
+            updated_stocks.append(enrich_fast_intraday_stock_row(base, spot_rows.get(code), previous_stocks.get(code)))
+        latest_row = summarize_fast_intraday_board_row(formatted_date, updated_stocks)
+        trend[:] = [row for row in trend if row.get("date") != formatted_date]
+        trend.append(latest_row)
+        trend.sort(key=lambda row: str(row.get("date") or ""))
+        if len(trend) > days:
+            del trend[:-days]
+        sync_fast_intraday_board_latest(board, latest_row)
+        board["boardNewHighTrend"] = [
+            {
+                "date": item.get("date"),
+                "stockCount": item.get("high100StockCount", 0),
+                "high100Count": item.get("high100Count", 0),
+                "nearHigh100Count": item.get("nearHigh100Count", 0),
+                "high100Rate": item.get("high100Rate"),
+                "nearHigh100Rate": item.get("nearHigh100Rate"),
+                "avgDistanceToHigh100": item.get("avgDistanceToHigh100"),
+                "avgPosition100": item.get("avgPosition100"),
+                "averageChange": item.get("averageChange"),
+            }
+            for item in trend
+        ]
+
+    market_index = payload.get("marketIndex") or {}
+    market_trend = market_index.setdefault("trend", [])
+    market_url = f"https://qt.gtimg.cn/q={quote(MARKET_INDEX_SYMBOL)}"
+    with urlopen(market_url, timeout=15) as response:
+        market_payload = response.read().decode("gbk", errors="replace")
+    market_spot = normalize_tencent_market_index_payload(market_payload, MARKET_INDEX_SYMBOL, date)
+    if market_spot:
+        previous = next((row for row in reversed(market_trend) if row.get("date") != formatted_date), None)
+        previous_turnover = (previous or {}).get("turnover") or (previous or {}).get("volume")
+        current_turnover = market_spot.get("turnover") or market_spot.get("volume")
+        market_spot.update(volume_price_state(market_spot.get("changePercent"), current_turnover, previous_turnover))
+        market_trend[:] = [row for row in market_trend if row.get("date") != formatted_date]
+        market_trend.append(market_spot)
+        market_trend.sort(key=lambda row: str(row.get("date") or ""))
+        if len(market_trend) > days:
+            del market_trend[:-days]
+    latest_market = market_trend[-1] if market_trend else {}
+    market_index["latestDate"] = latest_market.get("date")
+    market_index["latestClose"] = latest_market.get("close")
+    market_index["latestChangePercent"] = latest_market.get("changePercent")
+    market_index["latestVolume"] = latest_market.get("volume")
+    market_index["latestState"] = latest_market.get("label")
+    payload["marketIndex"] = market_index
+
+    payload["date"] = formatted_date
+    source = payload.setdefault("source", {})
+    source["name"] = "Tencent realtime quotes"
+    source["kind"] = "A-share realtime spot overlay"
+    source["note"] = "Fast intraday refresh updates only the latest custom-board rows used by the intraday radar."
+    payload["errors"] = [error for error in payload.get("errors", []) if error.get("code") not in {"intraday", "market_index"}]
+    payload = sanitize_json_value(payload)
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    print(f"Fast intraday rows: {len(spot_rows)}/{len(codes)} for {formatted_date}")
+    print(f"Wrote {out_path}")
+
+
 def latest_trading_dates(stock_histories: dict[str, list[dict[str, Any]]], days: int) -> list[str]:
     dates = {
         row["date"]
@@ -1210,7 +1411,12 @@ def main() -> None:
     parser.add_argument("--refresh-financial", action="store_true", help="Ignore cached financial metrics and fetch all codes again.")
     parser.add_argument("--skip-financial", action="store_true", help="Skip optional profit score enrichment.")
     parser.add_argument("--intraday", action="store_true", help="Overlay today's realtime spot quotes into the latest custom board row.")
+    parser.add_argument("--intraday-fast", action="store_true", help="Only update existing custom board JSON with realtime spot rows for intraday radar refresh.")
     args = parser.parse_args()
+
+    if args.intraday_fast:
+        fast_intraday_refresh(args.config, args.out, args.date)
+        return
 
     config = load_config(args.config)
     boards = config.get("boards", [])

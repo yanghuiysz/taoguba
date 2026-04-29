@@ -66,6 +66,19 @@ def format_date(value: str) -> str:
     return value
 
 
+def is_today(value: str, now: datetime | None = None) -> bool:
+    now = now or datetime.now()
+    return compact_date(format_date(value)) == now.strftime("%Y%m%d")
+
+
+def is_trading_time(now: datetime | None = None) -> bool:
+    now = now or datetime.now()
+    if now.weekday() >= 5:
+        return False
+    minutes = now.hour * 60 + now.minute
+    return (9 * 60 + 30 <= minutes <= 11 * 60 + 30) or (13 * 60 <= minutes <= 15 * 60 + 5)
+
+
 def verify_kpl_history(date: str) -> None:
     history_path = KPL_HISTORY_DIR / f"{compact_date(format_date(date))}.json"
     if history_path.exists():
@@ -84,8 +97,22 @@ def main() -> None:
     parser.add_argument("--custom-sleep", type=float, default=0.2, help="Delay between custom stock history requests.")
     parser.add_argument("--strict-external", action="store_true", help="Fail the run when optional external mapping fails.")
     parser.add_argument("--strict-custom", action="store_true", help="Fail the run when custom board rebuild fails.")
+    parser.add_argument("--intraday-radar-only", action="store_true", help="Only refresh custom-board intraday data used by the intraday radar.")
+    parser.add_argument("--full-during-trading", action="store_true", help="Run the full update even when the target date is today during trading hours.")
     parser.add_argument("--sort-by", default="strength", help="Kaipanla plate sort key.")
     args = parser.parse_args()
+
+    radar_only = args.intraday_radar_only or (
+        is_today(args.date)
+        and is_trading_time()
+        and not args.full_during_trading
+    )
+    if radar_only:
+        print("\nIntraday radar refresh mode: updating custom-board realtime data only.", flush=True)
+        args.skip_kpl = True
+        args.skip_external = True
+        args.skip_custom = False
+        args.intraday_custom = True
 
     if not args.skip_kpl:
         run_script(["scripts/fetch_kpl_probe.py", "--date", args.date])
@@ -101,6 +128,8 @@ def main() -> None:
 
     if not args.skip_custom:
         custom_args = ["scripts/build_custom_board_data.py", "--date", args.date, "--sleep", str(args.custom_sleep)]
+        if radar_only:
+            custom_args.append("--intraday-fast")
         if args.intraday_custom:
             custom_args.append("--intraday")
         if args.strict_custom:

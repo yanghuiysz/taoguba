@@ -4,21 +4,27 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260429-pullback-priority-v1",
+  custom: "./custom.html?v=20260429-intraday-tab-v1",
+  intraday: "./intraday.html?v=20260429-intraday-tab-v1",
 };
 const AUTO_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
-const AUTO_REFRESH_STOP_HOUR = 15;
-const AUTO_REFRESH_STOP_MINUTE = 5;
+const INTRADAY_REFRESH_TARGET = "intraday";
 
 function withCacheBust(src) {
   const separator = src.includes("?") ? "&" : "?";
   return `${src}${separator}auto=${Date.now()}`;
 }
 
-function isAfterTradingRefreshWindow(now = new Date()) {
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-  return hour > AUTO_REFRESH_STOP_HOUR || (hour === AUTO_REFRESH_STOP_HOUR && minute >= AUTO_REFRESH_STOP_MINUTE);
+function minutesSinceMidnight(now = new Date()) {
+  return now.getHours() * 60 + now.getMinutes();
+}
+
+function isTradingRefreshWindow(now = new Date()) {
+  const day = now.getDay();
+  if (day === 0 || day === 6) return false;
+  const minutes = minutesSinceMidnight(now);
+  return (minutes >= 9 * 60 + 30 && minutes <= 11 * 60 + 30)
+    || (minutes >= 13 * 60 && minutes <= 15 * 60 + 5);
 }
 
 function resizeFrame(frame) {
@@ -49,14 +55,13 @@ function activate(target) {
   });
 }
 
-function refreshActiveFrame() {
-  if (isAfterTradingRefreshWindow()) return;
-  const activePanel = document.querySelector(".panel.active");
-  const activeName = activePanel?.id?.replace("panel-", "");
-  const activeFrame = activePanel?.querySelector("iframe");
-  const expected = frameSrc[activeName];
-  if (!activeFrame || !expected) return;
-  activeFrame.setAttribute("src", withCacheBust(expected));
+function refreshIntradayFrame() {
+  if (!isTradingRefreshWindow()) return;
+  const panel = panels[INTRADAY_REFRESH_TARGET];
+  const frame = panel?.querySelector("iframe");
+  const expected = frameSrc[INTRADAY_REFRESH_TARGET];
+  if (!frame || !expected) return;
+  frame.setAttribute("src", withCacheBust(expected));
 }
 
 tabs.forEach((tab) => {
@@ -83,4 +88,4 @@ window.addEventListener("message", (event) => {
 });
 
 activate(document.querySelector(".tab.active")?.dataset.target || tabs[0]?.dataset.target);
-window.setInterval(refreshActiveFrame, AUTO_REFRESH_INTERVAL_MS);
+window.setInterval(refreshIntradayFrame, AUTO_REFRESH_INTERVAL_MS);

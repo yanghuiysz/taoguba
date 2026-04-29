@@ -589,7 +589,6 @@
             ${renderBoardMiniList(risk)}
           </div>
         </div>
-        ${renderIntradayOpportunityPanel(metrics)}
       </section>
     `;
   }
