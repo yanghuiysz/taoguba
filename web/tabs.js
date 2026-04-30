@@ -6,6 +6,7 @@ const frameSrc = {
   kpl: "./kpl.html",
   custom: "./custom.html?v=20260429-intraday-tab-v1",
   intraday: "./intraday.html?v=20260429-intraday-tab-v1",
+  trades: "./trades.html?v=20260430-trades-v1",
 };
 const AUTO_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 const INTRADAY_REFRESH_TARGET = "intraday";

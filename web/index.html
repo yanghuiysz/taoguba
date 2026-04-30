@@ -11,6 +11,7 @@
       <header class="top-switcher" aria-label="数据源切换">
         <nav class="tabs" aria-label="数据源切换">
           <button class="tab active" data-target="intraday">盘中雷达</button>
+          <button class="tab" data-target="trades">操作记录</button>
           <button class="tab" data-target="custom">自定义板块</button>
           <button class="tab" data-target="kpl">开盘啦强度</button>
         </nav>
@@ -18,6 +19,10 @@
 
       <section class="panel active" id="panel-intraday">
         <iframe title="盘中雷达" src="./intraday.html?v=20260429-intraday-tab-v1"></iframe>
+      </section>
+
+      <section class="panel" id="panel-trades">
+        <iframe title="操作记录" src="./trades.html?v=20260430-trades-v1"></iframe>
       </section>
 
       <section class="panel" id="panel-custom">
