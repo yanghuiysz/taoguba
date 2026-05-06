@@ -1,9 +1,11 @@
 (function initTradesPage() {
   const app = document.querySelector("#trades-app");
   const DATA_URL = "./data/trades.json";
+  const CUSTOM_DATA_URL = "./data/custom_boards.json";
 
   const state = {
     records: [],
+    quotes: new Map(),
     error: "",
     expanded: new Set(),
     filters: {
@@ -51,6 +53,12 @@
     });
   };
 
+  const percent = (value) => {
+    const parsed = safeNumber(value);
+    if (parsed === null) return "-";
+    return `${parsed.toFixed(2)}%`;
+  };
+
   const integer = (value) => {
     const parsed = safeNumber(value);
     return parsed === null ? "-" : parsed.toLocaleString("zh-CN", { maximumFractionDigits: 0 });
@@ -62,6 +70,37 @@
   };
 
   const tagsOf = (record) => Array.isArray(record.tags) ? record.tags.filter(Boolean) : [];
+
+  function normalizeCode(value) {
+    const digits = String(value || "").replace(/\D/g, "");
+    return digits ? digits.slice(-6).padStart(6, "0") : "";
+  }
+
+  function quoteOf(code) {
+    return state.quotes.get(normalizeCode(code)) || null;
+  }
+
+  function buildQuoteMap(data) {
+    const quotes = new Map();
+    (data?.boards || []).forEach((board) => {
+      (board.stocks || []).forEach((stock) => {
+        const code = normalizeCode(stock.code);
+        const latestClose = safeNumber(stock.latestClose);
+        if (!code || latestClose === null) return;
+        const previous = quotes.get(code);
+        if (previous && String(previous.latestDate || "").localeCompare(String(stock.latestDate || "")) >= 0) return;
+        quotes.set(code, {
+          code,
+          name: stock.name || code,
+          boardName: board.name || "",
+          latestDate: stock.latestDate || data?.date || "",
+          latestClose,
+          latestChangePercent: safeNumber(stock.latestChangePercent),
+        });
+      });
+    });
+    return quotes;
+  }
 
   function postResize() {
     window.parent?.postMessage({ type: "dashboard:resize" }, window.location.origin);
@@ -87,11 +126,11 @@
   function groupByStock(records) {
     const groups = new Map();
     records.forEach((record) => {
-      const key = record.stockCode || record.stockName || record.id;
+      const key = normalizeCode(record.stockCode) || record.stockName || record.id;
       if (!groups.has(key)) {
         groups.set(key, {
           key,
-          stockCode: record.stockCode || "",
+          stockCode: normalizeCode(record.stockCode) || record.stockCode || "",
           stockName: record.stockName || record.stockCode || "-",
           boardName: record.boardName || "",
           records: [],
@@ -131,6 +170,27 @@
         netCost: group.buyAmount - group.sellAmount,
         realizedEstimate: group.sellQuantity && group.buyQuantity ? group.sellAmount - (group.sellQuantity * (group.buyAmount / group.buyQuantity)) : null,
       }))
+      .map((group) => {
+        const quote = quoteOf(group.stockCode);
+        const latestPrice = quote?.latestClose ?? null;
+        const marketValue = group.netQuantity > 0 && latestPrice !== null ? group.netQuantity * latestPrice : 0;
+        const remainingCost = group.netQuantity > 0 && group.avgBuyPrice !== null ? group.netQuantity * group.avgBuyPrice : 0;
+        const unrealizedEstimate = group.netQuantity > 0 && latestPrice !== null && group.avgBuyPrice !== null
+          ? marketValue - remainingCost
+          : null;
+        const realized = group.realizedEstimate ?? 0;
+        return {
+          ...group,
+          latestPrice,
+          latestPriceDate: quote?.latestDate || "",
+          latestChangePercent: quote?.latestChangePercent ?? null,
+          marketValue,
+          remainingCost,
+          unrealizedEstimate,
+          totalEstimate: realized + (unrealizedEstimate ?? 0),
+          quoteMissing: group.netQuantity > 0 && latestPrice === null,
+        };
+      })
       .sort((a, b) => String(b.lastDate || "").localeCompare(String(a.lastDate || "")) || String(a.stockCode || "").localeCompare(String(b.stockCode || "")));
   }
 
@@ -168,7 +228,7 @@
     const keys = new Set(groups.map((group) => group.key));
     const query = state.filters.query.trim().toLowerCase();
     return records.filter((record) => {
-      const key = record.stockCode || record.stockName || record.id;
+      const key = normalizeCode(record.stockCode) || record.stockName || record.id;
       if (!keys.has(key)) return false;
       if (state.filters.action !== "all" && record.action !== state.filters.action) return false;
       if (query && !recordSearchText(record).includes(query)) return false;
@@ -187,7 +247,12 @@
       holdingCount: groups.filter((group) => group.netQuantity > 0).length,
       closedCount: groups.filter((group) => group.netQuantity <= 0 && group.sellQuantity > 0).length,
       netCost: groups.reduce((sum, group) => sum + group.netCost, 0),
+      buyAmount: groups.reduce((sum, group) => sum + group.buyAmount, 0),
       realized: groups.reduce((sum, group) => sum + (group.realizedEstimate ?? 0), 0),
+      unrealized: groups.reduce((sum, group) => sum + (group.unrealizedEstimate ?? 0), 0),
+      totalPnl: groups.reduce((sum, group) => sum + (group.totalEstimate ?? 0), 0),
+      marketValue: groups.reduce((sum, group) => sum + (group.marketValue ?? 0), 0),
+      missingQuoteCount: groups.filter((group) => group.quoteMissing).length,
     };
   }
 
@@ -234,19 +299,9 @@
           <small>${integer(metric.stockCount)} 只纳入复盘</small>
         </div>
         <div class="trade-metric">
-          <span>净投入</span>
-          <strong>${currency(metric.netCost)}</strong>
-          <small>买入金额 - 卖出金额</small>
-        </div>
-        <div class="trade-metric">
-          <span>估算已兑现</span>
-          <strong class="${metric.realized >= 0 ? "rise" : "fall"}">${currency(metric.realized)}</strong>
-          <small>${integer(metric.closedCount)} 只已清仓</small>
-        </div>
-        <div class="trade-metric">
-          <span>逐笔记录</span>
-          <strong>${integer(metric.recordCount)}</strong>
-          <small>来自 trades.json</small>
+          <span>总盈亏估算</span>
+          <strong class="${metric.totalPnl >= 0 ? "rise" : "fall"}">${currency(metric.totalPnl)}</strong>
+          <small>总收益率 ${percent(metric.buyAmount ? metric.totalPnl / metric.buyAmount * 100 : null)}</small>
         </div>
       </section>
     `;
@@ -310,7 +365,7 @@
                 </span>
                 <span class="stock-board">${escapeHtml(group.boardName || "未归属板块")}</span>
                 <span class="trade-chip ${status.tone}">${status.label}</span>
-                <span class="stock-amount ${group.netCost >= 0 ? "fall" : "rise"}">${currency(group.netCost)}</span>
+                <span class="stock-amount ${(group.totalEstimate ?? 0) >= 0 ? "rise" : "fall"}">${currency(group.totalEstimate)}</span>
                 <span class="stock-window">${escapeHtml(shortDate(group.firstDate))} - ${escapeHtml(shortDate(group.lastDate))}</span>
                 <span class="stock-expand">${isExpanded ? "收起" : "展开"}</span>
               </button>
@@ -318,7 +373,10 @@
                 <div><span>当前股数</span><strong>${integer(group.netQuantity)}</strong></div>
                 <div><span>买入均价</span><strong>${currency(group.avgBuyPrice)}</strong></div>
                 <div><span>卖出均价</span><strong>${currency(group.avgSellPrice)}</strong></div>
-                <div><span>估算兑现</span><strong class="${Number(group.realizedEstimate) >= 0 ? "rise" : "fall"}">${group.realizedEstimate === null ? "-" : currency(group.realizedEstimate)}</strong></div>
+                <div><span>最新价</span><strong>${group.latestPrice === null ? "-" : currency(group.latestPrice)}</strong></div>
+                <div><span>持仓市值</span><strong>${currency(group.marketValue)}</strong></div>
+                <div><span>浮盈亏</span><strong class="${Number(group.unrealizedEstimate) >= 0 ? "rise" : "fall"}">${group.unrealizedEstimate === null ? "-" : currency(group.unrealizedEstimate)}</strong></div>
+                <div><span>总盈亏</span><strong class="${Number(group.totalEstimate) >= 0 ? "rise" : "fall"}">${currency(group.totalEstimate)}</strong></div>
               </div>
               <div class="stock-latest-note">
                 <span class="muted">最近</span>
@@ -471,6 +529,12 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       state.records = Array.isArray(data.records) ? data.records : [];
+      try {
+        const quoteResponse = await fetch(`${CUSTOM_DATA_URL}?v=${Date.now()}`, { cache: "no-store" });
+        state.quotes = quoteResponse.ok ? buildQuoteMap(await quoteResponse.json()) : new Map();
+      } catch {
+        state.quotes = new Map();
+      }
       const firstGroup = groupByStock(normalizedRecords())[0];
       if (firstGroup) state.expanded.add(firstGroup.key);
     } catch (error) {

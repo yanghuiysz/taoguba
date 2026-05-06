@@ -24,6 +24,16 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
+def number_or_none(value: Any) -> float | None:
+    try:
+        if value is None:
+            return None
+        number = float(value)
+        return number
+    except (TypeError, ValueError):
+        return None
+
+
 def validate_kpl(web_data: Path) -> dict[str, Any]:
     dashboard_path = web_data / "kpl_dashboard.json"
     index_path = web_data / "kpl/index.json"
@@ -73,6 +83,19 @@ def validate_custom(web_data: Path) -> dict[str, Any]:
         if not isinstance(board.get("trend"), list) or not board.get("trend")
     ]
     require(not boards_without_trend, "Custom boards missing trend data: " + ", ".join(boards_without_trend))
+
+    market_trend = data.get("marketIndex", {}).get("trend", [])
+    require(isinstance(market_trend, list), f"{data_path} marketIndex.trend must be a list")
+    for previous, current in zip(market_trend, market_trend[1:]):
+        current_volume = number_or_none(current.get("volume"))
+        previous_volume = number_or_none(previous.get("volume"))
+        if current.get("source") == "intraday_index_spot_tencent" and current_volume is not None and previous_volume:
+            ratio = current_volume / previous_volume
+            require(
+                0.2 <= ratio <= 5,
+                "Suspicious market index volume ratio; realtime volume may use a different unit: "
+                f"{current.get('date')} volume={current_volume}, previous={previous_volume}, ratio={ratio:.4f}",
+            )
     return {
         "date": data.get("date"),
         "boards": len(data.get("boards", [])),

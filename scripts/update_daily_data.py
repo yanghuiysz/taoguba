@@ -4,6 +4,7 @@ import argparse
 import importlib.util
 import subprocess
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -19,7 +20,12 @@ CUSTOM_DASHBOARD = ROOT / "web/data/custom_boards.json"
 def run_script(args: list[str]) -> None:
     command = [PYTHON, *args]
     print(f"\n> {' '.join(command)}", flush=True)
-    subprocess.run(command, cwd=ROOT, check=True)
+    start = time.perf_counter()
+    try:
+        subprocess.run(command, cwd=ROOT, check=True)
+    finally:
+        elapsed = time.perf_counter() - start
+        print(f"< completed in {elapsed:.1f}s: {' '.join(args)}", flush=True)
 
 
 def has_module(name: str) -> bool:

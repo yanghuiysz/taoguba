@@ -20,6 +20,7 @@ CONFIG_PATH = Path("web/data/custom_boards_config.json")
 OUT_PATH = Path("web/data/custom_boards.json")
 CACHE_DIR = Path("data/custom_stock_history")
 FINANCIAL_CACHE_DIR = Path("data/custom_financial_metrics")
+MARKET_INDEX_CACHE_DIR = Path("data/custom_market_index_history")
 HIGH100_WINDOW = 100
 MARKET_INDEX_SYMBOL = "sh000001"
 MARKET_INDEX_NAME = "上证指数"
@@ -134,6 +135,30 @@ def load_cached_history(cache_dir: Path, code: str, end_date: str, lookback_days
     except json.JSONDecodeError:
         return None
     return payload if isinstance(payload, list) else None
+
+
+def load_latest_cached_history(cache_dir: Path, code: str, end_date: str, lookback_days: int) -> list[dict[str, Any]] | None:
+    target = compact_date(format_date(end_date))
+    candidates: list[tuple[str, Path]] = []
+    if not cache_dir.exists():
+        return None
+    suffix = f"_{lookback_days}"
+    for directory in cache_dir.iterdir():
+        if not directory.is_dir() or not directory.name.endswith(suffix):
+            continue
+        cache_date = directory.name[: -len(suffix)]
+        if cache_date.isdigit() and cache_date < target:
+            path = directory / f"{code}.json"
+            if path.exists():
+                candidates.append((cache_date, path))
+    for _, path in sorted(candidates, reverse=True):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, list):
+            return payload
+    return None
 
 
 def write_cached_history(cache_dir: Path, code: str, end_date: str, lookback_days: int, rows: list[dict[str, Any]]) -> None:
@@ -335,6 +360,12 @@ def fetch_tencent_spot(codes: set[str], date: str, batch_size: int = 60) -> dict
 
 def fetch_intraday_spot_once(codes: set[str], date: str) -> dict[str, dict[str, Any]]:
     try:
+        rows = fetch_tencent_spot(codes, date)
+        if rows:
+            return rows
+    except Exception as exc:  # noqa: BLE001 - fall back to AkShare spot sources.
+        print(f"Tencent spot failed, falling back to Eastmoney spot: {exc}")
+    try:
         df = ak.stock_zh_a_spot_em()
         rows = normalize_spot_rows(df, codes, date)
         if rows:
@@ -408,7 +439,8 @@ def normalize_tencent_market_index_payload(text: str, symbol: str, date: str) ->
     if len(parts) > 35 and parts[35]:
         snapshot = parts[35].split("/")
         if len(snapshot) >= 2:
-            volume = number_or_none(snapshot[1])
+            volume_lots = number_or_none(snapshot[1])
+            volume = round(volume_lots * 100, 2) if volume_lots is not None else None
         if len(snapshot) >= 3:
             turnover = number_or_none(snapshot[2])
     return {
@@ -427,6 +459,15 @@ def normalize_tencent_market_index_payload(text: str, symbol: str, date: str) ->
 
 
 def fetch_market_index_intraday_once(symbol: str, date: str) -> dict[str, Any] | None:
+    try:
+        url = f"https://qt.gtimg.cn/q={quote(symbol)}"
+        with urlopen(url, timeout=15) as response:
+            payload = response.read().decode("gbk", errors="replace")
+        item = normalize_tencent_market_index_payload(payload, symbol, date)
+        if item:
+            return item
+    except Exception as exc:  # noqa: BLE001 - fall through to public quote sources.
+        print(f"Tencent market index spot failed, falling back to AkShare index spot: {exc}")
     for source_name in ("stock_zh_index_spot_em", "stock_zh_index_spot_sina"):
         try:
             df = getattr(ak, source_name)()
@@ -437,10 +478,7 @@ def fetch_market_index_intraday_once(symbol: str, date: str) -> dict[str, Any] |
                     return item
         except Exception as exc:  # noqa: BLE001 - fall through to the next public quote source.
             print(f"{source_name} failed for market index overlay: {exc}")
-    url = f"https://qt.gtimg.cn/q={quote(symbol)}"
-    with urlopen(url, timeout=15) as response:
-        payload = response.read().decode("gbk", errors="replace")
-    return normalize_tencent_market_index_payload(payload, symbol, date)
+    return None
 
 
 def fetch_market_index_intraday(symbol: str, date: str) -> dict[str, Any] | None:
@@ -636,9 +674,7 @@ def fast_intraday_refresh(config_path: Path, out_path: Path, date: str) -> None:
     market_spot = normalize_tencent_market_index_payload(market_payload, MARKET_INDEX_SYMBOL, date)
     if market_spot:
         previous = next((row for row in reversed(market_trend) if row.get("date") != formatted_date), None)
-        previous_turnover = (previous or {}).get("turnover") or (previous or {}).get("volume")
-        current_turnover = market_spot.get("turnover") or market_spot.get("volume")
-        market_spot.update(volume_price_state(market_spot.get("changePercent"), current_turnover, previous_turnover))
+        market_spot.update(volume_price_state(market_spot.get("changePercent"), market_spot.get("volume"), (previous or {}).get("volume")))
         market_trend[:] = [row for row in market_trend if row.get("date") != formatted_date]
         market_trend.append(market_spot)
         market_trend.sort(key=lambda row: str(row.get("date") or ""))
@@ -876,6 +912,29 @@ def load_cached_financial(cache_dir: Path, code: str, end_date: str) -> dict[str
     return payload if isinstance(payload, dict) else None
 
 
+def load_latest_cached_financial(cache_dir: Path, code: str, end_date: str) -> dict[str, Any] | None:
+    target = compact_date(format_date(end_date))
+    candidates: list[tuple[str, Path]] = []
+    if not cache_dir.exists():
+        return None
+    for directory in cache_dir.iterdir():
+        if not directory.is_dir():
+            continue
+        cache_date = directory.name
+        if cache_date.isdigit() and cache_date < target:
+            path = directory / f"{code}.json"
+            if path.exists():
+                candidates.append((cache_date, path))
+    for _, path in sorted(candidates, reverse=True):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            return payload
+    return None
+
+
 def write_cached_financial(cache_dir: Path, code: str, end_date: str, payload: dict[str, Any]) -> None:
     path = financial_cache_path(cache_dir, code, end_date)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1052,6 +1111,10 @@ def build_financial_map(codes: set[str], end_date: str, cache_dir: Path, refresh
     errors: list[str] = []
     for code in sorted(codes):
         cached = None if refresh else load_cached_financial(cache_dir, code, end_date)
+        if cached is None and not refresh:
+            cached = load_latest_cached_financial(cache_dir, code, end_date)
+            if cached is not None:
+                write_cached_financial(cache_dir, code, end_date, cached)
         if cached is not None:
             financials[code] = cached
             continue
@@ -1135,10 +1198,10 @@ def row_turnover(row: dict[str, Any] | None) -> float | None:
     return legacy_amount
 
 
-def volume_price_state(change: Any, current_turnover: Any, previous_turnover: Any) -> dict[str, Any]:
+def volume_price_state(change: Any, current_value: Any, previous_value: Any) -> dict[str, Any]:
     parsed_change = number_or_none(change)
-    current = number_or_none(current_turnover)
-    previous = number_or_none(previous_turnover)
+    current = number_or_none(current_value)
+    previous = number_or_none(previous_value)
     if parsed_change is None or current is None or previous in (None, 0):
         return {
             "label": None,
@@ -1188,6 +1251,18 @@ def fetch_market_index_history(symbol: str, end_date: str, lookback_days: int) -
         if close is not None:
             previous_close = close
     return rows
+
+
+def load_cached_market_index_history(cache_dir: Path, symbol: str, end_date: str, lookback_days: int) -> list[dict[str, Any]] | None:
+    return load_cached_history(cache_dir, symbol, end_date, lookback_days)
+
+
+def load_latest_cached_market_index_history(cache_dir: Path, symbol: str, end_date: str, lookback_days: int) -> list[dict[str, Any]] | None:
+    return load_latest_cached_history(cache_dir, symbol, end_date, lookback_days)
+
+
+def write_cached_market_index_history(cache_dir: Path, symbol: str, end_date: str, lookback_days: int, rows: list[dict[str, Any]]) -> None:
+    write_cached_history(cache_dir, symbol, end_date, lookback_days, rows)
 
 
 def build_market_index(rows: list[dict[str, Any]], dates: list[str]) -> dict[str, Any]:
@@ -1407,6 +1482,7 @@ def main() -> None:
     parser.add_argument("--sleep", type=float, default=0.2)
     parser.add_argument("--cache-dir", type=Path, default=CACHE_DIR)
     parser.add_argument("--financial-cache-dir", type=Path, default=FINANCIAL_CACHE_DIR)
+    parser.add_argument("--market-index-cache-dir", type=Path, default=MARKET_INDEX_CACHE_DIR)
     parser.add_argument("--refresh", action="store_true", help="Ignore cached stock histories and fetch all codes again.")
     parser.add_argument("--refresh-financial", action="store_true", help="Ignore cached financial metrics and fetch all codes again.")
     parser.add_argument("--skip-financial", action="store_true", help="Skip optional profit score enrichment.")
@@ -1431,21 +1507,29 @@ def main() -> None:
 
     stock_histories: dict[str, list[dict[str, Any]]] = {}
     errors: list[dict[str, str]] = []
+    reused_history_codes: set[str] = set()
     for index, code in enumerate(codes, start=1):
+        fetched_history = False
         try:
             cached = None if args.refresh else load_cached_history(args.cache_dir, code, args.date, args.lookback_days)
+            if cached is None and args.intraday and not args.refresh:
+                cached = load_latest_cached_history(args.cache_dir, code, args.date, args.lookback_days)
+                if cached is not None:
+                    reused_history_codes.add(code)
             if cached is None:
                 stock_histories[code] = fetch_stock_history(code, args.date, args.lookback_days)
                 write_cached_history(args.cache_dir, code, args.date, args.lookback_days, stock_histories[code])
+                fetched_history = True
                 print(f"Fetched {code} ({index}/{len(codes)})")
             else:
                 stock_histories[code] = cached
-                print(f"Cached {code} ({index}/{len(codes)})")
+                source = "Reused" if code in reused_history_codes else "Cached"
+                print(f"{source} {code} ({index}/{len(codes)})")
         except Exception as exc:  # noqa: BLE001 - keep one bad code from blocking other custom boards.
             stock_histories[code] = []
             errors.append({"code": code, "error": str(exc)})
             print(f"Failed {code}: {exc}")
-        if args.sleep and index < len(codes):
+        if fetched_history and args.sleep and index < len(codes):
             time.sleep(args.sleep)
 
     intraday_rows: dict[str, dict[str, Any]] = {}
@@ -1453,6 +1537,9 @@ def main() -> None:
         try:
             intraday_rows = fetch_intraday_spot(set(codes), args.date)
             merge_intraday_rows(stock_histories, intraday_rows, args.date)
+            for code in reused_history_codes:
+                if code in intraday_rows:
+                    write_cached_history(args.cache_dir, code, args.date, args.lookback_days, stock_histories[code])
             print(f"Intraday rows: {len(intraday_rows)}/{len(codes)} for {format_date(args.date)}")
         except Exception as exc:  # noqa: BLE001 - keep historical build available when realtime source is unavailable.
             errors.append({"code": "intraday", "error": str(exc)})
@@ -1474,11 +1561,45 @@ def main() -> None:
     built_boards = sorted(built_boards, key=lambda board: sort_change_value(board.get("latestAverageChange")), reverse=True)
     market_index = None
     try:
-        market_rows = fetch_market_index_history(MARKET_INDEX_SYMBOL, args.date, args.lookback_days)
+        market_rows = None if args.refresh else load_cached_market_index_history(
+            args.market_index_cache_dir,
+            MARKET_INDEX_SYMBOL,
+            args.date,
+            args.lookback_days,
+        )
+        reused_market_rows = False
+        if market_rows is None and args.intraday and not args.refresh:
+            market_rows = load_latest_cached_market_index_history(
+                args.market_index_cache_dir,
+                MARKET_INDEX_SYMBOL,
+                args.date,
+                args.lookback_days,
+            )
+            reused_market_rows = market_rows is not None
+        if market_rows is None:
+            market_rows = fetch_market_index_history(MARKET_INDEX_SYMBOL, args.date, args.lookback_days)
+            write_cached_market_index_history(
+                args.market_index_cache_dir,
+                MARKET_INDEX_SYMBOL,
+                args.date,
+                args.lookback_days,
+                market_rows,
+            )
+            print(f"Fetched market index history: {MARKET_INDEX_SYMBOL}")
+        else:
+            source = "Reused" if reused_market_rows else "Cached"
+            print(f"{source} market index history: {MARKET_INDEX_SYMBOL}")
         if args.intraday:
             market_spot = fetch_market_index_intraday(MARKET_INDEX_SYMBOL, args.date)
             merge_market_index_intraday(market_rows, market_spot, args.date)
             if market_spot:
+                write_cached_market_index_history(
+                    args.market_index_cache_dir,
+                    MARKET_INDEX_SYMBOL,
+                    args.date,
+                    args.lookback_days,
+                    market_rows,
+                )
                 print(f"Intraday market index row: {MARKET_INDEX_SYMBOL} for {format_date(args.date)}")
         market_index = build_market_index(market_rows, dates)
     except Exception as exc:  # noqa: BLE001 - keep custom board build available even when index source is unavailable.

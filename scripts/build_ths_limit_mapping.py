@@ -92,6 +92,68 @@ def load_dashboard(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_cached_mapping(out_dir: Path, date: str) -> dict[str, Any] | None:
+    path = out_dir / date / "ths_limit_mapping.json"
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def apply_mapping_to_dashboard(payload: dict[str, Any], mapping: dict[str, Any]) -> bool:
+    cached_plates = {
+        (str(plate.get("plateCode") or ""), str(plate.get("plateName") or "")): plate
+        for plate in mapping.get("plates", [])
+    }
+    if not cached_plates:
+        return False
+
+    missing = 0
+    for plate in payload.get("plates", []):
+        key = (str(plate.get("plateCode") or ""), str(plate.get("plateName") or ""))
+        cached = cached_plates.get(key)
+        if cached is None:
+            missing += 1
+            continue
+        plate["externalLimitMapping"] = {
+            "source": "Tonghuashun concepts + Eastmoney limit-up pool",
+            "note": "This is an external cross-source mapping, not a Kaipanla official plate detail endpoint.",
+            "matchedConcepts": cached.get("matchedConcepts", []),
+            "limitUpStocks": cached.get("limitUpStocks", []),
+            "errors": cached.get("errors", []),
+        }
+    if missing:
+        return False
+
+    source = mapping.get("source") or {
+        "name": "Tonghuashun concepts + Eastmoney limit-up pool",
+        "date": mapping.get("date"),
+        "note": "Maps Kaipanla plates to Tonghuashun concepts, then intersects first-page concept constituents with Eastmoney limit-up pool.",
+    }
+    external_sources = payload.setdefault("externalSources", [])
+    external_sources[:] = [
+        item
+        for item in external_sources
+        if item.get("name") != source.get("name") or item.get("date") != source.get("date")
+    ]
+    external_sources.append(source)
+
+    mapped_codes = {
+        stock["code"]
+        for item in mapping.get("plates", [])
+        for stock in item.get("limitUpStocks", [])
+        if stock.get("code")
+    }
+    payload["summary"]["externalLimitUpStockCount"] = len(mapped_codes)
+    payload["summary"]["externalLimitUpMappingCount"] = sum(
+        len(item.get("limitUpStocks", [])) for item in mapping.get("plates", [])
+    )
+    return True
+
+
 def load_concepts() -> list[dict[str, str]]:
     df = ak.stock_board_concept_name_ths()
     return [{"name": str(row["name"]), "code": str(row["code"])} for _, row in df.iterrows()]
@@ -295,11 +357,16 @@ def main() -> None:
     parser.add_argument("--dashboard", type=Path, default=DASHBOARD_PATH)
     parser.add_argument("--history-dir", type=Path, default=HISTORY_DIR)
     parser.add_argument("--out-dir", type=Path, default=OUT_DIR)
+    parser.add_argument("--refresh", action="store_true", help="Ignore same-date cached mapping and fetch external sources again.")
     args = parser.parse_args()
 
     payload = load_dashboard(args.dashboard)
     date = args.date or compact_date(str(payload.get("date", "")))
-    mapping = build_mapping(payload, date)
+    mapping = None if args.refresh else load_cached_mapping(args.out_dir, date)
+    if mapping is not None and apply_mapping_to_dashboard(payload, mapping):
+        print(f"Reused cached mapping for {date}")
+    else:
+        mapping = build_mapping(payload, date)
 
     args.dashboard.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     write_history(payload, args.history_dir)
