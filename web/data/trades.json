@@ -63,6 +63,36 @@
         "趋势承接待验证"
       ],
       "note": "半符合：锂电分歧日核心承接观察仓；不足：买在修复后，非低位回踩点。"
+    },
+    {
+      "id": "20260508-sell-002709-001",
+      "date": "2026-05-08",
+      "action": "sell",
+      "stockCode": "002709",
+      "stockName": "天赐材料",
+      "boardName": "锂电",
+      "quantity": 100,
+      "price": 58.41,
+      "amount": 5841,
+      "tags": [
+        "卖出"
+      ],
+      "note": ""
+    },
+    {
+      "id": "20260508-sell-002812-001",
+      "date": "2026-05-08",
+      "action": "sell",
+      "stockCode": "002812",
+      "stockName": "恩捷股份",
+      "boardName": "锂电",
+      "quantity": 100,
+      "price": 83.9,
+      "amount": 8390,
+      "tags": [
+        "卖出"
+      ],
+      "note": ""
     }
   ]
 }
