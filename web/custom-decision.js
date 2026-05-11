@@ -4,6 +4,11 @@
 
   let scheduled = false;
   let enhancing = false;
+  let overviewSort = {
+    key: 'default',
+    direction: 'desc',
+  };
+  let overviewTransitionFilter = new Set();
 
   function safeNumber(value) {
     const parsed = Number(value);
@@ -43,9 +48,21 @@
     return parsed === null ? '暂无' : `${fmt(parsed, digits)}%`;
   }
 
+  function fmtDelta(value, digits = 0) {
+    const parsed = safeNumber(value);
+    if (parsed === null) return '暂无';
+    return `${parsed >= 0 ? '+' : ''}${fmt(parsed, digits)}`;
+  }
+
   function changeClass(value) {
     if (typeof signedClass === 'function') return signedClass(value);
     return Number(value) >= 0 ? 'rise' : 'fall';
+  }
+
+  function deltaClass(value) {
+    const parsed = safeNumber(value);
+    if (parsed === null || parsed === 0) return '';
+    return parsed > 0 ? 'rise' : 'fall';
   }
 
   function rows(board) {
@@ -53,18 +70,19 @@
     return (board?.trend || []).filter((row) => row?.averageChange !== null && row?.averageChange !== undefined);
   }
 
-  function selectedIndex(trendRows) {
+  function selectedIndex(trendRows, offset = 0) {
     if (!trendRows.length) return -1;
+    let index = trendRows.length - 1;
     if (state?.sortDate) {
-      const index = trendRows.findIndex((row) => row.date === state.sortDate);
-      if (index >= 0) return index;
+      const selected = trendRows.findIndex((row) => row.date === state.sortDate);
+      if (selected >= 0) index = selected;
     }
-    return trendRows.length - 1;
+    return Math.max(0, Math.min(trendRows.length - 1, index + offset));
   }
 
-  function rowsToSelected(board, days) {
+  function rowsToSelected(board, days, offset = 0) {
     const trendRows = rows(board);
-    const end = selectedIndex(trendRows);
+    const end = selectedIndex(trendRows, offset);
     if (end < 0) return [];
     return trendRows.slice(Math.max(0, end - days + 1), end + 1);
   }
@@ -142,37 +160,153 @@
     return { label: '无明显回踩', score: 52, ratio };
   }
 
-  function boardDecisionMetric(board) {
-    const recent3 = rowsToSelected(board, 3);
-    const recent5 = rowsToSelected(board, 5);
-    const recent10 = rowsToSelected(board, 10);
-    const recent20 = rowsToSelected(board, 20);
+  function attackQualityMetric(row) {
+    const stocks = (row?.stocks || []).filter((stock) => safeNumber(stock.changePercent) !== null);
+    if (!stocks.length) return { score: 0, high5Rate: null, high3Rate: null, redRate: null };
+    const high5Rate = stocks.filter((stock) => Number(stock.changePercent) >= 5).length / stocks.length * 100;
+    const high3Rate = stocks.filter((stock) => Number(stock.changePercent) >= 3).length / stocks.length * 100;
+    const redRateValue = stocks.filter((stock) => Number(stock.changePercent) > 0).length / stocks.length * 100;
+    const score = clampValue(
+      0.42 * scoreRange(high5Rate, 0, 35)
+      + 0.34 * scoreRange(high3Rate, 5, 55)
+      + 0.24 * scoreRange(redRateValue, 35, 85),
+      0,
+      100,
+    );
+    return { score, high5Rate, high3Rate, redRate: redRateValue };
+  }
+
+  function stageForStatus(status) {
+    if (['主升', '启动', '二波观察'].includes(status)) return '进攻段';
+    if (status === '良性回踩') return '良性回踩';
+    if (status === '恶性回踩') return '恶性回踩';
+    return '退潮段';
+  }
+
+  function stageRank(stage) {
+    return {
+      进攻段: 0,
+      良性回踩: 1,
+      恶性回踩: 2,
+      退潮段: 3,
+    }[stage] ?? 9;
+  }
+
+  function transitionLabel(metric, previous) {
+    if (!previous?.latestRow) return { label: '暂无对比', tone: 'watch' };
+    const heatDelta = metric.heatScore - previous.heatScore;
+    const qualityDelta = metric.attackQuality.score - previous.attackQuality.score;
+    if (metric.stage !== previous.stage) {
+      if (metric.stage === '退潮段' || metric.stage === '恶性回踩') return { label: `${previous.stage}转弱`, tone: 'risk' };
+      if (metric.stage === '进攻段') return { label: `${previous.stage}转强`, tone: 'strong' };
+      return { label: `${previous.stage}转${metric.stage}`, tone: metric.action.tone };
+    }
+    if (metric.stage === '进攻段') {
+      if (heatDelta >= 0 && qualityDelta >= 0) return { label: '进攻增强', tone: 'strong' };
+      if (qualityDelta < -12 && heatDelta < -8) return { label: '进攻钝化', tone: 'risk' };
+      if (qualityDelta < -5 || heatDelta < -5) return { label: '弱分歧', tone: 'test' };
+      return { label: '进攻延续', tone: 'strong' };
+    }
+    if (metric.stage === '良性回踩') return { label: qualityDelta >= -8 ? '承接观察' : '回踩走弱', tone: qualityDelta >= -8 ? 'test' : 'risk' };
+    if (metric.stage === '恶性回踩') return { label: '恶化', tone: 'risk' };
+    return { label: '退潮延续', tone: 'risk' };
+  }
+
+  function transitionRank(label) {
+    return {
+      良性回踩转强: 0,
+      进攻增强: 1,
+      弱分歧: 2,
+      进攻延续: 3,
+      承接观察: 4,
+      进攻钝化: 5,
+      回踩走弱: 6,
+      恶化: 7,
+      退潮延续: 8,
+      暂无对比: 9,
+    }[label] ?? (String(label || '').includes('转强') ? 0 : String(label || '').includes('转弱') ? 7 : 6);
+  }
+
+  function metricWithPrevious(metric) {
+    const previous = boardDecisionMetric(metric.board, -1);
+    const stageHistory = [-4, -3, -2, -1, 0].map((offset) => boardDecisionMetric(metric.board, offset));
+    return {
+      ...metric,
+      previous,
+      stageHistory,
+      transition: transitionLabel(metric, previous),
+      heatDelta: previous?.latestRow ? metric.heatScore - previous.heatScore : null,
+      qualityDelta: previous?.latestRow ? metric.attackQuality.score - previous.attackQuality.score : null,
+      changeDelta: previous?.latestRow ? (metric.latestChange ?? 0) - (previous.latestChange ?? 0) : null,
+    };
+  }
+
+  function overviewSortLabel(key) {
+    if (overviewSort.key !== key) return '';
+    return overviewSort.direction === 'asc' ? ' ↑' : ' ↓';
+  }
+
+  function sortOverviewRows(rows) {
+    if (overviewSort.key === 'transition') {
+      const direction = overviewSort.direction === 'asc' ? 1 : -1;
+      return [...rows].sort((a, b) =>
+        direction * (transitionRank(a.transition.label) - transitionRank(b.transition.label))
+        || b.decisionScore - a.decisionScore
+        || b.attackQuality.score - a.attackQuality.score);
+    }
+    return [...rows].sort((a, b) =>
+      stageRank(a.stage) - stageRank(b.stage)
+      || b.decisionScore - a.decisionScore
+      || b.attackQuality.score - a.attackQuality.score);
+  }
+
+  function transitionFilterOptions(rows) {
+    const labels = [...new Set(rows.map((item) => item.transition.label))]
+      .sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN'));
+    return [
+      ...labels.map((label) => `<option value="${label}" ${overviewTransitionFilter.has(label) ? 'selected' : ''}>${label}</option>`),
+    ].join('');
+  }
+
+  function renderStageHistory(metric) {
+    return metric.stageHistory.map((item) => `<span class="decision-badge ${toneFor(item.status, item.heatScore)}">${item.stage}</span>`).join('<span class="stage-arrow">-&gt;</span>');
+  }
+
+  function boardDecisionMetric(board, offset = 0) {
+    const recent3 = rowsToSelected(board, 3, offset);
+    const recent5 = rowsToSelected(board, 5, offset);
+    const recent10 = rowsToSelected(board, 10, offset);
+    const recent20 = rowsToSelected(board, 20, offset);
     const latestRow = recent20.at(-1) || null;
     const latestChange = boardChange(board, latestRow);
+    const return3 = compoundReturn(recent3.map((row) => boardChange(board, row)));
     const return5 = compoundReturn(recent5.map((row) => boardChange(board, row)));
     const return10 = compoundReturn(recent10.map((row) => boardChange(board, row)));
+    const index3 = compoundReturn(recent3.map((row) => indexChange(row.date)));
     const index5 = compoundReturn(recent5.map((row) => indexChange(row.date)));
     const index10 = compoundReturn(recent10.map((row) => indexChange(row.date)));
+    const excess3 = return3 !== null && index3 !== null ? return3 - index3 : null;
     const excess5 = return5 !== null && index5 !== null ? return5 - index5 : null;
     const excess10 = return10 !== null && index10 !== null ? return10 - index10 : null;
+    const redRateToday = redRate(latestRow);
+    const redRate3 = average(recent3.map(redRate));
     const redRate5 = average(recent5.map(redRate));
+    const changes3 = recent3.map((row) => boardChange(board, row));
     const changes10 = recent10.map((row) => boardChange(board, row));
+    const drawdown3 = maxDrawdown(changes3);
     const drawdown10 = maxDrawdown(changes10);
-    const upDays5 = changes10.slice(-5).filter((value) => safeNumber(value) !== null && Number(value) > 0).length;
-    const valid5 = changes10.slice(-5).filter((value) => safeNumber(value) !== null).length;
     const turnoverNow = latestRow ? rowTurnoverValue(latestRow) : null;
     const avgTurnover5 = average(recent5.map(rowTurnoverValue));
     const turnoverRatio = turnoverNow !== null && avgTurnover5 ? turnoverNow / avgTurnover5 : null;
-    const upDayScore = valid5 ? upDays5 / valid5 * 100 : 0;
+    const attackQuality = attackQualityMetric(latestRow);
 
     const heatScore = clampValue(
-      0.22 * scoreRange(return5, -3, 8)
-      + 0.18 * scoreRange(return10, -5, 15)
-      + 0.22 * scoreRange(excess10, -4, 10)
-      + 0.16 * scoreRange(redRate5, 35, 85)
-      + 0.10 * upDayScore
-      + 0.07 * scoreRange(turnoverRatio, 0.75, 1.6)
-      + 0.05 * (100 - scoreRange(drawdown10, 4, 16)),
+      0.28 * scoreRange(latestChange, -3, 6)
+      + 0.22 * scoreRange(return3, -3, 8)
+      + 0.18 * scoreRange(excess3, -3, 6)
+      + 0.14 * scoreRange(redRateToday, 30, 80)
+      + 0.10 * scoreRange(redRate3, 35, 85)
+      + 0.08 * scoreRange(turnoverRatio, 0.75, 1.6),
       0,
       100,
     );
@@ -183,35 +317,42 @@
     const decisionScore = Math.round(0.60 * heatScore + 0.40 * positionScore);
 
     let status = '趋势走弱';
+    const backgroundOk = ((excess5 ?? 0) >= 0) || ((return5 ?? 0) > 0) || ((excess10 ?? 0) > 1);
     const badPullback = (latestChange ?? 0) < 0
       && heatScore >= 35
-      && ((excess5 ?? 0) < -1 || (redRate5 ?? 0) < 40 || drawdown10 > 9 || (pullback.ratio ?? 0) > 1.25);
-    if (heatScore < 35 || ((excess10 ?? 0) < -2 && (excess5 ?? 0) < -1)) status = '热度退潮';
-    else if (heatScore >= 76 && (excess5 ?? 0) >= 1.5 && (return5 ?? 0) >= 3 && (redRate5 ?? 0) >= 60) status = '主升';
-    else if (heatScore >= 55 && (latestChange ?? 0) < 0 && (excess10 ?? 0) > 1 && (redRate5 ?? 0) >= 45 && drawdown10 <= 9) status = '良性回踩';
+      && ((excess3 ?? 0) < -1 || (redRateToday ?? 0) < 35 || drawdown3 > 6 || (pullback.ratio ?? 0) > 1.25);
+    if (heatScore < 35 || ((excess3 ?? 0) < -2 && (redRateToday ?? 0) < 35) || ((excess5 ?? 0) < -1 && (excess10 ?? 0) < -2)) status = '热度退潮';
+    else if (heatScore >= 65 && (latestChange ?? 0) >= 0 && (return3 ?? 0) > 0 && (excess3 ?? 0) >= 0 && (redRateToday ?? 0) >= 50 && backgroundOk) status = '主升';
+    else if ((latestChange ?? 0) < 0 && heatScore >= 50 && (excess3 ?? 0) >= -0.5 && (redRateToday ?? 0) >= 40 && (pullback.ratio ?? 0) <= 1.15 && backgroundOk) status = '良性回踩';
     else if (badPullback) status = '恶性回踩';
-    else if (heatScore >= 60 && (latestChange ?? 0) > 0 && drawdown10 >= 3 && (excess10 ?? 0) > 1) status = '二波观察';
-    else if (heatScore >= 55 && (latestChange ?? 0) >= 0 && (return5 ?? 0) > 0 && (excess5 ?? 0) >= 0) status = '启动';
-    else if (heatScore >= 45 && drawdown10 >= 8) status = '高位震荡';
+    else if (heatScore >= 55 && (latestChange ?? 0) >= 0 && (return3 ?? 0) > 0 && (excess3 ?? 0) >= -0.5 && backgroundOk) status = '启动';
+    else if (heatScore >= 45 && drawdown3 >= 4) status = '高位震荡';
 
     const action = actionFor({ decisionScore, status, trend, pullback, excess10 });
     return {
       board,
       latestRow,
       latestChange,
+      return3,
       return5,
       return10,
+      excess3,
       excess5,
       excess10,
+      redRateToday,
+      redRate3,
       redRate5,
+      drawdown3,
       drawdown10,
       turnoverRatio,
       heatScore,
+      attackQuality,
       trend,
       pullback,
       positionScore,
       decisionScore,
       status,
+      stage: stageForStatus(status),
       action,
     };
   }
@@ -252,10 +393,13 @@
         return found ? { row, stock: found } : null;
       }).filter(Boolean);
       const changes = items.map((item) => safeNumber(item.stock.changePercent));
+      const ret3 = compoundReturn(changes.slice(-3));
       const ret5 = compoundReturn(changes.slice(-5));
       const ret10 = compoundReturn(changes.slice(-10));
+      const boardRet3 = compoundReturn(items.slice(-3).map((item) => boardChange(board, item.row)));
       const boardRet5 = compoundReturn(items.slice(-5).map((item) => boardChange(board, item.row)));
       const boardRet10 = compoundReturn(items.slice(-10).map((item) => boardChange(board, item.row)));
+      const rel3 = ret3 !== null && boardRet3 !== null ? ret3 - boardRet3 : null;
       const rel5 = ret5 !== null && boardRet5 !== null ? ret5 - boardRet5 : null;
       const rel10 = ret10 !== null && boardRet10 !== null ? ret10 - boardRet10 : null;
       const drawdown = maxDrawdown(changes.slice(-10));
@@ -279,6 +423,14 @@
       const latestTurnover = latest ? stockTurnoverValue(latest) : null;
       const prevTurnover = average(items.slice(-6, -1).map((item) => stockTurnoverValue(item.stock)));
       const pullback = pullbackMetric(safeNumber(latest?.changePercent), latestTurnover, prevTurnover);
+      const amount5 = items.slice(-5)
+        .map((item) => stockTurnoverValue(item.stock))
+        .filter((value) => value !== null)
+        .reduce((sum, value) => sum + value, 0);
+      const amount3 = items.slice(-3)
+        .map((item) => stockTurnoverValue(item.stock))
+        .filter((value) => value !== null)
+        .reduce((sum, value) => sum + value, 0);
       const relScore = scoreRange(average([rel5, rel10]), -5, 10);
       const drawdownScore = 100 - scoreRange(drawdown, 4, 18);
       const macdScore = safeNumber(latest?.macdScore) ?? 50;
@@ -292,6 +444,12 @@
         0,
         100,
       );
+      const sortScore = clampValue(
+        0.58 * scoreRange(amount5, 0, 5000000000)
+        + 0.42 * scoreRange(ret5, -5, 18),
+        0,
+        100,
+      );
       let action = '普通观察';
       if (resilienceScore >= 78 && ['均线多头', '趋势保持'].includes(trendLabel) && pullback.label !== '放量下跌') action = '优先观察';
       else if (resilienceScore >= 65 && pullback.label !== '放量下跌') action = '可观察';
@@ -299,8 +457,12 @@
       return {
         code: stock.code,
         name: stock.name || stock.code,
+        ret3,
         rel5,
         rel10,
+        rel3,
+        amount3,
+        amount5,
         drawdown,
         trendLabel,
         trendScore,
@@ -308,9 +470,10 @@
         macdLabel,
         macdScore,
         resilienceScore,
+        sortScore,
         action,
       };
-    }).sort((a, b) => b.resilienceScore - a.resilienceScore);
+    }).sort((a, b) => b.sortScore - a.sortScore || b.amount5 - a.amount5 || (b.rel5 ?? -999) - (a.rel5 ?? -999));
   }
 
   function conclusion(metric) {
@@ -336,7 +499,7 @@
             <h2>${board.name} · 波段决策</h2>
             <p>${conclusion(metric)}</p>
             <div class="decision-badges">
-              <span class="decision-badge ${toneFor(metric.status, metric.heatScore)}">${metric.status}</span>
+              <span class="decision-badge ${toneFor(metric.status, metric.heatScore)}">${metric.stage}</span>
               <span class="decision-badge ${toneFor(metric.trend.label, metric.trend.score)}">${metric.trend.label}</span>
               <span class="decision-badge ${toneFor(metric.pullback.label, metric.pullback.score)}">${metric.pullback.label}</span>
               <span class="decision-action ${metric.action.tone}">${metric.action.label}</span>
@@ -346,12 +509,13 @@
         </div>
 
         <div class="decision-metrics">
-          ${metricCard('热度分', fmt(metric.heatScore, 0), '5/10日强度')}
-          ${metricCard('10日超额', fmtPercent(metric.excess10), '板块 - 指数', changeClass(metric.excess10))}
-          ${metricCard('5日红盘率', metric.redRate5 === null ? '暂无' : fmtPercent(metric.redRate5, 0), '内部扩散')}
+          ${metricCard('短线热度', fmt(metric.heatScore, 0), '今日/3日强度')}
+          ${metricCard('进攻质量', fmt(metric.attackQuality.score, 0), `5%占比 ${fmtPercent(metric.attackQuality.high5Rate, 0)}`)}
+          ${metricCard('3日超额', fmtPercent(metric.excess3), '板块 - 指数', changeClass(metric.excess3))}
+          ${metricCard('今日红盘率', metric.redRateToday === null ? '暂无' : fmtPercent(metric.redRateToday, 0), '内部扩散')}
           ${metricCard('趋势确认', metric.trend.label, `趋势分 ${fmt(metric.trend.score, 0)}`)}
           ${metricCard('回踩状态', metric.pullback.label, `量比 ${metric.pullback.ratio === null ? '暂无' : fmt(metric.pullback.ratio, 2)}`)}
-          ${metricCard('10日回撤', fmtPercent(metric.drawdown10), '波段风险')}
+          ${metricCard('3日回撤', fmtPercent(metric.drawdown3), '短线风险')}
         </div>
 
         <div class="decision-section-title">
@@ -362,7 +526,7 @@
           <table>
             <thead>
               <tr>
-                <th>排名</th><th>股票</th><th>韧性分</th><th>5日相对板块</th><th>趋势</th><th>MACD</th><th>回踩</th><th>操作标签</th>
+                <th>排名</th><th>股票</th><th>综合排序</th><th>3日成交额</th><th>5日成交额</th><th>3日涨幅</th><th>5日涨幅</th><th>3日相对板块</th><th>5日相对板块</th><th>趋势</th><th>MACD</th><th>回踩</th><th>操作标签</th>
               </tr>
             </thead>
             <tbody>
@@ -370,7 +534,12 @@
                 <tr>
                   <td>${index + 1}</td>
                   <td><strong>${item.name}</strong><br><span class="code">${item.code}</span></td>
-                  <td><strong>${fmt(item.resilienceScore, 0)}</strong></td>
+                  <td><strong>${fmt(item.sortScore, 0)}</strong></td>
+                  <td>${typeof amountText === 'function' ? amountText(item.amount3) : fmt(item.amount3 / 100000000, 2) + '亿'}</td>
+                  <td>${typeof amountText === 'function' ? amountText(item.amount5) : fmt(item.amount5 / 100000000, 2) + '亿'}</td>
+                  <td class="${changeClass(item.ret3)}">${fmtPercent(item.ret3)}</td>
+                  <td class="${changeClass(item.ret5)}">${fmtPercent(item.ret5)}</td>
+                  <td class="${changeClass(item.rel3)}">${fmtPercent(item.rel3)}</td>
                   <td class="${changeClass(item.rel5)}">${fmtPercent(item.rel5)}</td>
                   <td><span class="decision-badge ${toneFor(item.trendLabel, item.trendScore)}">${item.trendLabel}</span></td>
                   <td><span class="decision-badge ${macdTone(item.macdLabel, item.macdScore)}">${item.macdLabel}</span></td>
@@ -383,19 +552,21 @@
 
         <details class="decision-fold">
           <summary>展开明细口径</summary>
-          <p>波段综合分 = 热度分 60% + 位置分 40%。热度分看5/10日强度、10日超额、红盘率、量能和回撤；位置分看趋势确认与缩量回踩。个股韧性分看相对板块强度、回撤、趋势和回踩状态。</p>
+          <p>波段综合分 = 短线热度 60% + 位置分 40%。短线热度看今日、3日涨幅、3日超额、今日红盘率、3日红盘率和量能；5/10日只作为背景确认。个股韧性分看相对板块强度、回撤、趋势和回踩状态。</p>
         </details>
       </section>
     `;
   }
 
   function overviewBuckets() {
-    const metrics = (state?.data?.boards || []).map(boardDecisionMetric).filter((metric) => metric.latestRow);
+    const metrics = (state?.data?.boards || [])
+      .map(boardDecisionMetric)
+      .filter((metric) => metric.latestRow)
+      .map(metricWithPrevious)
+      .filter((metric) => metric.stage !== '退潮段');
     return {
-      hot: metrics.filter((item) => ['主升', '启动', '二波观察'].includes(item.status)).sort((a, b) => b.decisionScore - a.decisionScore).slice(0, 8),
-      pullback: metrics.filter((item) => item.status === '良性回踩').sort((a, b) => b.decisionScore - a.decisionScore).slice(0, 8),
-      badPullback: metrics.filter((item) => item.status === '恶性回踩').sort((a, b) => a.decisionScore - b.decisionScore).slice(0, 8),
-      risk: metrics.filter((item) => ['高位震荡', '趋势走弱', '热度退潮'].includes(item.status)).sort((a, b) => a.decisionScore - b.decisionScore).slice(0, 8),
+      baseRows: metrics,
+      rows: sortOverviewRows(metrics.filter((metric) => overviewTransitionFilter.size === 0 || overviewTransitionFilter.has(metric.transition.label))),
     };
   }
 
@@ -409,18 +580,58 @@
   }
 
   function renderDecisionOverview() {
-    const buckets = overviewBuckets();
+    const { baseRows, rows } = overviewBuckets();
     return `
       <section class="card section-card decision-overview-panel">
         <div class="section-head">
-          <div><h2>今日波段决策总览</h2><p class="muted">分为进攻段、良性回踩、恶性回踩、退潮段四类，点击板块直接进入波段决策。</p></div>
-          <span class="count-pill">简化版</span>
+          <div><h2>今日波段决策总览</h2><p class="muted">表格展示四段、短线热度、进攻质量和关键证据，点击板块进入波段决策。</p></div>
+          <span class="count-pill">表格版</span>
         </div>
-        <div class="decision-overview-grid">
-          <div class="pool-card primary"><div class="pool-title"><strong>进攻段</strong><span>${buckets.hot.length}</span></div>${buckets.hot.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
-          <div class="pool-card"><div class="pool-title"><strong>良性回踩</strong><span>${buckets.pullback.length}</span></div>${buckets.pullback.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
-          <div class="pool-card bad"><div class="pool-title"><strong>恶性回踩</strong><span>${buckets.badPullback.length}</span></div>${buckets.badPullback.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
-          <div class="pool-card risk"><div class="pool-title"><strong>退潮段</strong><span>${buckets.risk.length}</span></div>${buckets.risk.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
+        <div class="table-wrap decision-overview-table">
+          <table>
+            <thead>
+              <tr>
+                <th>板块</th>
+                <th>四段变化</th>
+                <th>
+                  <div class="column-filter">
+                    <button class="table-sort-btn" type="button" data-decision-overview-sort-key="transition">变化结论${overviewSortLabel('transition')}</button>
+                    <select class="overview-filter" data-decision-transition-filter multiple size="1" title="按变化结论筛选">
+                      ${transitionFilterOptions(baseRows)}
+                    </select>
+                  </div>
+                </th>
+                <th>短线热度</th>
+                <th>进攻质量</th>
+                <th>今日涨幅</th>
+                <th>3日超额</th>
+                <th>量能比</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((metric) => `
+                <tr>
+                  <td>
+                    <button class="decision-board-item decision-board-link" data-board-code="${metric.board.code}" type="button">
+                      <strong>${metric.board.name}</strong>
+                    </button>
+                  </td>
+                  <td class="stage-flow">
+                    ${renderStageHistory(metric)}
+                    <br><small>${metric.stageHistory.map((item) => item.latestRow?.date ? String(item.latestRow.date).slice(5) : '暂无').join(' -> ')}</small>
+                  </td>
+                  <td><span class="decision-action ${metric.transition.tone}">${metric.transition.label}</span></td>
+                  <td><strong>${fmt(metric.heatScore, 0)}</strong><br><small class="${deltaClass(metric.heatDelta)}">${fmtDelta(metric.heatDelta, 0)}</small></td>
+                  <td><strong>${fmt(metric.attackQuality.score, 0)}</strong><br><small class="${deltaClass(metric.qualityDelta)}">${fmtDelta(metric.qualityDelta, 0)}</small></td>
+                  <td class="${changeClass(metric.latestChange)}">${fmtPercent(metric.latestChange)}<br><small class="${deltaClass(metric.changeDelta)}">${fmtDelta(metric.changeDelta, 2)}</small></td>
+                  <td class="${changeClass(metric.excess3)}">${fmtPercent(metric.excess3)}</td>
+                  <td>${metric.turnoverRatio === null ? '暂无' : fmt(metric.turnoverRatio, 2)}</td>
+                  <td><span class="decision-action ${metric.action.tone}">${metric.action.label}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
         </div>
       </section>
     `;
@@ -464,6 +675,20 @@
   }
 
   document.addEventListener('click', (event) => {
+    const sortButton = event.target.closest?.('[data-decision-overview-sort-key]');
+    if (sortButton) {
+      event.preventDefault();
+      const key = sortButton.dataset.decisionOverviewSortKey;
+      if (overviewSort.key === key) {
+        overviewSort.direction = overviewSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        overviewSort = { key, direction: 'asc' };
+      }
+      document.querySelectorAll('.decision-overview-panel').forEach((node) => node.remove());
+      scheduleEnhance();
+      return;
+    }
+
     const item = event.target.closest?.('.decision-board-item');
     if (item && typeof state !== 'undefined') {
       state.selectedCode = item.dataset.boardCode || state.selectedCode;
@@ -471,6 +696,14 @@
       if (typeof render === 'function') render();
       scheduleEnhance();
     }
+  }, true);
+
+  document.addEventListener('change', (event) => {
+    const filter = event.target.closest?.('[data-decision-transition-filter]');
+    if (!filter) return;
+    overviewTransitionFilter = new Set([...filter.selectedOptions].map((option) => option.value).filter(Boolean));
+    document.querySelectorAll('.decision-overview-panel').forEach((node) => node.remove());
+    scheduleEnhance();
   }, true);
 
   const startObserver = () => {

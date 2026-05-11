@@ -4,8 +4,8 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260511-positions-v1",
-  intraday: "./intraday.html?v=20260511-positions-v1",
+  custom: "./custom.html?v=20260511-high-count-chart-v1",
+  intraday: "./intraday.html?v=20260511-stock-sort-v1",
   trades: "./trades.html?v=20260506-pnl-v4",
 };
 const AUTO_REFRESH_INTERVAL_MS = 30 * 60 * 1000;

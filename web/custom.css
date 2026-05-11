@@ -834,6 +834,11 @@ p { line-height: 1.55; }
   height: 280px;
 }
 
+.high-count-svg {
+  width: 100%;
+  height: 240px;
+}
+
 .new-high-svg {
   width: 100%;
   height: 290px;
@@ -888,6 +893,27 @@ p { line-height: 1.55; }
   fill: #ffffff;
   stroke: #0b7893;
   stroke-width: 2.5;
+}
+
+.trend-high-line {
+  fill: none;
+  stroke: #f08c3a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.6;
+  stroke-dasharray: 5 4;
+}
+
+.trend-high-dot {
+  fill: #ffffff;
+  stroke: #f08c3a;
+  stroke-width: 2.4;
+}
+
+.high-count-label {
+  fill: #a95712;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .new-high-card {

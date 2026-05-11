@@ -1143,6 +1143,61 @@ function renderTrendChart(board) {
   `;
 }
 
+function renderHighCountChart(board) {
+  const trend = trendValues(board).filter((item) => item?.date);
+  if (!trend.length) {
+    return `
+      <div>
+        <strong>暂无百日新高数量</strong>
+        <p>这个板块最近没有可用百日新高数据。</p>
+      </div>
+    `;
+  }
+
+  const width = 760;
+  const height = 220;
+  const pad = { top: 30, right: 34, bottom: 44, left: 54 };
+  const plotWidth = width - pad.left - pad.right;
+  const plotHeight = height - pad.top - pad.bottom;
+  const maxCount = Math.max(...trend.map((item) => Number(item.high100Count) || 0), 1);
+  const yFor = (count) => pad.top + ((maxCount - count) / maxCount) * plotHeight;
+  const points = trend.map((item, index) => {
+    const count = Number(item.high100Count) || 0;
+    const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
+    const y = yFor(count);
+    return {
+      ...item,
+      count,
+      x,
+      y,
+      selected: item.date === state.sortDate,
+    };
+  });
+  const line = points.map((point) => `${point.x},${point.y}`).join(' ');
+  const axisBottom = height - pad.bottom;
+
+  return `
+    <svg class="high-count-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 百日新高数量走势">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 10}" width="36" height="${plotHeight + 20}" rx="8"></rect>
+      `).join('')}
+      <line class="zero-line" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
+      <line class="zero-line" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${maxCount}只</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">0只</text>
+      <polyline points="${line}" class="trend-high-line"></polyline>
+      ${points.map((point) => `
+        <g>
+          <circle cx="${point.x}" cy="${point.y}" r="${point.selected ? 5.8 : 4.4}" class="trend-high-dot"></circle>
+          <text x="${point.x}" y="${Math.max(pad.top + 10, point.y - 10)}" text-anchor="middle" class="high-count-label">${point.count}只</text>
+          <text x="${point.x}" y="${height - 14}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
+          <title>${point.date} 百日新高 ${point.count}/${point.stockCount || board.stockCount || 0}</title>
+        </g>
+      `).join('')}
+    </svg>
+  `;
+}
+
 function pureCoreChartScaffold(board) {
   const series = pureCoreSeries(board);
   const usable = series.filter((item) => item.count && item.averageChange !== null);
@@ -1749,6 +1804,9 @@ function renderDetail(board) {
   if (!board) {
     return '<div class="card section-card empty">暂无自定义板块数据</div>';
   }
+  if (state.detailTab === 'new-high') {
+    state.detailTab = 'trend';
+  }
   const selectedRow = trendSnapshotByDate(board, state.sortDate);
   const selectedAverageChange = rowDisplayAverageChange(board, selectedRow);
   const boardFlow = boardVolumePriceState(board, state.sortDate);
@@ -1756,7 +1814,6 @@ function renderDetail(board) {
   const resonance = boardMarketResonance(board, state.sortDate);
   const isOverviewTab = state.detailTab === 'overview';
   const isTrendTab = state.detailTab === 'trend';
-  const isNewHighTab = state.detailTab === 'new-high';
   const isProfitTab = state.detailTab === 'profit';
 
   return `
@@ -1765,12 +1822,10 @@ function renderDetail(board) {
         <div class="detail-tabs" role="tablist" aria-label="详情页签">
           <button class="detail-tab-btn${isOverviewTab ? ' active' : ''}" type="button" data-detail-tab="overview" role="tab" aria-selected="${isOverviewTab}">概览</button>
           <button class="detail-tab-btn${isTrendTab ? ' active' : ''}" type="button" data-detail-tab="trend" role="tab" aria-selected="${isTrendTab}">趋势曲线</button>
-          <button class="detail-tab-btn${isNewHighTab ? ' active' : ''}" type="button" data-detail-tab="new-high" role="tab" aria-selected="${isNewHighTab}">百日新高</button>
           <button class="detail-tab-btn${isProfitTab ? ' active' : ''}" type="button" data-detail-tab="profit" role="tab" aria-selected="${isProfitTab}">盈利评分</button>
           <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
         </div>
       </section>
-      ${isNewHighTab ? renderNewHighTrendPanel(board) : ''}
       ${isOverviewTab ? `
       ${renderSetupSummary(board)}
       ` : ''}
@@ -1793,6 +1848,13 @@ function renderDetail(board) {
               <span>正宗股平均涨跌幅 / ${state.data?.marketIndex?.name || '指数'}涨跌幅</span>
             </div>
             <div class="chart-box">${renderTrendChart(board)}</div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-panel-head">
+              <strong>百日新高数量</strong>
+              <span>板块内创近100日新高个股数</span>
+            </div>
+            <div class="chart-box">${renderHighCountChart(board)}</div>
           </div>
           <div class="chart-panel">
             <div class="chart-panel-head">

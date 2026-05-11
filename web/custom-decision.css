@@ -165,6 +165,71 @@
   gap: 10px;
 }
 
+.decision-overview-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.decision-overview-table table {
+  min-width: 1200px;
+  font-size: 13px;
+}
+
+.decision-overview-table th,
+.decision-overview-table td {
+  padding: 9px 10px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.decision-overview-table small {
+  color: var(--muted);
+}
+
+.stage-flow {
+  min-width: 190px;
+}
+
+.stage-arrow {
+  display: inline-block;
+  margin: 0 7px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.overview-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.overview-filter {
+  min-height: 32px;
+  border: 1px solid #d7e2df;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  padding: 5px 9px;
+}
+
+.column-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.column-filter .overview-filter {
+  min-height: 28px;
+  max-width: 128px;
+  padding: 3px 7px;
+  font-size: 12px;
+  overflow: hidden;
+}
+
 .decision-board-item {
   min-height: 48px;
   display: grid;
@@ -182,6 +247,22 @@
 
 .decision-board-item:hover {
   border-color: #97bab5;
+}
+
+.decision-board-link {
+  min-height: 0;
+  display: inline;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+  font: inherit;
+  font-weight: 800;
+}
+
+.decision-board-link:hover {
+  color: var(--active);
+  text-decoration: underline;
 }
 
 .decision-board-item strong,

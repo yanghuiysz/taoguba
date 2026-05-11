@@ -163,6 +163,71 @@
   padding-right: 8px;
 }
 
+.swing-overview-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.swing-overview-table table {
+  min-width: 1120px;
+  font-size: 13px;
+}
+
+.swing-overview-table th,
+.swing-overview-table td {
+  padding: 9px 10px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.swing-overview-table small {
+  color: var(--muted);
+}
+
+.stage-flow {
+  min-width: 190px;
+}
+
+.stage-arrow {
+  display: inline-block;
+  margin: 0 7px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.overview-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.overview-filter {
+  min-height: 32px;
+  border: 1px solid #d7e2df;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  padding: 5px 9px;
+}
+
+.column-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.column-filter .overview-filter {
+  min-height: 28px;
+  max-width: 128px;
+  padding: 3px 7px;
+  font-size: 12px;
+  overflow: hidden;
+}
+
 .swing-board-jump {
   cursor: pointer;
 }
@@ -228,6 +293,11 @@
 
   .swing-intraday-table table {
     min-width: 980px;
+    font-size: 12px;
+  }
+
+  .swing-overview-table table {
+    min-width: 1040px;
     font-size: 12px;
   }
 

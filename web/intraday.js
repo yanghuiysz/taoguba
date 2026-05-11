@@ -13,6 +13,20 @@
       direction: "desc",
     },
   };
+  const INTRADAY_WATCH_TRANSITIONS = new Set([
+    "良性回踩转强",
+    "退潮转强",
+    "恶性回踩修复",
+    "弱分歧",
+    "进攻分歧",
+    "承接观察",
+    "进攻增强",
+    "进攻延续",
+    "恶性转良性",
+    "退潮修复",
+    "进攻钝化",
+    "回踩走弱",
+  ]);
 
   const safeNumber = (value) => {
     const parsed = Number(value);
@@ -107,6 +121,10 @@
     return safeNumber(row?.totalTurnover ?? row?.totalAmount);
   }
 
+  function stockTurnoverValue(stock) {
+    return safeNumber(stock?.turnover ?? stock?.amount);
+  }
+
   function tradingDates() {
     return [...new Set((state.data?.boards || [])
       .flatMap((board) => trendRows(board).map((row) => row.date))
@@ -136,25 +154,42 @@
     };
   }
 
+  function attackQualityMetric(row) {
+    const stocks = (row?.stocks || []).filter((stock) => safeNumber(stock.changePercent) !== null);
+    if (!stocks.length) {
+      return { score: 0, high5Rate: null, high3Rate: null, redRate: null };
+    }
+    const high5Rate = stocks.filter((stock) => Number(stock.changePercent) >= 5).length / stocks.length * 100;
+    const high3Rate = stocks.filter((stock) => Number(stock.changePercent) >= 3).length / stocks.length * 100;
+    const redRateValue = stocks.filter((stock) => Number(stock.changePercent) > 0).length / stocks.length * 100;
+    const score = (
+      0.42 * scoreRange(high5Rate, 0, 35)
+      + 0.34 * scoreRange(high3Rate, 5, 55)
+      + 0.24 * scoreRange(redRateValue, 35, 85)
+    );
+    return { score: clamp(score, 0, 100), high5Rate, high3Rate, redRate: redRateValue };
+  }
+
   function boardStatus(metric) {
     const latestChange = metric.latestChange ?? 0;
-    const r5 = metric.return5 ?? 0;
+    const r3 = metric.return3 ?? 0;
+    const excess3 = metric.excess3 ?? 0;
     const excess5 = metric.excess5 ?? 0;
     const excess10 = metric.excess10 ?? 0;
-    const redRate5 = metric.redRate5 ?? 0;
-    const drawdown10 = metric.drawdown10 ?? 0;
+    const redRateToday = metric.redRateToday ?? 0;
+    const drawdown3 = metric.drawdown3 ?? 0;
     const turnoverRatio = metric.turnoverRatio ?? 0;
+    const backgroundOk = (excess5 >= 0) || ((metric.return5 ?? 0) > 0) || (excess10 > 1);
     const badPullback = latestChange < 0
       && metric.heatScore >= 35
-      && (excess5 < -1 || redRate5 < 40 || drawdown10 > 9 || turnoverRatio > 1.25);
+      && (excess3 < -1 || redRateToday < 35 || drawdown3 > 6 || turnoverRatio > 1.25);
 
-    if (metric.heatScore < 35 || (excess10 < -2 && excess5 < -1)) return "热度退潮";
-    if (metric.heatScore >= 76 && excess5 >= 1.5 && r5 >= 3 && redRate5 >= 60) return "主升";
-    if (metric.heatScore >= 55 && latestChange < 0 && excess10 > 1 && redRate5 >= 45 && drawdown10 <= 9) return "良性回踩";
+    if (metric.heatScore < 35 || (excess3 < -2 && redRateToday < 35) || (excess5 < -1 && excess10 < -2)) return "热度退潮";
+    if (metric.heatScore >= 65 && latestChange >= 0 && r3 > 0 && excess3 >= 0 && redRateToday >= 50 && backgroundOk) return "主升";
+    if (latestChange < 0 && metric.heatScore >= 50 && excess3 >= -0.5 && redRateToday >= 40 && turnoverRatio <= 1.15 && backgroundOk) return "良性回踩";
     if (badPullback) return "恶性回踩";
-    if (metric.heatScore >= 60 && latestChange > 0 && drawdown10 >= 3 && excess10 > 1) return "二波观察";
-    if (metric.heatScore >= 55 && latestChange >= 0 && r5 > 0 && excess5 >= 0) return "启动";
-    if (metric.heatScore >= 45 && drawdown10 >= 8) return "高位震荡";
+    if (metric.heatScore >= 55 && latestChange >= 0 && r3 > 0 && excess3 >= -0.5 && backgroundOk) return "启动";
+    if (metric.heatScore >= 45 && drawdown3 >= 4) return "高位震荡";
     return "趋势走弱";
   }
 
@@ -182,44 +217,115 @@
     const rows = trendRows(board);
     const endIndex = rows.length ? Math.max(0, Math.min(rows.length - 1 + offset, rows.length - 1)) : -1;
     const latestRow = endIndex >= 0 ? rows[endIndex] : null;
+    const window3 = boardWindow(board, 3, endIndex);
     const window5 = boardWindow(board, 5, endIndex);
     const window10 = boardWindow(board, 10, endIndex);
     const latestChange = boardChange(latestRow);
+    const return3 = window3.boardReturn;
     const return5 = window5.boardReturn;
     const return10 = window10.boardReturn;
+    const index3 = window3.indexReturn;
     const index5 = window5.indexReturn;
     const index10 = window10.indexReturn;
+    const excess3 = return3 !== null && index3 !== null ? return3 - index3 : null;
     const excess5 = return5 !== null && index5 !== null ? return5 - index5 : null;
     const excess10 = return10 !== null && index10 !== null ? return10 - index10 : null;
     const turnoverRatio = window5.avgTurnover && window5.turnover ? window5.turnover / window5.avgTurnover : null;
-    const upDayScore = window5.validDays ? window5.upDays / window5.validDays * 100 : 0;
+    const redRateToday = redRate(latestRow);
     const heatScore = (
-      0.22 * scoreRange(return5, -3, 8)
-      + 0.18 * scoreRange(return10, -5, 15)
-      + 0.22 * scoreRange(excess10, -4, 10)
-      + 0.16 * scoreRange(window5.redRate, 35, 85)
-      + 0.10 * upDayScore
-      + 0.07 * scoreRange(turnoverRatio, 0.75, 1.6)
-      + 0.05 * (100 - scoreRange(window10.drawdown, 4, 16))
+      0.28 * scoreRange(latestChange, -3, 6)
+      + 0.22 * scoreRange(return3, -3, 8)
+      + 0.18 * scoreRange(excess3, -3, 6)
+      + 0.14 * scoreRange(redRateToday, 30, 80)
+      + 0.10 * scoreRange(window3.redRate, 35, 85)
+      + 0.08 * scoreRange(turnoverRatio, 0.75, 1.6)
     );
     const metric = {
       board,
       date: latestRow?.date || "",
       latestRow,
       latestChange,
+      return3,
       return5,
       return10,
+      index3,
+      excess3,
       excess5,
       excess10,
+      redRateToday,
+      redRate3: window3.redRate,
       redRate5: window5.redRate,
       turnoverRatio,
+      drawdown3: window3.drawdown,
       drawdown10: window10.drawdown,
       heatScore: clamp(heatScore, 0, 100),
+      attackQuality: attackQualityMetric(latestRow),
     };
     metric.status = boardStatus(metric);
     metric.tone = statusTone(metric.status);
     metric.stage = stageForStatus(metric.status);
     return metric;
+  }
+
+  function transitionLabel(metric, previous) {
+    if (!previous?.latestRow) return { label: "暂无对比", tone: "watch" };
+    const heatDelta = metric.heatScore - previous.heatScore;
+    const qualityDelta = metric.attackQuality.score - previous.attackQuality.score;
+    if (metric.stage !== previous.stage) {
+      const labelMap = {
+        "进攻段->良性回踩": { label: "进攻分歧", tone: "test" },
+        "进攻段->恶性回踩": { label: "进攻转弱", tone: "weak" },
+        "进攻段->退潮段": { label: "进攻退潮", tone: "divergence" },
+        "良性回踩->进攻段": { label: "良性回踩转强", tone: "strong" },
+        "良性回踩->恶性回踩": { label: "承接失败", tone: "weak" },
+        "良性回踩->退潮段": { label: "回踩退潮", tone: "divergence" },
+        "恶性回踩->进攻段": { label: "恶性回踩修复", tone: "strong" },
+        "恶性回踩->良性回踩": { label: "恶性转良性", tone: "test" },
+        "恶性回踩->退潮段": { label: "恶性退潮", tone: "divergence" },
+        "退潮段->进攻段": { label: "退潮转强", tone: "strong" },
+        "退潮段->良性回踩": { label: "退潮修复", tone: "test" },
+        "退潮段->恶性回踩": { label: "退潮反抽失败", tone: "weak" },
+      };
+      return labelMap[`${previous.stage}->${metric.stage}`] || { label: `${previous.stage}转${metric.stage}`, tone: metric.tone };
+    }
+    if (metric.stage === "进攻段") {
+      if (heatDelta >= 0 && qualityDelta >= 0) return { label: "进攻增强", tone: "strong" };
+      if (qualityDelta < -12 && heatDelta < -8) return { label: "进攻钝化", tone: "mixed" };
+      if (qualityDelta < -5 || heatDelta < -5) return { label: "弱分歧", tone: "test" };
+      return { label: "进攻延续", tone: "strong" };
+    }
+    if (metric.stage === "良性回踩") {
+      if (qualityDelta >= -8 && metric.turnoverRatio <= 1.15) return { label: "承接观察", tone: "test" };
+      return { label: "回踩走弱", tone: "mixed" };
+    }
+    if (metric.stage === "恶性回踩") return { label: "恶化", tone: "weak" };
+    return { label: "退潮延续", tone: "divergence" };
+  }
+
+  function transitionRank(label) {
+    return {
+      良性回踩转强: 0,
+      退潮转强: 1,
+      恶性回踩修复: 2,
+      弱分歧: 3,
+      进攻分歧: 4,
+      承接观察: 5,
+      进攻增强: 6,
+      进攻延续: 7,
+      恶性转良性: 8,
+      退潮修复: 9,
+      进攻钝化: 10,
+      回踩走弱: 11,
+    }[label] ?? 99;
+  }
+
+  function metricWithPrevious(metric) {
+    const previous = boardMetric(metric.board, -1);
+    return {
+      ...metric,
+      previous,
+      transition: transitionLabel(metric, previous),
+    };
   }
 
   function stockRows(board, stockCode, days = 10) {
@@ -276,9 +382,20 @@
     return (board?.stocks || []).map((stock) => {
       const items = stockRows(board, stock.code, 10);
       const ret5 = stockReturn(items, 5);
+      const ret3 = stockReturn(items, 3);
       const ret10 = stockReturn(items, 10);
+      const amount3 = items.slice(Math.max(0, items.length - 3))
+        .map((item) => stockTurnoverValue(item.stock))
+        .filter((value) => value !== null)
+        .reduce((sum, value) => sum + value, 0);
+      const amount5 = items.slice(Math.max(0, items.length - 5))
+        .map((item) => stockTurnoverValue(item.stock))
+        .filter((value) => value !== null)
+        .reduce((sum, value) => sum + value, 0);
+      const boardRet3 = boardReturnForItems(items, 3);
       const boardRet5 = boardReturnForItems(items, 5);
       const boardRet10 = boardReturnForItems(items, 10);
+      const rel3 = ret3 !== null && boardRet3 !== null ? ret3 - boardRet3 : null;
       const rel5 = ret5 !== null && boardRet5 !== null ? ret5 - boardRet5 : null;
       const rel10 = ret10 !== null && boardRet10 !== null ? ret10 - boardRet10 : null;
       const latest = items.at(-1)?.stock || null;
@@ -299,12 +416,20 @@
         + 0.09 * trendScore
         + 0.10 * macdScore
       );
+      const sortScore = (
+        0.58 * scoreRange(amount5, 0, 5000000000)
+        + 0.42 * scoreRange(ret5, -5, 18)
+      );
       return {
         code: stock.code,
         name: stock.name || stock.code,
         latest,
+        ret3,
         ret5,
         ret10,
+        amount3,
+        amount5,
+        rel3,
         rel5,
         rel10,
         latestChange,
@@ -312,25 +437,26 @@
         macdScore,
         highStatus: latest?.highStatus || stock.latestHighStatus || "",
         score: clamp(score, 0, 100),
+        sortScore: clamp(sortScore, 0, 100),
       };
-    }).sort((a, b) => b.score - a.score);
+    }).sort((a, b) => b.sortScore - a.sortScore || b.amount5 - a.amount5 || (b.ret5 ?? -999) - (a.ret5 ?? -999));
   }
 
   function signalTone(signal) {
-    if (signal === "良性低吸") return "test";
-    if (signal === "转强加仓" || signal === "进攻前排") return "strong";
-    if (signal === "恶化否决") return "weak";
+    if (["良性回踩转强", "退潮转强", "恶性回踩修复", "进攻增强"].includes(signal)) return "strong";
+    if (["弱分歧", "进攻分歧", "承接观察", "恶性转良性", "退潮修复", "进攻延续"].includes(signal)) return "test";
+    if (["进攻钝化", "回踩走弱"].includes(signal)) return "mixed";
     return "watch";
   }
 
   function intradayState(metric) {
     const latestChange = metric.latestChange ?? 0;
-    const excess5 = metric.excess5 ?? 0;
-    const redRate5 = metric.redRate5 ?? 0;
-    const drawdown10 = metric.drawdown10 ?? 0;
+    const excess3 = metric.excess3 ?? 0;
+    const redRateToday = metric.redRateToday ?? 0;
+    const drawdown3 = metric.drawdown3 ?? 0;
     const turnoverRatio = metric.turnoverRatio ?? 0;
     const badPullback = latestChange < 0
-      && (excess5 < -1 || redRate5 < 40 || drawdown10 > 9 || turnoverRatio > 1.25 || metric.status === "恶性回踩");
+      && (excess3 < -1 || redRateToday < 35 || drawdown3 > 6 || turnoverRatio > 1.25 || metric.status === "恶性回踩");
 
     if (badPullback) return { label: "恶性回踩", tone: "weak" };
     if (latestChange < 0 && metric.stage !== "退潮段") return { label: "良性回踩", tone: "test" };
@@ -340,35 +466,8 @@
   }
 
   function buildTradeSignal(backgroundMetric, currentMetric, currentState, stock) {
-    const stockScore = safeNumber(stock.score) ?? 0;
-    const rel5 = safeNumber(stock.rel5) ?? 0;
-    const latestChange = safeNumber(stock.latestChange) ?? 0;
-    const qualifiedBackground = backgroundMetric.stage === "进攻段" || backgroundMetric.stage === "良性回踩";
-    const todayGoodPullback = currentState.label === "良性回踩";
-    const todayAttack = currentState.label === "盘中转强";
-    const todayBad = currentState.label === "恶性回踩" || currentState.label === "退潮走弱";
-    const stockResilient = stockScore >= 65 || rel5 >= 0 || latestChange >= 0;
-    const stockTurnStrong = latestChange >= 1 && rel5 >= 0;
-
-    if (!qualifiedBackground) {
-      return { signal: "背景不足", priority: 0 };
-    }
-    if (todayBad) {
-      return { signal: "恶化否决", priority: 1 };
-    }
-    if (todayGoodPullback && stockTurnStrong) {
-      return { signal: "转强加仓", priority: 4 };
-    }
-    if (todayGoodPullback && stockResilient) {
-      return { signal: "良性低吸", priority: 5 };
-    }
-    if (todayAttack && stockTurnStrong) {
-      return { signal: "进攻前排", priority: 3 };
-    }
-    if (stockScore >= 78 && rel5 >= 0) {
-      return { signal: "韧性观察", priority: 2 };
-    }
-    return { signal: "观察", priority: 0 };
+    if (!INTRADAY_WATCH_TRANSITIONS.has(currentState.label)) return { signal: "观察", priority: 0 };
+    return { signal: currentState.label, priority: Math.max(2, 12 - transitionRank(currentState.label)) };
   }
 
   function opportunityRows() {
@@ -376,13 +475,14 @@
       .map((board) => ({
         board,
         backgroundMetric: boardMetric(board, -1),
-        currentMetric: boardMetric(board),
+        currentMetric: metricWithPrevious(boardMetric(board)),
       }))
-      .flatMap(({ board, backgroundMetric, currentMetric }) => stockResilienceRows(board).slice(0, 8).map((stock) => {
+      .filter(({ currentMetric }) => INTRADAY_WATCH_TRANSITIONS.has(currentMetric.transition.label))
+      .flatMap(({ board, backgroundMetric, currentMetric }) => stockResilienceRows(board).slice(0, 3).map((stock) => {
         const latestChange = safeNumber(stock.latestChange) ?? 0;
         const rel5 = safeNumber(stock.rel5) ?? 0;
         const rel10 = safeNumber(stock.rel10) ?? 0;
-        const currentState = intradayState(currentMetric);
+        const currentState = currentMetric.transition;
         const tradeSignal = buildTradeSignal(backgroundMetric, currentMetric, currentState, stock);
         const opportunityScore = clamp(
           0.38 * (safeNumber(stock.score) ?? 0)
@@ -626,9 +726,9 @@
     }
 
     const rows = opportunityRows();
-    const firstBuyCount = rows.filter((item) => item.signal === "良性低吸").length;
-    const addBuyCount = rows.filter((item) => item.signal === "转强加仓").length;
-    const attackCount = rows.filter((item) => item.signal === "进攻前排").length;
+    const focusCount = rows.filter((item) => ["良性回踩转强", "退潮转强", "恶性回踩修复", "弱分歧", "进攻分歧", "承接观察"].includes(item.signal)).length;
+    const secondaryCount = rows.filter((item) => ["进攻增强", "进攻延续", "恶性转良性", "退潮修复"].includes(item.signal)).length;
+    const cautiousCount = rows.filter((item) => ["进攻钝化", "回踩走弱"].includes(item.signal)).length;
     const latestDate = latestDataDate();
     const backgroundDate = rows[0]?.backgroundMetric?.date || "";
     const updatedAt = new Date().toLocaleTimeString("zh-CN", { hour12: false });
@@ -639,16 +739,16 @@
         <div class="section-head">
           <div>
             <h2>盘中机会雷达</h2>
-            <p class="muted">昨日背景决定候选资格，今日盘中只保留良性低吸、转强加仓和辅助观察，排除恶性回踩与退潮走弱。</p>
+            <p class="muted">按热门板块波段观察的变化结论筛板块，每个板块只取 3 个核心股。</p>
           </div>
           <span class="count-pill">背景 ${shortDate(backgroundDate)} / 盘中 ${shortDate(latestDate)}</span>
         </div>
 
         <div class="intraday-summary">
           <div class="setup-metric"><span>机会数</span><strong>${rows.length}</strong><small>当前入选</small></div>
-          <div class="setup-metric"><span>良性低吸</span><strong>${firstBuyCount}</strong><small>第一笔候选</small></div>
-          <div class="setup-metric"><span>转强加仓</span><strong>${addBuyCount}</strong><small>第二笔候选</small></div>
-          <div class="setup-metric"><span>进攻前排</span><strong>${attackCount}</strong><small>辅助观察</small></div>
+          <div class="setup-metric"><span>重点</span><strong>${focusCount}</strong><small>优先观察</small></div>
+          <div class="setup-metric"><span>次重点</span><strong>${secondaryCount}</strong><small>跟踪观察</small></div>
+          <div class="setup-metric"><span>谨慎</span><strong>${cautiousCount}</strong><small>只看核心</small></div>
           <div class="setup-metric"><span>数据时间</span><strong>${shortDate(latestDate)}</strong><small>${updatedAt} 刷新页面</small></div>
         </div>
 
@@ -664,8 +764,8 @@
                 <tr>
                   <th>排名</th>
                   <th><button class="table-sort-btn" type="button" data-sort-key="board">板块${sortLabel("board")}</button></th>
-                  <th>昨日背景</th>
-                  <th>今日状态</th>
+                  <th>昨日阶段</th>
+                  <th>变化结论</th>
                   <th>个股</th>
                   <th>当前涨幅</th>
                   <th>5日相对</th>
