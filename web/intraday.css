@@ -4,7 +4,7 @@
 
 .intraday-summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -27,6 +27,32 @@
 
 .intraday-table table {
   min-width: 1180px;
+}
+
+.positions-card {
+  border-color: #d6e4df;
+}
+
+.positions-table table {
+  min-width: 980px;
+}
+
+.positions-table td {
+  vertical-align: top;
+}
+
+.table-sort-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 0;
+}
+
+.table-sort-btn:hover {
+  color: var(--active);
 }
 
 .intraday-board-cell {

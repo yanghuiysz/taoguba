@@ -1469,114 +1469,80 @@ function renderSetupBadge(setup) {
   return `<span class="setup-badge ${setup.tone}">${setup.label}</span>`;
 }
 
+function setupStrengthValue(label) {
+  return String(label || '').includes('强') ? 1 : 0;
+}
+
+function setupStructureWindow(board, date, size = 10) {
+  const labels = boardLabelSeries(board);
+  const currentIndex = labels.findIndex((item) => item.date === date);
+  const endIndex = currentIndex >= 0 ? currentIndex : labels.length - 1;
+  if (endIndex < 0) return [];
+  return labels.slice(Math.max(0, endIndex - size + 1), endIndex + 1);
+}
+
+function renderSetupStructureChart(board) {
+  const items = setupStructureWindow(board, state.sortDate, 10);
+  if (!items.length) {
+    return '<div class="pool-empty">暂无结构数据</div>';
+  }
+
+  const width = 720;
+  const height = 210;
+  const pad = { top: 24, right: 24, bottom: 42, left: 44 };
+  const plotWidth = width - pad.left - pad.right;
+  const plotHeight = height - pad.top - pad.bottom;
+  const step = items.length > 1 ? plotWidth / (items.length - 1) : 0;
+  const yFor = (value) => pad.top + (1 - value) * plotHeight;
+  const points = items.map((item, index) => ({
+    ...item,
+    value: setupStrengthValue(item.label),
+    x: pad.left + step * index,
+    y: yFor(setupStrengthValue(item.label)),
+  }));
+  const path = points.map((point, index) => `${index ? 'L' : 'M'} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(' ');
+  const latest = points.at(-1);
+  const labelText = points.map((point) => `${shortDate(point.date)} ${point.label}=${point.value}`).join(' / ');
+
+  return `
+    <div class="structure-chart-wrap">
+      <svg class="structure-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="10日结构强弱折线图">
+        <line class="chart-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}"></line>
+        <line class="chart-axis" x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}"></line>
+        <line class="structure-grid-line" x1="${pad.left}" y1="${yFor(1)}" x2="${width - pad.right}" y2="${yFor(1)}"></line>
+        <line class="structure-grid-line" x1="${pad.left}" y1="${yFor(0)}" x2="${width - pad.right}" y2="${yFor(0)}"></line>
+        <text class="structure-axis-label" x="18" y="${yFor(1) + 4}">1</text>
+        <text class="structure-axis-label" x="18" y="${yFor(0) + 4}">0</text>
+        <path class="structure-line" d="${path}"></path>
+        ${points.map((point) => `
+          <g class="structure-point ${point.value ? 'strong' : 'weak'}">
+            <circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="5"></circle>
+            <text x="${point.x.toFixed(1)}" y="${height - 16}" text-anchor="middle">${shortDate(point.date)}</text>
+          </g>
+        `).join('')}
+      </svg>
+      <div class="structure-legend">
+        <span>强=1</span>
+        <span>弱=0</span>
+        <strong>${latest ? `${shortDate(latest.date)} ${latest.label}=${latest.value}` : '暂无'}</strong>
+      </div>
+      <p class="muted structure-sequence">${labelText}</p>
+    </div>
+  `;
+}
+
 function renderSetupSummary(board) {
   const setup = boardSetup(board, state.sortDate);
-  const stats = setup.todayStats;
-  const d1 = setup.d1Stats;
-  const d2 = setup.d2Stats;
-  const metric = setup.dailyLabel?.metric;
-  const d1Label = boardLabelFor(board, setup.d1?.date);
-  const d2Label = boardLabelFor(board, setup.d2?.date);
-  const membership = membershipSummary(board, state.sortDate);
-  const suspectList = membership.assessments
-    .filter((item) => item.assessment.status === 'suspect' || item.assessment.status === 'overlap')
-    .slice(0, 5);
-  const boardFlow = boardVolumePriceState(board, state.sortDate);
-  const marketRow = marketIndexRowByDate(state.sortDate);
-  const marketFlow = marketVolumePriceState(state.sortDate);
-  const resonance = boardMarketResonance(board, state.sortDate);
-  const todayResonance = buildIndexResonanceItem(board, setup.today);
-  const recentResonance = setup.recentResonance;
-  const mainline = setup.mainline;
   return `
     <section class="card section-card setup-card">
       <div class="section-head">
         <div>
-          <h2>${board.name} · 模式观察</h2>
-          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.rawLabel}，主线状态 ${mainline.label}，强度分 ${setup.strengthScore === null ? '暂无' : number(setup.strengthScore, 0)}，分歧分 ${setup.divergenceScore === null ? '暂无' : number(setup.divergenceScore, 0)}。</p>
+          <h2>${board.name} · 10日结构</h2>
+          <p class="muted">按 ${shortDate(state.sortDate)} 判断：${setup.rawLabel}；强势结构记为 1，其余记为 0。</p>
         </div>
-        <span class="setup-badge ${mainline.tone}">${mainline.label}</span>
+        ${renderSetupBadge(setup)}
       </div>
-      <div class="setup-grid">
-        <div class="setup-metric">
-          <span>主线状态</span>
-          <strong class="state-chip ${mainline.tone}">${mainline.label}</strong>
-          <small>${mainline.detail}</small>
-        </div>
-        <div class="setup-metric">
-          <span>近5日确认</span>
-          <strong class="state-chip ${recentResonance?.tone || 'watch'}">${recentResonance?.label || '暂无'}</strong>
-          <small>${recentResonance?.detail || '缺少窗口共振数据'}</small>
-        </div>
-        <div class="setup-metric">
-          <span>今日共振分</span>
-          <strong class="state-chip ${todayResonance?.tone || 'watch'}">${todayResonance ? `${number(todayResonance.score, 0)} · ${todayResonance.label}` : '暂无'}</strong>
-          <small>${todayResonance ? `超额 ${percentText(todayResonance.excessPct)} · ${todayResonance.indexVolumeExpanded ? '指数放量' : '指数未放量'}` : '缺少指数数据'}</small>
-        </div>
-        <div class="setup-metric">
-          <span>今日强度</span>
-          <strong class="${signedClass(stats?.averageChange)}">${percentText(stats?.averageChange)}</strong>
-          <small>正宗涨停 ${metric?.raw_limit_up_count_t ?? 0} · 红盘 ${metric?.R_t === null || metric?.R_t === undefined ? '暂无' : number(metric.R_t * 100, 0)}%</small>
-        </div>
-        <div class="setup-metric">
-          <span>核心表现</span>
-          <strong class="${signedClass(metric?.C_t)}">${percentText(metric?.C_t)}</strong>
-          <small>B=${metric?.B_t === null || metric?.B_t === undefined ? '暂无' : number(metric.B_t)} · 分化 ${metric?.D_t === null || metric?.D_t === undefined ? '暂无' : number(metric.D_t)}</small>
-        </div>
-        <div class="setup-metric">
-          <span>距上次强势</span>
-          <strong>${setup.lastStrong ? `${setup.lastStrong.days} 天` : '暂无'}</strong>
-          <small>${setup.lastStrong ? `上次强势 ${shortDate(setup.lastStrong.date)}` : '历史区间无强势'}</small>
-        </div>
-        <div class="setup-metric">
-          <span>三日结构</span>
-          <strong>${d2Label?.label || '暂无'} → ${d1Label?.label || '暂无'} → ${setup.rawLabel}</strong>
-          <small>${shortDate(setup.d2?.date)} / ${shortDate(setup.d1?.date)} / ${shortDate(setup.today?.date)}</small>
-        </div>
-        <div class="setup-metric">
-          <span>板块量价</span>
-          <strong class="state-chip ${boardFlow?.priceDirection || ''} ${boardFlow?.amountDirection || ''}">${boardFlow?.label || '暂无'}</strong>
-          <small>${boardFlow ? `板块均涨 ${percentText(stats?.averageChange)} · 成交额 ${amountText(rowTotalTurnover(setup.today))}` : '缺少上一交易日对比'}</small>
-        </div>
-        <div class="setup-metric">
-          <span>${state.data?.marketIndex?.name || '指数'}量价</span>
-          <strong class="state-chip ${marketFlow?.priceDirection || ''} ${marketFlow?.amountDirection || ''}">${marketFlow?.label || '暂无'}</strong>
-          <small>${marketRow ? `指数涨跌 ${percentText(marketRow.changePercent)} · 成交量 ${volumeText(marketRow.volume)}` : '缺少指数数据'}</small>
-        </div>
-        <div class="setup-metric">
-          <span>与指数关系</span>
-          <strong class="state-chip ${resonance?.tone || ''}">${resonance?.label || '暂无'}</strong>
-          <small>${resonance?.detail || '缺少足够数据判断'}</small>
-        </div>
-      </div>
-      <div class="membership-alert">
-        <strong>标签依据：</strong>
-        ${setup.labelReason || '暂无'}${setup.riskFlags.length ? `；风险标记：${setup.riskFlags.join('、')}` : ''}
-      </div>
-      <div class="core-strip">
-        ${setup.coreRank.map((stock, index) => `
-          <div class="core-chip">
-            <span>${index + 1}. ${stock.name}</span>
-            <strong class="${signedClass(stock.changePercent)}">${percentText(stock.changePercent)}</strong>
-            <small>${amountText(stockTurnover(stock))}</small>
-          </div>
-        `).join('')}
-      </div>
-      <div class="membership-strip">
-        <div class="membership-count pure_core">正宗核心 ${membership.stats.pure_core || 0}</div>
-        <div class="membership-count pure_elastic">正宗弹性 ${membership.stats.pure_elastic || 0}</div>
-        <div class="membership-count supply_chain">产业配套 ${membership.stats.supply_chain || 0}</div>
-        <div class="membership-count theme_edge">题材沾边 ${membership.stats.theme_edge || 0}</div>
-        <div class="membership-count overlap">多题材 ${membership.stats.overlap || 0}</div>
-        <div class="membership-count suspect">存疑/剔除 ${membership.stats.suspect || 0}</div>
-        <div class="membership-count pending">待确认 ${membership.stats.pending || 0}</div>
-      </div>
-      ${suspectList.length ? `
-        <div class="membership-alert">
-          <strong>归属复盘：</strong>
-          ${suspectList.map((item) => `${item.stock.name}（${item.assessment.label}）`).join('、')}
-        </div>
-      ` : ''}
+      ${renderSetupStructureChart(board)}
     </section>
   `;
 }

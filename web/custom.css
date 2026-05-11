@@ -202,6 +202,7 @@ p { line-height: 1.55; }
 }
 
 .pool-card.primary { border-color: #d7b66a; }
+.pool-card.bad { border-color: #d6b9a8; }
 .pool-card.risk { border-color: #e3c4c4; }
 
 .pool-title {
@@ -459,6 +460,77 @@ p { line-height: 1.55; }
   font-size: 20px;
   line-height: 1.18;
   overflow-wrap: anywhere;
+}
+
+.structure-chart-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.structure-chart {
+  width: 100%;
+  height: 230px;
+  display: block;
+  border: 1px solid #edf2f1;
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.structure-grid-line {
+  stroke: #dce8e5;
+  stroke-dasharray: 4 5;
+}
+
+.structure-axis-label,
+.structure-point text {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+.structure-line {
+  fill: none;
+  stroke: var(--active);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.structure-point circle {
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.structure-point.strong circle {
+  fill: #c0392b;
+}
+
+.structure-point.weak circle {
+  fill: #7f8c8d;
+}
+
+.structure-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.structure-legend span,
+.structure-legend strong {
+  border: 1px solid #edf2f1;
+  border-radius: 8px;
+  background: #fbfdfc;
+  padding: 5px 8px;
+}
+
+.structure-legend strong {
+  color: var(--ink);
+}
+
+.structure-sequence {
+  margin: 0;
 }
 
 .profit-card {

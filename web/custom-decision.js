@@ -183,12 +183,16 @@
     const decisionScore = Math.round(0.60 * heatScore + 0.40 * positionScore);
 
     let status = '趋势走弱';
-    if (heatScore >= 76 && (excess5 ?? 0) >= 1.5 && (return5 ?? 0) >= 3 && (redRate5 ?? 0) >= 60) status = '主升';
+    const badPullback = (latestChange ?? 0) < 0
+      && heatScore >= 35
+      && ((excess5 ?? 0) < -1 || (redRate5 ?? 0) < 40 || drawdown10 > 9 || (pullback.ratio ?? 0) > 1.25);
+    if (heatScore < 35 || ((excess10 ?? 0) < -2 && (excess5 ?? 0) < -1)) status = '热度退潮';
+    else if (heatScore >= 76 && (excess5 ?? 0) >= 1.5 && (return5 ?? 0) >= 3 && (redRate5 ?? 0) >= 60) status = '主升';
     else if (heatScore >= 55 && (latestChange ?? 0) < 0 && (excess10 ?? 0) > 1 && (redRate5 ?? 0) >= 45 && drawdown10 <= 9) status = '良性回踩';
+    else if (badPullback) status = '恶性回踩';
     else if (heatScore >= 60 && (latestChange ?? 0) > 0 && drawdown10 >= 3 && (excess10 ?? 0) > 1) status = '二波观察';
     else if (heatScore >= 55 && (latestChange ?? 0) >= 0 && (return5 ?? 0) > 0 && (excess5 ?? 0) >= 0) status = '启动';
     else if (heatScore >= 45 && drawdown10 >= 8) status = '高位震荡';
-    else if (heatScore < 35 || ((excess5 ?? 0) < -1 && (latestChange ?? 0) < 0)) status = '热度退潮';
 
     const action = actionFor({ decisionScore, status, trend, pullback, excess10 });
     return {
@@ -213,7 +217,7 @@
   }
 
   function toneFor(text, score = 0) {
-    if (String(text).includes('风险') || String(text).includes('退潮') || String(text).includes('放量下跌')) return 'risk';
+    if (String(text).includes('风险') || String(text).includes('退潮') || String(text).includes('恶性') || String(text).includes('放量下跌')) return 'risk';
     if (String(text).includes('主升') || String(text).includes('均线多头') || score >= 80) return 'strong';
     if (String(text).includes('良性') || String(text).includes('缩量') || score >= 65) return 'test';
     if (String(text).includes('二波') || String(text).includes('修复')) return 'turn';
@@ -222,7 +226,7 @@
   }
 
   function actionFor(metric) {
-    if (metric.status === '热度退潮' || metric.pullback.label === '放量下跌') return { label: '暂时回避', tone: 'risk' };
+    if (metric.status === '热度退潮' || metric.status === '恶性回踩' || metric.pullback.label === '放量下跌') return { label: '暂时回避', tone: 'risk' };
     if (metric.decisionScore >= 78 && ['主升', '良性回踩', '二波观察'].includes(metric.status) && ['均线多头', '趋势保持'].includes(metric.trend.label)) {
       if (['缩量回踩', '正常回踩'].includes(metric.pullback.label)) return { label: '重点低吸观察', tone: 'strong' };
       if (metric.pullback.label === '放量修复') return { label: '持有/等回踩', tone: 'turn' };
@@ -390,6 +394,7 @@
     return {
       hot: metrics.filter((item) => ['主升', '启动', '二波观察'].includes(item.status)).sort((a, b) => b.decisionScore - a.decisionScore).slice(0, 8),
       pullback: metrics.filter((item) => item.status === '良性回踩').sort((a, b) => b.decisionScore - a.decisionScore).slice(0, 8),
+      badPullback: metrics.filter((item) => item.status === '恶性回踩').sort((a, b) => a.decisionScore - b.decisionScore).slice(0, 8),
       risk: metrics.filter((item) => ['高位震荡', '趋势走弱', '热度退潮'].includes(item.status)).sort((a, b) => a.decisionScore - b.decisionScore).slice(0, 8),
     };
   }
@@ -408,13 +413,14 @@
     return `
       <section class="card section-card decision-overview-panel">
         <div class="section-head">
-          <div><h2>今日波段决策总览</h2><p class="muted">只保留主线、良性回踩、风险退潮三类，点击板块直接进入波段决策。</p></div>
+          <div><h2>今日波段决策总览</h2><p class="muted">分为进攻段、良性回踩、恶性回踩、退潮段四类，点击板块直接进入波段决策。</p></div>
           <span class="count-pill">简化版</span>
         </div>
         <div class="decision-overview-grid">
-          <div class="pool-card primary"><div class="pool-title"><strong>主线/启动</strong><span>${buckets.hot.length}</span></div>${buckets.hot.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
+          <div class="pool-card primary"><div class="pool-title"><strong>进攻段</strong><span>${buckets.hot.length}</span></div>${buckets.hot.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
           <div class="pool-card"><div class="pool-title"><strong>良性回踩</strong><span>${buckets.pullback.length}</span></div>${buckets.pullback.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
-          <div class="pool-card risk"><div class="pool-title"><strong>风险/退潮</strong><span>${buckets.risk.length}</span></div>${buckets.risk.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
+          <div class="pool-card bad"><div class="pool-title"><strong>恶性回踩</strong><span>${buckets.badPullback.length}</span></div>${buckets.badPullback.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
+          <div class="pool-card risk"><div class="pool-title"><strong>退潮段</strong><span>${buckets.risk.length}</span></div>${buckets.risk.map(boardItem).join('') || '<div class="pool-empty">暂无</div>'}</div>
         </div>
       </section>
     `;

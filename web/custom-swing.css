@@ -153,7 +153,7 @@
 }
 
 .swing-pools {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .swing-pools .pool-card {
@@ -200,6 +200,20 @@
 
 .text-link:hover {
   text-decoration: underline;
+}
+
+.table-sort-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 0;
+}
+
+.table-sort-btn:hover {
+  color: var(--active);
 }
 
 @media (max-width: 1100px) {

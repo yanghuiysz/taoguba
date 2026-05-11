@@ -5,6 +5,10 @@
   const SWING_TAB = 'swing';
   let scheduled = false;
   let enhancing = false;
+  let opportunitySort = {
+    key: 'default',
+    direction: 'desc',
+  };
 
   function safeNumber(value) {
     const parsed = Number(value);
@@ -47,18 +51,19 @@
     return (board?.trend || []).filter((row) => row?.averageChange !== null && row?.averageChange !== undefined);
   }
 
-  function getSelectedIndex(rows) {
+  function getSelectedIndex(rows, offset = 0) {
     if (!rows.length) return -1;
+    let index = rows.length - 1;
     if (state?.sortDate) {
-      const index = rows.findIndex((row) => row.date === state.sortDate);
-      if (index >= 0) return index;
+      const selected = rows.findIndex((row) => row.date === state.sortDate);
+      if (selected >= 0) index = selected;
     }
-    return rows.length - 1;
+    return Math.max(0, Math.min(rows.length - 1, index + offset));
   }
 
-  function rowsToSelected(board, days) {
+  function rowsToSelected(board, days, offset = 0) {
     const rows = getTrendRows(board);
-    const end = getSelectedIndex(rows);
+    const end = getSelectedIndex(rows, offset);
     if (end < 0) return [];
     return rows.slice(Math.max(0, end - days + 1), end + 1);
   }
@@ -127,8 +132,8 @@
     return maxDrawdown;
   }
 
-  function boardWindowMetric(board, days) {
-    const rows = rowsToSelected(board, days);
+  function boardWindowMetric(board, days, offset = 0) {
+    const rows = rowsToSelected(board, days, offset);
     const boardReturns = rows.map((row) => getBoardChange(board, row));
     const indexReturns = rows.map((row) => getIndexChange(row.date));
     return {
@@ -151,13 +156,18 @@
     const excess10 = metric.excess10 ?? 0;
     const redRate = metric.redRate5 ?? 0;
     const drawdown10 = metric.drawdown10 ?? 0;
+    const turnoverRatio = metric.turnoverRatio ?? 0;
+    const badPullback = latestChange < 0
+      && metric.heatScore >= 35
+      && (excess5 < -1 || redRate < 40 || drawdown10 > 9 || turnoverRatio > 1.25);
 
+    if (metric.heatScore < 35 || (excess10 < -2 && excess5 < -1)) return '热度退潮';
     if (metric.heatScore >= 76 && excess5 >= 1.5 && r5 >= 3 && redRate >= 60) return '主升';
     if (metric.heatScore >= 55 && latestChange < 0 && excess10 > 1 && redRate >= 45 && drawdown10 <= 9) return '良性回踩';
+    if (badPullback) return '恶性回踩';
     if (metric.heatScore >= 60 && latestChange > 0 && drawdown10 >= 3 && excess10 > 1) return '二波观察';
     if (metric.heatScore >= 55 && latestChange >= 0 && r5 > 0 && excess5 >= 0) return '启动';
     if (metric.heatScore >= 45 && drawdown10 >= 8) return '高位震荡';
-    if (metric.heatScore < 35 || (excess5 < -1 && latestChange < 0)) return '热度退潮';
     return '趋势走弱';
   }
 
@@ -165,6 +175,7 @@
     return {
       主升: 'strong',
       良性回踩: 'test',
+      恶性回踩: 'weak',
       二波观察: 'turn',
       启动: 'watch',
       高位震荡: 'mixed',
@@ -173,9 +184,17 @@
     }[status] || 'watch';
   }
 
+  function stageForStatus(status) {
+    if (['主升', '启动', '二波观察'].includes(status)) return '进攻段';
+    if (status === '良性回踩') return '良性回踩';
+    if (status === '恶性回踩') return '恶性回踩';
+    return '退潮段';
+  }
+
   function statusConclusion(metric) {
     if (metric.status === '主升') return '板块近 5 日、10 日持续跑赢指数，内部扩散较好，适合作为波段主线继续跟踪。';
     if (metric.status === '良性回踩') return '板块短线有回踩，但中期超额仍在，适合观察板块内抗跌、缩量回踩的韧性个股。';
+    if (metric.status === '恶性回踩') return '板块短线回踩已经破坏承接，出现放量下跌、跑输、回撤加深或红盘率走弱，先从低吸候选里剔除。';
     if (metric.status === '二波观察') return '板块经历回撤后重新转强，适合观察是否形成第二波上攻。';
     if (metric.status === '启动') return '板块开始走强，但持续性还需要更多交易日验证。';
     if (metric.status === '高位震荡') return '板块热度尚在但波动变大，适合降低追涨欲望，等待更舒服的位置。';
@@ -183,13 +202,13 @@
     return '板块趋势偏弱，暂不适合作为波段主线。';
   }
 
-  function swingMetric(board) {
+  function swingMetric(board, offset = 0) {
     const rows = getTrendRows(board);
-    const selectedIndex = getSelectedIndex(rows);
+    const selectedIndex = getSelectedIndex(rows, offset);
     const latestRow = selectedIndex >= 0 ? rows[selectedIndex] : null;
-    const window3 = boardWindowMetric(board, 3);
-    const window5 = boardWindowMetric(board, 5);
-    const window10 = boardWindowMetric(board, 10);
+    const window3 = boardWindowMetric(board, 3, offset);
+    const window5 = boardWindowMetric(board, 5, offset);
+    const window10 = boardWindowMetric(board, 10, offset);
 
     const latestChange = getBoardChange(board, latestRow);
     const return3 = window3.boardReturn;
@@ -235,6 +254,7 @@
     };
     metric.status = boardStatus(metric);
     metric.tone = statusTone(metric.status);
+    metric.stage = stageForStatus(metric.status);
     metric.conclusion = statusConclusion(metric);
     return metric;
   }
@@ -464,63 +484,120 @@
   }
 
   function intradayOpportunityRows(metrics) {
-    const candidateStatuses = new Set(['启动', '良性回踩']);
-    return metrics
-      .filter((metric) => candidateStatuses.has(metric.status))
+    const rows = metrics
       .flatMap((metric) => stockResilienceRows(metric.board).slice(0, 8).map((stock) => {
         const stockScore = safeNumber(stock.score) ?? 0;
         const rel5 = safeNumber(stock.rel5) ?? 0;
         const rel10 = safeNumber(stock.rel10) ?? 0;
         const latestChange = safeNumber(stock.latestChange) ?? 0;
         const macdScore = safeNumber(stock.macdScore) ?? 50;
-        const boardPullback = metric.status === '良性回踩';
-        const reboundInPullback = boardPullback && latestChange >= 0 && rel5 >= 0;
-        const strongInStart = metric.status === '启动' && latestChange >= 1 && rel5 >= 0;
+        const backgroundMetric = swingMetric(metric.board, -1);
+        const intradayState = (() => {
+          const boardChangeNow = metric.latestChange ?? 0;
+          const badPullback = boardChangeNow < 0
+            && ((metric.excess5 ?? 0) < -1
+              || (metric.redRate5 ?? 0) < 40
+              || (metric.drawdown10 ?? 0) > 9
+              || (metric.turnoverRatio ?? 0) > 1.25
+              || metric.status === '恶性回踩');
+          if (badPullback) return { label: '恶性回踩', tone: 'weak' };
+          if (boardChangeNow < 0 && metric.stage !== '退潮段') return { label: '良性回踩', tone: 'test' };
+          if (boardChangeNow >= 0 && metric.stage === '进攻段') return { label: '盘中转强', tone: 'strong' };
+          if (metric.stage === '退潮段') return { label: '退潮走弱', tone: 'divergence' };
+          return { label: '观察', tone: 'watch' };
+        })();
+        const qualifiedBackground = backgroundMetric.stage === '进攻段' || backgroundMetric.stage === '良性回踩';
+        const todayGoodPullback = intradayState.label === '良性回踩';
+        const todayAttack = intradayState.label === '盘中转强';
+        const todayBad = intradayState.label === '恶性回踩' || intradayState.label === '退潮走弱';
+        const stockResilient = stockScore >= 65 || rel5 >= 0 || latestChange >= 0;
+        const stockTurnStrong = latestChange >= 1 && rel5 >= 0;
         const opportunityScore = clampValue(
           0.38 * stockScore
           + 0.20 * scoreRange(rel5, -2, 6)
           + 0.14 * scoreRange(rel10, -4, 10)
           + 0.12 * scoreRange(latestChange, -2, 6)
           + 0.10 * macdScore
-          + 0.06 * metric.heatScore,
+          + 0.06 * backgroundMetric.heatScore,
           0,
           100,
         );
         let signal = '观察';
-        if (reboundInPullback) signal = '回踩承接';
-        else if (strongInStart) signal = '启动前排';
-        else if (stockScore >= 78 && rel5 >= 0) signal = '韧性前排';
+        let signalPriority = 0;
+        if (!qualifiedBackground) {
+          signal = '背景不足';
+          signalPriority = 0;
+        } else if (todayBad) {
+          signal = '恶化否决';
+          signalPriority = 1;
+        } else if (todayGoodPullback && stockTurnStrong) {
+          signal = '转强加仓';
+          signalPriority = 4;
+        } else if (todayGoodPullback && stockResilient) {
+          signal = '良性低吸';
+          signalPriority = 5;
+        } else if (todayAttack && stockTurnStrong) {
+          signal = '进攻前排';
+          signalPriority = 3;
+        } else if (stockScore >= 78 && rel5 >= 0) {
+          signal = '韧性观察';
+          signalPriority = 2;
+        }
         return {
           board: metric.board,
+          backgroundMetric,
           boardMetric: metric,
+          intradayState,
           stock,
           signal,
+          signalPriority,
           opportunityScore,
         };
       }))
       .filter((item) =>
-        item.opportunityScore >= 62
-        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel5 >= 1)
-        && !String(item.stock.macdLabel || '').includes('死叉'))
-      .sort((a, b) => b.opportunityScore - a.opportunityScore)
-      .slice(0, 12);
+        item.signalPriority >= 2
+        && item.opportunityScore >= 58
+        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel5 >= 0)
+        && !String(item.stock.macdLabel || '').includes('死叉'));
+    const sorted = [...rows];
+    if (opportunitySort.key === 'board') {
+      const direction = opportunitySort.direction === 'asc' ? 1 : -1;
+      sorted.sort((a, b) => {
+        const nameDiff = String(a.board.name || '').localeCompare(String(b.board.name || ''), 'zh-Hans-CN');
+        if (nameDiff !== 0) return direction * nameDiff;
+        return b.signalPriority - a.signalPriority || b.opportunityScore - a.opportunityScore;
+      });
+    } else {
+      sorted.sort((a, b) => b.signalPriority - a.signalPriority || b.opportunityScore - a.opportunityScore);
+    }
+    return sorted.slice(0, 12);
   }
 
   function renderIntradayOpportunityPanel(metrics) {
     const rows = intradayOpportunityRows(metrics);
+    const signalTone = (signal) => {
+      if (signal === '良性低吸') return 'test';
+      if (signal === '转强加仓' || signal === '进攻前排') return 'strong';
+      if (signal === '恶化否决') return 'weak';
+      return 'watch';
+    };
+    const sortLabel = opportunitySort.key === 'board'
+      ? (opportunitySort.direction === 'asc' ? ' ↑' : ' ↓')
+      : '';
     return `
       <div class="swing-intraday-block">
         <div class="swing-section-title">
           <strong>盘中机会雷达</strong>
-          <span>只看启动/良性回踩板块内相对更强的个股</span>
+          <span>昨日背景筛资格，今日盘中区分良性低吸和转强加仓</span>
         </div>
         ${rows.length ? `
           <div class="table-wrap swing-intraday-table">
             <table>
               <thead>
                 <tr>
-                  <th>板块</th>
-                  <th>状态</th>
+                  <th><button class="table-sort-btn" type="button" data-swing-sort-key="board">板块${sortLabel}</button></th>
+                  <th>昨日背景</th>
+                  <th>今日状态</th>
                   <th>个股</th>
                   <th>当前涨幅</th>
                   <th>5日相对</th>
@@ -536,13 +613,14 @@
                     <td>
                       <button class="text-link swing-board-jump" type="button" data-code="${item.board.code}" data-board-code="${item.board.code}" data-target-tab="swing">${item.board.name}</button>
                     </td>
-                    <td><span class="swing-badge ${item.boardMetric.tone}">${item.boardMetric.status}</span></td>
+                    <td><span class="swing-badge ${item.backgroundMetric.tone}">${item.backgroundMetric.stage}</span><br><small>${item.backgroundMetric.status}</small></td>
+                    <td><span class="swing-badge ${item.intradayState.tone}">${item.intradayState.label}</span><br><small>${item.boardMetric.status}</small></td>
                     <td><strong>${item.stock.name}</strong><br><span class="code">${item.stock.code}</span></td>
                     <td class="${changeClass(item.stock.latestChange)}">${fmtPercent(item.stock.latestChange)}</td>
                     <td class="${changeClass(item.stock.rel5)}">${fmtPercent(item.stock.rel5)}</td>
                     <td><span class="swing-badge ${macdTone(item.stock.macdLabel, item.stock.macdScore)}">${item.stock.macdLabel}</span></td>
                     <td>${item.stock.highStatus || '暂无'}</td>
-                    <td><span class="swing-badge ${item.signal === '回踩承接' ? 'test' : item.signal === '启动前排' ? 'strong' : 'watch'}">${item.signal}</span></td>
+                    <td><span class="swing-badge ${signalTone(item.signal)}">${item.signal}</span></td>
                     <td><strong>${fmt(item.opportunityScore, 0)}</strong></td>
                   </tr>
                 `).join('')}
@@ -562,6 +640,9 @@
     const pullback = [...metrics]
       .filter((item) => item.status === '良性回踩')
       .sort((a, b) => b.heatScore - a.heatScore);
+    const badPullback = [...metrics]
+      .filter((item) => item.status === '恶性回踩')
+      .sort((a, b) => a.heatScore - b.heatScore);
     const risk = [...metrics]
       .filter((item) => ['高位震荡', '趋势走弱', '热度退潮'].includes(item.status))
       .sort((a, b) => a.heatScore - b.heatScore);
@@ -571,21 +652,25 @@
         <div class="section-head">
           <div>
             <h2>热门板块波段观察</h2>
-            <p class="muted">按 5/10 日持续性、超额收益、扩散度和回撤识别波段主线。</p>
+            <p class="muted">按 5/10 日持续性、超额收益、扩散度、回撤和量能，把板块分成进攻、良性回踩、恶性回踩、退潮四段。</p>
           </div>
           <span class="count-pill">波段版</span>
         </div>
         <div class="setup-pools swing-pools">
           <div class="pool-card primary">
-            <div class="pool-title"><strong>主线/启动</strong><span>${hot.length}</span></div>
+            <div class="pool-title"><strong>进攻段</strong><span>${hot.length}</span></div>
             ${renderBoardMiniList(hot)}
           </div>
           <div class="pool-card">
             <div class="pool-title"><strong>良性回踩</strong><span>${pullback.length}</span></div>
             ${renderBoardMiniList(pullback)}
           </div>
+          <div class="pool-card bad">
+            <div class="pool-title"><strong>恶性回踩</strong><span>${badPullback.length}</span></div>
+            ${renderBoardMiniList(badPullback)}
+          </div>
           <div class="pool-card risk">
-            <div class="pool-title"><strong>风险/退潮</strong><span>${risk.length}</span></div>
+            <div class="pool-title"><strong>退潮段</strong><span>${risk.length}</span></div>
             ${renderBoardMiniList(risk)}
           </div>
         </div>
@@ -683,6 +768,23 @@
   }, true);
 
   document.addEventListener('click', (event) => {
+    const sortButton = event.target.closest?.('[data-swing-sort-key]');
+    if (sortButton) {
+      event.preventDefault();
+      const key = sortButton.dataset.swingSortKey;
+      if (opportunitySort.key === key) {
+        opportunitySort.direction = opportunitySort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        opportunitySort = { key, direction: 'asc' };
+      }
+      const panel = document.querySelector('.swing-panel');
+      if (panel) {
+        panel.remove();
+      }
+      scheduleEnhance();
+      return;
+    }
+
     const tab = event.target.closest?.(`[data-detail-tab="${SWING_TAB}"]`);
     if (tab && typeof state !== 'undefined') {
       state.detailTab = SWING_TAB;
