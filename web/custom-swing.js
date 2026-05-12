@@ -688,16 +688,42 @@
       || b.attackQuality.score - a.attackQuality.score);
   }
 
-  function transitionFilterOptions(rows) {
+  function toggleOverviewTransition(label) {
+    if (!label) return;
+    const next = new Set(overviewTransitionFilter);
+    if (next.has(label)) {
+      next.delete(label);
+    } else {
+      next.add(label);
+    }
+    overviewTransitionFilter = next;
+    document.querySelectorAll('.swing-overview-panel').forEach((node) => node.remove());
+    scheduleEnhance();
+  }
+
+  function transitionFilterControls(rows) {
     const labels = [...new Set(rows.map((item) => item.transition.label))]
       .sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN'));
-    return [
-      ...labels.map((label) => `<option value="${label}" ${overviewTransitionFilter.has(label) ? 'selected' : ''}>${label}</option>`),
-    ].join('');
+    const selectedCount = overviewTransitionFilter.size;
+    return `
+      <div class="transition-filter-pills" aria-label="按变化结论筛选">
+        <button class="transition-filter-pill ${selectedCount === 0 ? 'active' : ''}" type="button" data-swing-transition-clear>全部</button>
+        ${labels.map((label) => `
+          <button class="transition-filter-pill ${overviewTransitionFilter.has(label) ? 'active' : ''}" type="button" data-swing-transition-option="${label}">
+            ${label}
+          </button>
+        `).join('')}
+      </div>
+    `;
   }
 
   function renderStageHistory(item) {
-    return item.stageHistory.map((metric) => `<span class="swing-badge ${metric.tone}">${metric.stage}</span>`).join('<span class="stage-arrow">-&gt;</span>');
+    return item.stageHistory.map((metric) => `
+      <span class="stage-step">
+        <span class="swing-badge ${metric.tone}">${metric.stage}</span>
+        <small>${fmt(metric.heatScore, 0)}分</small>
+      </span>
+    `).join('<span class="stage-arrow">-&gt;</span>');
   }
 
   function renderBoardMiniList(items) {
@@ -850,13 +876,11 @@
             <thead>
               <tr>
                 <th>板块</th>
-                <th>四段变化</th>
+                <th>板块节奏</th>
                 <th>
-                  <div class="column-filter">
+                  <div class="column-filter transition-filter-head">
                     <button class="table-sort-btn" type="button" data-swing-overview-sort-key="transition">变化结论${overviewSortLabel('transition')}</button>
-                    <select class="overview-filter" data-swing-transition-filter multiple size="1" title="按变化结论筛选">
-                      ${transitionFilterOptions(baseRows)}
-                    </select>
+                    ${transitionFilterControls(baseRows)}
                   </div>
                 </th>
                 <th>短线热度</th>
@@ -874,9 +898,12 @@
                   </td>
                   <td class="stage-flow">
                     ${renderStageHistory(item)}
-                    <br><small>${item.stageHistory.map((metric) => fmtDate(metric.date)).join(' -> ')}</small>
                   </td>
-                  <td><span class="swing-badge ${item.transition.tone}">${item.transition.label}</span></td>
+                  <td>
+                    <button class="swing-badge transition-badge-filter ${item.transition.tone} ${overviewTransitionFilter.has(item.transition.label) ? 'active' : ''}" type="button" data-swing-transition-option="${item.transition.label}">
+                      ${item.transition.label}
+                    </button>
+                  </td>
                   <td><strong>${fmt(item.heatScore, 0)}</strong><br><small class="${deltaClass(item.heatDelta)}">${fmtDelta(item.heatDelta, 0)}</small></td>
                   <td><strong>${fmt(item.attackQuality.score, 0)}</strong><br><small class="${deltaClass(item.qualityDelta)}">${fmtDelta(item.qualityDelta, 0)}</small></td>
                   <td class="${changeClass(item.latestChange)}">${fmtPercent(item.latestChange)}<br><small class="${deltaClass(item.changeDelta)}">${fmtDelta(item.changeDelta, 2)}</small></td>
@@ -995,6 +1022,22 @@
       return;
     }
 
+    const transitionClear = event.target.closest?.('[data-swing-transition-clear]');
+    if (transitionClear) {
+      event.preventDefault();
+      overviewTransitionFilter = new Set();
+      document.querySelectorAll('.swing-overview-panel').forEach((node) => node.remove());
+      scheduleEnhance();
+      return;
+    }
+
+    const transitionOption = event.target.closest?.('[data-swing-transition-option]');
+    if (transitionOption) {
+      event.preventDefault();
+      toggleOverviewTransition(transitionOption.dataset.swingTransitionOption);
+      return;
+    }
+
     const sortButton = event.target.closest?.('[data-swing-sort-key]');
     if (sortButton) {
       event.preventDefault();
@@ -1036,14 +1079,6 @@
 
     const jump = event.target.closest?.('.swing-board-jump');
     if (jump) jumpToSwingBoard(jump);
-  }, true);
-
-  document.addEventListener('change', (event) => {
-    const filter = event.target.closest?.('[data-swing-transition-filter]');
-    if (!filter) return;
-    overviewTransitionFilter = new Set([...filter.selectedOptions].map((option) => option.value).filter(Boolean));
-    document.querySelectorAll('.swing-overview-panel').forEach((node) => node.remove());
-    scheduleEnhance();
   }, true);
 
   const startObserver = () => {

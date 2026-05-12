@@ -185,14 +185,30 @@
 }
 
 .stage-flow {
-  min-width: 190px;
+  min-width: 330px;
 }
 
 .stage-arrow {
   display: inline-block;
-  margin: 0 7px;
+  margin: 0 5px;
   color: var(--muted);
   font-weight: 900;
+  vertical-align: top;
+  line-height: 28px;
+}
+
+.stage-step {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  vertical-align: top;
+}
+
+.stage-step small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1;
 }
 
 .overview-tools {
@@ -218,6 +234,47 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.transition-filter-head {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transition-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 250px;
+}
+
+.transition-filter-pill {
+  border: 1px solid #d7e2df;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 5px 8px;
+}
+
+.transition-filter-pill.active {
+  border-color: #b3d7ce;
+  background: #e6f5f1;
+  color: var(--accent);
+}
+
+.transition-badge-filter {
+  border: 0;
+  cursor: pointer;
+}
+
+.transition-badge-filter.active {
+  box-shadow: 0 0 0 2px rgba(22, 126, 107, 0.22);
 }
 
 .column-filter .overview-filter {
