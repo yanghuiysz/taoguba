@@ -854,7 +854,7 @@
   function renderOverviewPanel() {
     const baseRows = allBoardSwingMetrics()
       .map(metricWithPrevious)
-      .filter((item) => item.stage !== '退潮段');
+      
     const rows = baseRows.filter((item) => overviewTransitionFilter.size === 0 || overviewTransitionFilter.has(item.transition.label));
     const sortedRows = sortOverviewRows(rows);
     const stageCounts = rows.reduce((acc, item) => {
@@ -949,7 +949,7 @@
     if (state?.detailTab === 'overview') {
       if (pane.querySelector('.swing-overview-panel')) return;
       pane.querySelectorAll('.swing-panel').forEach((node) => node.remove());
-      const anchor = pane.querySelector('.detail-tabs-card');
+      const anchor = pane.querySelector('.swing-overview-anchor') || pane.querySelector('.detail-tabs-card');
       const html = renderOverviewPanel();
       if (anchor) {
         anchor.insertAdjacentHTML('afterend', html);

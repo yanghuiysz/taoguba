@@ -7,3 +7,4 @@ __pycache__/
 .workbuddy/
 .codex-run/
 .codex-http-*.log
+.env

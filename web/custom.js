@@ -1827,6 +1827,7 @@ function renderDetail(board) {
         </div>
       </section>
       ${isOverviewTab ? `
+      <div class="swing-overview-anchor"></div>
       ${renderSetupSummary(board)}
       ` : ''}
       ${isTrendTab ? `
@@ -2036,6 +2037,8 @@ async function boot() {
   state.sortDate = dates[0] || state.data.date || null;
   selectTopBoard();
   render();
+  // 确保波段观察面板能被注入
+  setTimeout(() => app.dispatchEvent(new Event('dashboard:rendered')), 0);
 }
 
 boot().catch((error) => {

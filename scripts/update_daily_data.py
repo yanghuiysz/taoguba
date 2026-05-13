@@ -97,7 +97,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Update Kaipanla and custom board daily data snapshots.")
     parser.add_argument("--date", default=datetime.now().strftime("%Y%m%d"), help="Trading date, e.g. 20260415.")
     parser.add_argument("--skip-kpl", action="store_true", help="Skip Kaipanla public endpoint update.")
-    parser.add_argument("--skip-external", action="store_true", help="Skip Tonghuashun/Eastmoney external mapping.")
+    parser.add_argument("--skip-external", action="store_true", default=True, help="Skip Tonghuashun/Eastmoney external mapping (default: skipped).")
     parser.add_argument("--skip-custom", action="store_true", help="Skip custom board average history update.")
     parser.add_argument("--intraday-custom", action="store_true", help="Overlay realtime spot quotes into custom board data.")
     parser.add_argument("--custom-sleep", type=float, default=0.2, help="Delay between custom stock history requests.")

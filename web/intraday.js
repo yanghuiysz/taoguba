@@ -55,8 +55,6 @@
 
   const shortDate = (date) => date ? String(date).slice(5) : "暂无";
 
-  const normalizeCode = (code) => String(code || "").replace(/\D/g, "").padStart(6, "0").slice(-6);
-
   function postResize() {
     window.parent?.postMessage({ type: "dashboard:resize" }, window.location.origin);
   }
