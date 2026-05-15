@@ -117,6 +117,154 @@ def index_row_by_date(data: dict, date: str) -> Optional[dict]:
     return None
 
 
+def market_index_rows(data: dict) -> list[dict]:
+    """获取有效指数行"""
+    return [
+        row for row in (data.get("marketIndex", {}).get("trend") or [])
+        if safe_number(row.get("changePercent")) is not None
+    ]
+
+
+def trading_progress_fraction(row: dict) -> float:
+    """A 股盘中交易进度，用于把当前成交量估算为全天量。"""
+    text = str(row.get("timestamp") or "")
+    if len(text) != 14 or not text.isdigit():
+        return 1.0
+
+    hour = int(text[8:10])
+    minute = int(text[10:12])
+    minutes = hour * 60 + minute
+    morning_start = 9 * 60 + 30
+    morning_end = 11 * 60 + 30
+    afternoon_start = 13 * 60
+    close = 15 * 60
+
+    if minutes <= morning_start:
+        traded = 0
+    elif minutes <= morning_end:
+        traded = minutes - morning_start
+    elif minutes <= afternoon_start:
+        traded = 120
+    elif minutes <= close:
+        traded = 120 + minutes - afternoon_start
+    else:
+        traded = 240
+    return clamp(traded / 240, 0.05, 1)
+
+
+def index_volume_state(rows: list[dict], latest: dict) -> dict:
+    """用盘中预估全天量比近5日均量判断放量/平量/缩量。"""
+    current_volume = safe_number(latest.get("volume"))
+    previous_volumes = [
+        value for value in [safe_number(row.get("volume")) for row in rows[-6:-1]]
+        if value is not None and value > 0
+    ]
+    avg_volume = average(previous_volumes)
+    if current_volume is None or avg_volume is None or avg_volume <= 0:
+        label = str(latest.get("label") or "")
+        if "放量" in label:
+            return {"state": "放量", "ratio": None, "label": "放量"}
+        if "缩量" in label:
+            return {"state": "缩量", "ratio": None, "label": "缩量"}
+        return {"state": "平量", "ratio": None, "label": "量能暂无"}
+
+    progress = trading_progress_fraction(latest)
+    estimated_volume = current_volume / progress
+    ratio = estimated_volume / avg_volume
+    if ratio >= 1.05:
+        return {"state": "放量", "ratio": ratio, "label": f"预估放量 {ratio:.2f}x"}
+    if ratio <= 0.85:
+        return {"state": "缩量", "ratio": ratio, "label": f"预估缩量 {ratio:.2f}x"}
+    return {"state": "平量", "ratio": ratio, "label": f"预估平量 {ratio:.2f}x"}
+
+
+def index_gate(data: dict) -> dict:
+    """指数闸门：红灯禁止买入，黄灯小仓试错，绿灯正常观察转强。"""
+    rows = market_index_rows(data)
+    latest = rows[-1] if rows else None
+    previous = rows[-2] if len(rows) >= 2 else None
+    if not latest:
+        return {
+            "light": "yellow",
+            "tone": "test",
+            "label": "指数黄灯",
+            "action": "数据不足，只能小仓试错",
+            "score": 45,
+            "reason": "缺少指数实时数据",
+        }
+
+    latest_change = safe_number(latest.get("changePercent")) or 0
+    previous_change = safe_number(previous.get("changePercent")) if previous else None
+    volume_state = index_volume_state(rows, latest)
+    volume_expanded = volume_state.get("state") == "放量"
+    recent3 = rows[-3:]
+    down_days3 = sum(1 for row in recent3 if (safe_number(row.get("changePercent")) or 0) < 0)
+    return3 = compound_return([row.get("changePercent") for row in recent3]) or latest_change
+    fall_narrowed = previous_change is not None and latest_change < 0 and latest_change > previous_change
+
+    score = 50
+    if latest_change >= 0.5:
+        score += 25
+    elif latest_change >= 0:
+        score += 15
+    elif latest_change >= -0.5:
+        score += 5
+    else:
+        score -= 15
+
+    if volume_expanded and latest_change < 0:
+        score -= 25
+    elif not volume_expanded and latest_change < 0:
+        score += 10
+    elif volume_expanded and latest_change >= 0:
+        score += 15
+
+    if down_days3 >= 2:
+        score -= 15
+    elif down_days3 == 0:
+        score += 10
+
+    if return3 >= 0:
+        score += 10
+    elif return3 <= -2:
+        score -= 15
+
+    if fall_narrowed:
+        score += 8
+    score = clamp(score, 0, 100)
+
+    reason = f"{latest_change:.2f}%，{volume_state.get('label')}，近3日{return3:.2f}%"
+    if score >= 70:
+        return {
+            "light": "green",
+            "tone": "strong",
+            "label": "指数绿灯",
+            "action": "允许正常做退潮转强",
+            "score": score,
+            "latest": latest,
+            "reason": reason,
+        }
+    if score >= 40:
+        return {
+            "light": "yellow",
+            "tone": "test",
+            "label": "指数黄灯",
+            "action": "只允许小仓试错",
+            "score": score,
+            "latest": latest,
+            "reason": reason,
+        }
+    return {
+        "light": "red",
+        "tone": "weak",
+        "label": "指数红灯",
+        "action": "禁止买入，只观察逆势强",
+        "score": score,
+        "latest": latest,
+        "reason": reason,
+    }
+
+
 def board_window(data: dict, board: dict, days: int, end_index: int = -1) -> dict:
     """板块窗口统计"""
     if end_index < 0:
@@ -619,6 +767,10 @@ def intraday_state(metric: dict) -> dict:
 
 def signal_tone(signal: str) -> str:
     """信号色调"""
+    if "红灯" in str(signal):
+        return "weak"
+    if "黄灯" in str(signal):
+        return "test"
     if signal in ["良性回踩转强", "退潮转强", "恶性回踩修复", "进攻增强"]:
         return "strong"
     if signal in ["弱分歧", "进攻分歧", "承接观察", "恶性转良性", "退潮修复", "进攻延续"]:
@@ -628,13 +780,18 @@ def signal_tone(signal: str) -> str:
     return "watch"
 
 
-def build_trade_signal(current_state: dict, metric: dict) -> dict:
+def build_trade_signal(current_state: dict, metric: dict, gate: dict | None = None) -> dict:
     """构建交易信号"""
     if current_state.get("label") not in INTRADAY_WATCH_TRANSITIONS:
         return {"signal": "观察", "priority": 0}
+    base_priority = max(2, 12 - transition_rank(current_state.get("label", "")))
+    if gate and gate.get("light") == "red":
+        return {"signal": f"{current_state.get('label', '观察')}｜指数红灯观察", "priority": 2}
+    if gate and gate.get("light") == "yellow":
+        return {"signal": f"{current_state.get('label', '观察')}｜指数黄灯试错", "priority": min(base_priority, 6)}
     return {
         "signal": current_state.get("label", "观察"),
-        "priority": max(2, 12 - transition_rank(current_state.get("label", ""))),
+        "priority": base_priority,
     }
 
 
@@ -644,6 +801,7 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
     """计算机会数据"""
     boards = data.get("boards", [])
     result = []
+    gate = index_gate(data)
 
     for board in boards:
         background_metric = board_metric(data, board, offset=-1)
@@ -670,7 +828,7 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
             rel5 = safe_number(stock.get("rel5")) or 0
             rel10 = safe_number(stock.get("rel10")) or 0
             current_state = current_metric.get("transition", {})
-            trade_signal = build_trade_signal(current_state, current_metric)
+            trade_signal = build_trade_signal(current_state, current_metric, gate)
             macd_label = stock.get("macd_label", "")
 
             # 计算机会分
@@ -703,6 +861,7 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
                 "stock": stock,
                 "signal": trade_signal.get("signal", "观察"),
                 "signal_priority": trade_signal.get("priority", 0),
+                "index_gate": gate,
                 "opportunity_score": opportunity_score,
             })
 

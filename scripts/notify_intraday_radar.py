@@ -14,6 +14,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 
 from scripts.intraday_radar_engine import (
     board_metric,
+    index_gate,
     opportunity_rows,
     load_radar_data,
     signal_tone,
@@ -192,12 +193,14 @@ def send_intraday_radar(data: dict, notifier, top_n: int = 80) -> tuple[bool, in
 
     latest_date = latest_data_date(data)
     background_date = rows[0].get("background_metric", {}).get("date", "") if rows else ""
+    gate = index_gate(data)
     board_sections = grouped_board_sections(rows, data)
 
     header_lines = [
         f"# 盘中机会雷达 {now_str}",
         "",
         f"> 背景 {short_date(background_date)} / 盘中 {short_date(latest_date)}",
+        f"> 指数闸门：**{gate.get('label', '暂无')} {gate.get('score', 0):.0f}分**；{gate.get('action', '暂无操作权限')}；{gate.get('reason', '')}",
         "",
     ]
     sections: list[list[str]] = []

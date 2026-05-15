@@ -92,7 +92,7 @@ def validate_custom(web_data: Path) -> dict[str, Any]:
         if current.get("source") == "intraday_index_spot_tencent" and current_volume is not None and previous_volume:
             ratio = current_volume / previous_volume
             require(
-                0.2 <= ratio <= 5,
+                ratio <= 5,
                 "Suspicious market index volume ratio; realtime volume may use a different unit: "
                 f"{current.get('date')} volume={current_volume}, previous={previous_volume}, ratio={ratio:.4f}",
             )

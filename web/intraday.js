@@ -83,6 +83,132 @@
     return (state.data?.marketIndex?.trend || []).find((row) => row.date === date) || null;
   }
 
+  function marketIndexRows() {
+    return (state.data?.marketIndex?.trend || []).filter((row) => safeNumber(row?.changePercent) !== null);
+  }
+
+  function indexGate() {
+    const rows = marketIndexRows();
+    const latest = rows.at(-1) || null;
+    if (!latest) {
+      return {
+        light: "yellow",
+        tone: "test",
+        label: "指数黄灯",
+        action: "数据不足，只能小仓试错",
+        score: 45,
+        reason: "缺少指数实时数据",
+      };
+    }
+
+    const latestChange = safeNumber(latest.changePercent) ?? 0;
+    const previous = rows.at(-2) || null;
+    const previousChange = safeNumber(previous?.changePercent);
+    const volumeState = indexVolumeState(rows, latest);
+    const volumeExpanded = volumeState.state === "放量";
+    const recent3 = rows.slice(-3);
+    const downDays3 = recent3.filter((row) => (safeNumber(row.changePercent) ?? 0) < 0).length;
+    const return3 = compoundReturn(recent3.map((row) => row.changePercent)) ?? latestChange;
+    const fallNarrowed = previousChange !== null && latestChange < 0 && latestChange > previousChange;
+
+    let score = 50;
+    if (latestChange >= 0.5) score += 25;
+    else if (latestChange >= 0) score += 15;
+    else if (latestChange >= -0.5) score += 5;
+    else score -= 15;
+
+    if (volumeExpanded && latestChange < 0) score -= 25;
+    else if (!volumeExpanded && latestChange < 0) score += 10;
+    else if (volumeExpanded && latestChange >= 0) score += 15;
+
+    if (downDays3 >= 2) score -= 15;
+    else if (downDays3 === 0) score += 10;
+
+    if (return3 >= 0) score += 10;
+    else if (return3 <= -2) score -= 15;
+
+    if (fallNarrowed) score += 8;
+    score = clamp(score, 0, 100);
+
+    if (score >= 70) {
+      return {
+        light: "green",
+        tone: "strong",
+        label: "指数绿灯",
+        action: "允许正常做退潮转强",
+        score,
+        latest,
+        reason: `${percent(latestChange)}，${volumeState.label}，近3日${percent(return3)}`,
+      };
+    }
+    if (score >= 40) {
+      return {
+        light: "yellow",
+        tone: "test",
+        label: "指数黄灯",
+        action: "只允许小仓试错",
+        score,
+        latest,
+        reason: `${percent(latestChange)}，${volumeState.label}，近3日${percent(return3)}`,
+      };
+    }
+    return {
+      light: "red",
+      tone: "weak",
+      label: "指数红灯",
+      action: "禁止买入，只观察逆势强",
+      score,
+      latest,
+      reason: `${percent(latestChange)}，${volumeState.label}，近3日${percent(return3)}`,
+    };
+  }
+
+  function parseIndexTimestamp(row) {
+    const text = String(row?.timestamp || "");
+    if (/^\d{14}$/.test(text)) {
+      return {
+        hour: Number(text.slice(8, 10)),
+        minute: Number(text.slice(10, 12)),
+      };
+    }
+    return null;
+  }
+
+  function tradingProgressFraction(row) {
+    const time = parseIndexTimestamp(row);
+    if (!time) return 1;
+    const minutes = time.hour * 60 + time.minute;
+    const morningStart = 9 * 60 + 30;
+    const morningEnd = 11 * 60 + 30;
+    const afternoonStart = 13 * 60;
+    const close = 15 * 60;
+    let traded = 0;
+    if (minutes <= morningStart) traded = 0;
+    else if (minutes <= morningEnd) traded = minutes - morningStart;
+    else if (minutes <= afternoonStart) traded = 120;
+    else if (minutes <= close) traded = 120 + minutes - afternoonStart;
+    else traded = 240;
+    return clamp(traded / 240, 0.05, 1);
+  }
+
+  function indexVolumeState(rows, latest) {
+    const currentVolume = safeNumber(latest?.volume);
+    const previousVolumes = rows.slice(-6, -1).map((row) => safeNumber(row.volume)).filter((value) => value !== null && value > 0);
+    const avgVolume = average(previousVolumes);
+    if (currentVolume === null || avgVolume === null || avgVolume <= 0) {
+      const label = String(latest?.label || "");
+      if (label.includes("放量")) return { state: "放量", ratio: null, label: "放量" };
+      if (label.includes("缩量")) return { state: "缩量", ratio: null, label: "缩量" };
+      return { state: "平量", ratio: null, label: "量能暂无" };
+    }
+    const progress = tradingProgressFraction(latest);
+    const estimatedVolume = currentVolume / progress;
+    const ratio = estimatedVolume / avgVolume;
+    if (ratio >= 1.05) return { state: "放量", ratio, label: `预估放量 ${number(ratio, 2)}x` };
+    if (ratio <= 0.85) return { state: "缩量", ratio, label: `预估缩量 ${number(ratio, 2)}x` };
+    return { state: "平量", ratio, label: `预估平量 ${number(ratio, 2)}x` };
+  }
+
   function compoundReturn(values) {
     const valid = values.map(safeNumber).filter((value) => value !== null);
     if (!valid.length) return null;
@@ -441,6 +567,8 @@
   }
 
   function signalTone(signal) {
+    if (String(signal || "").includes("红灯")) return "weak";
+    if (String(signal || "").includes("黄灯")) return "test";
     if (["良性回踩转强", "退潮转强", "恶性回踩修复", "进攻增强"].includes(signal)) return "strong";
     if (["弱分歧", "进攻分歧", "承接观察", "恶性转良性", "退潮修复", "进攻延续"].includes(signal)) return "test";
     if (["进攻钝化", "回踩走弱"].includes(signal)) return "mixed";
@@ -463,12 +591,20 @@
     return { label: "观察", tone: "watch" };
   }
 
-  function buildTradeSignal(backgroundMetric, currentMetric, currentState, stock) {
+  function buildTradeSignal(backgroundMetric, currentMetric, currentState, stock, gate) {
     if (!INTRADAY_WATCH_TRANSITIONS.has(currentState.label)) return { signal: "观察", priority: 0 };
-    return { signal: currentState.label, priority: Math.max(2, 12 - transitionRank(currentState.label)) };
+    const basePriority = Math.max(2, 12 - transitionRank(currentState.label));
+    if (gate?.light === "red") {
+      return { signal: `${currentState.label}｜指数红灯观察`, priority: 2 };
+    }
+    if (gate?.light === "yellow") {
+      return { signal: `${currentState.label}｜指数黄灯试错`, priority: Math.min(basePriority, 6) };
+    }
+    return { signal: currentState.label, priority: basePriority };
   }
 
   function opportunityRows() {
+    const gate = indexGate();
     const rows = (state.data?.boards || [])
       .map((board) => ({
         board,
@@ -481,7 +617,7 @@
         const rel5 = safeNumber(stock.rel5) ?? 0;
         const rel10 = safeNumber(stock.rel10) ?? 0;
         const currentState = currentMetric.transition;
-        const tradeSignal = buildTradeSignal(backgroundMetric, currentMetric, currentState, stock);
+        const tradeSignal = buildTradeSignal(backgroundMetric, currentMetric, currentState, stock, gate);
         const opportunityScore = clamp(
           0.38 * (safeNumber(stock.score) ?? 0)
           + 0.20 * scoreRange(rel5, -2, 6)
@@ -500,6 +636,7 @@
           stock,
           signal: tradeSignal.signal,
           signalPriority: tradeSignal.priority,
+          indexGate: gate,
           opportunityScore,
         };
       }))
@@ -724,9 +861,11 @@
     }
 
     const rows = opportunityRows();
-    const focusCount = rows.filter((item) => ["良性回踩转强", "退潮转强", "恶性回踩修复", "弱分歧", "进攻分歧", "承接观察"].includes(item.signal)).length;
-    const secondaryCount = rows.filter((item) => ["进攻增强", "进攻延续", "恶性转良性", "退潮修复"].includes(item.signal)).length;
-    const cautiousCount = rows.filter((item) => ["进攻钝化", "回踩走弱"].includes(item.signal)).length;
+    const gate = indexGate();
+    const signalBase = (signal) => String(signal || "").split("｜")[0];
+    const focusCount = rows.filter((item) => ["良性回踩转强", "退潮转强", "恶性回踩修复", "弱分歧", "进攻分歧", "承接观察"].includes(signalBase(item.signal))).length;
+    const secondaryCount = rows.filter((item) => ["进攻增强", "进攻延续", "恶性转良性", "退潮修复"].includes(signalBase(item.signal))).length;
+    const cautiousCount = rows.filter((item) => ["进攻钝化", "回踩走弱"].includes(signalBase(item.signal))).length;
     const latestDate = latestDataDate();
     const backgroundDate = rows[0]?.backgroundMetric?.date || "";
     const updatedAt = new Date().toLocaleTimeString("zh-CN", { hour12: false });
@@ -743,6 +882,8 @@
         </div>
 
         <div class="intraday-summary">
+          <div class="setup-metric"><span>指数闸门</span><strong class="state-chip ${gate.tone}">${gate.label}</strong><small>${gate.action}</small></div>
+          <div class="setup-metric"><span>闸门分</span><strong>${number(gate.score, 0)}</strong><small>${gate.reason}</small></div>
           <div class="setup-metric"><span>机会数</span><strong>${rows.length}</strong><small>当前入选</small></div>
           <div class="setup-metric"><span>重点</span><strong>${focusCount}</strong><small>优先观察</small></div>
           <div class="setup-metric"><span>次重点</span><strong>${secondaryCount}</strong><small>跟踪观察</small></div>

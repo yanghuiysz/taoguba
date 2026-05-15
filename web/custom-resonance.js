@@ -3,8 +3,23 @@
   window.__customResonancePanelInstalled = true;
 
   const RESONANCE_TAB = 'resonance';
+  const STYLE_ID = 'custom-resonance-panel-style';
   let scheduled = false;
   let enhancing = false;
+
+  function ensureStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      .resonance-panel .resonance-metrics,
+      .resonance-panel .resonance-current-note,
+      .resonance-panel .resonance-score-parts {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   function safeNumber(value) {
     const parsed = Number(value);
@@ -255,6 +270,7 @@
     const series = resonanceSeries(board);
     const current = currentItem(series);
     const indexName = state?.data?.marketIndex?.name || '指数';
+
     const setup = typeof boardSetup === 'function' ? boardSetup(board, state?.sortDate) : null;
     const mainline = setup?.mainline || null;
     const recent = setup?.recentResonance || (typeof recentIndexResonance === 'function' ? recentIndexResonance(board, state?.sortDate, 5) : null);
@@ -282,7 +298,7 @@
               对比指数：${indexName}。核心看今日共振分、近5日放量确认和窗口超额，避免要求每天都必须共振。
             </p>
           </div>
-          <span class="resonance-badge ${mainline?.tone || current.tone}">${mainline?.label || current.label}</span>
+          <span class="resonance-badge ${current.tone}">${current.label}</span>
         </div>
 
         <div class="resonance-metrics">
@@ -379,6 +395,7 @@
     if (typeof state === 'undefined') return;
     enhancing = true;
     try {
+      ensureStyles();
       ensureTab();
       ensurePanel();
     } finally {
