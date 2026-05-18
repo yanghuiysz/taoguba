@@ -118,6 +118,30 @@
   color: #923939;
 }
 
+.swing-badge.traffic-red,
+.pool-score.traffic-red {
+  background: #fdeeee;
+  color: var(--red);
+}
+
+.swing-badge.traffic-yellow,
+.pool-score.traffic-yellow {
+  background: #fff5cc;
+  color: #8b6500;
+}
+
+.swing-badge.traffic-yellow-strong,
+.pool-score.traffic-yellow-strong {
+  background: #edf5e7;
+  color: #4d7425;
+}
+
+.swing-badge.traffic-green,
+.pool-score.traffic-green {
+  background: #eaf7ef;
+  color: #2c7a3f;
+}
+
 .swing-table-wrap {
   width: 100%;
   max-width: 100%;

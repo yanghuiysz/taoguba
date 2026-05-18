@@ -673,6 +673,26 @@ p { line-height: 1.55; }
   color: #48616a;
 }
 
+.state-chip.traffic-red {
+  background: #fdeeee;
+  color: var(--red);
+}
+
+.state-chip.traffic-yellow {
+  background: #fff5cc;
+  color: #8b6500;
+}
+
+.state-chip.traffic-yellow-strong {
+  background: #edf5e7;
+  color: #4d7425;
+}
+
+.state-chip.traffic-green {
+  background: #eaf7ef;
+  color: #2c7a3f;
+}
+
 .core-strip {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

@@ -24,6 +24,9 @@ start "Taoguba Web Server" /D "%ROOT%" cmd /k "python -m http.server %PORT%"
 echo [Taoguba] Starting intraday radar daemon ...
 start "Taoguba Intraday Radar" /D "%ROOT%" cmd /k "python .\scripts\intraday_radar_daemon.py"
 
+echo [Taoguba] Starting auction probe ...
+start "Taoguba Auction Probe" /D "%ROOT%" cmd /k "python .\scripts\auction_probe.py"
+
 echo [Taoguba] Opening dashboard in browser ...
 start "" "%URL%"
 

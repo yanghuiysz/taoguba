@@ -187,7 +187,7 @@ def index_gate(data: dict) -> dict:
         return {
             "light": "yellow",
             "tone": "test",
-            "label": "指数黄灯",
+            "label": "指数黄灯谨慎",
             "action": "数据不足，只能小仓试错",
             "score": 45,
             "reason": "缺少指数实时数据",
@@ -245,11 +245,12 @@ def index_gate(data: dict) -> dict:
             "reason": reason,
         }
     if score >= 40:
+        constructive = score >= 55
         return {
             "light": "yellow",
             "tone": "test",
-            "label": "指数黄灯",
-            "action": "只允许小仓试错",
+            "label": "指数黄偏绿" if constructive else "指数黄灯谨慎",
+            "action": "允许模式内小仓试错" if constructive else "只允许小仓观察",
             "score": score,
             "latest": latest,
             "reason": reason,
@@ -769,6 +770,8 @@ def signal_tone(signal: str) -> str:
     """信号色调"""
     if "红灯" in str(signal):
         return "weak"
+    if "黄偏绿" in str(signal):
+        return "test"
     if "黄灯" in str(signal):
         return "test"
     if signal in ["良性回踩转强", "退潮转强", "恶性回踩修复", "进攻增强"]:
@@ -788,7 +791,8 @@ def build_trade_signal(current_state: dict, metric: dict, gate: dict | None = No
     if gate and gate.get("light") == "red":
         return {"signal": f"{current_state.get('label', '观察')}｜指数红灯观察", "priority": 2}
     if gate and gate.get("light") == "yellow":
-        return {"signal": f"{current_state.get('label', '观察')}｜指数黄灯试错", "priority": min(base_priority, 6)}
+        gate_label = "指数黄偏绿试错" if gate.get("label") == "指数黄偏绿" else "指数黄灯谨慎"
+        return {"signal": f"{current_state.get('label', '观察')}｜{gate_label}", "priority": min(base_priority, 6)}
     return {
         "signal": current_state.get("label", "观察"),
         "priority": base_priority,

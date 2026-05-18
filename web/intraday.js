@@ -6,8 +6,10 @@
   const state = {
     data: null,
     positions: [],
+    auction: null,
     error: "",
     positionError: "",
+    auctionError: "",
     opportunitySort: {
       key: "default",
       direction: "desc",
@@ -51,9 +53,24 @@
     return parsed === null ? "暂无" : `${number(parsed, digits)}%`;
   };
 
+  function normalizeCode(value) {
+    const digits = String(value || "").replace(/\D/g, "");
+    return digits ? digits.slice(-6).padStart(6, "0") : "";
+  }
+
+  const formatAmount = (value) => {
+    const parsed = safeNumber(value);
+    if (parsed === null) return "暂无";
+    if (parsed >= 1e8) return `${number(parsed / 1e8, 2)}亿`;
+    if (parsed >= 1e4) return `${number(parsed / 1e4, 0)}万`;
+    return number(parsed, 0);
+  };
+
   const signedClass = (value) => Number(value) >= 0 ? "rise" : "fall";
 
   const shortDate = (date) => date ? String(date).slice(5) : "暂无";
+
+  const compactDate = (date) => String(date || "").replace(/\D/g, "").slice(0, 8);
 
   function postResize() {
     window.parent?.postMessage({ type: "dashboard:resize" }, window.location.origin);
@@ -93,8 +110,8 @@
     if (!latest) {
       return {
         light: "yellow",
-        tone: "test",
-        label: "指数黄灯",
+        tone: "traffic-yellow",
+        label: "指数黄灯谨慎",
         action: "数据不足，只能小仓试错",
         score: 45,
         reason: "缺少指数实时数据",
@@ -133,7 +150,7 @@
     if (score >= 70) {
       return {
         light: "green",
-        tone: "strong",
+        tone: "traffic-green",
         label: "指数绿灯",
         action: "允许正常做退潮转强",
         score,
@@ -142,11 +159,12 @@
       };
     }
     if (score >= 40) {
+      const constructive = score >= 55;
       return {
         light: "yellow",
-        tone: "test",
-        label: "指数黄灯",
-        action: "只允许小仓试错",
+        tone: constructive ? "traffic-yellow-strong" : "traffic-yellow",
+        label: constructive ? "指数黄偏绿" : "指数黄灯谨慎",
+        action: constructive ? "允许模式内小仓试错" : "只允许小仓观察",
         score,
         latest,
         reason: `${percent(latestChange)}，${volumeState.label}，近3日${percent(return3)}`,
@@ -154,7 +172,7 @@
     }
     return {
       light: "red",
-      tone: "weak",
+      tone: "traffic-red",
       label: "指数红灯",
       action: "禁止买入，只观察逆势强",
       score,
@@ -243,6 +261,144 @@
 
   function rowTurnover(row) {
     return safeNumber(row?.totalTurnover ?? row?.totalAmount);
+  }
+
+  function latestRow(board) {
+    return trendRows(board).at(-1) || null;
+  }
+
+  function parseTimestampText(text) {
+    const value = String(text || "");
+    if (/^\d{14}$/.test(value)) {
+      return {
+        hour: Number(value.slice(8, 10)),
+        minute: Number(value.slice(10, 12)),
+      };
+    }
+    const matched = value.match(/(\d{2}):(\d{2})/);
+    if (matched) {
+      return {
+        hour: Number(matched[1]),
+        minute: Number(matched[2]),
+      };
+    }
+    return null;
+  }
+
+  function minutesOfTime(time) {
+    if (!time) return null;
+    return time.hour * 60 + time.minute;
+  }
+
+  function latestBoardTimestamp(row) {
+    const stamps = (row?.stocks || [])
+      .map((stock) => parseTimestampText(stock.timestamp))
+      .filter(Boolean)
+      .map(minutesOfTime)
+      .filter((value) => value !== null);
+    if (!stamps.length) return null;
+    const latest = Math.max(...stamps);
+    return {
+      hour: Math.floor(latest / 60),
+      minute: latest % 60,
+    };
+  }
+
+  function formatClock(time) {
+    if (!time) return "暂无";
+    return `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`;
+  }
+
+  function elapsedMinutes(start, end) {
+    const startValue = minutesOfTime(start);
+    const endValue = minutesOfTime(end);
+    if (startValue === null || endValue === null || endValue <= startValue) return null;
+    return endValue - startValue;
+  }
+
+  function boardAuctionSnapshot(board, sample) {
+    const stocks = (board?.stocks || [])
+      .map((stock) => sample?.quotes?.[normalizeCode(stock.code)] || null)
+      .filter(Boolean);
+    if (!stocks.length) return null;
+    const changes = stocks.map((stock) => safeNumber(stock.changePercent)).filter((value) => value !== null);
+    const turnovers = stocks.map((stock) => safeNumber(stock.turnover)).filter((value) => value !== null);
+    if (!changes.length) return null;
+    const redCount = changes.filter((value) => value > 0).length;
+    return {
+      stockCount: changes.length,
+      averageChange: average(changes),
+      redRate: changes.length ? redCount / changes.length * 100 : null,
+      totalTurnover: turnovers.length ? turnovers.reduce((sum, value) => sum + value, 0) : null,
+    };
+  }
+
+  function accelerationRows() {
+    const sample = state.auction?.samples?.at(-1) || null;
+    if (!sample || !state.data?.boards?.length) return [];
+    const startTime = parseTimestampText(sample.time);
+
+    return state.data.boards
+      .map((board) => {
+        const currentRow = latestRow(board);
+        const auctionRow = boardAuctionSnapshot(board, sample);
+        if (!currentRow || !auctionRow) return null;
+        const currentAvg = boardChange(currentRow);
+        const auctionAvg = safeNumber(auctionRow.averageChange);
+        if (currentAvg === null || auctionAvg === null) return null;
+        const currentRedRate = redRate(currentRow);
+        const auctionRedRate = safeNumber(auctionRow.redRate);
+        const currentTurnover = rowTurnover(currentRow);
+        const auctionTurnover = safeNumber(auctionRow.totalTurnover);
+        const latestTime = latestBoardTimestamp(currentRow);
+        const mins = elapsedMinutes(startTime, latestTime);
+        const accel = currentAvg - auctionAvg;
+        const accelPer10m = mins ? accel / mins * 10 : null;
+        const turnoverRatio = currentTurnover !== null && auctionTurnover !== null && auctionTurnover > 0
+          ? currentTurnover / auctionTurnover
+          : null;
+        const score = clamp(
+          0.48 * scoreRange(accel, -1, 4)
+          + 0.22 * scoreRange(accelPer10m, -0.5, 1.6)
+          + 0.18 * scoreRange((currentRedRate ?? 0) - (auctionRedRate ?? 0), -15, 35)
+          + 0.12 * scoreRange(turnoverRatio, 1, 18),
+          0,
+          100,
+        );
+        const leaders = [...(currentRow.stocks || [])]
+          .filter((stock) => safeNumber(stock.changePercent) !== null)
+          .sort((a, b) => (safeNumber(b.changePercent) ?? -999) - (safeNumber(a.changePercent) ?? -999))
+          .slice(0, 2)
+          .map((stock) => `${stock.name} ${percent(stock.changePercent)}`);
+
+        return {
+          board,
+          sampleTime: startTime,
+          latestTime,
+          currentRow,
+          auctionRow,
+          currentAvg,
+          auctionAvg,
+          accel,
+          accelPer10m,
+          currentRedRate,
+          auctionRedRate,
+          turnoverRatio,
+          score,
+          leaders,
+          state: metricWithPrevious(boardMetric(board)).transition,
+        };
+      })
+      .filter((item) =>
+        item
+        && item.accel >= 0.2
+        && (item.currentAvg >= 0.3 || (item.currentRedRate ?? 0) >= 45)
+      )
+      .sort((a, b) =>
+        b.score - a.score
+        || b.accel - a.accel
+        || (b.currentAvg ?? -999) - (a.currentAvg ?? -999))
+      .slice(0, 12);
   }
 
   function stockTurnoverValue(stock) {
@@ -540,9 +696,11 @@
         + 0.09 * trendScore
         + 0.10 * macdScore
       );
+      // Pick board representatives with a balanced mix of resilience, liquidity, and short-term trend.
       const sortScore = (
-        0.58 * scoreRange(amount5, 0, 5000000000)
-        + 0.42 * scoreRange(ret5, -5, 18)
+        0.20 * clamp(score, 0, 100)
+        + 0.50 * scoreRange(amount5, 0, 5000000000)
+        + 0.30 * scoreRange(ret5, -5, 18)
       );
       return {
         code: stock.code,
@@ -567,8 +725,10 @@
   }
 
   function signalTone(signal) {
-    if (String(signal || "").includes("红灯")) return "weak";
-    if (String(signal || "").includes("黄灯")) return "test";
+    if (String(signal || "").includes("红灯")) return "traffic-red";
+    if (String(signal || "").includes("黄偏绿")) return "traffic-yellow-strong";
+    if (String(signal || "").includes("黄灯")) return "traffic-yellow";
+    if (String(signal || "").includes("绿灯")) return "traffic-green";
     if (["良性回踩转强", "退潮转强", "恶性回踩修复", "进攻增强"].includes(signal)) return "strong";
     if (["弱分歧", "进攻分歧", "承接观察", "恶性转良性", "退潮修复", "进攻延续"].includes(signal)) return "test";
     if (["进攻钝化", "回踩走弱"].includes(signal)) return "mixed";
@@ -598,7 +758,8 @@
       return { signal: `${currentState.label}｜指数红灯观察`, priority: 2 };
     }
     if (gate?.light === "yellow") {
-      return { signal: `${currentState.label}｜指数黄灯试错`, priority: Math.min(basePriority, 6) };
+      const gateLabel = gate.label === "指数黄偏绿" ? "指数黄偏绿试错" : "指数黄灯谨慎";
+      return { signal: `${currentState.label}｜${gateLabel}`, priority: Math.min(basePriority, 6) };
     }
     return { signal: currentState.label, priority: basePriority };
   }
@@ -699,7 +860,9 @@
       };
     }
     const cost = safeNumber(position.cost);
+    const forceExitPrice = safeNumber(position.forceExitPrice);
     const firstBuyLow = safeNumber(position.firstBuyLow ?? position.divergenceLow);
+    const effectiveStopPrice = Math.max(forceExitPrice ?? -Infinity, firstBuyLow ?? -Infinity);
     const pressure = safeNumber(position.pressure);
     const currentPrice = safeNumber(context.stock.close);
     const profitPct = cost && currentPrice ? (currentPrice / cost - 1) * 100 : null;
@@ -707,11 +870,14 @@
     const holdDays = tradingDayAge(position.entryDate, currentDate);
     const weakStock = (safeNumber(context.stock.changePercent) ?? 0) < 0 || (safeNumber(context.stock.macdScore) ?? 50) <= 35;
 
-    if (firstBuyLow !== null && currentPrice !== null && currentPrice < firstBuyLow) {
+    if (currentPrice !== null && effectiveStopPrice !== -Infinity && currentPrice < effectiveStopPrice) {
+      const useForceExit = forceExitPrice !== null && effectiveStopPrice === forceExitPrice && (firstBuyLow === null || forceExitPrice >= firstBuyLow);
       return {
-        action: "硬止损",
+        action: useForceExit ? "强制平仓" : "硬止损",
         tone: "weak",
-        reason: `跌破第一笔低吸日低点 ${number(firstBuyLow)}`,
+        reason: useForceExit
+          ? `跌破强制平仓执行线 ${number(effectiveStopPrice)}`
+          : `跌破第一笔低点执行线 ${number(effectiveStopPrice)}`,
         profitPct,
         holdDays,
       };
@@ -821,7 +987,13 @@
               <tbody>
                 ${rows.map(({ position, context, decision }) => `
                   <tr>
-                    <td><strong>${position.name || context?.stock?.name || normalizeCode(position.code)}</strong><span class="code">${normalizeCode(position.code)}</span></td>
+                    <td>
+                      <strong>${position.name || context?.stock?.name || normalizeCode(position.code)}</strong>
+                      <span class="code">${normalizeCode(position.code)}</span>
+                      <small>第一笔低点 ${position.firstBuyLow === null || position.firstBuyLow === undefined ? "未设" : number(position.firstBuyLow)}</small>
+                      <small>强平价 ${position.forceExitPrice === null || position.forceExitPrice === undefined ? "未设" : number(position.forceExitPrice)}</small>
+                      <small>执行线 ${position.effectiveStopPrice === null || position.effectiveStopPrice === undefined ? "未设" : number(position.effectiveStopPrice)}</small>
+                    </td>
                     <td>${context ? `<strong>${context.board.name}</strong><br><small>${context.backgroundMetric.stage} · ${context.backgroundMetric.status}</small>` : "暂无"}</td>
                     <td>${context ? `<span class="swing-badge ${context.currentState.tone}">${context.currentState.label}</span><br><small>${context.currentMetric.status}</small>` : "暂无"}</td>
                     <td><strong>${context?.stock?.close === undefined ? "暂无" : number(context.stock.close)}</strong><br><small class="${signedClass(decision.profitPct)}">${decision.profitPct === null || decision.profitPct === undefined ? "浮盈暂无" : `浮盈 ${number(decision.profitPct)}%`}</small></td>
@@ -848,6 +1020,166 @@
       .at(-1);
   }
 
+  function renderAuctionPanel() {
+    const latestDate = latestDataDate();
+    const snapshotDate = compactDate(latestDate);
+    const auction = state.auction;
+    const alerts = auction?.latestAlerts || [];
+    const sampleCount = auction?.samples?.length || 0;
+    const updatedAt = auction?.updatedAt || auction?.samples?.at(-1)?.time || "";
+
+    if (state.auctionError) {
+      return `<section class="card section-card auction-card"><div class="empty">集合竞价预警读取失败：${state.auctionError}</div></section>`;
+    }
+
+    if (!auction) {
+      return `
+        <section class="card section-card auction-card">
+          <div class="section-head">
+            <div>
+              <h2>集合竞价预警</h2>
+              <p class="muted">等待 ${snapshotDate || "今日"} 09:15-09:25 采样结果，盘中会保留当天最后一版预警。</p>
+            </div>
+            <span class="count-pill">暂无快照</span>
+          </div>
+          <div class="pool-empty">尚未生成集合竞价快照</div>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="card section-card auction-card">
+        <div class="section-head">
+          <div>
+            <h2>集合竞价预警</h2>
+            <p class="muted">按竞价均涨、红盘率、竞价额共振和锚定股强度筛选超预期板块。</p>
+          </div>
+          <span class="count-pill">${shortDate(auction.date || latestDate)} / ${sampleCount} 次采样</span>
+        </div>
+
+        <div class="auction-meta">
+          <span>最新采样：${updatedAt || "暂无"}</span>
+          <span>预警板块：${alerts.length}</span>
+        </div>
+
+        ${alerts.length ? `
+          <div class="auction-grid">
+            ${alerts.slice(0, 8).map((alert, index) => {
+              const ratio = alert.turnoverRatio === null || alert.turnoverRatio === undefined ? "暂无" : `${number(Number(alert.turnoverRatio) * 100, 2)}%`;
+              const stocks = (alert.topStocks || []).slice(0, 3);
+              return `
+                <article class="auction-board">
+                  <div class="auction-board-head">
+                    <div>
+                      <strong>${index + 1}. ${alert.boardName}</strong>
+                      <small>${alert.mode || "暂无结构"}</small>
+                    </div>
+                    <span class="auction-score">${number(alert.score, 0)}</span>
+                  </div>
+                  <div class="auction-stats">
+                    <span>均涨 <b class="${signedClass(alert.avgChange)}">${percent(alert.avgChange)}</b></span>
+                    <span>红盘 <b>${number(alert.redRate, 0)}%</b></span>
+                    <span>强股 <b>${alert.strongCount || 0}/${alert.validCount || 0}</b></span>
+                    <span>竞价额 <b>${formatAmount(alert.totalTurnover)}</b></span>
+                    <span>占5日额 <b>${ratio}</b></span>
+                  </div>
+                  <div class="auction-stocks">
+                    ${stocks.map((stock) => `
+                      <span>
+                        <strong>${stock.name}</strong>
+                        <em class="${signedClass(stock.changePercent)}">${percent(stock.changePercent)}</em>
+                        <small>${formatAmount(stock.turnover)} / ${number(stock.score, 0)}分</small>
+                      </span>
+                    `).join("")}
+                  </div>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        ` : '<div class="pool-empty">当前快照没有达到预警阈值的板块</div>'}
+      </section>
+    `;
+  }
+
+  function renderAccelerationPanel() {
+    const rows = accelerationRows();
+    const sample = state.auction?.samples?.at(-1) || null;
+
+    if (!sample) {
+      return `
+        <section class="card section-card acceleration-card">
+          <div class="section-head">
+            <div>
+              <h2>开盘加速板块榜</h2>
+              <p class="muted">当前先按“集合竞价到最新盘中”衡量板块加速度，适合验证你说的开盘资金方向。</p>
+            </div>
+            <span class="count-pill">等待竞价快照</span>
+          </div>
+          <div class="pool-empty">还没有可用的集合竞价快照，先运行早盘采样后这里才会出榜。</div>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="card section-card acceleration-card">
+        <div class="section-head">
+          <div>
+            <h2>开盘加速板块榜</h2>
+            <p class="muted">看的是竞价到当前的板块均涨抬升，不是静态涨幅榜。更适合抓开盘后还在继续强化的方向。</p>
+          </div>
+          <span class="count-pill">${formatClock(parseTimestampText(sample.time))} -> ${formatClock(rows[0]?.latestTime || null)}</span>
+        </div>
+
+        <div class="auction-meta">
+          <span>上榜板块：${rows.length}</span>
+          <span>竞价快照：${formatClock(parseTimestampText(sample.time))}</span>
+          <span>口径：竞价均涨 -> 当前均涨</span>
+        </div>
+
+        ${rows.length ? `
+          <div class="table-wrap acceleration-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>板块</th>
+                  <th>竞价均涨</th>
+                  <th>当前均涨</th>
+                  <th>加速值</th>
+                  <th>10分钟斜率</th>
+                  <th>红盘率变化</th>
+                  <th>成交放大</th>
+                  <th>当前节奏</th>
+                  <th>前排个股</th>
+                  <th>加速分</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map((item, index) => `
+                  <tr>
+                    <td><strong>${index + 1}</strong></td>
+                    <td class="intraday-board-cell"><strong>${item.board.name}</strong><span class="code">${item.board.code}</span></td>
+                    <td class="${signedClass(item.auctionAvg)}">${percent(item.auctionAvg)}</td>
+                    <td class="${signedClass(item.currentAvg)}">${percent(item.currentAvg)}</td>
+                    <td class="${signedClass(item.accel)}"><strong>${item.accel >= 0 ? "+" : ""}${number(item.accel)}%</strong></td>
+                    <td class="${signedClass(item.accelPer10m)}">${item.accelPer10m === null ? "暂无" : `${item.accelPer10m >= 0 ? "+" : ""}${number(item.accelPer10m)}%`}</td>
+                    <td class="${signedClass((item.currentRedRate ?? 0) - (item.auctionRedRate ?? 0))}">
+                      ${item.currentRedRate === null || item.auctionRedRate === null ? "暂无" : `${number(item.auctionRedRate, 0)}% -> ${number(item.currentRedRate, 0)}%`}
+                    </td>
+                    <td>${item.turnoverRatio === null ? "暂无" : `${number(item.turnoverRatio, 1)}x`}</td>
+                    <td><span class="swing-badge ${item.state.tone}">${item.state.label}</span></td>
+                    <td class="trade-text">${item.leaders.length ? item.leaders.join(" / ") : "暂无"}</td>
+                    <td><strong>${number(item.score, 0)}</strong></td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        ` : '<div class="pool-empty">当前没有满足条件的开盘加速板块，说明竞价后的强化还不明显。</div>'}
+      </section>
+    `;
+  }
+
   function render() {
     if (!state.data && !state.error) {
       app.innerHTML = '<section class="card section-card"><div class="empty">正在加载盘中雷达...</div></section>';
@@ -872,6 +1204,8 @@
 
     app.innerHTML = `
       ${renderPositionsPanel()}
+      ${renderAuctionPanel()}
+      ${renderAccelerationPanel()}
       <section class="card section-card swing-overview-panel">
         <div class="section-head">
           <div>
@@ -893,7 +1227,7 @@
 
         <div class="intraday-toolbar">
           <p class="muted">顶部定时刷新只会重载本页，避免盘中反复刷新其他看板。</p>
-          <span class="intraday-time">自动刷新：交易时段每 30 分钟</span>
+          <span class="intraday-time">自动刷新：交易时段每 1 分钟</span>
         </div>
 
         ${rows.length ? `
@@ -966,6 +1300,24 @@
     } catch (error) {
       state.positions = [];
       state.positionError = error.message || String(error);
+    }
+    try {
+      const auctionDate = compactDate(latestDataDate());
+      if (auctionDate) {
+        const auctionResponse = await fetch(`./data/auction_snapshots/${auctionDate}.json?v=${Date.now()}`, { cache: "no-store" });
+        if (auctionResponse.ok) {
+          state.auction = await auctionResponse.json();
+          state.auctionError = "";
+        } else if (auctionResponse.status === 404) {
+          state.auction = null;
+          state.auctionError = "";
+        } else {
+          throw new Error(`HTTP ${auctionResponse.status}`);
+        }
+      }
+    } catch (error) {
+      state.auction = null;
+      state.auctionError = error.message || String(error);
     }
     render();
   }

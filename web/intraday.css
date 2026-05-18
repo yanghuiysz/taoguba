@@ -41,6 +41,142 @@
   vertical-align: top;
 }
 
+.auction-card {
+  border-color: #d7b66a;
+}
+
+.acceleration-card {
+  border-color: #b8d5ea;
+}
+
+.acceleration-table table {
+  min-width: 1360px;
+}
+
+.auction-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.auction-meta span {
+  border: 1px solid #edf2f1;
+  border-radius: 999px;
+  background: #fbfdfc;
+  padding: 6px 9px;
+}
+
+.auction-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.auction-board {
+  min-width: 0;
+  border: 1px solid #edf2f1;
+  border-radius: 8px;
+  background: #fbfdfc;
+  padding: 11px;
+}
+
+.auction-board-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 9px;
+}
+
+.auction-board-head strong,
+.auction-board-head small {
+  display: block;
+}
+
+.auction-board-head strong {
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.auction-board-head small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.auction-score {
+  flex: 0 0 auto;
+  min-width: 42px;
+  border-radius: 999px;
+  background: #fff5cc;
+  color: #8b6500;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 8px 9px;
+  text-align: center;
+}
+
+.auction-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.auction-stats span {
+  min-width: 0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 7px 8px;
+}
+
+.auction-stats b {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.auction-stocks {
+  display: grid;
+  gap: 6px;
+}
+
+.auction-stocks span {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  align-items: center;
+  border-radius: 7px;
+  background: #ffffff;
+  padding: 7px 8px;
+}
+
+.auction-stocks strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auction-stocks em {
+  font-style: normal;
+  font-weight: 800;
+}
+
+.auction-stocks small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .table-sort-btn {
   border: 0;
   background: transparent;
@@ -77,6 +213,14 @@
 
 @media (max-width: 900px) {
   .intraday-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .auction-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auction-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

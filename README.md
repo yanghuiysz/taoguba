@@ -74,8 +74,8 @@ python .\scripts\intraday_radar_daemon.py
 
 当前默认行为：
 
-- 每 `120s` 刷新一次盘中雷达数据
-- 每 `5min` 推送一次企业微信通知
+- 每 `60s` 刷新一次盘中雷达数据
+- 每 `60s` 推送一次企业微信通知
 - 只在交易时段执行
 - 刷新成功后才会触发通知
 
@@ -83,9 +83,35 @@ python .\scripts\intraday_radar_daemon.py
 
 ```powershell
 python .\scripts\intraday_radar_daemon.py --disable-notify
-python .\scripts\intraday_radar_daemon.py --notify-interval 300
+python .\scripts\intraday_radar_daemon.py --notify-interval 60
 python .\scripts\intraday_radar_daemon.py --once --force
 ```
+
+## 集合竞价探针
+
+集合竞价探针会在 `09:15-09:25` 采样自定义板块成分股实时行情，保存原始快照，并在 `09:20` 后按板块竞价强度推送企业微信提醒。
+
+```powershell
+python .\scripts\auction_probe.py
+```
+
+常用参数：
+
+```powershell
+python .\scripts\auction_probe.py --no-notify
+python .\scripts\auction_probe.py --sample-interval 5
+python .\scripts\auction_probe.py --once --force --no-notify
+```
+
+输出文件：
+- `web/data/auction_snapshots/YYYYMMDD.json`：每次采样的原始行情和当次预警板块。
+
+盘中雷达页面会读取当天快照，并在顶部展示最新的集合竞价预警板块和锚定股。
+
+评分口径：
+- 板块竞价均涨、红盘率、强竞价个股数量。
+- 板块竞价成交额相对近 5 日日均成交额的比例。
+- 锚定股的竞价涨幅、竞价成交额、相对近 5 日成交额占比。
 
 ## 企业微信通知
 
@@ -114,6 +140,7 @@ python .\scripts\notify_intraday_radar.py --top 80
 - `scripts/build_ths_limit_mapping.py`：生成同花顺/东财增强映射
 - `scripts/intraday_radar_engine.py`：盘中雷达计算逻辑
 - `scripts/intraday_radar_daemon.py`：盘中守护刷新与通知节流
+- `scripts/auction_probe.py`：集合竞价采样、板块超预期评分与企业微信提醒
 - `scripts/notify_intraday_radar.py`：盘中雷达通知拼装
 - `scripts/notify_wecom.py`：企业微信发送封装
 - `scripts/refresh_latest_after_close.py`：收盘后自动补刷新

@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "code": "600667",
+    "name": "太极实业",
+    "boardName": "存储芯片",
+    "entryDate": "2026-05-18",
+    "quantity": 300,
+    "cost": 13.44,
+    "forceExitPrice": 12.9,
+    "firstBuyLow": 12.69,
+    "pressure": null,
+    "hasTakenHalfProfit": false,
+    "breakevenArmed": false,
+    "effectiveStopPrice": 12.9
+  }
+]

@@ -2,6 +2,21 @@
   "version": 1,
   "records": [
     {
+      "id": "20260518-buy-600667-001",
+      "date": "2026-05-18",
+      "action": "buy",
+      "stockCode": "600667",
+      "stockName": "太极实业",
+      "boardName": "存储芯片",
+      "quantity": 300,
+      "price": 13.44,
+      "amount": 4032,
+      "tags": [
+        "买入"
+      ],
+      "note": "指数震荡预期，存储芯片由退潮转为进攻"
+    },
+    {
       "id": "20260429-buy-002812-001",
       "date": "2026-04-29",
       "action": "buy",
