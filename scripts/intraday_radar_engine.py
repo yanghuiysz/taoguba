@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Optional, Any
 import json
 
+STOCK_SELECTION_DAYS = 3
+
 
 # ── 工具函数 ────────────────────────────────────────────────────────────────
 
@@ -645,13 +647,13 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
             continue
 
         ret5 = stock_return(items, 5)
-        ret3 = stock_return(items, 3)
+        ret3 = stock_return(items, STOCK_SELECTION_DAYS)
         ret10 = stock_return(items, 10)
 
         amount3 = sum(
             v for v in [
                 stock_turnover_value(item.get("stock", {}))
-                for item in items[-3:]
+                for item in items[-STOCK_SELECTION_DAYS:]
             ]
             if v is not None
         )
@@ -663,7 +665,7 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
             if v is not None
         )
 
-        board_ret3 = board_return_for_items(data, items, 3)
+        board_ret3 = board_return_for_items(data, items, STOCK_SELECTION_DAYS)
         board_ret5 = board_return_for_items(data, items, 5)
         board_ret10 = board_return_for_items(data, items, 10)
 
@@ -675,16 +677,16 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
         latest_change = safe_number(latest.get("changePercent"))
         macd_score = safe_number(latest.get("macdScore")) or 50
 
-        rel_score = score_range(average([rel5, rel10]), -5, 10)
+        rel_score = score_range(average([rel3, rel5]), -4, 8)
 
         stock_changes = [safe_number(item.get("stock", {}).get("changePercent")) for item in items]
         stock_changes = [c for c in stock_changes if c is not None]
         drawdown_score = 100 - score_range(max_drawdown(stock_changes), 4, 18)
 
         trend_score = (
-            0.55 * score_range(ret5, -3, 8)
-            + 0.25 * score_range(ret10, -5, 15)
-            + 0.20 * score_range(latest_change, -3, 5)
+            0.60 * score_range(ret3, -2, 6)
+            + 0.25 * score_range(ret5, -3, 8)
+            + 0.15 * score_range(latest_change, -3, 5)
         )
 
         score = (
@@ -697,8 +699,9 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
         )
 
         sort_score = (
-            0.58 * score_range(amount5, 0, 5_000_000_000)
-            + 0.42 * score_range(ret5, -5, 18)
+            0.20 * clamp(score, 0, 100)
+            + 0.50 * score_range(amount3, 0, 3_000_000_000)
+            + 0.30 * score_range(ret3, -3, 12)
         )
 
         result.append({
@@ -721,7 +724,7 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
             "sort_score": clamp(sort_score, 0, 100),
         })
 
-    result.sort(key=lambda x: (-x["sort_score"], -x.get("amount5", 0), -(x.get("ret5") or -999)))
+    result.sort(key=lambda x: (-x["sort_score"], -x.get("amount3", 0), -(x.get("ret3") or -999)))
     return result
 
 
@@ -829,8 +832,8 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
 
         for stock in resilience_stocks:
             latest_change = safe_number(stock.get("latest_change")) or 0
+            rel3 = safe_number(stock.get("rel3")) or 0
             rel5 = safe_number(stock.get("rel5")) or 0
-            rel10 = safe_number(stock.get("rel10")) or 0
             current_state = current_metric.get("transition", {})
             trade_signal = build_trade_signal(current_state, current_metric, gate)
             macd_label = stock.get("macd_label", "")
@@ -838,8 +841,8 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
             # 计算机会分
             opportunity_score = clamp(
                 0.38 * (safe_number(stock.get("score")) or 0)
-                + 0.20 * score_range(rel5, -2, 6)
-                + 0.14 * score_range(rel10, -4, 10)
+                + 0.20 * score_range(rel3, -2, 5)
+                + 0.14 * score_range(rel5, -3, 7)
                 + 0.12 * score_range(latest_change, -2, 6)
                 + 0.10 * (safe_number(stock.get("macd_score")) or 50)
                 + 0.06 * (background_metric.get("heat_score") or 0),
@@ -852,7 +855,7 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
                 continue
             if opportunity_score < 58:
                 continue
-            if not (stock.get("score", 0) >= 65 or latest_change >= 1 or rel5 >= 0):
+            if not (stock.get("score", 0) >= 65 or latest_change >= 1 or rel3 >= 0):
                 continue
             if "死叉" in str(macd_label):
                 continue

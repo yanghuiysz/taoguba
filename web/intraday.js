@@ -30,6 +30,8 @@
     "回踩走弱",
   ]);
 
+  const STOCK_SELECTION_DAYS = 3;
+
   const safeNumber = (value) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
@@ -662,9 +664,9 @@
     return (board?.stocks || []).map((stock) => {
       const items = stockRows(board, stock.code, 10);
       const ret5 = stockReturn(items, 5);
-      const ret3 = stockReturn(items, 3);
+      const ret3 = stockReturn(items, STOCK_SELECTION_DAYS);
       const ret10 = stockReturn(items, 10);
-      const amount3 = items.slice(Math.max(0, items.length - 3))
+      const amount3 = items.slice(Math.max(0, items.length - STOCK_SELECTION_DAYS))
         .map((item) => stockTurnoverValue(item.stock))
         .filter((value) => value !== null)
         .reduce((sum, value) => sum + value, 0);
@@ -672,7 +674,7 @@
         .map((item) => stockTurnoverValue(item.stock))
         .filter((value) => value !== null)
         .reduce((sum, value) => sum + value, 0);
-      const boardRet3 = boardReturnForItems(items, 3);
+      const boardRet3 = boardReturnForItems(items, STOCK_SELECTION_DAYS);
       const boardRet5 = boardReturnForItems(items, 5);
       const boardRet10 = boardReturnForItems(items, 10);
       const rel3 = ret3 !== null && boardRet3 !== null ? ret3 - boardRet3 : null;
@@ -681,12 +683,12 @@
       const latest = items.at(-1)?.stock || null;
       const latestChange = items.length ? safeNumber(latest?.changePercent) : null;
       const macdScore = safeNumber(latest?.macdScore) ?? 50;
-      const relScore = scoreRange(average([rel5, rel10]), -5, 10);
+      const relScore = scoreRange(average([rel3, rel5]), -4, 8);
       const drawdownScore = 100 - scoreRange(maxDrawdown(items.map((item) => item.stock.changePercent)), 4, 18);
       const trendScore = (
-        0.55 * scoreRange(ret5, -3, 8)
-        + 0.25 * scoreRange(ret10, -5, 15)
-        + 0.20 * scoreRange(latestChange, -3, 5)
+        0.60 * scoreRange(ret3, -2, 6)
+        + 0.25 * scoreRange(ret5, -3, 8)
+        + 0.15 * scoreRange(latestChange, -3, 5)
       );
       const score = (
         0.34 * relScore
@@ -696,11 +698,11 @@
         + 0.09 * trendScore
         + 0.10 * macdScore
       );
-      // Pick board representatives with a balanced mix of resilience, liquidity, and short-term trend.
+      // Keep the shortlist anchored to the most recent 3 trading days.
       const sortScore = (
         0.20 * clamp(score, 0, 100)
-        + 0.50 * scoreRange(amount5, 0, 5000000000)
-        + 0.30 * scoreRange(ret5, -5, 18)
+        + 0.50 * scoreRange(amount3, 0, 3000000000)
+        + 0.30 * scoreRange(ret3, -3, 12)
       );
       return {
         code: stock.code,
@@ -721,7 +723,7 @@
         score: clamp(score, 0, 100),
         sortScore: clamp(sortScore, 0, 100),
       };
-    }).sort((a, b) => b.sortScore - a.sortScore || b.amount5 - a.amount5 || (b.ret5 ?? -999) - (a.ret5 ?? -999));
+    }).sort((a, b) => b.sortScore - a.sortScore || b.amount3 - a.amount3 || (b.ret3 ?? -999) - (a.ret3 ?? -999));
   }
 
   function signalTone(signal) {
@@ -775,14 +777,14 @@
       .filter(({ currentMetric }) => INTRADAY_WATCH_TRANSITIONS.has(currentMetric.transition.label))
       .flatMap(({ board, backgroundMetric, currentMetric }) => stockResilienceRows(board).slice(0, 3).map((stock) => {
         const latestChange = safeNumber(stock.latestChange) ?? 0;
+        const rel3 = safeNumber(stock.rel3) ?? 0;
         const rel5 = safeNumber(stock.rel5) ?? 0;
-        const rel10 = safeNumber(stock.rel10) ?? 0;
         const currentState = currentMetric.transition;
         const tradeSignal = buildTradeSignal(backgroundMetric, currentMetric, currentState, stock, gate);
         const opportunityScore = clamp(
           0.38 * (safeNumber(stock.score) ?? 0)
-          + 0.20 * scoreRange(rel5, -2, 6)
-          + 0.14 * scoreRange(rel10, -4, 10)
+          + 0.20 * scoreRange(rel3, -2, 5)
+          + 0.14 * scoreRange(rel5, -3, 7)
           + 0.12 * scoreRange(latestChange, -2, 6)
           + 0.10 * (safeNumber(stock.macdScore) ?? 50)
           + 0.06 * backgroundMetric.heatScore,
@@ -804,7 +806,7 @@
       .filter((item) =>
         item.signalPriority >= 2
         && item.opportunityScore >= 58
-        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel5 >= 0)
+        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel3 >= 0)
         && !String(item.stock.macdLabel || "").includes("死叉"))
       .slice(0, 80);
     return sortOpportunityRows(rows);

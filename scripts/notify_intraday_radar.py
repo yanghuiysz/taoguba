@@ -22,6 +22,9 @@ from scripts.intraday_radar_engine import (
     transition_rank,
 )
 
+STRUCTURE_DAYS = 5
+STRUCTURE_SCORE_JUMP = 15.0
+
 
 def fmt_chg(chg: float) -> str:
     """涨跌幅颜色标注（A股红涨绿跌）"""
@@ -51,6 +54,35 @@ def fmt_signal(signal: str, tone: str) -> str:
 def short_date(date_str: str) -> str:
     """日期缩写，和页面展示保持一致。"""
     return str(date_str or "")[5:] if date_str else "暂无"
+
+
+def fmt_structure_score(score: float | None, previous_score: float | None = None) -> str:
+    if score is None:
+        return "-"
+    score_text = f"{score:.0f}"
+    if previous_score is None:
+        return score_text
+    delta = score - previous_score
+    if delta >= STRUCTURE_SCORE_JUMP:
+        return f'<font color="green">{score_text}</font>'
+    if delta <= -STRUCTURE_SCORE_JUMP:
+        return f'<font color="red">{score_text}</font>'
+    return score_text
+
+
+def format_structure_metric_chain(metrics: list[dict]) -> str:
+    if not metrics:
+        return "**鏆傛棤**(-)"
+
+    parts: list[str] = []
+    previous_score: float | None = None
+    for metric in metrics:
+        stage = metric.get("stage", "鏆傛棤")
+        score = metric.get("heat_score")
+        parts.append(f"**{stage}**({fmt_structure_score(score, previous_score)})")
+        if score is not None:
+            previous_score = score
+    return " -> ".join(parts)
 
 
 def latest_data_date(data: dict) -> str:
@@ -149,7 +181,7 @@ def grouped_board_sections(rows: list[dict], data: dict) -> list[list[str]]:
             board = board_entry["board"]
             curr = board_entry["current_metric"]
             metric_chain = []
-            for offset in (-3, -2, -1, 0):
+            for offset in range(-(STRUCTURE_DAYS - 1), 1):
                 metric = board_metric(data, board, offset=offset)
                 if metric and metric.get("stage"):
                     metric_chain.append(metric)
@@ -157,6 +189,8 @@ def grouped_board_sections(rows: list[dict], data: dict) -> list[list[str]]:
             structure_text = " -> ".join(
                 f"**{metric.get('stage', '暂无')}**" for metric in metric_chain
             ) or f"**{curr.get('stage', '暂无')}**"
+
+            structure_text = format_structure_metric_chain(metric_chain)
 
             block = [
                 f"### {idx}. {board.get('name', '未知')}({board.get('code', '')})",

@@ -51,6 +51,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 _load_env_file(_ROOT / ".env")
 
 DEFAULT_WEBHOOK_URL = os.environ.get("WECOM_WEBHOOK_URL", "")
+BOARD_SWING_DAYS = 7
 
 
 # ── 工具函数 ────────────────────────────────────────────────────────────────
@@ -153,7 +154,7 @@ class WeComNotifier:
         """发送两部分板块观察消息，返回 (盘中雷达结果, 波段观察结果)
 
         第一部分「盘中雷达」：按涨幅排序前N，显示均涨、红盘率、成交额
-        第二部分「热门板块波段观察」：按高位率排序，显示新高率/近高率/近3天均涨趋势
+        第二部分「热门板块波段观察」：按高位率排序，显示新高率/近高率/近7天板块节奏
         """
         if not boards:
             return False, False
@@ -192,11 +193,11 @@ class WeComNotifier:
             name = b.get("name", "未知")
             high_rate = b.get("high100_rate", 0)
             near_rate = b.get("nearHigh100_rate", 0)
-            # 取最近3天趋势
+            # 取最近7天趋势
             trend = b.get("trend", [])
-            recent = trend[-3:] if len(trend) >= 3 else trend
+            recent = trend[-BOARD_SWING_DAYS:] if len(trend) >= BOARD_SWING_DAYS else trend
 
-            # 近3天均涨趋势字符串
+            # 近7天板块节奏字符串
             trend_str = ""
             for t in recent:
                 chg = t.get("averageChange", 0)
@@ -226,7 +227,7 @@ class WeComNotifier:
             lines2.append(
                 f"> {i}. **{name}** {flag}\n"
                 f">    新高率{high_rate:.0f}%  近高率{near_rate:.0f}%  "
-                f"近3日趋势：{trend_str or '-'}"
+                f"近7日节奏：{trend_str or '-'}"
             )
 
         ok2 = self.send_markdown("\n".join(lines2))
@@ -261,10 +262,10 @@ def load_custom_boards(json_path: Path) -> list[dict]:
                 )
                 up_ratio = up_count / len(stocks) * 100
 
-            # 取近3天波段趋势
+            # 取近7天波段趋势
             trend_raw = b.get("boardNewHighTrend", [])
             trend = []
-            for t in (trend_raw[-3:] if len(trend_raw) >= 3 else trend_raw):
+            for t in (trend_raw[-BOARD_SWING_DAYS:] if len(trend_raw) >= BOARD_SWING_DAYS else trend_raw):
                 trend.append({
                     "date": t.get("date", ""),
                     "averageChange": t.get("averageChange", 0),

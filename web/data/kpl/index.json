@@ -1,6 +1,16 @@
 {
-  "latest": "2026-05-18",
+  "latest": "2026-05-19",
   "items": [
+    {
+      "date": "2026-05-19",
+      "path": "./data/kpl/history/20260519.json",
+      "summary": {
+        "plateCount": 271,
+        "linkedPlateCount": 0,
+        "limitUpStockCount": 0,
+        "strongStockCount": 0
+      }
+    },
     {
       "date": "2026-05-18",
       "path": "./data/kpl/history/20260518.json",
