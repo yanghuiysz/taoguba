@@ -193,7 +193,7 @@
 }
 
 .swing-overview-table table {
-  min-width: 1120px;
+  min-width: 1040px;
   font-size: 13px;
 }
 
@@ -209,16 +209,34 @@
 }
 
 .stage-flow {
-  min-width: 330px;
+  min-width: 600px;
+  max-width: 760px;
+  white-space: normal;
+}
+
+.stage-flow-track {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 3px 0;
+}
+
+.stage-flow-track::before {
+  content: none;
+}
+
+.stage-flow-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
 }
 
 .stage-arrow {
-  display: inline-block;
-  margin: 0 5px;
-  color: var(--muted);
+  color: #8aa09b;
+  font-size: 13px;
   font-weight: 900;
-  vertical-align: top;
   line-height: 28px;
+  margin: 0;
 }
 
 .stage-step {
@@ -226,13 +244,29 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  vertical-align: top;
+  min-width: 0;
+  padding: 0;
+  text-align: center;
 }
 
 .stage-step small {
   color: var(--muted);
   font-size: 11px;
   line-height: 1;
+}
+
+.stage-step .swing-badge {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.stage-date {
+  font-variant-numeric: tabular-nums;
+}
+
+.stage-score {
+  font-weight: 800;
+  text-align: right;
 }
 
 .overview-tools {
@@ -378,7 +412,7 @@
   }
 
   .swing-overview-table table {
-    min-width: 1040px;
+    min-width: 960px;
     font-size: 12px;
   }
 

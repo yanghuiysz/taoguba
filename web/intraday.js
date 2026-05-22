@@ -1,10 +1,12 @@
 (function initIntradayRadar() {
   const app = document.querySelector("#intraday-app");
   const DATA_URL = "./data/custom_boards.json";
+  const MEMBERSHIP_URL = "./data/custom_board_membership.json";
   const POSITIONS_URL = "./data/positions.json";
 
   const state = {
     data: null,
+    membership: { overrides: [] },
     positions: [],
     auction: null,
     error: "",
@@ -60,6 +62,68 @@
     return digits ? digits.slice(-6).padStart(6, "0") : "";
   }
 
+  function membershipOverride(board, stock) {
+    const overrides = Array.isArray(state.membership?.overrides) ? state.membership.overrides : [];
+    const boardCode = String(board?.code || "");
+    const stockCode = normalizeCode(stock?.code);
+    return overrides.find((item) =>
+      String(item.boardCode || "") === boardCode
+      && normalizeCode(item.stockCode) === stockCode);
+  }
+
+  function stockBoardCount(stockCode) {
+    const code = normalizeCode(stockCode);
+    if (!code) return 0;
+    return (state.data?.boards || []).filter((board) =>
+      (board.stocks || []).some((stock) => normalizeCode(stock.code) === code)).length;
+  }
+
+  function latestStockRank(board, stockCode, valueFn) {
+    const code = normalizeCode(stockCode);
+    const latestRow = (board?.trend || []).at(-1);
+    const ranked = [...(latestRow?.stocks || [])]
+      .filter((item) => safeNumber(valueFn(item)) !== null)
+      .sort((a, b) => Number(valueFn(b)) - Number(valueFn(a)));
+    const index = ranked.findIndex((item) => normalizeCode(item.code) === code);
+    return index >= 0 ? index + 1 : null;
+  }
+
+  function stockAuthenticityMetric(board, stock) {
+    const override = membershipOverride(board, stock);
+    const statusScores = {
+      pure_core: 100,
+      pure_elastic: 88,
+      core: 82,
+      active: 74,
+      supply_chain: 68,
+      overlap: 62,
+      manual: 58,
+      pending: 55,
+      theme_edge: 42,
+      suspect: 20,
+    };
+    if (override) {
+      const status = override.status || "manual";
+      const suggestedKeep = String(override.suggestedKeep || "");
+      const baseScore = statusScores[status] ?? 58;
+      const score = suggestedKeep.includes("否") ? Math.min(baseScore, 35) : baseScore;
+      return {
+        score,
+        label: override.label || status,
+        status,
+      };
+    }
+
+    const amountRank = latestStockRank(board, stock.code, stockTurnoverValue);
+    const changeRank = latestStockRank(board, stock.code, (item) => item.changePercent);
+    const latestRow = (board?.trend || []).at(-1);
+    const row = (latestRow?.stocks || []).find((item) => normalizeCode(item.code) === normalizeCode(stock.code));
+    if (amountRank !== null && amountRank <= 5) return { score: 78, label: "容量核心", status: "core" };
+    if (changeRank !== null && changeRank <= 3 && Number(row?.changePercent) > 0) return { score: 72, label: "弹性前排", status: "active" };
+    if (stockBoardCount(stock.code) >= 3) return { score: 60, label: "多题材", status: "overlap" };
+    return { score: 55, label: "待确认", status: "pending" };
+  }
+
   const formatAmount = (value) => {
     const parsed = safeNumber(value);
     if (parsed === null) return "暂无";
@@ -73,6 +137,22 @@
   const shortDate = (date) => date ? String(date).slice(5) : "暂无";
 
   const compactDate = (date) => String(date || "").replace(/\D/g, "").slice(0, 8);
+
+  const snapshotShortDate = (date) => {
+    const compact = compactDate(date);
+    if (compact.length === 8) return `${compact.slice(4, 6)}-${compact.slice(6, 8)}`;
+    return shortDate(date);
+  };
+
+  const todayCompactDate = () => {
+    const formatter = new Intl.DateTimeFormat("zh-CN", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    return compactDate(formatter.format(new Date()));
+  };
 
   function postResize() {
     window.parent?.postMessage({ type: "dashboard:resize" }, window.location.origin);
@@ -452,6 +532,38 @@
     return { score: clamp(score, 0, 100), high5Rate, high3Rate, redRate: redRateValue };
   }
 
+  function boardTurnoverLevelScore(turnover) {
+    const parsed = safeNumber(turnover);
+    if (parsed === null || parsed <= 0) return 0;
+    return scoreRange(Math.log10(Math.max(parsed, 1)), 8.5, 10.8);
+  }
+
+  function boardProfitabilityMetric(row, board) {
+    const stockScores = (row?.stocks || [])
+      .map((stock) => safeNumber(stock.profitScore))
+      .filter((value) => value !== null);
+    const avgScore = stockScores.length
+      ? average(stockScores)
+      : safeNumber(board?.latestAvgProfitScore);
+    const strongRate = stockScores.length
+      ? stockScores.filter((value) => value >= 60).length / stockScores.length * 100
+      : null;
+    const score = avgScore === null
+      ? 50
+      : clamp(
+        0.72 * avgScore
+        + 0.28 * scoreRange(strongRate ?? 40, 15, 75),
+        0,
+        100,
+      );
+    return {
+      score,
+      avgScore,
+      strongRate,
+      scoredCount: stockScores.length,
+    };
+  }
+
   function boardStatus(metric) {
     const latestChange = metric.latestChange ?? 0;
     const r3 = metric.return3 ?? 0;
@@ -512,15 +624,20 @@
     const excess3 = return3 !== null && index3 !== null ? return3 - index3 : null;
     const excess5 = return5 !== null && index5 !== null ? return5 - index5 : null;
     const excess10 = return10 !== null && index10 !== null ? return10 - index10 : null;
+    const latestTurnover = rowTurnover(latestRow);
     const turnoverRatio = window5.avgTurnover && window5.turnover ? window5.turnover / window5.avgTurnover : null;
+    const turnoverLevelScore = boardTurnoverLevelScore(latestTurnover);
     const redRateToday = redRate(latestRow);
+    const profitability = boardProfitabilityMetric(latestRow, board);
     const heatScore = (
-      0.28 * scoreRange(latestChange, -3, 6)
-      + 0.22 * scoreRange(return3, -3, 8)
-      + 0.18 * scoreRange(excess3, -3, 6)
-      + 0.14 * scoreRange(redRateToday, 30, 80)
-      + 0.10 * scoreRange(window3.redRate, 35, 85)
+      0.24 * scoreRange(latestChange, -3, 6)
+      + 0.20 * scoreRange(return3, -3, 8)
+      + 0.16 * scoreRange(excess3, -3, 6)
+      + 0.12 * scoreRange(redRateToday, 30, 80)
+      + 0.08 * scoreRange(window3.redRate, 35, 85)
       + 0.08 * scoreRange(turnoverRatio, 0.75, 1.6)
+      + 0.07 * turnoverLevelScore
+      + 0.05 * profitability.score
     );
     const metric = {
       board,
@@ -537,9 +654,12 @@
       redRateToday,
       redRate3: window3.redRate,
       redRate5: window5.redRate,
+      latestTurnover,
       turnoverRatio,
+      turnoverLevelScore,
       drawdown3: window3.drawdown,
       drawdown10: window10.drawdown,
+      profitability,
       heatScore: clamp(heatScore, 0, 100),
       attackQuality: attackQualityMetric(latestRow),
     };
@@ -660,6 +780,12 @@
     return "watch";
   }
 
+  function stockTurnoverScore(amount) {
+    const parsed = safeNumber(amount);
+    if (parsed === null || parsed <= 0) return 0;
+    return scoreRange(Math.log10(Math.max(parsed, 1)), 8, 10.8);
+  }
+
   function stockResilienceRows(board) {
     return (board?.stocks || []).map((stock) => {
       const items = stockRows(board, stock.code, 10);
@@ -683,7 +809,10 @@
       const latest = items.at(-1)?.stock || null;
       const latestChange = items.length ? safeNumber(latest?.changePercent) : null;
       const macdScore = safeNumber(latest?.macdScore) ?? 50;
+      const profitScore = safeNumber(latest?.profitScore) ?? 50;
+      const authenticity = stockAuthenticityMetric(board, stock);
       const relScore = scoreRange(average([rel3, rel5]), -4, 8);
+      const turnoverScore = stockTurnoverScore(amount3);
       const drawdownScore = 100 - scoreRange(maxDrawdown(items.map((item) => item.stock.changePercent)), 4, 18);
       const trendScore = (
         0.60 * scoreRange(ret3, -2, 6)
@@ -691,18 +820,21 @@
         + 0.15 * scoreRange(latestChange, -3, 5)
       );
       const score = (
-        0.34 * relScore
-        + 0.22 * drawdownScore
-        + 0.16 * stockDefenseScore(items)
-        + 0.09 * stockReboundScore(items)
-        + 0.09 * trendScore
+        0.29 * relScore
+        + 0.19 * drawdownScore
+        + 0.14 * stockDefenseScore(items)
+        + 0.08 * stockReboundScore(items)
+        + 0.08 * trendScore
         + 0.10 * macdScore
+        + 0.07 * turnoverScore
+        + 0.05 * profitScore
       );
       // Keep the shortlist anchored to the most recent 3 trading days.
       const sortScore = (
-        0.20 * clamp(score, 0, 100)
-        + 0.50 * scoreRange(amount3, 0, 3000000000)
-        + 0.30 * scoreRange(ret3, -3, 12)
+        0.28 * clamp(score, 0, 100)
+        + 0.32 * turnoverScore
+        + 0.24 * scoreRange(ret3, -3, 12)
+        + 0.16 * profitScore
       );
       return {
         code: stock.code,
@@ -719,6 +851,11 @@
         latestChange,
         macdLabel: latest?.macdLabel || "MACD暂无",
         macdScore,
+        profitScore,
+        authenticityScore: authenticity.score,
+        authenticityLabel: authenticity.label,
+        authenticityStatus: authenticity.status,
+        turnoverScore,
         highStatus: latest?.highStatus || stock.latestHighStatus || "",
         score: clamp(score, 0, 100),
         sortScore: clamp(sortScore, 0, 100),
@@ -778,16 +915,15 @@
       .flatMap(({ board, backgroundMetric, currentMetric }) => stockResilienceRows(board).slice(0, 3).map((stock) => {
         const latestChange = safeNumber(stock.latestChange) ?? 0;
         const rel3 = safeNumber(stock.rel3) ?? 0;
-        const rel5 = safeNumber(stock.rel5) ?? 0;
         const currentState = currentMetric.transition;
         const tradeSignal = buildTradeSignal(backgroundMetric, currentMetric, currentState, stock, gate);
-        const opportunityScore = clamp(
-          0.38 * (safeNumber(stock.score) ?? 0)
-          + 0.20 * scoreRange(rel3, -2, 5)
-          + 0.14 * scoreRange(rel5, -3, 7)
-          + 0.12 * scoreRange(latestChange, -2, 6)
-          + 0.10 * (safeNumber(stock.macdScore) ?? 50)
-          + 0.06 * backgroundMetric.heatScore,
+        const stockPickScore = clamp(
+          0.34 * (safeNumber(stock.score) ?? 0)
+          + 0.22 * scoreRange(rel3, -2, 5)
+          + 0.13 * (safeNumber(stock.turnoverScore) ?? 0)
+          + 0.12 * (safeNumber(stock.authenticityScore) ?? 55)
+          + 0.10 * scoreRange(latestChange, -2, 6)
+          + 0.09 * (safeNumber(stock.macdScore) ?? 50),
           0,
           100,
         );
@@ -800,7 +936,8 @@
           signal: tradeSignal.signal,
           signalPriority: tradeSignal.priority,
           indexGate: gate,
-          opportunityScore,
+          opportunityScore: stockPickScore,
+          stockPickScore,
         };
       }))
       .filter((item) =>
@@ -1024,8 +1161,8 @@
 
   function renderAuctionPanel() {
     const latestDate = latestDataDate();
-    const snapshotDate = compactDate(latestDate);
     const auction = state.auction;
+    const snapshotDate = compactDate(auction?.date || latestDate);
     const alerts = auction?.latestAlerts || [];
     const sampleCount = auction?.samples?.length || 0;
     const updatedAt = auction?.updatedAt || auction?.samples?.at(-1)?.time || "";
@@ -1056,7 +1193,7 @@
             <h2>集合竞价预警</h2>
             <p class="muted">按竞价均涨、红盘率、竞价额共振和锚定股强度筛选超预期板块。</p>
           </div>
-          <span class="count-pill">${shortDate(auction.date || latestDate)} / ${sampleCount} 次采样</span>
+          <span class="count-pill">${snapshotShortDate(auction.date || latestDate)} / ${sampleCount} 次采样</span>
         </div>
 
         <div class="auction-meta">
@@ -1243,12 +1380,13 @@
                   <th>变化结论</th>
                   <th>个股</th>
                   <th>当前涨幅</th>
-                  <th>5日相对</th>
-                  <th>10日相对</th>
+                  <th>3日相对</th>
+                  <th>3日成交额</th>
+                  <th>正宗性</th>
                   <th>MACD</th>
                   <th>高位</th>
                   <th>信号</th>
-                  <th>机会分</th>
+                  <th>选股分</th>
                 </tr>
               </thead>
               <tbody>
@@ -1260,8 +1398,9 @@
                     <td><span class="swing-badge ${item.currentState.tone}">${item.currentState.label}</span><br><small>${item.currentMetric.status}</small></td>
                     <td class="intraday-stock-cell"><strong>${item.stock.name}</strong><span class="code">${item.stock.code}</span></td>
                     <td class="${signedClass(item.stock.latestChange)}">${percent(item.stock.latestChange)}</td>
-                    <td class="${signedClass(item.stock.rel5)}">${percent(item.stock.rel5)}</td>
-                    <td class="${signedClass(item.stock.rel10)}">${percent(item.stock.rel10)}</td>
+                    <td class="${signedClass(item.stock.rel3)}">${percent(item.stock.rel3)}</td>
+                    <td>${formatAmount(item.stock.amount3)}</td>
+                    <td><span class="swing-badge ${item.stock.authenticityStatus || "watch"}">${item.stock.authenticityLabel || "待确认"}</span></td>
                     <td><span class="swing-badge ${macdTone(item.stock.macdLabel, item.stock.macdScore)}">${item.stock.macdLabel}</span></td>
                     <td>${item.stock.highStatus || "暂无"}</td>
                     <td><span class="swing-badge intraday-signal ${signalTone(item.signal)}">${item.signal}</span></td>
@@ -1288,6 +1427,12 @@
       state.error = error.message || String(error);
     }
     try {
+      const membershipResponse = await fetch(`${MEMBERSHIP_URL}?v=${Date.now()}`, { cache: "no-store" });
+      state.membership = membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
+    } catch (error) {
+      state.membership = { overrides: [] };
+    }
+    try {
       const positionResponse = await fetch(`${POSITIONS_URL}?v=${Date.now()}`, { cache: "no-store" });
       if (positionResponse.ok) {
         const payload = await positionResponse.json();
@@ -1304,15 +1449,17 @@
       state.positionError = error.message || String(error);
     }
     try {
-      const auctionDate = compactDate(latestDataDate());
-      if (auctionDate) {
+      const auctionDates = [...new Set([todayCompactDate(), compactDate(latestDataDate())].filter(Boolean))];
+      for (const auctionDate of auctionDates) {
         const auctionResponse = await fetch(`./data/auction_snapshots/${auctionDate}.json?v=${Date.now()}`, { cache: "no-store" });
         if (auctionResponse.ok) {
           state.auction = await auctionResponse.json();
           state.auctionError = "";
+          break;
         } else if (auctionResponse.status === 404) {
           state.auction = null;
           state.auctionError = "";
+          continue;
         } else {
           throw new Error(`HTTP ${auctionResponse.status}`);
         }

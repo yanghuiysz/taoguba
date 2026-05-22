@@ -103,7 +103,7 @@
 }
 
 .resonance-table-wrap table {
-  min-width: 1120px;
+  min-width: 1240px;
 }
 
 .resonance-conclusion-cell {
@@ -112,9 +112,284 @@
   line-height: 1.45;
 }
 
+.resonance-matrix {
+  display: grid;
+  gap: 8px;
+}
+
+.resonance-matrix-head,
+.resonance-day-row {
+  display: grid;
+  grid-template-columns: 72px 150px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.resonance-matrix-head {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 2px 2px;
+}
+
+.resonance-day-row {
+  min-height: 96px;
+  border: 1px solid #e1ebea;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.resonance-date {
+  color: var(--ink);
+  font-weight: 800;
+  padding-top: 9px;
+}
+
+.resonance-index-bar-cell {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.resonance-index-bar-cell.volume-rise,
+.resonance-index-bar-cell.today-rise,
+.resonance-index-bar-cell.today {
+  border-left: 3px solid var(--red);
+  border-radius: 7px;
+  background: #fff2f0;
+  box-shadow: inset 0 0 0 1px #ffd1cc;
+  padding: 8px 8px 8px 10px;
+}
+
+.resonance-index-bar-cell.today {
+  border-left-color: #8aa09b;
+  background: #fbfdfc;
+  box-shadow: inset 0 0 0 1px #dce7e5;
+}
+
+.resonance-index-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.resonance-index-bar-cell strong {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.resonance-index-special {
+  border: 1px solid #ffb8b1;
+  border-radius: 999px;
+  background: #fffaf9;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+
+.resonance-index-bar-track {
+  position: relative;
+  height: 9px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #eef3f2;
+}
+
+.resonance-index-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+}
+
+.resonance-index-bar.rise {
+  background: linear-gradient(90deg, #f5c6c6, var(--red));
+}
+
+.resonance-index-bar.volume-rise,
+.resonance-index-bar.today-rise {
+  background: linear-gradient(90deg, #ffb0a8, #e53935);
+}
+
+.resonance-index-bar.today {
+  background: linear-gradient(90deg, #d2e0dd, #8aa09b);
+}
+
+.resonance-index-bar.fall {
+  background: linear-gradient(90deg, #bfe7d7, var(--green));
+}
+
+.resonance-top-board-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+  gap: 8px;
+  position: relative;
+}
+
+.resonance-matrix.has-link .resonance-top-board-list::before {
+  content: none;
+}
+
+.resonance-board-chip {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 5px;
+  align-items: center;
+  padding: 7px 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.resonance-board-chip:hover {
+  filter: brightness(0.98);
+  border-color: #8fb6b1;
+}
+
+.resonance-board-chip.linked {
+  border-color: #ff4d4f;
+  box-shadow: inset 0 0 0 2px #ff4d4f;
+  opacity: 1;
+  transform: none;
+  z-index: 1;
+}
+
+.resonance-board-chip.linked.pinned {
+  position: relative;
+}
+
+.resonance-board-chip.linked::after {
+  content: none;
+}
+
+.resonance-board-chip.linked.pinned::before {
+  content: none;
+}
+
+.resonance-board-chip.outside-top {
+  border-style: dashed;
+  background: #ffffff;
+}
+
+.resonance-matrix.has-link .resonance-board-chip:not(.linked) {
+  opacity: 1;
+}
+
+.resonance-board-chip span,
+.resonance-board-chip em {
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.resonance-board-chip strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.resonance-board-chip.hot {
+  background: #f8cccc;
+  color: #9b2f2f;
+}
+
+.resonance-board-chip.warm {
+  background: #fde3c8;
+  color: #9a4b14;
+}
+
+.resonance-board-chip.watch {
+  background: #fff4c7;
+  color: #7f6108;
+}
+
+.resonance-board-chip.cool {
+  background: #dff1ea;
+  color: #0f684b;
+}
+
+.resonance-board-chip.cold,
+.resonance-empty-cell {
+  background: #eef3f2;
+  color: #48616a;
+}
+
+.resonance-empty-cell {
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+.resonance-link-missing {
+  min-height: 44px;
+  border: 1px dashed #cfdcda;
+  border-radius: 8px;
+  background: #fbfdfc;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  font-size: 12px;
+}
+
+.resonance-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.resonance-linked-label {
+  border-radius: 999px;
+  background: #172126;
+  color: #ffffff;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.resonance-clear-link {
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--muted);
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.resonance-clear-link:hover {
+  border-color: #91b9b4;
+  color: var(--ink);
+}
+
 @media (max-width: 900px) {
   .resonance-metrics,
   .resonance-score-parts {
     grid-template-columns: 1fr;
+  }
+
+  .resonance-matrix-head {
+    display: none;
+  }
+
+  .resonance-day-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .resonance-top-board-list {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

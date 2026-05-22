@@ -7,6 +7,8 @@ const state = {
   selectedCode: null,
   sortMode: 'avg_change',
   sortDate: null,
+  profitSort: { key: 'profitScore', direction: 'desc' },
+  stockListSort: { key: 'displayChangePercent', direction: 'desc' },
   detailTab: 'overview',
   editable: false,
   busy: false,
@@ -69,6 +71,44 @@ const profitMetricText = (metrics, key, suffix = '%', digits = 1) => {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return '暂无';
   return suffix ? `${number(value, digits)}${suffix}` : number(value, digits);
 };
+
+const sortLabel = (sortState, key) => {
+  if (sortState.key !== key) return '';
+  return sortState.direction === 'asc' ? ' ↑' : ' ↓';
+};
+
+const numericSortValue = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const compareNumeric = (a, b, key, direction = 'desc') => {
+  const valueA = numericSortValue(a?.[key]);
+  const valueB = numericSortValue(b?.[key]);
+  if (valueA === null && valueB === null) return 0;
+  if (valueA === null) return 1;
+  if (valueB === null) return -1;
+  const multiplier = direction === 'asc' ? 1 : -1;
+  return multiplier * (valueA - valueB);
+};
+
+const profitSortValue = (stock, key) => {
+  if (key === 'profitScore') return profitScoreValue(stock);
+  return numericSortValue(stock?.profitMetrics?.[key]);
+};
+
+function sortedProfitRows(board) {
+  return boardProfitRank(board).sort((a, b) => {
+    const valueA = profitSortValue(a, state.profitSort.key);
+    const valueB = profitSortValue(b, state.profitSort.key);
+    if (valueA === null && valueB === null) return 0;
+    if (valueA === null) return 1;
+    if (valueB === null) return -1;
+    const multiplier = state.profitSort.direction === 'asc' ? 1 : -1;
+    return multiplier * (valueA - valueB)
+      || String(a.name || '').localeCompare(String(b.name || ''), 'zh-Hans-CN');
+  });
+}
 
 function boardProfitRank(board) {
   const rows = Array.isArray(board?.profitRank) && board.profitRank.length ? board.profitRank : (board?.stocks || []);
@@ -1080,10 +1120,8 @@ function renderTrendChart(board) {
   const height = 240;
   const pad = { top: 30, right: 48, bottom: 46, left: 52 };
   const avgValues = trend.map((item) => Number(item.displayAverageChange));
-  const indexValues = trend.map((item) => Number(item.indexChange));
-  const allValues = [...avgValues, ...indexValues];
-  const rawMax = Math.max(...allValues, 1);
-  const rawMin = Math.min(...allValues, -1);
+  const rawMax = Math.max(...avgValues, 1);
+  const rawMin = Math.min(...avgValues, -1);
   const valuePadding = Math.max(0.35, (rawMax - rawMin) * 0.14);
   const valueMax = rawMax + valuePadding;
   const valueMin = rawMin - valuePadding;
@@ -1092,32 +1130,25 @@ function renderTrendChart(board) {
   const plotHeight = height - pad.top - pad.bottom;
   const points = trend.map((item, index) => {
     const change = Number(item.displayAverageChange) || 0;
-    const indexChange = Number(item.indexChange) || 0;
     const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
     const yAvg = pad.top + ((valueMax - change) / valueRange) * plotHeight;
-    const yIndex = pad.top + ((valueMax - indexChange) / valueRange) * plotHeight;
     const label = boardLabelFor(board, item.date) || labelFor(board, item.date);
-    const close = Math.abs(yAvg - yIndex) < 16;
     return {
       ...item,
       change,
-      indexChange,
       selected: item.date === state.sortDate,
       x,
       yAvg,
-      yIndex,
-      yAvgLabel: close ? yAvg - 14 : yAvg - 10,
-      yIndexLabel: close ? yIndex + 16 : yIndex - 10,
+      yAvgLabel: yAvg - 10,
       tag: label?.displayLabel || label?.label || null,
     };
   });
   const avgLine = points.map((point) => `${point.x},${point.yAvg}`).join(' ');
-  const indexLine = points.map((point) => `${point.x},${point.yIndex}`).join(' ');
   const zeroY = pad.top + ((valueMax - 0) / valueRange) * plotHeight;
   const axisBottom = height - pad.bottom;
 
   return `
-    <svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 近15日平均涨跌幅与指数涨跌幅走势">
+    <svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 近15日平均涨跌幅走势">
       ${points.filter((point) => point.selected).map((point) => `
         <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
       `).join('')}
@@ -1127,71 +1158,13 @@ function renderTrendChart(board) {
       <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0%</text>
       <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${number(valueMin)}%</text>
       <polyline points="${avgLine}" style="fill:none;stroke:#0b7893;stroke-linecap:round;stroke-width:3;"></polyline>
-      <polyline points="${indexLine}" style="fill:none;stroke:#c74343;stroke-linecap:round;stroke-width:3;"></polyline>
       ${points.map((point) => `
         <g>
           <circle cx="${point.x}" cy="${point.yAvg}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#0b7893;stroke-width:${point.selected ? 3 : 2.2};"></circle>
-          <circle cx="${point.x}" cy="${point.yIndex}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#c74343;stroke-width:${point.selected ? 3 : 2.2};"></circle>
           <text x="${point.x}" y="${point.yAvgLabel}" text-anchor="middle" class="value-label">${number(point.change)}%</text>
-          <text x="${point.x}" y="${point.yIndexLabel}" text-anchor="middle" class="value-label">${number(point.indexChange)}%</text>
           ${point.tag ? `<text x="${point.x}" y="${height - 30}" text-anchor="middle" class="tag-label">${point.tag}</text>` : ''}
           <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
-          <title>${point.date} 板块平均涨跌幅 ${number(point.change)}% | 指数涨跌幅 ${number(point.indexChange)}% | 有效股票 ${point.stockCount}</title>
-        </g>
-      `).join('')}
-    </svg>
-  `;
-}
-
-function renderHighCountChart(board) {
-  const trend = trendValues(board).filter((item) => item?.date);
-  if (!trend.length) {
-    return `
-      <div>
-        <strong>暂无百日新高数量</strong>
-        <p>这个板块最近没有可用百日新高数据。</p>
-      </div>
-    `;
-  }
-
-  const width = 760;
-  const height = 220;
-  const pad = { top: 30, right: 34, bottom: 44, left: 54 };
-  const plotWidth = width - pad.left - pad.right;
-  const plotHeight = height - pad.top - pad.bottom;
-  const maxCount = Math.max(...trend.map((item) => Number(item.high100Count) || 0), 1);
-  const yFor = (count) => pad.top + ((maxCount - count) / maxCount) * plotHeight;
-  const points = trend.map((item, index) => {
-    const count = Number(item.high100Count) || 0;
-    const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
-    const y = yFor(count);
-    return {
-      ...item,
-      count,
-      x,
-      y,
-      selected: item.date === state.sortDate,
-    };
-  });
-  const line = points.map((point) => `${point.x},${point.y}`).join(' ');
-  const axisBottom = height - pad.bottom;
-
-  return `
-    <svg class="high-count-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 百日新高数量走势">
-      ${points.filter((point) => point.selected).map((point) => `
-        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 10}" width="36" height="${plotHeight + 20}" rx="8"></rect>
-      `).join('')}
-      <line class="zero-line" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
-      <line class="zero-line" x1="${pad.left}" y1="${axisBottom}" x2="${width - pad.right}" y2="${axisBottom}"></line>
-      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${maxCount}只</text>
-      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">0只</text>
-      <polyline points="${line}" class="trend-high-line"></polyline>
-      ${points.map((point) => `
-        <g>
-          <circle cx="${point.x}" cy="${point.y}" r="${point.selected ? 5.8 : 4.4}" class="trend-high-dot"></circle>
-          <text x="${point.x}" y="${Math.max(pad.top + 10, point.y - 10)}" text-anchor="middle" class="high-count-label">${point.count}只</text>
-          <text x="${point.x}" y="${height - 14}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
-          <title>${point.date} 百日新高 ${point.count}/${point.stockCount || board.stockCount || 0}</title>
+          <title>${point.date} 板块平均涨跌幅 ${number(point.change)}% | 有效股票 ${point.stockCount}</title>
         </g>
       `).join('')}
     </svg>
@@ -1638,53 +1611,14 @@ function renderEditor(board) {
 }
 
 function renderProfitPanel(board) {
-  const stocks = boardProfitRank(board);
-  const topStock = stocks.find((stock) => profitScoreValue(stock) !== null) || stocks[0] || null;
-  const metrics = topStock?.profitMetrics || {};
-  const score = profitScoreValue(topStock);
-  const label = topStock?.profitLabel || '暂无评级';
-  const scoreParts = topStock?.profitScores || {};
+  const stocks = sortedProfitRows(board);
   return `
     <section class="card section-card profit-card">
       <div class="section-head">
         <div>
           <h2>${board.name} · 盈利评分</h2>
-          <p class="muted">按成长 40%、盈利能力 25%、盈利质量 20%、趋势改善 15% 排序；当前板块均分 ${board.latestAvgProfitScore === null || board.latestAvgProfitScore === undefined ? '暂无' : number(board.latestAvgProfitScore, 1)}。</p>
         </div>
-        <span class="setup-badge ${profitTone(label, score)}">${label}</span>
       </div>
-      ${topStock ? `
-        <div class="profit-hero">
-          <div class="profit-hero-main">
-            <div class="profit-stock-title">
-              <strong>${topStock.name}</strong>
-              <span class="code">${topStock.code}</span>
-            </div>
-            <div class="profit-score-block">
-              <span>盈利评分</span>
-              <strong>${score === null ? '暂无' : number(score, 0)}</strong>
-              <em>${label}</em>
-            </div>
-            <p>${topStock.profitConclusion || '财务字段不足，暂无法形成明确结论。'}</p>
-          </div>
-          <div class="profit-metrics-grid">
-            <div><span>最近一期</span><strong>${metrics.reportDate || '暂无'}</strong></div>
-            <div><span>营收同比</span><strong class="${signedClass(metrics.revenueYoY)}">${profitMetricText(metrics, 'revenueYoY')}</strong></div>
-            <div><span>净利润同比</span><strong class="${signedClass(metrics.netProfitYoY)}">${profitMetricText(metrics, 'netProfitYoY')}</strong></div>
-            <div><span>扣非同比</span><strong class="${signedClass(metrics.deductedNetProfitYoY)}">${profitMetricText(metrics, 'deductedNetProfitYoY')}</strong></div>
-            <div><span>毛利率</span><strong>${profitMetricText(metrics, 'grossMargin')}</strong></div>
-            <div><span>净利率</span><strong>${profitMetricText(metrics, 'netMargin')}</strong></div>
-            <div><span>ROE</span><strong>${profitMetricText(metrics, 'roe')}</strong></div>
-            <div><span>现金流/净利</span><strong>${profitMetricText(metrics, 'operatingCashFlowToNetProfit', '', 2)}</strong></div>
-          </div>
-        </div>
-        <div class="profit-score-strip">
-          <div><span>成长分</span><strong>${scoreParts.growth === null || scoreParts.growth === undefined ? '暂无' : number(scoreParts.growth, 1)}</strong></div>
-          <div><span>盈利能力</span><strong>${scoreParts.ability === null || scoreParts.ability === undefined ? '暂无' : number(scoreParts.ability, 1)}</strong></div>
-          <div><span>盈利质量</span><strong>${scoreParts.quality === null || scoreParts.quality === undefined ? '暂无' : number(scoreParts.quality, 1)}</strong></div>
-          <div><span>趋势改善</span><strong>${scoreParts.trend === null || scoreParts.trend === undefined ? '暂无' : number(scoreParts.trend, 1)}</strong></div>
-        </div>
-      ` : `<div class="empty">暂无个股</div>`}
       <div class="table-wrap profit-table-wrap">
         <table class="profit-table">
           <thead>
@@ -1692,12 +1626,12 @@ function renderProfitPanel(board) {
               <th>排名</th>
               <th>股票</th>
               <th>盈利标签</th>
-              <th>盈利分</th>
-              <th>营收同比</th>
-              <th>净利同比</th>
-              <th>扣非同比</th>
-              <th>毛利率</th>
-              <th>现金流/净利</th>
+              <th><button class="table-sort-btn" type="button" data-profit-sort-key="profitScore">盈利分${sortLabel(state.profitSort, 'profitScore')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-profit-sort-key="revenueYoY">营收同比${sortLabel(state.profitSort, 'revenueYoY')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-profit-sort-key="netProfitYoY">净利同比${sortLabel(state.profitSort, 'netProfitYoY')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-profit-sort-key="deductedNetProfitYoY">扣非同比${sortLabel(state.profitSort, 'deductedNetProfitYoY')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-profit-sort-key="grossMargin">毛利率${sortLabel(state.profitSort, 'grossMargin')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-profit-sort-key="operatingCashFlowToNetProfit">现金流/净利${sortLabel(state.profitSort, 'operatingCashFlowToNetProfit')}</button></th>
             </tr>
           </thead>
           <tbody>
@@ -1747,7 +1681,9 @@ function renderStocksTable(board) {
         membership: membershipAssessment(board, stock, state.sortDate),
       };
     })
-    .sort((a, b) => sortChangeValue(b.displayChangePercent) - sortChangeValue(a.displayChangePercent));
+    .sort((a, b) =>
+      compareNumeric(a, b, state.stockListSort.key, state.stockListSort.direction)
+      || sortChangeValue(b.displayChangePercent) - sortChangeValue(a.displayChangePercent));
   const actionColumn = state.editable ? '<th>操作</th>' : '';
   return `
     <section class="card section-card">
@@ -1765,12 +1701,8 @@ function renderStocksTable(board) {
               <th>代码</th>
               <th>名称</th>
               <th>归属</th>
-              <th>涨跌幅</th>
-              <th>成交额</th>
-              <th>距百日新高</th>
-              <th>百日新高</th>
-              <th>近高位</th>
-              <th>百日位置</th>
+              <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayChangePercent">涨跌幅${sortLabel(state.stockListSort, 'displayChangePercent')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayAmount">成交额${sortLabel(state.stockListSort, 'displayAmount')}</button></th>
               <th>新高状态</th>
               <th>依据</th>
               ${actionColumn}
@@ -1784,15 +1716,11 @@ function renderStocksTable(board) {
                 <td><span class="membership-badge ${stock.membership.tone}">${stock.membership.label}</span></td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
                 <td>${amountText(stock.displayAmount)}</td>
-                <td class="${signedClass(stock.displayDistanceToHigh100)}">${percentText(stock.displayDistanceToHigh100)}</td>
-                <td>${boolText(stock.displayIsHigh100)}</td>
-                <td>${boolText(stock.displayIsNearHigh100)}</td>
-                <td>${stock.displayPosition100 === null || stock.displayPosition100 === undefined ? '暂无' : `${number(Number(stock.displayPosition100) * 100)}%`}</td>
                 <td><span class="setup-badge ${highStatusTone(stock.displayHighStatus)}">${stock.displayHighStatus || '暂无'}</span></td>
                 <td class="membership-reason">${stock.membership.reason}</td>
                 ${state.editable ? `<td><button class="remove-stock" data-code="${stock.code}" data-name="${stock.name}" ${state.busy ? 'disabled' : ''}>删除</button></td>` : ''}
               </tr>
-            `).join('') : `<tr><td colspan="${state.editable ? 12 : 11}" class="empty">该板块暂无已配置个股</td></tr>`}
+            `).join('') : `<tr><td colspan="${state.editable ? 8 : 7}" class="empty">该板块暂无已配置个股</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -1828,7 +1756,6 @@ function renderDetail(board) {
       </section>
       ${isOverviewTab ? `
       <div class="swing-overview-anchor"></div>
-      ${renderSetupSummary(board)}
       ` : ''}
       ${isTrendTab ? `
       <section class="card section-card">
@@ -1839,23 +1766,15 @@ function renderDetail(board) {
           </div>
           <div class="badges">
             <span class="badge">蓝线：板块涨幅</span>
-            <span class="badge">红线：指数涨幅</span>
           </div>
         </div>
         <div class="chart-grid">
           <div class="chart-panel">
             <div class="chart-panel-head">
               <strong>板块与指数</strong>
-              <span>正宗股平均涨跌幅 / ${state.data?.marketIndex?.name || '指数'}涨跌幅</span>
+              <span>正宗股平均涨跌幅</span>
             </div>
             <div class="chart-box">${renderTrendChart(board)}</div>
-          </div>
-          <div class="chart-panel">
-            <div class="chart-panel-head">
-              <strong>百日新高数量</strong>
-              <span>板块内创近100日新高个股数</span>
-            </div>
-            <div class="chart-box">${renderHighCountChart(board)}</div>
           </div>
           <div class="chart-panel">
             <div class="chart-panel-head">
@@ -1969,6 +1888,26 @@ function render() {
   document.querySelectorAll('.detail-tab-btn').forEach((button) => {
     button.addEventListener('click', () => {
       state.detailTab = button.dataset.detailTab;
+      render();
+    });
+  });
+  document.querySelectorAll('[data-profit-sort-key]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const key = button.dataset.profitSortKey;
+      state.profitSort = {
+        key,
+        direction: state.profitSort.key === key && state.profitSort.direction === 'desc' ? 'asc' : 'desc',
+      };
+      render();
+    });
+  });
+  document.querySelectorAll('[data-stock-list-sort-key]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const key = button.dataset.stockListSortKey;
+      state.stockListSort = {
+        key,
+        direction: state.stockListSort.key === key && state.stockListSort.direction === 'desc' ? 'asc' : 'desc',
+      };
       render();
     });
   });

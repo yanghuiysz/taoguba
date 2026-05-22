@@ -149,6 +149,77 @@
     return safeNumber(stock?.turnover ?? stock?.amount);
   }
 
+  function normalizeCode(value) {
+    const digits = String(value || '').replace(/\D/g, '');
+    return digits ? digits.slice(-6).padStart(6, '0') : '';
+  }
+
+  function membershipOverride(board, stock) {
+    const overrides = Array.isArray(state?.membership?.overrides) ? state.membership.overrides : [];
+    const boardCode = String(board?.code || '');
+    const stockCode = normalizeCode(stock?.code);
+    return overrides.find((item) =>
+      String(item.boardCode || '') === boardCode
+      && normalizeCode(item.stockCode) === stockCode);
+  }
+
+  function stockBoardCount(stockCode) {
+    const code = normalizeCode(stockCode);
+    if (!code) return 0;
+    return (state?.data?.boards || []).filter((board) =>
+      (board.stocks || []).some((stock) => normalizeCode(stock.code) === code)).length;
+  }
+
+  function latestStockRank(board, stockCode, valueFn) {
+    const code = normalizeCode(stockCode);
+    const latestRow = getTrendRows(board).at(-1);
+    const ranked = [...(latestRow?.stocks || [])]
+      .filter((item) => safeNumber(valueFn(item)) !== null)
+      .sort((a, b) => Number(valueFn(b)) - Number(valueFn(a)));
+    const index = ranked.findIndex((item) => normalizeCode(item.code) === code);
+    return index >= 0 ? index + 1 : null;
+  }
+
+  function stockTurnoverScore(amount) {
+    const parsed = safeNumber(amount);
+    if (parsed === null || parsed <= 0) return 0;
+    return scoreRange(Math.log10(Math.max(parsed, 1)), 8, 10.8);
+  }
+
+  function stockAuthenticityMetric(board, stock) {
+    const override = membershipOverride(board, stock);
+    const statusScores = {
+      pure_core: 100,
+      pure_elastic: 88,
+      core: 82,
+      active: 74,
+      supply_chain: 68,
+      overlap: 62,
+      manual: 58,
+      pending: 55,
+      theme_edge: 42,
+      suspect: 20,
+    };
+    if (override) {
+      const status = override.status || 'manual';
+      const suggestedKeep = String(override.suggestedKeep || '');
+      const baseScore = statusScores[status] ?? 58;
+      return {
+        score: suggestedKeep.includes('否') ? Math.min(baseScore, 35) : baseScore,
+        label: override.label || status,
+        status,
+      };
+    }
+    const amountRank = latestStockRank(board, stock.code, stockTurnoverValue);
+    const changeRank = latestStockRank(board, stock.code, (item) => item.changePercent);
+    const latestRow = getTrendRows(board).at(-1);
+    const row = (latestRow?.stocks || []).find((item) => normalizeCode(item.code) === normalizeCode(stock.code));
+    if (amountRank !== null && amountRank <= 5) return { score: 78, label: '容量核心', status: 'core' };
+    if (changeRank !== null && changeRank <= 3 && Number(row?.changePercent) > 0) return { score: 72, label: '弹性前排', status: 'active' };
+    if (stockBoardCount(stock.code) >= 3) return { score: 60, label: '多题材', status: 'overlap' };
+    return { score: 55, label: '待确认', status: 'pending' };
+  }
+
   function compoundReturn(values) {
     const valid = values
       .map((value) => safeNumber(value))
@@ -427,6 +498,8 @@
       const latest = items.at(-1)?.stock || null;
       const macdScore = safeNumber(latest?.macdScore) ?? 50;
       const macdLabel = latest?.macdLabel || 'MACD暂无';
+      const authenticity = stockAuthenticityMetric(board, stock);
+      const turnoverScore = stockTurnoverScore(amount3);
       const relScore = scoreRange(average([rel5, rel10]), -5, 10);
       const drawdownScore = 100 - scoreRange(drawdown, 4, 18);
       const trendScore = (
@@ -464,6 +537,10 @@
         latestChange,
         macdLabel,
         macdScore,
+        authenticityScore: authenticity.score,
+        authenticityLabel: authenticity.label,
+        authenticityStatus: authenticity.status,
+        turnoverScore,
         highStatus: latest?.highStatus || stock.latestHighStatus || '',
         score: clampValue(score, 0, 100),
         sortScore: clampValue(sortScore, 0, 100),
@@ -525,14 +602,14 @@
             <tr>
               <th>排名</th>
               <th>股票</th>
-              <th>综合排序</th>
+              <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="sortScore">综合排序${stockSortLabel('sortScore')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="amount3">3日成交额${stockSortLabel('amount3')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="amount5">5日成交额${stockSortLabel('amount5')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="ret3">3日涨幅${stockSortLabel('ret3')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="ret5">5日涨幅${stockSortLabel('ret5')}</button></th>
-              <th>3日相对板块</th>
-              <th>5日相对板块</th>
-              <th>最大回撤</th>
+              <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="rel3">3日相对板块${stockSortLabel('rel3')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="rel5">5日相对板块${stockSortLabel('rel5')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="drawdown">最大回撤${stockSortLabel('drawdown')}</button></th>
               <th>MACD</th>
             </tr>
           </thead>
@@ -562,25 +639,8 @@
   }
 
   function renderSwingPanel(board) {
-    const metric = swingMetric(board);
     return `
       <section class="card section-card swing-panel">
-        <div class="section-head">
-          <div>
-            <h2>${board.name} · 波段观察</h2>
-            <p class="muted">
-              适配 1-2 周持股：先看板块 5/10 日热度与超额收益，再看板块内个股韧性。
-            </p>
-          </div>
-          <span class="swing-badge ${metric.tone}">${metric.stage} · ${fmt(metric.heatScore, 0)}分</span>
-        </div>
-
-        ${renderMetricCards(metric)}
-
-        <div class="swing-current-note">
-          <strong>波段结论：</strong>${metric.conclusion}
-        </div>
-
         <div class="swing-section-title">
           <strong>板块内韧性股排行</strong>
           <span>按 5 日成交额与 5 日涨幅综合排序，韧性分作为参考</span>
@@ -657,7 +717,9 @@
 
   function metricWithPrevious(metric) {
     const previous = swingMetric(metric.board, -1);
-    const stageHistory = [-4, -3, -2, -1, 0].map((offset) => swingMetric(metric.board, offset));
+    const stageHistory = Array.from({ length: 10 }, (_, index) => index - 9)
+      .map((offset) => swingMetric(metric.board, offset))
+      .filter((item) => item?.latestRow);
     return {
       ...metric,
       previous,
@@ -675,6 +737,26 @@
   }
 
   function sortOverviewRows(rows) {
+    const numericKeys = {
+      heatScore: (item) => item.heatScore,
+      attackQuality: (item) => item.attackQuality?.score,
+      latestChange: (item) => item.latestChange,
+      excess3: (item) => item.excess3,
+      turnoverRatio: (item) => item.turnoverRatio,
+    };
+    if (numericKeys[overviewSort.key]) {
+      const direction = overviewSort.direction === 'asc' ? 1 : -1;
+      return [...rows].sort((a, b) => {
+        const valueA = safeNumber(numericKeys[overviewSort.key](a));
+        const valueB = safeNumber(numericKeys[overviewSort.key](b));
+        if (valueA === null && valueB === null) return 0;
+        if (valueA === null) return 1;
+        if (valueB === null) return -1;
+        return direction * (valueA - valueB)
+          || b.heatScore - a.heatScore
+          || b.attackQuality.score - a.attackQuality.score;
+      });
+    }
     if (overviewSort.key === 'transition') {
       const direction = overviewSort.direction === 'asc' ? 1 : -1;
       return [...rows].sort((a, b) =>
@@ -718,12 +800,26 @@
   }
 
   function renderStageHistory(item) {
-    return item.stageHistory.map((metric) => `
-      <span class="stage-step">
-        <span class="swing-badge ${metric.tone}">${metric.stage}</span>
-        <small>${fmt(metric.heatScore, 0)}分</small>
-      </span>
-    `).join('<span class="stage-arrow">-&gt;</span>');
+    const rows = [];
+    for (let index = 0; index < item.stageHistory.length; index += 5) {
+      rows.push(item.stageHistory.slice(index, index + 5));
+    }
+    return `
+      <div class="stage-flow-track" aria-label="近10日板块节奏">
+        ${rows.map((row) => `
+          <div class="stage-flow-row">
+            ${row.map((metric, index) => `
+              ${index > 0 ? '<span class="stage-arrow">-&gt;</span>' : ''}
+              <span class="stage-step">
+                <small class="stage-date">${fmtDate(metric.date)}</small>
+                <span class="swing-badge ${metric.tone}">${metric.stage}</span>
+                <small class="stage-score">${fmt(metric.heatScore, 0)}分</small>
+              </span>
+            `).join('')}
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
 
   function renderBoardMiniList(items) {
@@ -745,18 +841,16 @@
       .filter((metric) => INTRADAY_WATCH_TRANSITIONS.has(metric.transition.label))
       .flatMap((metric) => stockResilienceRows(metric.board).slice(0, 3).map((stock) => {
         const stockScore = safeNumber(stock.score) ?? 0;
-        const rel5 = safeNumber(stock.rel5) ?? 0;
-        const rel10 = safeNumber(stock.rel10) ?? 0;
+        const rel3 = safeNumber(stock.rel3) ?? 0;
         const latestChange = safeNumber(stock.latestChange) ?? 0;
         const macdScore = safeNumber(stock.macdScore) ?? 50;
-        const backgroundMetric = metric.previous;
-        const opportunityScore = clampValue(
-          0.38 * stockScore
-          + 0.20 * scoreRange(rel5, -2, 6)
-          + 0.14 * scoreRange(rel10, -4, 10)
-          + 0.12 * scoreRange(latestChange, -2, 6)
-          + 0.10 * macdScore
-          + 0.06 * backgroundMetric.heatScore,
+        const stockPickScore = clampValue(
+          0.34 * stockScore
+          + 0.22 * scoreRange(rel3, -2, 5)
+          + 0.13 * (safeNumber(stock.turnoverScore) ?? 0)
+          + 0.12 * (safeNumber(stock.authenticityScore) ?? 55)
+          + 0.10 * scoreRange(latestChange, -2, 6)
+          + 0.09 * macdScore,
           0,
           100,
         );
@@ -764,19 +858,20 @@
         const signalPriority = Math.max(2, 12 - transitionRank(signal));
         return {
           board: metric.board,
-          backgroundMetric,
+          backgroundMetric: metric.previous,
           boardMetric: metric,
           intradayState: metric.transition,
           stock,
           signal,
           signalPriority,
-          opportunityScore,
+          opportunityScore: stockPickScore,
+          stockPickScore,
         };
       }))
       .filter((item) =>
         item.signalPriority >= 2
         && item.opportunityScore >= 58
-        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel5 >= 0)
+        && (item.stock.score >= 65 || item.stock.latestChange >= 1 || item.stock.rel3 >= 0)
         && !String(item.stock.macdLabel || '').includes('死叉'));
     const sorted = [...rows];
     if (opportunitySort.key === 'board') {
@@ -787,7 +882,27 @@
         return b.signalPriority - a.signalPriority || b.opportunityScore - a.opportunityScore;
       });
     } else {
-      sorted.sort((a, b) => b.signalPriority - a.signalPriority || b.opportunityScore - a.opportunityScore);
+      const numericKeys = {
+        latestChange: (item) => item.stock.latestChange,
+        rel3: (item) => item.stock.rel3,
+        amount3: (item) => item.stock.amount3,
+        opportunityScore: (item) => item.opportunityScore,
+      };
+      if (numericKeys[opportunitySort.key]) {
+        const direction = opportunitySort.direction === 'asc' ? 1 : -1;
+        sorted.sort((a, b) => {
+          const valueA = safeNumber(numericKeys[opportunitySort.key](a));
+          const valueB = safeNumber(numericKeys[opportunitySort.key](b));
+          if (valueA === null && valueB === null) return 0;
+          if (valueA === null) return 1;
+          if (valueB === null) return -1;
+          return direction * (valueA - valueB)
+            || b.signalPriority - a.signalPriority
+            || b.opportunityScore - a.opportunityScore;
+        });
+      } else {
+        sorted.sort((a, b) => b.signalPriority - a.signalPriority || b.opportunityScore - a.opportunityScore);
+      }
     }
     return sorted.slice(0, 12);
   }
@@ -818,12 +933,14 @@
                   <th>昨日阶段</th>
                   <th>变化结论</th>
                   <th>个股</th>
-                  <th>当前涨幅</th>
-                  <th>5日相对</th>
+                  <th><button class="table-sort-btn" type="button" data-swing-sort-key="latestChange">当前涨幅${opportunitySort.key === 'latestChange' ? (opportunitySort.direction === 'asc' ? ' ↑' : ' ↓') : ''}</button></th>
+                  <th><button class="table-sort-btn" type="button" data-swing-sort-key="rel3">3日相对${opportunitySort.key === 'rel3' ? (opportunitySort.direction === 'asc' ? ' ↑' : ' ↓') : ''}</button></th>
+                  <th><button class="table-sort-btn" type="button" data-swing-sort-key="amount3">3日成交额${opportunitySort.key === 'amount3' ? (opportunitySort.direction === 'asc' ? ' ↑' : ' ↓') : ''}</button></th>
+                  <th>正宗性</th>
                   <th>MACD</th>
                   <th>高位</th>
                   <th>信号</th>
-                  <th>机会分</th>
+                  <th><button class="table-sort-btn" type="button" data-swing-sort-key="opportunityScore">选股分${opportunitySort.key === 'opportunityScore' ? (opportunitySort.direction === 'asc' ? ' ↑' : ' ↓') : ''}</button></th>
                 </tr>
               </thead>
               <tbody>
@@ -836,7 +953,9 @@
                     <td><span class="swing-badge ${item.intradayState.tone}">${item.intradayState.label}</span><br><small>${item.boardMetric.stage} · ${item.boardMetric.status}</small></td>
                     <td><strong>${item.stock.name}</strong><br><span class="code">${item.stock.code}</span></td>
                     <td class="${changeClass(item.stock.latestChange)}">${fmtPercent(item.stock.latestChange)}</td>
-                    <td class="${changeClass(item.stock.rel5)}">${fmtPercent(item.stock.rel5)}</td>
+                    <td class="${changeClass(item.stock.rel3)}">${fmtPercent(item.stock.rel3)}</td>
+                    <td>${fmtAmount(item.stock.amount3)}</td>
+                    <td><span class="swing-badge ${item.stock.authenticityStatus || 'watch'}">${item.stock.authenticityLabel || '待确认'}</span></td>
                     <td><span class="swing-badge ${macdTone(item.stock.macdLabel, item.stock.macdScore)}">${item.stock.macdLabel}</span></td>
                     <td>${item.stock.highStatus || '暂无'}</td>
                     <td><span class="swing-badge ${signalTone(item.signal)}">${item.signal}</span></td>
@@ -883,11 +1002,7 @@
                     ${transitionFilterControls(baseRows)}
                   </div>
                 </th>
-                <th>短线热度</th>
-                <th>进攻质量</th>
-                <th>今日涨幅</th>
-                <th>3日超额</th>
-                <th>量能比</th>
+                <th><button class="table-sort-btn" type="button" data-swing-overview-sort-key="turnoverRatio">量能比${overviewSortLabel('turnoverRatio')}</button></th>
               </tr>
             </thead>
             <tbody>
@@ -904,10 +1019,6 @@
                       ${item.transition.label}
                     </button>
                   </td>
-                  <td><strong>${fmt(item.heatScore, 0)}</strong><br><small class="${deltaClass(item.heatDelta)}">${fmtDelta(item.heatDelta, 0)}</small></td>
-                  <td><strong>${fmt(item.attackQuality.score, 0)}</strong><br><small class="${deltaClass(item.qualityDelta)}">${fmtDelta(item.qualityDelta, 0)}</small></td>
-                  <td class="${changeClass(item.latestChange)}">${fmtPercent(item.latestChange)}<br><small class="${deltaClass(item.changeDelta)}">${fmtDelta(item.changeDelta, 2)}</small></td>
-                  <td class="${changeClass(item.excess3)}">${fmtPercent(item.excess3)}</td>
                   <td>${item.turnoverRatio === null ? '暂无' : fmt(item.turnoverRatio, 2)}</td>
                 </tr>
               `).join('')}

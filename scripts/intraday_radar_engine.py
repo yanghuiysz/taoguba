@@ -343,6 +343,39 @@ def attack_quality_metric(row: dict) -> dict:
     }
 
 
+def board_turnover_level_score(turnover: Any) -> float:
+    """板块绝对成交额评分"""
+    parsed = safe_number(turnover)
+    if parsed is None or parsed <= 0:
+        return 0.0
+    import math
+    return score_range(math.log10(max(parsed, 1)), 8.5, 10.8)
+
+
+def board_profitability_metric(row: dict | None, board: dict | None) -> dict:
+    """板块盈利质量评分"""
+    stocks = (row or {}).get("stocks") or []
+    stock_scores = [safe_number(stock.get("profitScore")) for stock in stocks]
+    stock_scores = [score for score in stock_scores if score is not None]
+    avg_score = average(stock_scores)
+    if avg_score is None and board is not None:
+        avg_score = safe_number(board.get("latestAvgProfitScore"))
+    strong_rate = None
+    if stock_scores:
+        strong_rate = sum(1 for score in stock_scores if score >= 60) / len(stock_scores) * 100
+    score = 50.0 if avg_score is None else clamp(
+        0.72 * avg_score + 0.28 * score_range(strong_rate if strong_rate is not None else 40, 15, 75),
+        0,
+        100,
+    )
+    return {
+        "score": score,
+        "avg_score": avg_score,
+        "strong_rate": strong_rate,
+        "scored_count": len(stock_scores),
+    }
+
+
 def board_status(metric: dict) -> str:
     """板块状态判断"""
     latest_change = metric.get("latest_change", 0) or 0
@@ -428,19 +461,24 @@ def board_metric(data: dict, board: dict, offset: int = 0) -> dict:
     excess5 = (return5 - index5) if return5 is not None and index5 is not None else None
     excess10 = (return10 - index10) if return10 is not None and index10 is not None else None
 
+    latest_turnover = turnover = safe_number(latest_row.get("totalTurnover") or latest_row.get("totalAmount")) if latest_row else None
     avg_turnover = window5.get("avg_turnover")
     turnover = window5.get("turnover")
     turnover_ratio = (turnover / avg_turnover) if avg_turnover and turnover else None
+    turnover_level_score = board_turnover_level_score(latest_turnover)
 
     red_rate_today = red_rate(latest_row) if latest_row else None
+    profitability = board_profitability_metric(latest_row, board)
 
     heat_score = (
-        0.28 * score_range(latest_change, -3, 6)
-        + 0.22 * score_range(return3, -3, 8)
-        + 0.18 * score_range(excess3, -3, 6)
-        + 0.14 * score_range(red_rate_today, 30, 80)
-        + 0.10 * score_range(window3.get("red_rate"), 35, 85)
+        0.24 * score_range(latest_change, -3, 6)
+        + 0.20 * score_range(return3, -3, 8)
+        + 0.16 * score_range(excess3, -3, 6)
+        + 0.12 * score_range(red_rate_today, 30, 80)
+        + 0.08 * score_range(window3.get("red_rate"), 35, 85)
         + 0.08 * score_range(turnover_ratio, 0.75, 1.6)
+        + 0.07 * turnover_level_score
+        + 0.05 * profitability["score"]
     )
 
     attack_quality = attack_quality_metric(latest_row) if latest_row else {"score": 0}
@@ -460,9 +498,12 @@ def board_metric(data: dict, board: dict, offset: int = 0) -> dict:
         "red_rate_today": red_rate_today,
         "red_rate3": window3.get("red_rate"),
         "red_rate5": window5.get("red_rate"),
+        "latest_turnover": latest_turnover,
         "turnover_ratio": turnover_ratio,
+        "turnover_level_score": turnover_level_score,
         "drawdown3": window3.get("drawdown", 0),
         "drawdown10": window10.get("drawdown", 0),
+        "profitability": profitability,
         "heat_score": clamp(heat_score, 0, 100),
         "attack_quality": attack_quality,
     }
@@ -587,6 +628,86 @@ def stock_turnover_value(stock: dict) -> Optional[float]:
     return safe_number(stock.get("turnover") or stock.get("amount"))
 
 
+def normalize_code(value: Any) -> str:
+    digits = "".join(ch for ch in str(value or "") if ch.isdigit())
+    return digits[-6:].zfill(6) if digits else ""
+
+
+def membership_override(membership: dict | None, board: dict, stock: dict) -> dict | None:
+    overrides = (membership or {}).get("overrides") or []
+    board_code = str(board.get("code") or "")
+    stock_code = normalize_code(stock.get("code"))
+    for item in overrides:
+        if str(item.get("boardCode") or "") == board_code and normalize_code(item.get("stockCode")) == stock_code:
+            return item
+    return None
+
+
+def latest_stock_rank(board: dict, stock_code: str, value_getter) -> int | None:
+    latest_row = (board.get("trend") or [])[-1] if board.get("trend") else {}
+    ranked = [
+        item for item in (latest_row.get("stocks") or [])
+        if safe_number(value_getter(item)) is not None
+    ]
+    ranked.sort(key=lambda item: safe_number(value_getter(item)) or 0, reverse=True)
+    target = normalize_code(stock_code)
+    for index, item in enumerate(ranked, start=1):
+        if normalize_code(item.get("code")) == target:
+            return index
+    return None
+
+
+def stock_board_count(data: dict, stock_code: str) -> int:
+    target = normalize_code(stock_code)
+    if not target:
+        return 0
+    return sum(
+        1 for board in (data.get("boards") or [])
+        if any(normalize_code(stock.get("code")) == target for stock in (board.get("stocks") or []))
+    )
+
+
+def stock_authenticity_metric(data: dict, board: dict, stock: dict, membership: dict | None = None) -> dict:
+    override = membership_override(membership, board, stock)
+    status_scores = {
+        "pure_core": 100,
+        "pure_elastic": 88,
+        "core": 82,
+        "active": 74,
+        "supply_chain": 68,
+        "overlap": 62,
+        "manual": 58,
+        "pending": 55,
+        "theme_edge": 42,
+        "suspect": 20,
+    }
+    if override:
+        status = override.get("status") or "manual"
+        base_score = status_scores.get(status, 58)
+        suggested_keep = str(override.get("suggestedKeep") or "")
+        score = min(base_score, 35) if "否" in suggested_keep else base_score
+        return {
+            "score": score,
+            "label": override.get("label") or status,
+            "status": status,
+        }
+
+    amount_rank = latest_stock_rank(board, stock.get("code", ""), stock_turnover_value)
+    change_rank = latest_stock_rank(board, stock.get("code", ""), lambda item: item.get("changePercent"))
+    latest_row = (board.get("trend") or [])[-1] if board.get("trend") else {}
+    row = next(
+        (item for item in (latest_row.get("stocks") or []) if normalize_code(item.get("code")) == normalize_code(stock.get("code"))),
+        None,
+    )
+    if amount_rank is not None and amount_rank <= 5:
+        return {"score": 78, "label": "容量核心", "status": "core"}
+    if change_rank is not None and change_rank <= 3 and (safe_number((row or {}).get("changePercent")) or 0) > 0:
+        return {"score": 72, "label": "弹性前排", "status": "active"}
+    if stock_board_count(data, stock.get("code", "")) >= 3:
+        return {"score": 60, "label": "多题材", "status": "overlap"}
+    return {"score": 55, "label": "待确认", "status": "pending"}
+
+
 def stock_defense_score(items: list) -> float:
     """个股防御评分"""
     down_days = [
@@ -636,7 +757,16 @@ def stock_rebound_score(items: list) -> float:
     return score_range(average(diffs), -2, 5)
 
 
-def stock_resilience_rows(data: dict, board: dict) -> list:
+def stock_turnover_score(amount: Any) -> float:
+    """个股成交额评分"""
+    parsed = safe_number(amount)
+    if parsed is None or parsed <= 0:
+        return 0.0
+    import math
+    return score_range(math.log10(max(parsed, 1)), 8, 10.8)
+
+
+def stock_resilience_rows(data: dict, board: dict, membership: dict | None = None) -> list:
     """个股韧性数据"""
     result = []
 
@@ -676,8 +806,11 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
         latest = items[-1].get("stock", {}) if items else {}
         latest_change = safe_number(latest.get("changePercent"))
         macd_score = safe_number(latest.get("macdScore")) or 50
+        profit_score = safe_number(latest.get("profitScore")) or 50
+        authenticity = stock_authenticity_metric(data, board, stock, membership)
 
         rel_score = score_range(average([rel3, rel5]), -4, 8)
+        turnover_score = stock_turnover_score(amount3)
 
         stock_changes = [safe_number(item.get("stock", {}).get("changePercent")) for item in items]
         stock_changes = [c for c in stock_changes if c is not None]
@@ -690,18 +823,21 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
         )
 
         score = (
-            0.34 * rel_score
-            + 0.22 * drawdown_score
-            + 0.16 * stock_defense_score(items)
-            + 0.09 * stock_rebound_score(items)
-            + 0.09 * trend_score
+            0.29 * rel_score
+            + 0.19 * drawdown_score
+            + 0.14 * stock_defense_score(items)
+            + 0.08 * stock_rebound_score(items)
+            + 0.08 * trend_score
             + 0.10 * macd_score
+            + 0.07 * turnover_score
+            + 0.05 * profit_score
         )
 
         sort_score = (
-            0.20 * clamp(score, 0, 100)
-            + 0.50 * score_range(amount3, 0, 3_000_000_000)
-            + 0.30 * score_range(ret3, -3, 12)
+            0.28 * clamp(score, 0, 100)
+            + 0.32 * turnover_score
+            + 0.24 * score_range(ret3, -3, 12)
+            + 0.16 * profit_score
         )
 
         result.append({
@@ -719,6 +855,11 @@ def stock_resilience_rows(data: dict, board: dict) -> list:
             "latest_change": latest_change,
             "macd_label": latest.get("macdLabel") or "MACD暂无",
             "macd_score": macd_score,
+            "profit_score": profit_score,
+            "authenticity_score": authenticity.get("score"),
+            "authenticity_label": authenticity.get("label"),
+            "authenticity_status": authenticity.get("status"),
+            "turnover_score": turnover_score,
             "high_status": latest.get("highStatus") or stock.get("latestHighStatus") or "",
             "score": clamp(score, 0, 100),
             "sort_score": clamp(sort_score, 0, 100),
@@ -804,7 +945,7 @@ def build_trade_signal(current_state: dict, metric: dict, gate: dict | None = No
 
 # ── 机会数据 ─────────────────────────────────────────────────────────────────
 
-def opportunity_rows(data: dict, limit: int = 80) -> list:
+def opportunity_rows(data: dict, limit: int = 80, membership: dict | None = None) -> list:
     """计算机会数据"""
     boards = data.get("boards", [])
     result = []
@@ -828,24 +969,23 @@ def opportunity_rows(data: dict, limit: int = 80) -> list:
             continue
 
         # 获取板块前3个韧性个股
-        resilience_stocks = stock_resilience_rows(data, board)[:3]
+        resilience_stocks = stock_resilience_rows(data, board, membership)[:3]
 
         for stock in resilience_stocks:
             latest_change = safe_number(stock.get("latest_change")) or 0
             rel3 = safe_number(stock.get("rel3")) or 0
-            rel5 = safe_number(stock.get("rel5")) or 0
             current_state = current_metric.get("transition", {})
             trade_signal = build_trade_signal(current_state, current_metric, gate)
             macd_label = stock.get("macd_label", "")
 
             # 计算机会分
             opportunity_score = clamp(
-                0.38 * (safe_number(stock.get("score")) or 0)
-                + 0.20 * score_range(rel3, -2, 5)
-                + 0.14 * score_range(rel5, -3, 7)
-                + 0.12 * score_range(latest_change, -2, 6)
-                + 0.10 * (safe_number(stock.get("macd_score")) or 50)
-                + 0.06 * (background_metric.get("heat_score") or 0),
+                0.34 * (safe_number(stock.get("score")) or 0)
+                + 0.22 * score_range(rel3, -2, 5)
+                + 0.13 * (safe_number(stock.get("turnover_score")) or 0)
+                + 0.12 * (safe_number(stock.get("authenticity_score")) or 55)
+                + 0.10 * score_range(latest_change, -2, 6)
+                + 0.09 * (safe_number(stock.get("macd_score")) or 50),
                 0,
                 100,
             )

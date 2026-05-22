@@ -18,8 +18,8 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo [Taoguba] Starting web server on port %PORT% ...
-start "Taoguba Web Server" /D "%ROOT%" cmd /k "python -m http.server %PORT%"
+echo [Taoguba] Starting editable no-cache web server on port %PORT% ...
+start "Taoguba Web Server" /D "%ROOT%" cmd /k "python .\scripts\serve_custom_boards.py --host 127.0.0.1 --port %PORT%"
 
 echo [Taoguba] Starting intraday radar daemon ...
 start "Taoguba Intraday Radar" /D "%ROOT%" cmd /k "python .\scripts\intraday_radar_daemon.py"

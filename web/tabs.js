@@ -4,8 +4,8 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   kpl: "./kpl.html",
-  custom: "./custom.html?v=20260511-high-count-chart-v1",
-  intraday: "./intraday.html?v=20260518-auction-panel-v1",
+  custom: "./custom.html?v=20260522-resonance-fast-link-v1",
+  intraday: "./intraday.html?v=20260520-stock-pick-v1",
   trades: "./trades.html?v=20260518-buy-reason-only-v1",
 };
 const AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
