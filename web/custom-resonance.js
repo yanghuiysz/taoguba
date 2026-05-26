@@ -4,6 +4,10 @@
 
   const RESONANCE_TAB = 'resonance';
   const STYLE_ID = 'custom-resonance-panel-style';
+  const CUSTOM_RESONANCE_CONFIG_URL = './data/custom_resonance_config.json';
+  const stateConfig = {
+    highlightDate: '',
+  };
   let scheduled = false;
   let enhancing = false;
   let linkedBoardCode = null;
@@ -445,7 +449,7 @@
       const allRows = rankedByDate.get(date) || [];
       const detail = indexDetail(date);
       const marketState = marketStateForDate(date);
-      const isToday = String(date) === String(state?.sortDate || state?.data?.date || '');
+      const isHighlightedDate = stateConfig.highlightDate && String(date) === String(stateConfig.highlightDate);
       const isVolumeRise = marketState?.priceDirection === 'rise' && marketState?.amountDirection === 'expand';
       const isIndexRise = safeNumber(detail.change) !== null && Number(detail.change) >= 0;
       return {
@@ -453,8 +457,8 @@
         index: {
           ...detail,
           marketLabel: marketState?.label || detail.label,
-          special: isToday,
-          specialTone: isToday && isVolumeRise ? 'volume-rise' : (isToday && isIndexRise ? 'today-rise' : 'today'),
+          special: isHighlightedDate,
+          specialTone: isHighlightedDate && isVolumeRise ? 'volume-rise' : (isHighlightedDate && isIndexRise ? 'today-rise' : 'today'),
         },
         indexWidth: Math.max(4, Math.min(100, Math.abs(detail.change ?? 0) / maxAbs * 100)),
         boards: allRows.slice(0, limit),
@@ -705,9 +709,23 @@
     scheduleEnhance();
   };
 
+  async function loadConfig() {
+    try {
+      const response = await fetch(`${CUSTOM_RESONANCE_CONFIG_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!response.ok) return;
+      const config = await response.json();
+      stateConfig.highlightDate = String(config?.highlightDate || '');
+      resonanceCache = null;
+      scheduleEnhance();
+    } catch {
+      stateConfig.highlightDate = '';
+    }
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', startObserver, { once: true });
   } else {
     startObserver();
   }
+  loadConfig();
 }());
