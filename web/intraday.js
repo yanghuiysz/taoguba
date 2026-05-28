@@ -2,15 +2,12 @@
   const app = document.querySelector("#intraday-app");
   const DATA_URL = "./data/custom_boards.json";
   const MEMBERSHIP_URL = "./data/custom_board_membership.json";
-  const POSITIONS_URL = "./data/positions.json";
 
   const state = {
     data: null,
     membership: { overrides: [] },
-    positions: [],
     auction: null,
     error: "",
-    positionError: "",
     auctionError: "",
     opportunitySort: {
       key: "default",
@@ -487,19 +484,6 @@
     return safeNumber(stock?.turnover ?? stock?.amount);
   }
 
-  function tradingDates() {
-    return [...new Set((state.data?.boards || [])
-      .flatMap((board) => trendRows(board).map((row) => row.date))
-      .filter(Boolean))]
-      .sort();
-  }
-
-  function tradingDayAge(entryDate, currentDate) {
-    if (!entryDate || !currentDate) return null;
-    const dates = tradingDates().filter((date) => date >= entryDate && date <= currentDate);
-    return dates.length || null;
-  }
-
   function boardWindow(board, days, endIndex = trendRows(board).length - 1) {
     const rows = selectedRowsUntil(board, days, endIndex);
     const boardReturns = rows.map(boardChange);
@@ -967,188 +951,6 @@
     return state.opportunitySort.direction === "asc" ? " ↑" : " ↓";
   }
 
-  function stockLookup(stockCode) {
-    const code = normalizeCode(stockCode);
-    const matches = [];
-    (state.data?.boards || []).forEach((board) => {
-      const rows = trendRows(board);
-      const currentRow = rows.at(-1) || null;
-      const currentStock = (currentRow?.stocks || []).find((stock) => normalizeCode(stock.code) === code) || null;
-      if (!currentStock) return;
-      const backgroundMetric = boardMetric(board, -1);
-      const currentMetric = boardMetric(board);
-      matches.push({
-        board,
-        stock: currentStock,
-        backgroundMetric,
-        currentMetric,
-        currentState: intradayState(currentMetric),
-      });
-    });
-    return matches.sort((a, b) =>
-      b.backgroundMetric.heatScore - a.backgroundMetric.heatScore
-      || Math.abs(safeNumber(b.stock.changePercent) ?? 0) - Math.abs(safeNumber(a.stock.changePercent) ?? 0))[0] || null;
-  }
-
-  function positionAction(position, context) {
-    if (!context) {
-      return {
-        action: "暂无行情",
-        tone: "watch",
-        reason: "未在自定义板块数据里匹配到该持仓",
-      };
-    }
-    const cost = safeNumber(position.cost);
-    const forceExitPrice = safeNumber(position.forceExitPrice);
-    const firstBuyLow = safeNumber(position.firstBuyLow ?? position.divergenceLow);
-    const effectiveStopPrice = Math.max(forceExitPrice ?? -Infinity, firstBuyLow ?? -Infinity);
-    const pressure = safeNumber(position.pressure);
-    const currentPrice = safeNumber(context.stock.close);
-    const profitPct = cost && currentPrice ? (currentPrice / cost - 1) * 100 : null;
-    const currentDate = latestDataDate();
-    const holdDays = tradingDayAge(position.entryDate, currentDate);
-    const weakStock = (safeNumber(context.stock.changePercent) ?? 0) < 0 || (safeNumber(context.stock.macdScore) ?? 50) <= 35;
-
-    if (currentPrice !== null && effectiveStopPrice !== -Infinity && currentPrice < effectiveStopPrice) {
-      const useForceExit = forceExitPrice !== null && effectiveStopPrice === forceExitPrice && (firstBuyLow === null || forceExitPrice >= firstBuyLow);
-      return {
-        action: useForceExit ? "强制平仓" : "硬止损",
-        tone: "weak",
-        reason: useForceExit
-          ? `跌破强制平仓执行线 ${number(effectiveStopPrice)}`
-          : `跌破第一笔低点执行线 ${number(effectiveStopPrice)}`,
-        profitPct,
-        holdDays,
-      };
-    }
-    if (holdDays !== null && holdDays >= 3 && (profitPct ?? 0) < 3 && context.currentState.label !== "盘中转强") {
-      return {
-        action: "时间止损",
-        tone: "weak",
-        reason: `持仓 ${holdDays} 个交易日，修复未达预期`,
-        profitPct,
-        holdDays,
-      };
-    }
-    if (context.currentState.label === "恶性回踩" || context.currentState.label === "退潮走弱") {
-      return {
-        action: weakStock ? "减仓/止损观察" : "持有观察",
-        tone: weakStock ? "weak" : "watch",
-        reason: `${context.currentState.label}，不加仓`,
-        profitPct,
-        holdDays,
-      };
-    }
-    if (!position.hasTakenHalfProfit && ((profitPct ?? 0) >= 5 || (pressure !== null && currentPrice !== null && currentPrice >= pressure))) {
-      return {
-        action: "减仓 1/2",
-        tone: "strong",
-        reason: pressure !== null && currentPrice !== null && currentPrice >= pressure ? `触及压力位 ${number(pressure)}` : `浮盈 ${number(profitPct)}%`,
-        profitPct,
-        holdDays,
-      };
-    }
-    if (!position.breakevenArmed && (profitPct ?? 0) >= 3) {
-      return {
-        action: "上移止损",
-        tone: "test",
-        reason: `浮盈 ${number(profitPct)}%，止损上移至成本 +0.5%`,
-        profitPct,
-        holdDays,
-      };
-    }
-    if (context.currentState.label === "盘中转强") {
-      return {
-        action: "持有/加仓观察",
-        tone: "strong",
-        reason: "盘中转强，观察第二笔条件",
-        profitPct,
-        holdDays,
-      };
-    }
-    if (context.currentState.label === "良性回踩") {
-      return {
-        action: "持有观察",
-        tone: "test",
-        reason: "板块仍是良性回踩，观察承接",
-        profitPct,
-        holdDays,
-      };
-    }
-    return {
-      action: "持有观察",
-      tone: "watch",
-      reason: "未触发卖出或加仓规则",
-      profitPct,
-      holdDays,
-    };
-  }
-
-  function positionRows() {
-    return (state.positions || []).map((position) => {
-      const context = stockLookup(position.code);
-      return {
-        position,
-        context,
-        decision: positionAction(position, context),
-      };
-    });
-  }
-
-  function renderPositionsPanel() {
-    if (state.positionError) {
-      return `<section class="card section-card positions-card"><div class="empty">持仓读取失败：${state.positionError}</div></section>`;
-    }
-    const rows = positionRows();
-    return `
-      <section class="card section-card positions-card">
-        <div class="section-head">
-          <div>
-            <h2>我的持仓操作提醒</h2>
-            <p class="muted">按成本保护、动能兑现、逻辑证伪和时间截断给出盘中动作建议。</p>
-          </div>
-          <span class="count-pill">${rows.length} 只持仓</span>
-        </div>
-        ${rows.length ? `
-          <div class="table-wrap positions-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>持仓</th>
-                  <th>所属板块</th>
-                  <th>今日状态</th>
-                  <th>现价/浮盈</th>
-                  <th>持仓天数</th>
-                  <th>动作建议</th>
-                  <th>触发原因</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows.map(({ position, context, decision }) => `
-                  <tr>
-                    <td>
-                      <strong>${position.name || context?.stock?.name || normalizeCode(position.code)}</strong>
-                      <span class="code">${normalizeCode(position.code)}</span>
-                      <small>第一笔低点 ${position.firstBuyLow === null || position.firstBuyLow === undefined ? "未设" : number(position.firstBuyLow)}</small>
-                      <small>强平价 ${position.forceExitPrice === null || position.forceExitPrice === undefined ? "未设" : number(position.forceExitPrice)}</small>
-                      <small>执行线 ${position.effectiveStopPrice === null || position.effectiveStopPrice === undefined ? "未设" : number(position.effectiveStopPrice)}</small>
-                    </td>
-                    <td>${context ? `<strong>${context.board.name}</strong><br><small>${context.backgroundMetric.stage} · ${context.backgroundMetric.status}</small>` : "暂无"}</td>
-                    <td>${context ? `<span class="swing-badge ${context.currentState.tone}">${context.currentState.label}</span><br><small>${context.currentMetric.status}</small>` : "暂无"}</td>
-                    <td><strong>${context?.stock?.close === undefined ? "暂无" : number(context.stock.close)}</strong><br><small class="${signedClass(decision.profitPct)}">${decision.profitPct === null || decision.profitPct === undefined ? "浮盈暂无" : `浮盈 ${number(decision.profitPct)}%`}</small></td>
-                    <td>${decision.holdDays || "暂无"}</td>
-                    <td><span class="swing-badge ${decision.tone}">${decision.action}</span></td>
-                    <td>${decision.reason}</td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>
-          </div>
-        ` : '<div class="pool-empty">暂无持仓配置。可在 web/data/positions.json 添加持仓。</div>'}
-      </section>
-    `;
-  }
-
   function latestDataDate() {
     const explicit = state.data?.date;
     if (explicit) return explicit;
@@ -1342,7 +1144,6 @@
     const updatedAt = new Date().toLocaleTimeString("zh-CN", { hour12: false });
 
     app.innerHTML = `
-      ${renderPositionsPanel()}
       ${renderAuctionPanel()}
       ${renderAccelerationPanel()}
       <section class="card section-card swing-overview-panel">
@@ -1431,22 +1232,6 @@
       state.membership = membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
     } catch (error) {
       state.membership = { overrides: [] };
-    }
-    try {
-      const positionResponse = await fetch(`${POSITIONS_URL}?v=${Date.now()}`, { cache: "no-store" });
-      if (positionResponse.ok) {
-        const payload = await positionResponse.json();
-        state.positions = Array.isArray(payload) ? payload : [];
-        state.positionError = "";
-      } else if (positionResponse.status === 404) {
-        state.positions = [];
-        state.positionError = "";
-      } else {
-        throw new Error(`HTTP ${positionResponse.status}`);
-      }
-    } catch (error) {
-      state.positions = [];
-      state.positionError = error.message || String(error);
     }
     try {
       const auctionDates = [...new Set([todayCompactDate(), compactDate(latestDataDate())].filter(Boolean))];

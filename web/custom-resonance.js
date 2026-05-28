@@ -7,6 +7,7 @@
   const CUSTOM_RESONANCE_CONFIG_URL = './data/custom_resonance_config.json';
   const stateConfig = {
     highlightDate: '',
+    marketNotes: {},
   };
   let scheduled = false;
   let enhancing = false;
@@ -50,6 +51,15 @@
   function fmtDate(date) {
     if (typeof shortDate === 'function') return shortDate(date);
     return date ? String(date).slice(5) : '暂无';
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
   }
 
   function changeClass(value) {
@@ -398,6 +408,11 @@
     return detail;
   }
 
+  function marketNotesForDate(date) {
+    const notes = stateConfig.marketNotes?.[date];
+    return Array.isArray(notes) ? notes.filter(Boolean) : [];
+  }
+
   function scoreTone(score) {
     const parsed = safeNumber(score);
     if (parsed === null) return 'empty';
@@ -457,6 +472,7 @@
         index: {
           ...detail,
           marketLabel: marketState?.label || detail.label,
+          notes: marketNotesForDate(date),
           special: isHighlightedDate,
           specialTone: isHighlightedDate && isVolumeRise ? 'volume-rise' : (isHighlightedDate && isIndexRise ? 'today-rise' : 'today'),
         },
@@ -552,6 +568,11 @@
                 <strong class="${changeClass(row.index.change)}">${fmtPercent(row.index.change)}</strong>
                 ${row.index.special ? `<span class="resonance-index-special">${row.index.marketLabel || '今日'}</span>` : ''}
               </div>
+              ${row.index.notes?.length ? `
+                <div class="resonance-index-notes">
+                  ${row.index.notes.map((note) => `<span>${escapeHtml(note)}</span>`).join('')}
+                </div>
+              ` : ''}
               <div class="resonance-index-bar-track" aria-hidden="true">
                 <span
                   class="resonance-index-bar ${changeClass(row.index.change)}${row.index.special ? ` ${row.index.specialTone}` : ''}"
@@ -715,10 +736,14 @@
       if (!response.ok) return;
       const config = await response.json();
       stateConfig.highlightDate = String(config?.highlightDate || '');
+      stateConfig.marketNotes = config?.marketNotes && typeof config.marketNotes === 'object'
+        ? config.marketNotes
+        : {};
       resonanceCache = null;
       scheduleEnhance();
     } catch {
       stateConfig.highlightDate = '';
+      stateConfig.marketNotes = {};
     }
   }
 

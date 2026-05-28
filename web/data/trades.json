@@ -2,6 +2,40 @@
   "version": 1,
   "records": [
     {
+      "id": "20260527-buy-603256-001",
+      "date": "2026-05-27",
+      "action": "buy",
+      "stockCode": "603256",
+      "stockName": "宏和科技",
+      "boardName": "玻纤",
+      "quantity": null,
+      "price": null,
+      "amount": null,
+      "tags": [
+        "买入",
+        "科技发力预期",
+        "冲高回落"
+      ],
+      "note": "早上科创板新高，判断科技方向可能继续发力，因此买入；但最终走势冲高回落。"
+    },
+    {
+      "id": "20260527-buy-002463-001",
+      "date": "2026-05-27",
+      "action": "buy",
+      "stockCode": "002463",
+      "stockName": "沪电股份",
+      "boardName": "PCB",
+      "quantity": null,
+      "price": null,
+      "amount": null,
+      "tags": [
+        "买入",
+        "科技发力预期",
+        "冲高回落"
+      ],
+      "note": "早上科创板新高，判断科技方向可能继续发力，因此买入；但最终走势冲高回落。"
+    },
+    {
       "id": "20260519-sell-600667-001",
       "date": "2026-05-19",
       "action": "sell",

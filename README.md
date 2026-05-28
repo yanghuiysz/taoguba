@@ -1,16 +1,26 @@
 # 题材数据看板
 
-本项目用于本地维护一套题材观察工作流，把盘中雷达、自定义板块、开盘啦强度和交易记录放到同一个看板里。
+这是一个本地运行的 A 股题材复盘与盘中观察工具。项目把自定义板块、盘中雷达、集合竞价预警、开盘啦强度和交易记录放到同一个看板里，方便在交易日快速刷新、筛选和复盘。
 
-当前主入口：
+主入口：
 
-- `web/index.html`：看板总入口，包含盘中雷达、操作记录、自定义板块、开盘啦强度四个标签页
-- `web/intraday.html`：盘中机会雷达
-- `web/custom.html`：自定义板块、热门板块波段观察
-- `web/kpl.html`：开盘啦板块强度
-- `web/trades.html`：操作记录
+```text
+http://127.0.0.1:8765/web/
+```
+
+## 功能入口
+
+| 页面 | 路径 | 说明 |
+| --- | --- | --- |
+| 总入口 | `web/index.html` | 标签页容器，整合盘中雷达、操作记录、自定义板块、开盘啦强度 |
+| 盘中雷达 | `web/intraday.html` | 盘中机会、集合竞价预警、开盘后加速板块和核心股筛选 |
+| 自定义板块 | `web/custom.html` | 自定义板块维护、板块强度、波段状态和成员股观察 |
+| 操作记录 | `web/trades.html` | 本地交易/观察记录 |
+| 开盘啦强度 | `web/kpl.html` | 开盘啦板块强度数据展示 |
 
 ## 环境准备
+
+建议使用 Python 虚拟环境：
 
 ```powershell
 python -m venv .venv
@@ -18,12 +28,21 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+主要依赖见 `requirements.txt`：
+
+- `akshare`：行情与历史数据
+- `pandas`：数据处理
+- `requests` / `beautifulsoup4`：接口和页面解析
+- `playwright`：部分采集或验证流程使用
+
 ## 本地启动
 
-最简单的静态查看：
+### 推荐：可编辑服务
+
+如果需要在页面里编辑自定义板块，启动项目自带服务：
 
 ```powershell
-python -m http.server 8765
+python .\scripts\serve_custom_boards.py --host 127.0.0.1 --port 8765
 ```
 
 访问：
@@ -32,13 +51,23 @@ python -m http.server 8765
 http://127.0.0.1:8765/web/
 ```
 
-如果需要在页面里直接编辑自定义板块，使用可编辑服务：
+### 简单静态预览
+
+只看静态页面时可以用：
 
 ```powershell
-python .\scripts\serve_custom_boards.py --host 127.0.0.1 --port 8765
+python -m http.server 8765
 ```
 
-如果希望启动时顺手做一次收盘后补刷新，并自动拉起本地网页和盘中守护进程：
+### 一键启动
+
+`start_server.bat` 会依次执行：
+
+1. 检查是否需要收盘后补刷新。
+2. 启动可编辑本地服务。
+3. 启动盘中雷达守护进程。
+4. 启动集合竞价探针。
+5. 打开本地看板。
 
 ```powershell
 .\start_server.bat
@@ -46,7 +75,9 @@ python .\scripts\serve_custom_boards.py --host 127.0.0.1 --port 8765
 
 ## 日常数据更新
 
-完整日更：
+### 完整更新
+
+用于收盘后或需要刷新全部数据时：
 
 ```powershell
 $date = Get-Date -Format yyyyMMdd
@@ -54,7 +85,11 @@ python .\scripts\update_daily_data.py --date $date --intraday-custom --full-duri
 python .\scripts\validate_web_data.py
 ```
 
-盘中只刷新雷达依赖数据：
+完整更新会尝试刷新开盘啦、自定义板块和前端依赖数据。脚本会保留已有数据文件，并在可选数据源不可用时给出 warning。
+
+### 盘中快速刷新
+
+交易时段只刷新盘中雷达依赖的数据：
 
 ```powershell
 $date = Get-Date -Format yyyyMMdd
@@ -62,22 +97,15 @@ python .\scripts\update_daily_data.py --date $date --intraday-custom --intraday-
 python .\scripts\validate_web_data.py
 ```
 
-`update_daily_data.py` 在交易时段内、目标日期又是今天时，也会自动切到盘中雷达快刷模式。
+如果目标日期是今天且处于交易时段，`update_daily_data.py` 默认也会自动切到盘中快速刷新模式；需要强制完整更新时加 `--full-during-trading`。
 
-## 盘中自动刷新与通知
+## 盘中雷达守护
 
-盘中守护进程：
+守护进程会在交易时段循环刷新盘中雷达数据，并按节流规则发送企业微信通知。
 
 ```powershell
 python .\scripts\intraday_radar_daemon.py
 ```
-
-当前默认行为：
-
-- 每 `60s` 刷新一次盘中雷达数据
-- 每 `60s` 推送一次企业微信通知
-- 只在交易时段执行
-- 刷新成功后才会触发通知
 
 常用参数：
 
@@ -87,9 +115,15 @@ python .\scripts\intraday_radar_daemon.py --notify-interval 60
 python .\scripts\intraday_radar_daemon.py --once --force
 ```
 
+日志写入：
+
+```text
+logs/intraday_radar.log
+```
+
 ## 集合竞价探针
 
-集合竞价探针会在 `09:15-09:25` 采样自定义板块成分股实时行情，保存原始快照，并在 `09:20` 后按板块竞价强度推送企业微信提醒。
+集合竞价探针会在 `09:15-09:25` 采样自定义板块成分股行情，保存快照，并在 `09:20` 后按板块竞价强度推送提醒。
 
 ```powershell
 python .\scripts\auction_probe.py
@@ -104,68 +138,95 @@ python .\scripts\auction_probe.py --once --force --no-notify
 ```
 
 输出文件：
-- `web/data/auction_snapshots/YYYYMMDD.json`：每次采样的原始行情和当次预警板块。
 
-盘中雷达页面会读取当天快照，并在顶部展示最新的集合竞价预警板块和锚定股。
+```text
+web/data/auction_snapshots/YYYYMMDD.json
+```
 
-评分口径：
-- 板块竞价均涨、红盘率、强竞价个股数量。
-- 板块竞价成交额相对近 5 日日均成交额的比例。
-- 锚定股的竞价涨幅、竞价成交额、相对近 5 日成交额占比。
+盘中雷达页面会读取当天快照，在顶部展示最新集合竞价预警板块和锁定股。
 
 ## 企业微信通知
 
-企业微信机器人配置放在本地 `.env`：
+企业微信机器人地址放在本地 `.env`：
 
 ```text
 WECOM_WEBHOOK_URL=...
 ```
 
-示例模板见 `.env.example`。
+模板见 `.env.example`。
 
-手动触发一次盘中通知：
+手动发送一次盘中雷达通知：
 
 ```powershell
 python .\scripts\notify_intraday_radar.py --top 80
 ```
 
+集合竞价探针也会复用同一套企业微信配置。
+
 ## 主要脚本
 
-- `scripts/update_daily_data.py`：统一调度日更和盘中快刷
-- `scripts/validate_web_data.py`：校验前端依赖的数据文件
-- `scripts/build_custom_board_data.py`：生成自定义板块数据
-- `scripts/fetch_kpl_probe.py`：抓取开盘啦原始数据
-- `scripts/build_kpl_plate_stock_links.py`：生成板块个股关联
-- `scripts/build_kpl_web_data.py`：生成开盘啦前端数据
-- `scripts/build_ths_limit_mapping.py`：生成同花顺/东财增强映射
-- `scripts/intraday_radar_engine.py`：盘中雷达计算逻辑
-- `scripts/intraday_radar_daemon.py`：盘中守护刷新与通知节流
-- `scripts/auction_probe.py`：集合竞价采样、板块超预期评分与企业微信提醒
-- `scripts/notify_intraday_radar.py`：盘中雷达通知拼装
-- `scripts/notify_wecom.py`：企业微信发送封装
-- `scripts/refresh_latest_after_close.py`：收盘后自动补刷新
-- `scripts/serve_custom_boards.py`：本地可编辑服务
+| 脚本 | 说明 |
+| --- | --- |
+| `scripts/update_daily_data.py` | 统一调度日更、盘中刷新和数据校验 |
+| `scripts/validate_web_data.py` | 校验前端依赖数据是否可读、字段是否完整 |
+| `scripts/build_custom_board_data.py` | 生成自定义板块行情、强度和成员股数据 |
+| `scripts/serve_custom_boards.py` | 本地可编辑服务，支持页面修改自定义板块配置 |
+| `scripts/intraday_radar_engine.py` | 盘中雷达核心计算逻辑 |
+| `scripts/intraday_radar_daemon.py` | 交易时段循环刷新和通知守护进程 |
+| `scripts/notify_intraday_radar.py` | 盘中雷达企业微信消息拼装 |
+| `scripts/auction_probe.py` | 集合竞价采样、预警评分和通知 |
+| `scripts/fetch_kpl_probe.py` | 抓取开盘啦原始板块数据 |
+| `scripts/build_kpl_plate_stock_links.py` | 生成开盘啦板块和个股关联 |
+| `scripts/build_kpl_web_data.py` | 生成开盘啦前端数据 |
+| `scripts/build_ths_limit_mapping.py` | 生成同花顺/东财涨停映射增强数据 |
+| `scripts/refresh_latest_after_close.py` | 启动前检查并执行收盘后补刷新 |
+| `scripts/notify_wecom.py` | 企业微信发送封装 |
+| `scripts/sync_position_stops.py` | 辅助同步持仓止损线数据 |
 
 ## 数据文件
 
-前端核心数据：
+核心前端数据位于 `web/data/`：
 
-- `web/data/custom_boards.json`
-- `web/data/custom_boards_config.json`
-- `web/data/custom_board_membership.json`
-- `web/data/custom_board_labels.json`
-- `web/data/kpl_dashboard.json`
-- `web/data/kpl/index.json`
-- `web/data/kpl/history/*.json`
-- `web/data/trades.json`
-- `web/data/positions.json`
+| 文件 | 说明 |
+| --- | --- |
+| `custom_boards.json` | 自定义板块主数据，盘中雷达和自定义板块页面都会读取 |
+| `custom_boards_config.json` | 自定义板块配置 |
+| `custom_board_membership.json` | 板块成员覆盖关系 |
+| `custom_board_labels.json` | 板块标签 |
+| `custom_resonance_config.json` | 共振观察相关配置 |
+| `kpl_dashboard.json` | 开盘啦看板数据 |
+| `kpl/index.json` | 开盘啦历史索引 |
+| `kpl/history/*.json` | 开盘啦按日期保存的历史数据 |
+| `auction_snapshots/YYYYMMDD.json` | 集合竞价采样快照 |
+| `trades.json` | 操作记录页面数据 |
+| `positions.json` | 持仓辅助数据，主要给脚本维护使用 |
 
-## 已做的清理
+## 推荐工作流
 
-本次已经移除了仓库里没有页面入口、也没有代码引用的前端孤儿文件：
+交易日前：
 
-- `web/custom-decision.css`
-- `web/custom-decision.js`
-- `web/custom-swing-plus.css`
-- `web/custom-swing-plus.js`
-- `web/custom-ui-fix.css`
+```powershell
+.\start_server.bat
+```
+
+盘中临时刷新：
+
+```powershell
+$date = Get-Date -Format yyyyMMdd
+python .\scripts\update_daily_data.py --date $date --intraday-custom --intraday-radar-only --custom-sleep 0
+```
+
+收盘后完整复盘：
+
+```powershell
+$date = Get-Date -Format yyyyMMdd
+python .\scripts\update_daily_data.py --date $date --intraday-custom --full-during-trading
+python .\scripts\validate_web_data.py
+```
+
+## 维护注意事项
+
+- 修改脚本或数据结构后，优先运行 `python .\scripts\validate_web_data.py`。
+- 不要手动提交 `.env`，企业微信 webhook 只保存在本地。
+- `web/data/custom_boards.json`、`web/data/kpl_dashboard.json`、`web/data/auction_snapshots/*.json` 属于生成数据，提交前确认日期和内容是否符合预期。
+- 页面入口统一从 `web/index.html` 维护，新增页面时同步更新标签页和 README。

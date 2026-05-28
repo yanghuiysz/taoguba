@@ -191,6 +191,24 @@
   white-space: nowrap;
 }
 
+.resonance-index-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.resonance-index-notes span {
+  border: 1px solid #d7e2e0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3f565e;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+
 .resonance-index-bar-track {
   position: relative;
   height: 9px;

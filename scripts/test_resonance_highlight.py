@@ -10,7 +10,11 @@ def test_resonance_highlight_uses_manual_date_only():
     assert "state?.sortDate" not in segment
     assert "CUSTOM_RESONANCE_CONFIG_URL" in source
     assert "stateConfig.highlightDate" in segment
-    assert '"highlightDate": "2026-05-22"' in config
+    assert "marketNotesForDate(date)" in segment
+    assert '"highlightDate": "2026-05-27"' in config
+    assert '"冲高回落"' in config
+    assert '"科技大跌"' in config
+    assert '"电力逆势上涨"' in config
 
 
 if __name__ == "__main__":
