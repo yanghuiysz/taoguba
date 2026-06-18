@@ -3648,6 +3648,90 @@
                           "suggestedKeep":  "是",
                           "primaryDriverBoard":  "锂电",
                           "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "603773",
+                          "stockName":  "沃格光电",
+                          "status":  "pure_core",
+                          "label":  "正宗核心",
+                          "note":  "玻璃基TGV、多层线路板及全流程工艺辨识度高，作为玻璃基板题材正宗核心观察；已排除688开头个股",
+                          "suggestedKeep":  "是",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "000725",
+                          "stockName":  "京东方A",
+                          "status":  "pure_core",
+                          "label":  "产业平台核心",
+                          "note":  "玻璃基封装载板试验线与康宁合作，偏产业平台型核心；已排除688开头个股",
+                          "suggestedKeep":  "是",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "300776",
+                          "stockName":  "帝尔激光",
+                          "status":  "pure_core",
+                          "label":  "设备核心",
+                          "note":  "激光微纳加工设备映射TGV玻璃通孔、精密加工等关键环节；已排除688开头个股",
+                          "suggestedKeep":  "是",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "600707",
+                          "stockName":  "彩虹股份",
+                          "status":  "pure_elastic",
+                          "label":  "材料弹性",
+                          "note":  "显示玻璃基板基础强，向半导体封装玻璃方向延伸，作为材料端弹性核心观察；已排除688开头个股",
+                          "suggestedKeep":  "是",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "300088",
+                          "stockName":  "长信科技",
+                          "status":  "pure_elastic",
+                          "label":  "加工弹性",
+                          "note":  "玻璃加工、镀膜及TGV中试线推进，作为加工端候选核心观察；已排除688开头个股",
+                          "suggestedKeep":  "是",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "002962",
+                          "stockName":  "五方光电",
+                          "status":  "theme_edge",
+                          "label":  "映射候选",
+                          "note":  "光学元件与玻璃加工方向的题材映射，偏激进观察，不先按正宗核心处理；已排除688开头个股",
+                          "suggestedKeep":  "观察",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
+                      },
+                      {
+                          "boardCode":  "bolijiban",
+                          "boardName":  "玻璃基板",
+                          "stockCode":  "300162",
+                          "stockName":  "雷曼光电",
+                          "status":  "theme_edge",
+                          "label":  "映射候选",
+                          "note":  "Micro LED与玻璃基显示封装方向的扩散映射，偏激进观察，不先按正宗核心处理；已排除688开头个股",
+                          "suggestedKeep":  "观察",
+                          "primaryDriverBoard":  "玻璃基板",
+                          "source":  ""
                       }
                   ],
     "statusGuide":  {

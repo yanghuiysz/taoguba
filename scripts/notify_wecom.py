@@ -290,7 +290,7 @@ def load_custom_boards(json_path: Path) -> list[dict]:
         return []
 
 
-# ── 5 分钟定时推送循环 ──────────────────────────────────────────────────────────
+# ── 10 分钟定时推送循环 ─────────────────────────────────────────────────────────
 def is_trading_time(now: Optional[datetime] = None) -> bool:
     """判断是否在 A 股交易时段"""
     now = now or datetime.now()
@@ -300,12 +300,12 @@ def is_trading_time(now: Optional[datetime] = None) -> bool:
     return (9 * 60 + 30 <= minutes <= 11 * 60 + 30) or (13 * 60 <= minutes <= 15 * 60 + 5)
 
 
-def run_5min_loop(webhook_url: str = "", interval: int = 300, force: bool = False) -> None:
-    """每 5 分钟推送一次板块雷达（仅在交易时段）"""
+def run_notify_loop(webhook_url: str = "", interval: int = 600, force: bool = False) -> None:
+    """每 10 分钟推送一次板块雷达（仅在交易时段）"""
     json_path = _ROOT / "web" / "data" / "custom_boards.json"
     notifier = WeComNotifier(webhook_url=webhook_url)
 
-    print(f"[5min-loop] 启动，间隔={interval}s，数据源={json_path}", flush=True)
+    print(f"[notify-loop] 启动，间隔={interval}s，数据源={json_path}", flush=True)
 
     while True:
         now = datetime.now()
@@ -335,7 +335,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="企业微信板块雷达推送")
     parser.add_argument("--webhook", default="", help="Webhook URL（留空则从 .env / 环境变量读取）")
-    parser.add_argument("--interval", type=int, default=300, help="推送间隔秒数，默认 300（5 分钟）")
+    parser.add_argument("--interval", type=int, default=600, help="推送间隔秒数，默认 600（10 分钟）")
     parser.add_argument("--force", action="store_true", help="忽略交易时间限制（测试用）")
     parser.add_argument("--once", action="store_true", help="只发送一次就退出")
     parser.add_argument("--test", action="store_true", help="发送一条测试消息")
@@ -363,4 +363,4 @@ if __name__ == "__main__":
             print("未读到板块数据")
         sys.exit(0)
 
-    run_5min_loop(webhook_url=args.webhook, interval=args.interval, force=args.force)
+    run_notify_loop(webhook_url=args.webhook, interval=args.interval, force=args.force)

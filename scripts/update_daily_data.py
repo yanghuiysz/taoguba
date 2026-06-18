@@ -108,8 +108,19 @@ def main() -> None:
     parser.add_argument("--sort-by", default="strength", help="Kaipanla plate sort key.")
     args = parser.parse_args()
 
+    target_is_today = is_today(args.date)
+    if not target_is_today and (args.intraday_custom or args.intraday_radar_only):
+        print(
+            f"\nWARNING: intraday refresh flags are ignored for historical date {format_date(args.date)}; "
+            "using historical daily data instead.",
+            file=sys.stderr,
+            flush=True,
+        )
+        args.intraday_custom = False
+        args.intraday_radar_only = False
+
     radar_only = args.intraday_radar_only or (
-        is_today(args.date)
+        target_is_today
         and is_trading_time()
         and not args.full_during_trading
     )

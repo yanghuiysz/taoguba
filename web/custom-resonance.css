@@ -179,6 +179,25 @@
   line-height: 1;
 }
 
+.resonance-secondary-index-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.resonance-secondary-index-value span {
+  white-space: nowrap;
+}
+
+.resonance-secondary-index-value strong {
+  font-size: 12px;
+}
+
 .resonance-index-special {
   border: 1px solid #ffb8b1;
   border-radius: 999px;

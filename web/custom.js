@@ -42,6 +42,12 @@ const shortDate = (date) => (date ? String(date).slice(5) : '暂无');
 
 const signedClass = (value) => (Number(value) >= 0 ? 'rise' : 'fall');
 
+const signedValueClass = (value) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed === 0) return '';
+  return parsed > 0 ? 'rise' : 'fall';
+};
+
 const sortChangeValue = (value) => {
   const parsed = Number(value);
   return Number.isNaN(parsed) ? -999999 : parsed;
@@ -142,6 +148,35 @@ const rowTotalTurnover = (row) => {
   const value = row?.totalTurnover ?? row?.totalAmount;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+};
+
+const rowMainNetInflow = (row) => {
+  const parsed = Number(row?.mainNetInflow);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const stockMainNetInflow = (stock) => {
+  const parsed = Number(stock?.mainNetInflow ?? stock?.latestMainNetInflow);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const fundFlowDateText = (date, quoteDate) => {
+  if (!date) return '资金暂无';
+  const short = shortDate(date);
+  return quoteDate && date !== quoteDate ? `资金${short}` : short;
+};
+
+const todayFundFlowCell = (value) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '';
+  return `<span class="${signedValueClass(parsed)}">${amountText(parsed)}</span>`;
+};
+
+const fundFlowCoverageText = (row) => {
+  const count = Number(row?.fundFlowStockCount);
+  const total = Number(row?.stockCount);
+  if (!Number.isFinite(count) || !Number.isFinite(total) || total <= 0) return '覆盖暂无';
+  return `覆盖 ${count}/${total}`;
 };
 
 function volumePriceState(change, currentTurnover, previousTurnover) {
@@ -1673,6 +1708,8 @@ function renderStocksTable(board) {
         displayClose: useDateSnapshot ? (current?.close ?? null) : stock.latestClose,
         displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock.latestChangePercent,
         displayAmount: useDateSnapshot ? stockTurnover(current) : (stock.latestTurnover ?? stock.latestAmount),
+        displayMainNetInflow: useDateSnapshot ? stockMainNetInflow(current) : stock.latestMainNetInflow,
+        displayFundFlowDate: useDateSnapshot ? current?.fundFlowDate : stock.latestFundFlowDate,
         displayDistanceToHigh100: useDateSnapshot ? (current?.distanceToHigh100 ?? null) : stock.latestDistanceToHigh100,
         displayIsHigh100: useDateSnapshot ? (current?.isHigh100 ?? null) : stock.latestIsHigh100,
         displayIsNearHigh100: useDateSnapshot ? (current?.isNearHigh100 ?? null) : stock.latestIsNearHigh100,
@@ -1703,6 +1740,7 @@ function renderStocksTable(board) {
               <th>归属</th>
               <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayChangePercent">涨跌幅${sortLabel(state.stockListSort, 'displayChangePercent')}</button></th>
               <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayAmount">成交额${sortLabel(state.stockListSort, 'displayAmount')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayMainNetInflow">主力净流入${sortLabel(state.stockListSort, 'displayMainNetInflow')}</button></th>
               <th>新高状态</th>
               <th>依据</th>
               ${actionColumn}
@@ -1716,11 +1754,12 @@ function renderStocksTable(board) {
                 <td><span class="membership-badge ${stock.membership.tone}">${stock.membership.label}</span></td>
                 <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
                 <td>${amountText(stock.displayAmount)}</td>
+                <td>${todayFundFlowCell(stock.displayMainNetInflow)}</td>
                 <td><span class="setup-badge ${highStatusTone(stock.displayHighStatus)}">${stock.displayHighStatus || '暂无'}</span></td>
                 <td class="membership-reason">${stock.membership.reason}</td>
                 ${state.editable ? `<td><button class="remove-stock" data-code="${stock.code}" data-name="${stock.name}" ${state.busy ? 'disabled' : ''}>删除</button></td>` : ''}
               </tr>
-            `).join('') : `<tr><td colspan="${state.editable ? 8 : 7}" class="empty">该板块暂无已配置个股</td></tr>`}
+            `).join('') : `<tr><td colspan="${state.editable ? 9 : 8}" class="empty">该板块暂无已配置个股</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -1740,6 +1779,7 @@ function renderDetail(board) {
   const boardFlow = boardVolumePriceState(board, state.sortDate);
   const marketFlow = marketVolumePriceState(state.sortDate);
   const resonance = boardMarketResonance(board, state.sortDate);
+  const selectedMainNetInflow = rowMainNetInflow(selectedRow);
   const isOverviewTab = state.detailTab === 'overview';
   const isTrendTab = state.detailTab === 'trend';
   const isProfitTab = state.detailTab === 'profit';
@@ -1762,7 +1802,7 @@ function renderDetail(board) {
         <div class="section-head">
           <div>
             <h2>${board.name} · 趋势曲线</h2>
-            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}。板块 ${boardFlow?.label || '暂无'}，指数 ${marketFlow?.label || '暂无'}，${resonance?.label || '暂无判断'}。</p>
+            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}，主力净流入 ${amountText(selectedMainNetInflow)}（${fundFlowDateText(selectedRow?.fundFlowLatestDate, selectedRow?.date)}，${fundFlowCoverageText(selectedRow)}）。板块 ${boardFlow?.label || '暂无'}，指数 ${marketFlow?.label || '暂无'}，${resonance?.label || '暂无判断'}。</p>
           </div>
           <div class="badges">
             <span class="badge">蓝线：板块涨幅</span>

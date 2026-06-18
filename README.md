@@ -98,6 +98,7 @@ python .\scripts\validate_web_data.py
 ```
 
 如果目标日期是今天且处于交易时段，`update_daily_data.py` 默认也会自动切到盘中快速刷新模式；需要强制完整更新时加 `--full-during-trading`。
+注意：`--intraday-custom` 和 `--intraday-radar-only` 只用于当天盘中刷新；补历史日期时脚本会自动忽略这两个盘中参数，避免实时行情覆盖历史数据。
 
 ## 盘中雷达守护
 
@@ -111,7 +112,7 @@ python .\scripts\intraday_radar_daemon.py
 
 ```powershell
 python .\scripts\intraday_radar_daemon.py --disable-notify
-python .\scripts\intraday_radar_daemon.py --notify-interval 60
+python .\scripts\intraday_radar_daemon.py --notify-interval 600
 python .\scripts\intraday_radar_daemon.py --once --force
 ```
 

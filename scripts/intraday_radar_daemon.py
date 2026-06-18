@@ -8,8 +8,8 @@
   python scripts/intraday_radar_daemon.py --disable-notify
   python scripts/intraday_radar_daemon.py --force
 
-交易日盘中自动刷新自定义板块实时数据，默认每 2 分钟执行一次。
-企业微信通知默认每 5 分钟推送一次，并复用盘中雷达通知脚本。
+交易日盘中自动刷新自定义板块实时数据，默认每 1 分钟执行一次。
+企业微信通知默认每 10 分钟推送一次，并复用盘中雷达通知脚本。
 日志写入 logs/intraday_radar.log。
 """
 
@@ -192,7 +192,7 @@ def maybe_notify(now: datetime, log_path: Path, interval_seconds: int, top_n: in
 def main() -> None:
     parser = argparse.ArgumentParser(description="Intraday radar daemon loop")
     parser.add_argument("--interval", type=int, default=60, help="Loop interval in seconds (default: 60)")
-    parser.add_argument("--notify-interval", type=int, default=60, help="WeCom notify interval in seconds (default: 60)")
+    parser.add_argument("--notify-interval", type=int, default=600, help="WeCom notify interval in seconds (default: 600)")
     parser.add_argument("--notify-top", type=int, default=80, help="Max radar opportunities per notification (default: 80)")
     parser.add_argument("--disable-notify", action="store_true", help="Refresh intraday radar without sending WeCom notifications")
     parser.add_argument("--once", action="store_true", help="Run once and exit")

@@ -11,9 +11,7 @@
       <header class="top-switcher" aria-label="数据源切换">
         <nav class="tabs" aria-label="数据源切换">
           <button class="tab active" data-target="intraday">盘中雷达</button>
-          <button class="tab" data-target="trades">操作记录</button>
           <button class="tab" data-target="custom">自定义板块</button>
-          <button class="tab" data-target="kpl">开盘啦强度</button>
         </nav>
       </header>
 
@@ -21,17 +19,10 @@
         <iframe title="盘中雷达" src="./intraday.html?v=20260520-stock-pick-v1"></iframe>
       </section>
 
-      <section class="panel" id="panel-trades">
-        <iframe title="操作记录" src="./trades.html?v=20260527-ledger-v1"></iframe>
-      </section>
-
       <section class="panel" id="panel-custom">
         <iframe title="自定义板块" src="./custom.html?v=20260525-selected-date-highlight-v1"></iframe>
       </section>
 
-      <section class="panel" id="panel-kpl">
-        <iframe title="开盘啦强度" src="./kpl.html"></iframe>
-      </section>
     </main>
 
     <script src="./tabs.js?v=20260520-stock-pick-v1" type="module"></script>

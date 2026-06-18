@@ -149,6 +149,37 @@
     return safeNumber(stock?.turnover ?? stock?.amount);
   }
 
+  function stockMainNetInflowValue(stock) {
+    if (typeof stockMainNetInflow === 'function') return stockMainNetInflow(stock);
+    return safeNumber(stock?.mainNetInflow ?? stock?.latestMainNetInflow);
+  }
+
+  function rowMainNetInflowValue(row) {
+    if (typeof rowMainNetInflow === 'function') return rowMainNetInflow(row);
+    return safeNumber(row?.mainNetInflow);
+  }
+
+  function sumFundFlowRows(rows, days) {
+    const values = rows
+      .slice(Math.max(0, rows.length - days))
+      .map((row) => rowMainNetInflowValue(row))
+      .filter((value) => value !== null);
+    return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
+  }
+
+  function fundFlowCoverageLabel(row) {
+    if (typeof fundFlowCoverageText === 'function') return fundFlowCoverageText(row);
+    const count = safeNumber(row?.fundFlowStockCount);
+    const total = safeNumber(row?.stockCount);
+    return count !== null && total ? `覆盖 ${count}/${total}` : '覆盖暂无';
+  }
+
+  function signedTone(value) {
+    const parsed = safeNumber(value);
+    if (parsed === null || parsed === 0) return '';
+    return parsed > 0 ? 'rise' : 'fall';
+  }
+
   function normalizeCode(value) {
     const digits = String(value || '').replace(/\D/g, '');
     return digits ? digits.slice(-6).padStart(6, '0') : '';
@@ -484,6 +515,18 @@
         .map((item) => stockTurnoverValue(item.stock))
         .filter((value) => value !== null)
         .reduce((sum, value) => sum + value, 0);
+      const mainNetInflow3Values = items.slice(Math.max(0, items.length - 3))
+        .map((item) => stockMainNetInflowValue(item.stock))
+        .filter((value) => value !== null);
+      const mainNetInflow5Values = items.slice(Math.max(0, items.length - 5))
+        .map((item) => stockMainNetInflowValue(item.stock))
+        .filter((value) => value !== null);
+      const mainNetInflow3 = mainNetInflow3Values.length
+        ? mainNetInflow3Values.reduce((sum, value) => sum + value, 0)
+        : null;
+      const mainNetInflow5 = mainNetInflow5Values.length
+        ? mainNetInflow5Values.reduce((sum, value) => sum + value, 0)
+        : null;
       const ret10 = stockReturn(items, 10);
       const boardRet3 = boardReturnForItems(board, items, 3);
       const boardRet5 = boardReturnForItems(board, items, 5);
@@ -496,6 +539,7 @@
       const reboundScore = stockReboundScore(board, items);
       const latestChange = items.length ? safeNumber(items.at(-1).stock.changePercent) : null;
       const latest = items.at(-1)?.stock || null;
+      const latestRow = items.at(-1)?.row || null;
       const macdScore = safeNumber(latest?.macdScore) ?? 50;
       const macdLabel = latest?.macdLabel || 'MACD暂无';
       const authenticity = stockAuthenticityMetric(board, stock);
@@ -528,6 +572,10 @@
         ret10,
         amount3,
         amount5,
+        mainNetInflow3,
+        mainNetInflow5,
+        fundFlowDate: latest?.fundFlowDate || stock.latestFundFlowDate,
+        quoteDate: latestRow?.date,
         rel3,
         rel5,
         rel10,
@@ -579,6 +627,10 @@
       ['3日回撤', fmtPercent(metric.drawdown3), '短线波动风险'],
       ['量能比', metric.turnoverRatio === null ? '暂无' : fmt(metric.turnoverRatio, 2), '当前/5日均额'],
     ];
+    const flow3 = sumFundFlowRows(rowsToSelected(metric.board, 3), 3);
+    const flow5 = sumFundFlowRows(rowsToSelected(metric.board, 5), 5);
+    if (flow3 !== null) cards.push(['3日主力净流入', fmtAmount(flow3), fundFlowCoverageLabel(metric.latestRow)]);
+    if (flow5 !== null) cards.push(['5日主力净流入', fmtAmount(flow5), fundFlowCoverageLabel(metric.latestRow)]);
     return `
       <div class="swing-metrics">
         ${cards.map(([title, value, sub]) => `
@@ -595,6 +647,8 @@
   function renderStockTable(board) {
     const rows = sortedStockRows(board).slice(0, 12);
     if (!rows.length) return '<div class="empty">暂无韧性股数据</div>';
+    const hasFundFlow3 = rows.some((item) => safeNumber(item.mainNetInflow3) !== null);
+    const hasFundFlow5 = rows.some((item) => safeNumber(item.mainNetInflow5) !== null);
     return `
       <div class="table-wrap swing-table-wrap">
         <table>
@@ -605,6 +659,8 @@
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="sortScore">综合排序${stockSortLabel('sortScore')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="amount3">3日成交额${stockSortLabel('amount3')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="amount5">5日成交额${stockSortLabel('amount5')}</button></th>
+              ${hasFundFlow3 ? `<th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="mainNetInflow3">3日主力净流入${stockSortLabel('mainNetInflow3')}</button></th>` : ''}
+              ${hasFundFlow5 ? `<th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="mainNetInflow5">5日主力净流入${stockSortLabel('mainNetInflow5')}</button></th>` : ''}
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="ret3">3日涨幅${stockSortLabel('ret3')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="ret5">5日涨幅${stockSortLabel('ret5')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="rel3">3日相对板块${stockSortLabel('rel3')}</button></th>
@@ -624,6 +680,8 @@
                 <td><strong>${fmt(item.sortScore, 0)}</strong></td>
                 <td>${fmtAmount(item.amount3)}</td>
                 <td>${fmtAmount(item.amount5)}</td>
+                ${hasFundFlow3 ? `<td class="${signedTone(item.mainNetInflow3)}">${item.mainNetInflow3 === null ? '' : fmtAmount(item.mainNetInflow3)}</td>` : ''}
+                ${hasFundFlow5 ? `<td class="${signedTone(item.mainNetInflow5)}">${item.mainNetInflow5 === null ? '' : fmtAmount(item.mainNetInflow5)}</td>` : ''}
                 <td class="${changeClass(item.ret3)}">${fmtPercent(item.ret3)}</td>
                 <td class="${changeClass(item.ret5)}">${fmtPercent(item.ret5)}</td>
                 <td class="${changeClass(item.rel3)}">${fmtPercent(item.rel3)}</td>

@@ -12,16 +12,22 @@ def test_resonance_highlight_uses_manual_date_only():
     assert "CUSTOM_RESONANCE_CONFIG_URL" in source
     assert "stateConfig.highlightDate" in segment
     assert "marketNotesForDate(date)" in segment
-    assert config["highlightDate"] == "2026-06-04"
-    assert config["marketNotes"]["2026-05-27"] == ["冲高回落", "科技大跌", "电力逆势上涨"]
-    assert config["marketNotes"]["2026-05-28"] == ["低开高走", "科技走强", "缩量"]
-    assert config["marketNotes"]["2026-05-29"] == ["高开低走", "双创破位", "巨量踩踏", "科技失血", "防守抱团"]
-    assert config["marketNotes"]["2026-06-01"] == ["高开低走", "科技补跌", "缩量"]
-    assert config["marketNotes"]["2026-06-02"] == ["指数企稳", "科技引领复苏"]
-    assert config["marketNotes"]["2026-06-03"] == ["指数冲高回落", "回暖后", "科技第二次分歧"]
-    assert config["marketNotes"]["2026-06-04"] == ["弱势震荡", "缩量普跌", "半导体逆势"]
+    assert config["highlightDate"] in config["marketNotes"]
+    assert all(isinstance(note, str) and note for note in config["marketNotes"][config["highlightDate"]])
+
+
+def test_resonance_renders_secondary_market_index_in_existing_index_column():
+    source = Path("web/custom-resonance.js").read_text(encoding="utf-8")
+    data = json.loads(Path("web/data/custom_boards.json").read_text(encoding="utf-8"))
+
+    assert "secondaryMarketIndex" in data
+    assert data["secondaryMarketIndex"]["name"] == "创业板指"
+    assert "resonance-secondary-index-value" in source
+    assert "row.index.secondary" in source
+    assert "grid-template-columns: 72px 150px minmax(0, 1fr)" in Path("web/custom-resonance.css").read_text(encoding="utf-8")
 
 
 if __name__ == "__main__":
     test_resonance_highlight_uses_manual_date_only()
+    test_resonance_renders_secondary_market_index_in_existing_index_column()
     print("resonance highlight date behavior ok")

@@ -20,10 +20,13 @@ CONFIG_PATH = Path("web/data/custom_boards_config.json")
 OUT_PATH = Path("web/data/custom_boards.json")
 CACHE_DIR = Path("data/custom_stock_history")
 FINANCIAL_CACHE_DIR = Path("data/custom_financial_metrics")
+FUND_FLOW_CACHE_DIR = Path("data/custom_fund_flow")
 MARKET_INDEX_CACHE_DIR = Path("data/custom_market_index_history")
 HIGH100_WINDOW = 100
 MARKET_INDEX_SYMBOL = "sh000001"
 MARKET_INDEX_NAME = "上证指数"
+SECONDARY_MARKET_INDEX_SYMBOL = "sz399006"
+SECONDARY_MARKET_INDEX_NAME = "创业板指"
 PROXY_ENV_KEYS = (
     "HTTP_PROXY",
     "HTTPS_PROXY",
@@ -122,6 +125,14 @@ def fetch_stock_history(code: str, end_date: str, lookback_days: int) -> list[di
         return normalize_price_history(code, df)
 
 
+def stock_market(code: str) -> str:
+    if code.startswith(("6", "9")):
+        return "sh"
+    if code.startswith(("8", "4")):
+        return "bj"
+    return "sz"
+
+
 def cache_path(cache_dir: Path, code: str, end_date: str, lookback_days: int) -> Path:
     return cache_dir / f"{end_date}_{lookback_days}" / f"{code}.json"
 
@@ -165,6 +176,36 @@ def write_cached_history(cache_dir: Path, code: str, end_date: str, lookback_day
     path = cache_path(cache_dir, code, end_date, lookback_days)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def normalize_fund_flow_history(code: str, df: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for _, row in df.iterrows():
+        rows.append(
+            {
+                "date": format_date(str(row.get("日期", ""))),
+                "code": code,
+                "close": number_or_none(row.get("收盘价")),
+                "changePercent": number_or_none(row.get("涨跌幅")),
+                "mainNetInflow": number_or_none(row.get("主力净流入-净额")),
+                "mainNetInflowRatio": number_or_none(row.get("主力净流入-净占比")),
+                "superLargeNetInflow": number_or_none(row.get("超大单净流入-净额")),
+                "superLargeNetInflowRatio": number_or_none(row.get("超大单净流入-净占比")),
+                "largeNetInflow": number_or_none(row.get("大单净流入-净额")),
+                "largeNetInflowRatio": number_or_none(row.get("大单净流入-净占比")),
+                "mediumNetInflow": number_or_none(row.get("中单净流入-净额")),
+                "mediumNetInflowRatio": number_or_none(row.get("中单净流入-净占比")),
+                "smallNetInflow": number_or_none(row.get("小单净流入-净额")),
+                "smallNetInflowRatio": number_or_none(row.get("小单净流入-净占比")),
+            }
+        )
+    return rows
+
+
+def fetch_fund_flow_history(code: str) -> list[dict[str, Any]]:
+    with without_proxy_env():
+        df = ak.stock_individual_fund_flow(stock=code, market=stock_market(code))
+    return normalize_fund_flow_history(code, df)
 
 
 def normalize_eastmoney_history(code: str, df: Any) -> list[dict[str, Any]]:
@@ -431,7 +472,8 @@ def normalize_tencent_market_index_payload(text: str, symbol: str, date: str) ->
         return None
     _, raw_value = payload.split("=", 1)
     parts = raw_value.strip().strip('";').split("~")
-    code = f"sh{parts[2]}" if len(parts) > 2 else ""
+    prefix = symbol[:2].lower() if symbol[:2].lower() in {"sh", "sz", "bj"} else "sh"
+    code = f"{prefix}{parts[2]}" if len(parts) > 2 else ""
     if code.lower() != symbol.lower():
         return None
     turnover = None
@@ -501,6 +543,48 @@ def merge_market_index_intraday(rows: list[dict[str, Any]], spot_row: dict[str, 
     rows.sort(key=lambda row: str(row.get("date") or ""))
 
 
+def update_market_index_with_tencent_spot(
+    market_index: dict[str, Any],
+    symbol: str,
+    name: str,
+    date: str,
+    days: int,
+) -> dict[str, Any]:
+    formatted_date = format_date(date)
+    if market_index.get("code") and market_index.get("code") != symbol:
+        market_index["trend"] = []
+    market_index["code"] = symbol
+    market_index["name"] = name
+    market_trend = market_index.setdefault("trend", [])
+    if len(market_trend) < days:
+        try:
+            history_rows = fetch_market_index_history(symbol, compact_date(format_date(date)), days + 20)
+            history_by_date = {str(row.get("date")): row for row in history_rows if row.get("date")}
+            history_by_date.update({str(row.get("date")): row for row in market_trend if row.get("date")})
+            market_trend[:] = sorted(history_by_date.values(), key=lambda row: str(row.get("date") or ""))[-days:]
+        except Exception as exc:  # noqa: BLE001 - realtime row below is still useful when history is unavailable.
+            print(f"Fast intraday {name} history backfill failed: {exc}")
+    market_url = f"https://qt.gtimg.cn/q={quote(symbol)}"
+    with urlopen(market_url, timeout=15) as response:
+        market_payload = response.read().decode("gbk", errors="replace")
+    market_spot = normalize_tencent_market_index_payload(market_payload, symbol, date)
+    if market_spot:
+        previous = next((row for row in reversed(market_trend) if row.get("date") != formatted_date), None)
+        market_spot.update(volume_price_state(market_spot.get("changePercent"), market_spot.get("volume"), (previous or {}).get("volume")))
+        market_trend[:] = [row for row in market_trend if row.get("date") != formatted_date]
+        market_trend.append(market_spot)
+        market_trend.sort(key=lambda row: str(row.get("date") or ""))
+        if len(market_trend) > days:
+            del market_trend[:-days]
+    latest_market = market_trend[-1] if market_trend else {}
+    market_index["latestDate"] = latest_market.get("date")
+    market_index["latestClose"] = latest_market.get("close")
+    market_index["latestChangePercent"] = latest_market.get("changePercent")
+    market_index["latestVolume"] = latest_market.get("volume")
+    market_index["latestState"] = latest_market.get("label")
+    return market_index
+
+
 def enrich_fast_intraday_stock_row(row: dict[str, Any], spot: dict[str, Any] | None, previous: dict[str, Any] | None) -> dict[str, Any]:
     updated = dict(previous or row)
     if spot:
@@ -536,6 +620,13 @@ def enrich_fast_intraday_stock_row(row: dict[str, Any], spot: dict[str, Any] | N
         "profitScore",
         "profitLabel",
         "profitMetrics",
+        "fundFlowDate",
+        "mainNetInflow",
+        "mainNetInflowRatio",
+        "superLargeNetInflow",
+        "largeNetInflow",
+        "mediumNetInflow",
+        "smallNetInflow",
     ):
         if updated.get(key) is None and previous:
             updated[key] = previous.get(key)
@@ -546,6 +637,12 @@ def summarize_fast_intraday_board_row(date: str, stocks: list[dict[str, Any]]) -
     values = [float(value) for value in (number_or_none(stock.get("changePercent")) for stock in stocks) if value is not None]
     volumes = [float(value) for value in (number_or_none(stock.get("volume")) for stock in stocks) if value is not None]
     turnovers = [float(value) for value in (number_or_none(stock.get("turnover")) for stock in stocks) if value is not None]
+    main_net_inflows = [float(value) for value in (number_or_none(stock.get("mainNetInflow")) for stock in stocks) if value is not None]
+    super_large_net_inflows = [float(value) for value in (number_or_none(stock.get("superLargeNetInflow")) for stock in stocks) if value is not None]
+    large_net_inflows = [float(value) for value in (number_or_none(stock.get("largeNetInflow")) for stock in stocks) if value is not None]
+    medium_net_inflows = [float(value) for value in (number_or_none(stock.get("mediumNetInflow")) for stock in stocks) if value is not None]
+    small_net_inflows = [float(value) for value in (number_or_none(stock.get("smallNetInflow")) for stock in stocks) if value is not None]
+    fund_flow_dates = [str(stock.get("fundFlowDate")) for stock in stocks if stock.get("fundFlowDate")]
     high_metrics = [
         stock for stock in stocks
         if stock.get("high100") is not None
@@ -561,6 +658,13 @@ def summarize_fast_intraday_board_row(date: str, stocks: list[dict[str, Any]]) -
         "totalVolume": round(sum(volumes), 2) if volumes else None,
         "totalTurnover": round(sum(turnovers), 2) if turnovers else None,
         "totalAmount": round(sum(turnovers), 2) if turnovers else None,
+        "mainNetInflow": round(sum(main_net_inflows), 2) if main_net_inflows else None,
+        "superLargeNetInflow": round(sum(super_large_net_inflows), 2) if super_large_net_inflows else None,
+        "largeNetInflow": round(sum(large_net_inflows), 2) if large_net_inflows else None,
+        "mediumNetInflow": round(sum(medium_net_inflows), 2) if medium_net_inflows else None,
+        "smallNetInflow": round(sum(small_net_inflows), 2) if small_net_inflows else None,
+        "fundFlowStockCount": len(main_net_inflows),
+        "fundFlowLatestDate": max(fund_flow_dates) if fund_flow_dates else None,
         "stockCount": len(values),
         "volumeStockCount": len(volumes),
         "turnoverStockCount": len(turnovers),
@@ -589,6 +693,13 @@ def sync_fast_intraday_board_latest(board: dict[str, Any], latest_row: dict[str,
     board["latestTotalVolume"] = latest_row.get("totalVolume")
     board["latestTotalTurnover"] = latest_row.get("totalTurnover")
     board["latestTotalAmount"] = latest_row.get("totalAmount")
+    board["latestMainNetInflow"] = latest_row.get("mainNetInflow")
+    board["latestSuperLargeNetInflow"] = latest_row.get("superLargeNetInflow")
+    board["latestLargeNetInflow"] = latest_row.get("largeNetInflow")
+    board["latestMediumNetInflow"] = latest_row.get("mediumNetInflow")
+    board["latestSmallNetInflow"] = latest_row.get("smallNetInflow")
+    board["latestFundFlowStockCount"] = latest_row.get("fundFlowStockCount")
+    board["latestFundFlowDate"] = latest_row.get("fundFlowLatestDate")
     stock_rows = {stock.get("code"): stock for stock in latest_row.get("stocks", [])}
     for stock in board.get("stocks", []):
         row = stock_rows.get(stock.get("code"))
@@ -612,6 +723,13 @@ def sync_fast_intraday_board_latest(board: dict[str, Any], latest_row: dict[str,
         stock["latestMacdHist"] = row.get("macdHist")
         stock["latestMacdLabel"] = row.get("macdLabel")
         stock["latestMacdScore"] = row.get("macdScore")
+        stock["latestFundFlowDate"] = row.get("fundFlowDate")
+        stock["latestMainNetInflow"] = row.get("mainNetInflow")
+        stock["latestMainNetInflowRatio"] = row.get("mainNetInflowRatio")
+        stock["latestSuperLargeNetInflow"] = row.get("superLargeNetInflow")
+        stock["latestLargeNetInflow"] = row.get("largeNetInflow")
+        stock["latestMediumNetInflow"] = row.get("mediumNetInflow")
+        stock["latestSmallNetInflow"] = row.get("smallNetInflow")
 
 
 def fast_intraday_refresh(config_path: Path, out_path: Path, date: str) -> None:
@@ -670,27 +788,20 @@ def fast_intraday_refresh(config_path: Path, out_path: Path, date: str) -> None:
             for item in trend
         ]
 
-    market_index = payload.get("marketIndex") or {}
-    market_trend = market_index.setdefault("trend", [])
-    market_url = f"https://qt.gtimg.cn/q={quote(MARKET_INDEX_SYMBOL)}"
-    with urlopen(market_url, timeout=15) as response:
-        market_payload = response.read().decode("gbk", errors="replace")
-    market_spot = normalize_tencent_market_index_payload(market_payload, MARKET_INDEX_SYMBOL, date)
-    if market_spot:
-        previous = next((row for row in reversed(market_trend) if row.get("date") != formatted_date), None)
-        market_spot.update(volume_price_state(market_spot.get("changePercent"), market_spot.get("volume"), (previous or {}).get("volume")))
-        market_trend[:] = [row for row in market_trend if row.get("date") != formatted_date]
-        market_trend.append(market_spot)
-        market_trend.sort(key=lambda row: str(row.get("date") or ""))
-        if len(market_trend) > days:
-            del market_trend[:-days]
-    latest_market = market_trend[-1] if market_trend else {}
-    market_index["latestDate"] = latest_market.get("date")
-    market_index["latestClose"] = latest_market.get("close")
-    market_index["latestChangePercent"] = latest_market.get("changePercent")
-    market_index["latestVolume"] = latest_market.get("volume")
-    market_index["latestState"] = latest_market.get("label")
-    payload["marketIndex"] = market_index
+    payload["marketIndex"] = update_market_index_with_tencent_spot(
+        payload.get("marketIndex") or {},
+        MARKET_INDEX_SYMBOL,
+        MARKET_INDEX_NAME,
+        date,
+        days,
+    )
+    payload["secondaryMarketIndex"] = update_market_index_with_tencent_spot(
+        payload.get("secondaryMarketIndex") or {},
+        SECONDARY_MARKET_INDEX_SYMBOL,
+        SECONDARY_MARKET_INDEX_NAME,
+        date,
+        days,
+    )
 
     payload["date"] = formatted_date
     source = payload.setdefault("source", {})
@@ -1135,6 +1246,83 @@ def build_financial_map(codes: set[str], end_date: str, cache_dir: Path, refresh
     return financials, errors
 
 
+def fund_flow_cache_path(cache_dir: Path, code: str, end_date: str) -> Path:
+    return cache_dir / end_date / f"{code}.json"
+
+
+def load_cached_fund_flow(cache_dir: Path, code: str, end_date: str) -> list[dict[str, Any]] | None:
+    path = fund_flow_cache_path(cache_dir, code, end_date)
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, list) else None
+
+
+def load_latest_cached_fund_flow(cache_dir: Path, code: str, end_date: str) -> list[dict[str, Any]] | None:
+    target = compact_date(format_date(end_date))
+    candidates: list[tuple[str, Path]] = []
+    if not cache_dir.exists():
+        return None
+    for directory in cache_dir.iterdir():
+        if not directory.is_dir() or not directory.name.isdigit() or directory.name > target:
+            continue
+        path = directory / f"{code}.json"
+        if path.exists():
+            candidates.append((directory.name, path))
+    for _, path in sorted(candidates, reverse=True):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, list):
+            return payload
+    return None
+
+
+def write_cached_fund_flow(cache_dir: Path, code: str, end_date: str, rows: list[dict[str, Any]]) -> None:
+    path = fund_flow_cache_path(cache_dir, code, end_date)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def build_fund_flow_map(codes: set[str], end_date: str, cache_dir: Path, refresh: bool, sleep: float) -> tuple[dict[str, list[dict[str, Any]]], list[str]]:
+    fund_flows: dict[str, list[dict[str, Any]]] = {}
+    errors: list[str] = []
+    for code in sorted(codes):
+        cached = None if refresh else load_cached_fund_flow(cache_dir, code, end_date)
+        if cached is None and not refresh:
+            cached = load_latest_cached_fund_flow(cache_dir, code, end_date)
+            if cached is not None:
+                write_cached_fund_flow(cache_dir, code, end_date, cached)
+        if cached is not None:
+            fund_flows[code] = cached
+            continue
+        try:
+            rows = fetch_fund_flow_history(code)
+            write_cached_fund_flow(cache_dir, code, end_date, rows)
+            fund_flows[code] = rows
+            if sleep:
+                time.sleep(sleep)
+        except Exception as exc:
+            errors.append(f"{code}: fund flow fetch failed: {exc}")
+            fund_flows[code] = []
+    return fund_flows, errors
+
+
+def fund_flow_lookup(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    return {str(row.get("date") or ""): row for row in rows if row.get("date")}
+
+
+def fund_flow_for_date(rows: list[dict[str, Any]], date: str | None) -> dict[str, Any] | None:
+    target = str(date or "")
+    if not target:
+        return None
+    return next((row for row in rows if str(row.get("date") or "") == target), None)
+
+
 def enrich_high100_metrics(rows: list[dict[str, Any]], window: int = HIGH100_WINDOW) -> None:
     ordered = sorted(rows, key=lambda row: str(row.get("date") or ""))
     valid_rows: list[dict[str, Any]] = []
@@ -1269,7 +1457,7 @@ def write_cached_market_index_history(cache_dir: Path, symbol: str, end_date: st
     write_cached_history(cache_dir, symbol, end_date, lookback_days, rows)
 
 
-def build_market_index(rows: list[dict[str, Any]], dates: list[str]) -> dict[str, Any]:
+def build_market_index(rows: list[dict[str, Any]], dates: list[str], symbol: str = MARKET_INDEX_SYMBOL, name: str = MARKET_INDEX_NAME) -> dict[str, Any]:
     rows_by_date = {str(row.get("date")): row for row in rows if row.get("date")}
     trend: list[dict[str, Any]] = []
     previous_volume: float | None = None
@@ -1296,8 +1484,8 @@ def build_market_index(rows: list[dict[str, Any]], dates: list[str]) -> dict[str
 
     latest = trend[-1] if trend else None
     return {
-        "code": MARKET_INDEX_SYMBOL,
-        "name": MARKET_INDEX_NAME,
+        "code": symbol,
+        "name": name,
         "trend": trend,
         "latestDate": latest.get("date") if latest else None,
         "latestClose": latest.get("close") if latest else None,
@@ -1307,14 +1495,65 @@ def build_market_index(rows: list[dict[str, Any]], dates: list[str]) -> dict[str
     }
 
 
+def load_or_fetch_market_index(args: Any, symbol: str, label: str) -> tuple[list[dict[str, Any]], bool]:
+    market_rows = None if args.refresh else load_cached_market_index_history(
+        args.market_index_cache_dir,
+        symbol,
+        args.date,
+        args.lookback_days,
+    )
+    reused_market_rows = False
+    if market_rows is None and args.intraday and not args.refresh:
+        market_rows = load_latest_cached_market_index_history(
+            args.market_index_cache_dir,
+            symbol,
+            args.date,
+            args.lookback_days,
+        )
+        reused_market_rows = market_rows is not None
+    if market_rows is None:
+        market_rows = fetch_market_index_history(symbol, args.date, args.lookback_days)
+        write_cached_market_index_history(
+            args.market_index_cache_dir,
+            symbol,
+            args.date,
+            args.lookback_days,
+            market_rows,
+        )
+        print(f"Fetched {label} history: {symbol}")
+    else:
+        source = "Reused" if reused_market_rows else "Cached"
+        print(f"{source} {label} history: {symbol}")
+    return market_rows, reused_market_rows
+
+
+def load_market_index_payload(args: Any, dates: list[str], symbol: str, name: str, label: str) -> dict[str, Any]:
+    market_rows, _ = load_or_fetch_market_index(args, symbol, label)
+    if args.intraday:
+        market_spot = fetch_market_index_intraday(symbol, args.date)
+        merge_market_index_intraday(market_rows, market_spot, args.date)
+        if market_spot:
+            write_cached_market_index_history(
+                args.market_index_cache_dir,
+                symbol,
+                args.date,
+                args.lookback_days,
+                market_rows,
+            )
+            print(f"Intraday {label} row: {symbol} for {format_date(args.date)}")
+    return build_market_index(market_rows, dates, symbol, name)
+
+
 def build_board(
     board: dict[str, Any],
     stock_histories: dict[str, list[dict[str, Any]]],
     dates: list[str],
     financials: dict[str, dict[str, Any]] | None = None,
+    fund_flows: dict[str, list[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     stocks = []
     stock_rows_by_code: dict[str, dict[str, dict[str, Any]]] = {}
+    fund_flow_rows_by_code: dict[str, list[dict[str, Any]]] = {}
     for item in board.get("stocks", []):
         code = normalize_stock_code(item.get("code"))
         if not code:
@@ -1325,6 +1564,9 @@ def build_board(
         stock_rows_by_code[code] = {row["date"]: row for row in rows}
         latest = next((row for row in reversed(rows) if row.get("changePercent") is not None), None)
         profit = (financials or {}).get(code) or {}
+        fund_rows = sorted((fund_flows or {}).get(code) or [], key=lambda row: str(row.get("date") or ""))
+        fund_flow_rows_by_code[code] = fund_rows
+        latest_fund = fund_flow_for_date(fund_rows, latest.get("date") if latest else None)
         stocks.append(
             {
                 "code": code,
@@ -1354,6 +1596,13 @@ def build_board(
                 "profitMetrics": profit.get("profitMetrics"),
                 "profitHistory": profit.get("profitHistory") or [],
                 "profitConclusion": profit.get("profitConclusion"),
+                "latestFundFlowDate": latest_fund.get("date") if latest_fund else None,
+                "latestMainNetInflow": latest_fund.get("mainNetInflow") if latest_fund else None,
+                "latestMainNetInflowRatio": latest_fund.get("mainNetInflowRatio") if latest_fund else None,
+                "latestSuperLargeNetInflow": latest_fund.get("superLargeNetInflow") if latest_fund else None,
+                "latestLargeNetInflow": latest_fund.get("largeNetInflow") if latest_fund else None,
+                "latestMediumNetInflow": latest_fund.get("mediumNetInflow") if latest_fund else None,
+                "latestSmallNetInflow": latest_fund.get("smallNetInflow") if latest_fund else None,
             }
         )
 
@@ -1363,9 +1612,16 @@ def build_board(
         values = []
         volumes = []
         turnovers = []
+        main_net_inflows = []
+        super_large_net_inflows = []
+        large_net_inflows = []
+        medium_net_inflows = []
+        small_net_inflows = []
+        fund_flow_dates = []
         high_metrics = []
         for stock in stocks:
             row = stock_rows_by_code.get(stock["code"], {}).get(date)
+            fund_flow = fund_flow_for_date(fund_flow_rows_by_code.get(stock["code"], []), date)
             change = row.get("changePercent") if row else None
             if change is not None:
                 values.append(float(change))
@@ -1375,6 +1631,23 @@ def build_board(
                 volumes.append(float(volume))
             if turnover is not None:
                 turnovers.append(float(turnover))
+            main_net_inflow = number_or_none(fund_flow.get("mainNetInflow")) if fund_flow else None
+            super_large_net_inflow = number_or_none(fund_flow.get("superLargeNetInflow")) if fund_flow else None
+            large_net_inflow = number_or_none(fund_flow.get("largeNetInflow")) if fund_flow else None
+            medium_net_inflow = number_or_none(fund_flow.get("mediumNetInflow")) if fund_flow else None
+            small_net_inflow = number_or_none(fund_flow.get("smallNetInflow")) if fund_flow else None
+            if main_net_inflow is not None:
+                main_net_inflows.append(float(main_net_inflow))
+            if super_large_net_inflow is not None:
+                super_large_net_inflows.append(float(super_large_net_inflow))
+            if large_net_inflow is not None:
+                large_net_inflows.append(float(large_net_inflow))
+            if medium_net_inflow is not None:
+                medium_net_inflows.append(float(medium_net_inflow))
+            if small_net_inflow is not None:
+                small_net_inflows.append(float(small_net_inflow))
+            if fund_flow and fund_flow.get("date"):
+                fund_flow_dates.append(str(fund_flow.get("date")))
             if row and row.get("high100") is not None and row.get("distanceToHigh100") is not None and row.get("position100") is not None:
                 high_metrics.append(row)
             daily_stocks.append(
@@ -1406,6 +1679,13 @@ def build_board(
                     "profitScore": stock.get("profitScore"),
                     "profitLabel": stock.get("profitLabel"),
                     "profitMetrics": stock.get("profitMetrics"),
+                    "fundFlowDate": fund_flow.get("date") if fund_flow else None,
+                    "mainNetInflow": main_net_inflow,
+                    "mainNetInflowRatio": fund_flow.get("mainNetInflowRatio") if fund_flow else None,
+                    "superLargeNetInflow": super_large_net_inflow,
+                    "largeNetInflow": large_net_inflow,
+                    "mediumNetInflow": medium_net_inflow,
+                    "smallNetInflow": small_net_inflow,
                 }
             )
         daily_stocks = sorted(daily_stocks, key=lambda row: sort_change_value(row.get("changePercent")), reverse=True)
@@ -1419,6 +1699,13 @@ def build_board(
                 "totalVolume": round(sum(volumes), 2) if volumes else None,
                 "totalTurnover": round(sum(turnovers), 2) if turnovers else None,
                 "totalAmount": round(sum(turnovers), 2) if turnovers else None,
+                "mainNetInflow": round(sum(main_net_inflows), 2) if main_net_inflows else None,
+                "superLargeNetInflow": round(sum(super_large_net_inflows), 2) if super_large_net_inflows else None,
+                "largeNetInflow": round(sum(large_net_inflows), 2) if large_net_inflows else None,
+                "mediumNetInflow": round(sum(medium_net_inflows), 2) if medium_net_inflows else None,
+                "smallNetInflow": round(sum(small_net_inflows), 2) if small_net_inflows else None,
+                "fundFlowStockCount": len(main_net_inflows),
+                "fundFlowLatestDate": max(fund_flow_dates) if fund_flow_dates else None,
                 "stockCount": len(values),
                 "volumeStockCount": len(volumes),
                 "turnoverStockCount": len(turnovers),
@@ -1471,6 +1758,13 @@ def build_board(
         "latestTotalVolume": latest_trend.get("totalVolume") if latest_trend else None,
         "latestTotalTurnover": latest_trend.get("totalTurnover") if latest_trend else None,
         "latestTotalAmount": latest_trend.get("totalAmount") if latest_trend else None,
+        "latestMainNetInflow": latest_trend.get("mainNetInflow") if latest_trend else None,
+        "latestSuperLargeNetInflow": latest_trend.get("superLargeNetInflow") if latest_trend else None,
+        "latestLargeNetInflow": latest_trend.get("largeNetInflow") if latest_trend else None,
+        "latestMediumNetInflow": latest_trend.get("mediumNetInflow") if latest_trend else None,
+        "latestSmallNetInflow": latest_trend.get("smallNetInflow") if latest_trend else None,
+        "latestFundFlowStockCount": latest_trend.get("fundFlowStockCount") if latest_trend else 0,
+        "latestFundFlowDate": latest_trend.get("fundFlowLatestDate") if latest_trend else None,
         "latestAvgProfitScore": round(sum(float(row["profitScore"]) for row in scored_profit_rank) / len(scored_profit_rank), 1) if scored_profit_rank else None,
         "profitRank": profit_rank,
         "stocks": sorted(stocks, key=lambda row: sort_change_value(row.get("latestChangePercent")), reverse=True),
@@ -1489,10 +1783,13 @@ def main() -> None:
     parser.add_argument("--sleep", type=float, default=0.2)
     parser.add_argument("--cache-dir", type=Path, default=CACHE_DIR)
     parser.add_argument("--financial-cache-dir", type=Path, default=FINANCIAL_CACHE_DIR)
+    parser.add_argument("--fund-flow-cache-dir", type=Path, default=FUND_FLOW_CACHE_DIR)
     parser.add_argument("--market-index-cache-dir", type=Path, default=MARKET_INDEX_CACHE_DIR)
     parser.add_argument("--refresh", action="store_true", help="Ignore cached stock histories and fetch all codes again.")
     parser.add_argument("--refresh-financial", action="store_true", help="Ignore cached financial metrics and fetch all codes again.")
+    parser.add_argument("--refresh-fund-flow", action="store_true", help="Ignore cached fund flow rows and fetch all codes again.")
     parser.add_argument("--skip-financial", action="store_true", help="Skip optional profit score enrichment.")
+    parser.add_argument("--skip-fund-flow", action="store_true", help="Skip optional Eastmoney fund flow enrichment.")
     parser.add_argument("--intraday", action="store_true", help="Overlay today's realtime spot quotes into the latest custom board row.")
     parser.add_argument("--intraday-fast", action="store_true", help="Only update existing custom board JSON with realtime spot rows for intraday radar refresh.")
     args = parser.parse_args()
@@ -1564,54 +1861,43 @@ def main() -> None:
         )
         errors.extend({"code": "financial", "error": error} for error in financial_errors)
         print(f"Financial rows: {len(financials)}/{len(codes)}")
-    built_boards = [build_board(board, stock_histories, dates, financials) for board in boards]
+    fund_flows: dict[str, list[dict[str, Any]]] = {}
+    warnings: dict[str, Any] = {}
+    if not args.skip_fund_flow:
+        fund_flows, fund_flow_errors = build_fund_flow_map(
+            set(codes),
+            args.date,
+            args.fund_flow_cache_dir,
+            args.refresh_fund_flow,
+            args.sleep,
+        )
+        if fund_flow_errors:
+            warnings["fundFlow"] = {
+                "source": "AkShare stock_individual_fund_flow / Eastmoney fund flow",
+                "failedCount": len(fund_flow_errors),
+                "sample": fund_flow_errors[:10],
+            }
+        print(f"Fund flow rows: {sum(1 for rows in fund_flows.values() if rows)}/{len(codes)}")
+    built_boards = [build_board(board, stock_histories, dates, financials, fund_flows) for board in boards]
     built_boards = sorted(built_boards, key=lambda board: sort_change_value(board.get("latestAverageChange")), reverse=True)
     market_index = None
+    secondary_market_index = None
     try:
-        market_rows = None if args.refresh else load_cached_market_index_history(
-            args.market_index_cache_dir,
-            MARKET_INDEX_SYMBOL,
-            args.date,
-            args.lookback_days,
-        )
-        reused_market_rows = False
-        if market_rows is None and args.intraday and not args.refresh:
-            market_rows = load_latest_cached_market_index_history(
-                args.market_index_cache_dir,
-                MARKET_INDEX_SYMBOL,
-                args.date,
-                args.lookback_days,
-            )
-            reused_market_rows = market_rows is not None
-        if market_rows is None:
-            market_rows = fetch_market_index_history(MARKET_INDEX_SYMBOL, args.date, args.lookback_days)
-            write_cached_market_index_history(
-                args.market_index_cache_dir,
-                MARKET_INDEX_SYMBOL,
-                args.date,
-                args.lookback_days,
-                market_rows,
-            )
-            print(f"Fetched market index history: {MARKET_INDEX_SYMBOL}")
-        else:
-            source = "Reused" if reused_market_rows else "Cached"
-            print(f"{source} market index history: {MARKET_INDEX_SYMBOL}")
-        if args.intraday:
-            market_spot = fetch_market_index_intraday(MARKET_INDEX_SYMBOL, args.date)
-            merge_market_index_intraday(market_rows, market_spot, args.date)
-            if market_spot:
-                write_cached_market_index_history(
-                    args.market_index_cache_dir,
-                    MARKET_INDEX_SYMBOL,
-                    args.date,
-                    args.lookback_days,
-                    market_rows,
-                )
-                print(f"Intraday market index row: {MARKET_INDEX_SYMBOL} for {format_date(args.date)}")
-        market_index = build_market_index(market_rows, dates)
+        market_index = load_market_index_payload(args, dates, MARKET_INDEX_SYMBOL, MARKET_INDEX_NAME, "market index")
     except Exception as exc:  # noqa: BLE001 - keep custom board build available even when index source is unavailable.
         errors.append({"code": "market_index", "error": str(exc)})
         print(f"Failed market index fetch: {exc}")
+    try:
+        secondary_market_index = load_market_index_payload(
+            args,
+            dates,
+            SECONDARY_MARKET_INDEX_SYMBOL,
+            SECONDARY_MARKET_INDEX_NAME,
+            "secondary market index",
+        )
+    except Exception as exc:  # noqa: BLE001 - keep custom board build available even when secondary index source is unavailable.
+        errors.append({"code": "secondary_market_index", "error": str(exc)})
+        print(f"Failed secondary market index fetch: {exc}")
     payload = {
         "date": format_date(args.date),
         "days": args.days,
@@ -1621,9 +1907,14 @@ def main() -> None:
             "note": "Custom board lines use member stock change percent; --intraday overlays today's realtime spot quote row when available.",
             "amountUnit": "turnover_yuan",
             "amountNote": "amount is kept for compatibility and equals turnover. Use volume for share volume and turnover for turnover amount in yuan.",
+            "fundFlowSource": "AkShare stock_individual_fund_flow / Eastmoney fund flow",
+            "fundFlowUnit": "yuan",
+            "fundFlowNote": "Custom board fund flow is aggregated from member-stock Eastmoney main net inflow rows. Fund-flow dates can lag intraday quote dates.",
         },
         "marketIndex": market_index,
+        "secondaryMarketIndex": secondary_market_index,
         "boards": built_boards,
+        "warnings": warnings,
         "errors": errors,
     }
 

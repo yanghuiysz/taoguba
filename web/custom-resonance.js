@@ -88,6 +88,11 @@
     return trend.find((row) => row.date === date) || null;
   }
 
+  function getSecondaryIndexRow(date) {
+    const trend = state?.data?.secondaryMarketIndex?.trend || [];
+    return trend.find((row) => row.date === date) || null;
+  }
+
   function getRedRate(row) {
     if (typeof rowRedRate === 'function') return rowRedRate(row);
     const stocks = (row?.stocks || []).filter((stock) => safeNumber(stock.changePercent) !== null);
@@ -243,6 +248,7 @@
         datesAsc: null,
         indexDetails: new Map(),
         indexRows: null,
+        secondaryIndexRows: null,
         marketStates: new Map(),
         boardCodes: new Map(),
         maxIndexAbs: null,
@@ -256,11 +262,23 @@
     const cache = getCache();
     if (cache.indexRows) return cache.indexRows;
     cache.indexRows = new Map((state?.data?.marketIndex?.trend || []).map((row) => [row.date, row]));
+    cache.secondaryIndexRows = new Map((state?.data?.secondaryMarketIndex?.trend || []).map((row) => [row.date, row]));
     return cache.indexRows;
+  }
+
+  function secondaryIndexRowsByDate() {
+    const cache = getCache();
+    if (cache.secondaryIndexRows) return cache.secondaryIndexRows;
+    cache.secondaryIndexRows = new Map((state?.data?.secondaryMarketIndex?.trend || []).map((row) => [row.date, row]));
+    return cache.secondaryIndexRows;
   }
 
   function getIndexRowFast(date) {
     return indexRowsByDate().get(date) || getIndexRow(date);
+  }
+
+  function getSecondaryIndexRowFast(date) {
+    return secondaryIndexRowsByDate().get(date) || getSecondaryIndexRow(date);
   }
 
   function marketStateForDate(date) {
@@ -397,12 +415,19 @@
   function indexDetail(date) {
     const cache = getCache();
     if (cache.indexDetails.has(date)) return cache.indexDetails.get(date);
-    const row = getIndexRow(date);
+    const row = getIndexRowFast(date);
+    const secondaryRow = getSecondaryIndexRowFast(date);
     const change = safeNumber(row?.changePercent);
+    const secondaryChange = safeNumber(secondaryRow?.changePercent);
     const detail = {
       change,
       label: row?.label || '暂无',
       close: safeNumber(row?.close),
+      secondary: secondaryRow ? {
+        name: state?.data?.secondaryMarketIndex?.name || '创业板指',
+        change: secondaryChange,
+        close: safeNumber(secondaryRow?.close),
+      } : null,
     };
     cache.indexDetails.set(date, detail);
     return detail;
@@ -552,12 +577,15 @@
 
   function renderTable(series) {
     const rows = dailyTopBoards(10);
+    const primaryIndexName = state?.data?.marketIndex?.name || '指数';
+    const secondaryIndexName = state?.data?.secondaryMarketIndex?.name || '';
+    const indexTitle = secondaryIndexName ? `${primaryIndexName}/${secondaryIndexName}` : primaryIndexName;
     if (!rows.length) return '<div class="empty">暂无板块与指数共振数据</div>';
     return `
       <div class="resonance-matrix${effectiveLinkedBoardCode() ? ' has-link' : ''}">
         <div class="resonance-matrix-head">
           <span>日期</span>
-          <span>${state?.data?.marketIndex?.name || '指数'}涨跌幅</span>
+          <span>${escapeHtml(indexTitle)}涨跌幅</span>
           <span>当天涨跌幅最高 10 个板块</span>
         </div>
         ${rows.map((row) => `
@@ -568,6 +596,12 @@
                 <strong class="${changeClass(row.index.change)}">${fmtPercent(row.index.change)}</strong>
                 ${row.index.special ? `<span class="resonance-index-special">${row.index.marketLabel || '今日'}</span>` : ''}
               </div>
+              ${row.index.secondary ? `
+                <div class="resonance-secondary-index-value">
+                  <span>${escapeHtml(row.index.secondary.name || '创业板指')}</span>
+                  <strong class="${changeClass(row.index.secondary.change)}">${fmtPercent(row.index.secondary.change)}</strong>
+                </div>
+              ` : ''}
               ${row.index.notes?.length ? `
                 <div class="resonance-index-notes">
                   ${row.index.notes.map((note) => `<span>${escapeHtml(note)}</span>`).join('')}
@@ -591,6 +625,8 @@
 
   function renderPanelHtml(board) {
     const indexName = state?.data?.marketIndex?.name || '指数';
+    const secondaryIndexName = state?.data?.secondaryMarketIndex?.name || '';
+    const indexDescName = secondaryIndexName ? `${indexName}/${secondaryIndexName}` : indexName;
     const rows = dailyTopBoards(10);
     const linkedBoard = effectiveLinkedBoardCode() ? findBoardByCode(effectiveLinkedBoardCode()) : null;
     return `
@@ -598,7 +634,7 @@
         <div class="section-head">
           <div>
             <h2>指数共振</h2>
-            <p class="muted">每行一天，只看 ${indexName} 涨跌幅，以及当天涨跌幅最高的 10 个自定义板块。</p>
+            <p class="muted">每行一天，只看 ${escapeHtml(indexDescName)} 涨跌幅，以及当天涨跌幅最高的 10 个自定义板块。</p>
           </div>
           <div class="resonance-head-actions">
             ${linkedBoard ? `
