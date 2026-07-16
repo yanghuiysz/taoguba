@@ -3,7 +3,7 @@ const panels = Object.fromEntries(
   [...document.querySelectorAll(".panel")].map((panel) => [panel.id.replace("panel-", ""), panel]),
 );
 const frameSrc = {
-  custom: "./custom.html?v=20260522-resonance-fast-link-v1",
+  custom: "./custom.html?v=20260525-selected-date-highlight-v1",
   intraday: "./intraday.html?v=20260520-stock-pick-v1",
 };
 const AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
@@ -46,6 +46,9 @@ function activate(target) {
     if (name === target) {
       const frame = panel.querySelector("iframe");
       const expected = frameSrc[name];
+      if (frame && !frame.getAttribute("src")) {
+        frame.setAttribute("src", frame.dataset.src || expected || "");
+      }
       if (frame && expected && !String(frame.getAttribute("src") || "").startsWith(expected)) {
         frame.setAttribute("src", expected);
       }

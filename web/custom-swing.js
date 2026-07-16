@@ -3,6 +3,7 @@
   window.__customSwingPanelInstalled = true;
 
   const SWING_TAB = 'swing';
+  const BOARD_RANKING_TAB = 'board-ranking';
   let scheduled = false;
   let enhancing = false;
   let opportunitySort = {
@@ -14,6 +15,10 @@
     direction: 'desc',
   };
   let stockTableSort = {
+    key: 'sortScore',
+    direction: 'desc',
+  };
+  let boardRankingSort = {
     key: 'sortScore',
     direction: 'desc',
   };
@@ -447,6 +452,88 @@
     return metric;
   }
 
+  function rankingRowsToDate(board, selectedDate) {
+    return getTrendRows(board)
+      .filter((row) => !selectedDate || String(row.date || '') <= String(selectedDate))
+      .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+  }
+
+  function boardRankingBaseMetric(board, selectedDate) {
+    const rows = rankingRowsToDate(board, selectedDate);
+
+    function windowMetric(days) {
+      if (rows.length < days) return null;
+      const windowRows = rows.slice(-days);
+      const changes = windowRows.map((row) => getBoardChange(board, row));
+      const indexChanges = windowRows.map((row) => getIndexChange(row.date));
+      const turnovers = windowRows.map(getRowTurnover);
+      const fundFlows = windowRows.map(rowMainNetInflowValue);
+      const complete = (values) => values.length === days && values.every((value) => value !== null);
+      const boardReturn = complete(changes) ? compoundReturn(changes) : null;
+      const indexReturn = complete(indexChanges) ? compoundReturn(indexChanges) : null;
+      return {
+        amount: complete(turnovers) ? turnovers.reduce((sum, value) => sum + value, 0) : null,
+        mainNetInflow: complete(fundFlows) ? fundFlows.reduce((sum, value) => sum + value, 0) : null,
+        boardReturn,
+        relative: boardReturn !== null && indexReturn !== null ? boardReturn - indexReturn : null,
+        changes,
+      };
+    }
+
+    const window3 = windowMetric(3);
+    const window5 = windowMetric(5);
+    return {
+      board,
+      date: rows.at(-1)?.date || '',
+      amount3: window3?.amount ?? null,
+      amount5: window5?.amount ?? null,
+      mainNetInflow3: window3?.mainNetInflow ?? null,
+      mainNetInflow5: window5?.mainNetInflow ?? null,
+      return3: window3?.boardReturn ?? null,
+      return5: window5?.boardReturn ?? null,
+      relative3: window3?.relative ?? null,
+      relative5: window5?.relative ?? null,
+      drawdown: window5 ? maxDrawdownFromChanges(window5.changes) : null,
+    };
+  }
+
+  function normalizeBoardRankingMetric(rows, key) {
+    const metricValue = (row) => row[key] === null || row[key] === undefined || row[key] === '' ? null : safeNumber(row[key]);
+    const values = rows.map(metricValue).filter((value) => value !== null);
+    if (!values.length) return new Map();
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    return new Map(rows.map((row) => {
+      const value = metricValue(row);
+      if (value === null) return [row.board.code, null];
+      return [row.board.code, max === min ? 50 : (value - min) / (max - min) * 100];
+    }));
+  }
+
+  function scoreBoardRankingRows(boards, selectedDate) {
+    const rows = (boards || []).map((board) => boardRankingBaseMetric(board, selectedDate));
+    const amountScores = normalizeBoardRankingMetric(rows, 'amount5');
+    const returnScores = normalizeBoardRankingMetric(rows, 'return5');
+    rows.forEach((row) => {
+      const amountScore = amountScores.get(row.board.code);
+      const returnScore = returnScores.get(row.board.code);
+      row.sortScore = amountScore === null || amountScore === undefined || returnScore === null || returnScore === undefined
+        ? null
+        : Math.round((0.58 * amountScore + 0.42 * returnScore) * 100) / 100;
+      if (row.sortScore === null) row.status = '数据不足';
+      else if ((row.drawdown ?? 0) > 8 || (row.relative5 ?? 0) < 0) row.status = '震荡/转弱';
+      else if (row.sortScore >= 78 && (row.relative5 ?? 0) > 0) row.status = '趋势增强';
+      else if (row.sortScore >= 65) row.status = '可观察';
+      else row.status = '偏弱';
+    });
+    return rows.sort((a, b) => {
+      if (a.sortScore === null && b.sortScore === null) return String(a.board.name || '').localeCompare(String(b.board.name || ''), 'zh-Hans-CN');
+      if (a.sortScore === null) return 1;
+      if (b.sortScore === null) return -1;
+      return b.sortScore - a.sortScore || (b.amount5 ?? -Infinity) - (a.amount5 ?? -Infinity);
+    });
+  }
+
   function stockRows(board, stockCode, limitDays = 10) {
     return rowsToSelected(board, limitDays)
       .map((row) => {
@@ -629,8 +716,8 @@
     ];
     const flow3 = sumFundFlowRows(rowsToSelected(metric.board, 3), 3);
     const flow5 = sumFundFlowRows(rowsToSelected(metric.board, 5), 5);
-    if (flow3 !== null) cards.push(['3日主力净流入', fmtAmount(flow3), fundFlowCoverageLabel(metric.latestRow)]);
-    if (flow5 !== null) cards.push(['5日主力净流入', fmtAmount(flow5), fundFlowCoverageLabel(metric.latestRow)]);
+    if (flow3 !== null) cards.push(['3日资金净流入', fmtAmount(flow3), fundFlowCoverageLabel(metric.latestRow)]);
+    if (flow5 !== null) cards.push(['5日资金净流入', fmtAmount(flow5), fundFlowCoverageLabel(metric.latestRow)]);
     return `
       <div class="swing-metrics">
         ${cards.map(([title, value, sub]) => `
@@ -659,8 +746,8 @@
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="sortScore">综合排序${stockSortLabel('sortScore')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="amount3">3日成交额${stockSortLabel('amount3')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="amount5">5日成交额${stockSortLabel('amount5')}</button></th>
-              ${hasFundFlow3 ? `<th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="mainNetInflow3">3日主力净流入${stockSortLabel('mainNetInflow3')}</button></th>` : ''}
-              ${hasFundFlow5 ? `<th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="mainNetInflow5">5日主力净流入${stockSortLabel('mainNetInflow5')}</button></th>` : ''}
+              ${hasFundFlow3 ? `<th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="mainNetInflow3">3日资金净流入${stockSortLabel('mainNetInflow3')}</button></th>` : ''}
+              ${hasFundFlow5 ? `<th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="mainNetInflow5">5日资金净流入${stockSortLabel('mainNetInflow5')}</button></th>` : ''}
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="ret3">3日涨幅${stockSortLabel('ret3')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="ret5">5日涨幅${stockSortLabel('ret5')}</button></th>
               <th><button class="table-sort-btn" type="button" data-swing-stock-sort-key="rel3">3日相对板块${stockSortLabel('rel3')}</button></th>
@@ -680,8 +767,8 @@
                 <td><strong>${fmt(item.sortScore, 0)}</strong></td>
                 <td>${fmtAmount(item.amount3)}</td>
                 <td>${fmtAmount(item.amount5)}</td>
-                ${hasFundFlow3 ? `<td class="${signedTone(item.mainNetInflow3)}">${item.mainNetInflow3 === null ? '' : fmtAmount(item.mainNetInflow3)}</td>` : ''}
-                ${hasFundFlow5 ? `<td class="${signedTone(item.mainNetInflow5)}">${item.mainNetInflow5 === null ? '' : fmtAmount(item.mainNetInflow5)}</td>` : ''}
+                ${hasFundFlow3 ? `<td class="${signedTone(item.mainNetInflow3)}">${fmtAmount(item.mainNetInflow3)}</td>` : ''}
+                ${hasFundFlow5 ? `<td class="${signedTone(item.mainNetInflow5)}">${fmtAmount(item.mainNetInflow5)}</td>` : ''}
                 <td class="${changeClass(item.ret3)}">${fmtPercent(item.ret3)}</td>
                 <td class="${changeClass(item.ret5)}">${fmtPercent(item.ret5)}</td>
                 <td class="${changeClass(item.rel3)}">${fmtPercent(item.rel3)}</td>
@@ -704,6 +791,87 @@
           <span>按 5 日成交额与 5 日涨幅综合排序，韧性分作为参考</span>
         </div>
         ${renderStockTable(board)}
+      </section>
+    `;
+  }
+
+  function boardRankingSortLabel(key) {
+    if (boardRankingSort.key !== key) return '';
+    return boardRankingSort.direction === 'asc' ? ' ↑' : ' ↓';
+  }
+
+  function sortedBoardRankingRows() {
+    const direction = boardRankingSort.direction === 'asc' ? 1 : -1;
+    return scoreBoardRankingRows(state?.data?.boards || [], state?.sortDate)
+      .sort((a, b) => {
+        const valueA = a[boardRankingSort.key];
+        const valueB = b[boardRankingSort.key];
+        const missingA = valueA === null || valueA === undefined || valueA === '';
+        const missingB = valueB === null || valueB === undefined || valueB === '';
+        if (missingA && missingB) return String(a.board.name || '').localeCompare(String(b.board.name || ''), 'zh-Hans-CN');
+        if (missingA) return 1;
+        if (missingB) return -1;
+        return direction * (Number(valueA) - Number(valueB))
+          || String(a.board.name || '').localeCompare(String(b.board.name || ''), 'zh-Hans-CN');
+      });
+  }
+
+  function boardRankingStatusTone(status) {
+    if (status === '趋势增强') return 'strong';
+    if (status === '可观察') return 'test';
+    if (status === '震荡/转弱') return 'weak';
+    return 'watch';
+  }
+
+  function renderBoardRankingPanel() {
+    const rows = sortedBoardRankingRows();
+    const sortableHeader = (key, label) => `<button class="table-sort-btn" type="button" data-swing-board-ranking-sort-key="${key}">${label}${boardRankingSortLabel(key)}</button>`;
+    return `
+      <section class="card section-card board-ranking-panel">
+        <div class="swing-section-title">
+          <strong>板块波段排行</strong>
+          <span>按5日成交额与5日涨幅综合排序；成交额和资金流均为板块成员股总额</span>
+        </div>
+        <div class="table-wrap board-ranking-table">
+          <table>
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>板块</th>
+                <th>${sortableHeader('sortScore', '综合排序')}</th>
+                <th>${sortableHeader('amount3', '3日成交额')}</th>
+                <th>${sortableHeader('amount5', '5日成交额')}</th>
+                <th>${sortableHeader('mainNetInflow3', '3日资金净流入')}</th>
+                <th>${sortableHeader('mainNetInflow5', '5日资金净流入')}</th>
+                <th>${sortableHeader('return3', '3日涨幅')}</th>
+                <th>${sortableHeader('return5', '5日涨幅')}</th>
+                <th>${sortableHeader('relative3', '3日相对大盘')}</th>
+                <th>${sortableHeader('relative5', '5日相对大盘')}</th>
+                <th>${sortableHeader('drawdown', '最大回撤')}</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((item, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td><button class="text-link swing-board-jump" type="button" data-board-ranking-code="${item.board.code}" data-board-code="${item.board.code}" data-target-tab="${SWING_TAB}">${item.board.name}</button></td>
+                  <td><strong>${item.sortScore === null ? '暂无' : fmt(item.sortScore, 0)}</strong></td>
+                  <td>${fmtAmount(item.amount3)}</td>
+                  <td>${fmtAmount(item.amount5)}</td>
+                  <td class="${deltaClass(item.mainNetInflow3)}">${fmtAmount(item.mainNetInflow3)}</td>
+                  <td class="${deltaClass(item.mainNetInflow5)}">${fmtAmount(item.mainNetInflow5)}</td>
+                  <td class="${deltaClass(item.return3)}">${fmtPercent(item.return3)}</td>
+                  <td class="${deltaClass(item.return5)}">${fmtPercent(item.return5)}</td>
+                  <td class="${deltaClass(item.relative3)}">${fmtPercent(item.relative3)}</td>
+                  <td class="${deltaClass(item.relative5)}">${fmtPercent(item.relative5)}</td>
+                  <td>${fmtPercent(item.drawdown)}</td>
+                  <td><span class="swing-badge board-ranking-status ${boardRankingStatusTone(item.status)}">${item.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </section>
     `;
   }
@@ -775,7 +943,7 @@
 
   function metricWithPrevious(metric) {
     const previous = swingMetric(metric.board, -1);
-    const stageHistory = Array.from({ length: 10 }, (_, index) => index - 9)
+    const stageHistory = Array.from({ length: 5 }, (_, index) => index - 4)
       .map((offset) => swingMetric(metric.board, offset))
       .filter((item) => item?.latestRow);
     return {
@@ -858,15 +1026,10 @@
   }
 
   function renderStageHistory(item) {
-    const rows = [];
-    for (let index = 0; index < item.stageHistory.length; index += 5) {
-      rows.push(item.stageHistory.slice(index, index + 5));
-    }
     return `
-      <div class="stage-flow-track" aria-label="近10日板块节奏">
-        ${rows.map((row) => `
-          <div class="stage-flow-row">
-            ${row.map((metric, index) => `
+      <div class="stage-flow-track" aria-label="近5日板块节奏">
+        <div class="stage-flow-row">
+            ${item.stageHistory.map((metric, index) => `
               ${index > 0 ? '<span class="stage-arrow">-&gt;</span>' : ''}
               <span class="stage-step">
                 <small class="stage-date">${fmtDate(metric.date)}</small>
@@ -874,8 +1037,7 @@
                 <small class="stage-score">${fmt(metric.heatScore, 0)}分</small>
               </span>
             `).join('')}
-          </div>
-        `).join('')}
+        </div>
       </div>
     `;
   }
@@ -1106,6 +1268,14 @@
         tabs.appendChild(tab);
       }
     }
+    let rankingTab = tabs.querySelector(`[data-detail-tab="${BOARD_RANKING_TAB}"]`);
+    if (!rankingTab) {
+      rankingTab = document.createElement('button');
+      rankingTab.className = 'detail-tab-btn';
+      rankingTab.dataset.detailTab = BOARD_RANKING_TAB;
+      rankingTab.textContent = '板块排行';
+      tab.after(rankingTab);
+    }
     tabs.querySelectorAll('.detail-tab-btn').forEach((button) => {
       button.classList.toggle('active', button.dataset.detailTab === state?.detailTab);
     });
@@ -1128,8 +1298,17 @@
       return;
     }
 
+    if (state?.detailTab === BOARD_RANKING_TAB) {
+      if (pane.querySelector('.board-ranking-panel')) return;
+      pane.querySelectorAll('.swing-panel, .swing-overview-panel, .board-ranking-panel').forEach((node) => node.remove());
+      const anchor = pane.querySelector('.detail-tabs-card');
+      if (anchor) anchor.insertAdjacentHTML('afterend', renderBoardRankingPanel());
+      else pane.insertAdjacentHTML('afterbegin', renderBoardRankingPanel());
+      return;
+    }
+
     if (state?.detailTab !== SWING_TAB) {
-      pane.querySelectorAll('.swing-panel, .swing-overview-panel').forEach((node) => node.remove());
+      pane.querySelectorAll('.swing-panel, .swing-overview-panel, .board-ranking-panel').forEach((node) => node.remove());
       return;
     }
     if (pane.querySelector('.swing-panel')) return;
@@ -1162,7 +1341,7 @@
 
   function jumpToSwingBoard(jump) {
     if (!jump || typeof state === 'undefined') return;
-    state.selectedCode = jump.dataset.boardCode || jump.dataset.code || state.selectedCode;
+    state.selectedCode = jump.dataset.boardRankingCode || jump.dataset.boardCode || jump.dataset.code || state.selectedCode;
     state.detailTab = jump.dataset.targetTab || SWING_TAB;
     if (typeof render === 'function') render();
     scheduleEnhance();
@@ -1177,6 +1356,19 @@
   }, true);
 
   document.addEventListener('click', (event) => {
+    const boardRankingSortButton = event.target.closest?.('[data-swing-board-ranking-sort-key]');
+    if (boardRankingSortButton) {
+      event.preventDefault();
+      const key = boardRankingSortButton.dataset.swingBoardRankingSortKey;
+      if (boardRankingSort.key === key) {
+        boardRankingSort.direction = boardRankingSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        boardRankingSort = { key, direction: 'desc' };
+      }
+      document.querySelectorAll('.board-ranking-panel').forEach((node) => node.remove());
+      scheduleEnhance();
+      return;
+    }
     const overviewSortButton = event.target.closest?.('[data-swing-overview-sort-key]');
     if (overviewSortButton) {
       event.preventDefault();
@@ -1241,6 +1433,14 @@
     const tab = event.target.closest?.(`[data-detail-tab="${SWING_TAB}"]`);
     if (tab && typeof state !== 'undefined') {
       state.detailTab = SWING_TAB;
+      if (typeof render === 'function') render();
+      scheduleEnhance();
+      return;
+    }
+
+    const rankingTab = event.target.closest?.(`[data-detail-tab="${BOARD_RANKING_TAB}"]`);
+    if (rankingTab && typeof state !== 'undefined') {
+      state.detailTab = BOARD_RANKING_TAB;
       if (typeof render === 'function') render();
       scheduleEnhance();
       return;

@@ -1,0 +1,42 @@
+<h2>资金净流入 / 净流出折线图</h2>
+<p class="subtitle">三种都放在现有“板块涨跌幅”图下方；日期轴上的强弱标签会删除。点击选择你喜欢的表现方式。</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:18px;background:#fbfdfd">
+      <div style="font-weight:700;margin-bottom:8px">A · 单色净流入线</div>
+      <svg viewBox="0 0 360 140" style="width:100%;height:140px">
+        <line x1="32" y1="70" x2="345" y2="70" stroke="#b8c9cb" stroke-dasharray="4 4"/>
+        <polyline points="35,48 82,30 128,92 175,56 222,112 270,45 330,84" fill="none" stroke="#0b7893" stroke-width="4"/>
+        <g fill="#fff" stroke="#0b7893" stroke-width="3"><circle cx="35" cy="48" r="4"/><circle cx="82" cy="30" r="4"/><circle cx="128" cy="92" r="4"/><circle cx="175" cy="56" r="4"/><circle cx="222" cy="112" r="4"/><circle cx="270" cy="45" r="4"/><circle cx="330" cy="84" r="4"/></g>
+        <text x="8" y="74" font-size="11" fill="#60777a">0</text>
+      </svg>
+    </div>
+    <div class="card-body"><h3>连续、最简洁</h3><p>正负都用蓝绿色，阅读趋势快，但流入和流出的视觉区分较弱。</p></div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:18px;background:#fbfdfd">
+      <div style="font-weight:700;margin-bottom:8px">B · 正负双色净流入线（推荐）</div>
+      <svg viewBox="0 0 360 140" style="width:100%;height:140px">
+        <line x1="32" y1="70" x2="345" y2="70" stroke="#9cb4b5" stroke-dasharray="4 4"/>
+        <path d="M35 48 L82 30 L105 70" fill="none" stroke="#15966d" stroke-width="4"/><path d="M105 70 L128 92 L151 70" fill="none" stroke="#d4545d" stroke-width="4"/><path d="M151 70 L175 56 L198 70" fill="none" stroke="#15966d" stroke-width="4"/><path d="M198 70 L222 112 L246 70" fill="none" stroke="#d4545d" stroke-width="4"/><path d="M246 70 L270 45 L300 70" fill="none" stroke="#15966d" stroke-width="4"/><path d="M300 70 L330 84" fill="none" stroke="#d4545d" stroke-width="4"/>
+        <text x="35" y="39" font-size="11" fill="#13795a">+15.6亿</text><text x="202" y="128" font-size="11" fill="#b33b46">-5.7亿</text><text x="8" y="74" font-size="11" fill="#60777a">0</text>
+      </svg>
+    </div>
+    <div class="card-body"><h3>流入绿色、流出红色</h3><p>一条连续净额线跨越零轴，方向最直观；保留数值标签与日期选择高亮。</p></div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:18px;background:#fbfdfd">
+      <div style="font-weight:700;margin-bottom:8px">C · 流入 / 流出双线</div>
+      <svg viewBox="0 0 360 140" style="width:100%;height:140px">
+        <line x1="32" y1="116" x2="345" y2="116" stroke="#b8c9cb"/>
+        <polyline points="35,75 82,35 128,116 175,58 222,116 270,42 330,116" fill="none" stroke="#15966d" stroke-width="3.5"/>
+        <polyline points="35,116 82,116 128,68 175,116 222,28 270,116 330,76" fill="none" stroke="#d4545d" stroke-width="3.5"/>
+        <text x="240" y="22" font-size="11" fill="#15966d">流入</text><text x="286" y="22" font-size="11" fill="#d4545d">流出</text>
+      </svg>
+    </div>
+    <div class="card-body"><h3>两条绝对值曲线</h3><p>方向分开，但当前数据只有“净额”，拆成两线会制造并不存在的总流入/总流出含义。</p></div>
+  </div>
+</div>

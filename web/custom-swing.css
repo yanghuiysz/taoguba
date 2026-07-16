@@ -193,8 +193,30 @@
 }
 
 .swing-overview-table table {
-  min-width: 1040px;
+  min-width: 780px;
+  table-layout: fixed;
   font-size: 13px;
+}
+
+.swing-overview-table th:nth-child(1),
+.swing-overview-table td:nth-child(1) {
+  width: 18%;
+}
+
+.swing-overview-table th:nth-child(2),
+.swing-overview-table td:nth-child(2) {
+  width: 48%;
+}
+
+.swing-overview-table th:nth-child(3),
+.swing-overview-table td:nth-child(3) {
+  width: 24%;
+}
+
+.swing-overview-table th:nth-child(4),
+.swing-overview-table td:nth-child(4) {
+  width: 10%;
+  text-align: right;
 }
 
 .swing-overview-table th,
@@ -209,15 +231,14 @@
 }
 
 .stage-flow {
-  min-width: 600px;
-  max-width: 760px;
+  min-width: 360px;
+  max-width: 520px;
   white-space: normal;
 }
 
 .stage-flow-track {
   display: flex;
-  flex-direction: column;
-  gap: 7px;
+  align-items: center;
   padding: 3px 0;
 }
 
@@ -227,8 +248,10 @@
 
 .stage-flow-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .stage-arrow {
@@ -244,7 +267,8 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  min-width: 0;
+  flex: 0 1 70px;
+  min-width: 54px;
   padding: 0;
   text-align: center;
 }
@@ -347,6 +371,40 @@
   cursor: pointer;
 }
 
+.board-ranking-panel {
+  min-width: 0;
+  border-color: #cbdedb;
+}
+
+.board-ranking-table {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.board-ranking-table table {
+  min-width: 1420px;
+  font-size: 13px;
+}
+
+.board-ranking-table th,
+.board-ranking-table td {
+  padding: 9px 8px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.board-ranking-table th:nth-child(2),
+.board-ranking-table td:nth-child(2) {
+  min-width: 104px;
+  text-align: left;
+}
+
+.board-ranking-status {
+  padding: 6px 10px;
+}
+
 .swing-intraday-block {
   margin-top: 16px;
 }
@@ -412,7 +470,7 @@
   }
 
   .swing-overview-table table {
-    min-width: 960px;
+    min-width: 740px;
     font-size: 12px;
   }
 
@@ -431,5 +489,10 @@
   .swing-section-title {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .board-ranking-table table {
+    min-width: 1320px;
+    font-size: 12px;
   }
 }

@@ -24,6 +24,7 @@ from scripts.build_custom_board_data import (  # noqa: E402
     normalize_stock_code,
     number_or_none,
 )
+from scripts.custom_board_history import load_custom_board_payload  # noqa: E402
 from scripts.intraday_radar_engine import board_metric, score_range  # noqa: E402
 from scripts.notify_wecom import WeComNotifier  # noqa: E402
 
@@ -31,6 +32,7 @@ from scripts.notify_wecom import WeComNotifier  # noqa: E402
 CONFIG_PATH = ROOT / "web" / "data" / "custom_boards_config.json"
 DASHBOARD_PATH = ROOT / "web" / "data" / "custom_boards.json"
 SNAPSHOT_DIR = ROOT / "web" / "data" / "auction_snapshots"
+RAW_SNAPSHOT_DIR = SNAPSHOT_DIR / "raw"
 NOTIFY_STATE_FILE = ROOT / "logs" / "auction_probe_notify_slot.txt"
 
 
@@ -298,8 +300,46 @@ def compute_alerts(
     return sorted(alerts, key=lambda item: (item["score"], item["totalTurnover"]), reverse=True)[:top_boards]
 
 
-def snapshot_path(date: str) -> Path:
-    return SNAPSHOT_DIR / f"{date}.json"
+def snapshot_path(date: str, snapshot_dir: Path = SNAPSHOT_DIR) -> Path:
+    return snapshot_dir / f"{date}.summary.json"
+
+
+def raw_snapshot_path(date: str, raw_dir: Path = RAW_SNAPSHOT_DIR) -> Path:
+    return raw_dir / f"{date}.json"
+
+
+def compact_sample(sample: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "time": sample.get("time") or "",
+        "alerts": sample.get("alerts") or [],
+        "boardSnapshots": sample.get("boardSnapshots") or {},
+    }
+
+
+def build_board_snapshots(config: dict[str, Any], quotes: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    snapshots: dict[str, dict[str, Any]] = {}
+    for board in config_boards(config):
+        changes: list[float] = []
+        turnovers: list[float] = []
+        for stock in board.get("stocks", []):
+            quote = quotes.get(normalize_stock_code(stock.get("code")))
+            if not quote:
+                continue
+            change = number_or_none(quote.get("changePercent"))
+            turnover = number_or_none(quote.get("turnover"))
+            if change is not None:
+                changes.append(change)
+            if turnover is not None:
+                turnovers.append(turnover)
+        if not changes:
+            continue
+        snapshots[str(board.get("code") or "")] = {
+            "stockCount": len(changes),
+            "averageChange": sum(changes) / len(changes),
+            "redRate": sum(1 for value in changes if value > 0) / len(changes) * 100,
+            "totalTurnover": sum(turnovers) if turnovers else None,
+        }
+    return snapshots
 
 
 def append_snapshot(
@@ -307,20 +347,36 @@ def append_snapshot(
     sample_time: datetime,
     quotes: dict[str, dict[str, Any]],
     alerts: list[dict[str, Any]],
+    snapshot_dir: Path = SNAPSHOT_DIR,
+    raw_dir: Path = RAW_SNAPSHOT_DIR,
+    config: dict[str, Any] | None = None,
 ) -> None:
-    path = snapshot_path(date)
-    payload = load_json(path, {"date": date, "samples": []})
-    payload.setdefault("date", date)
-    payload.setdefault("samples", []).append(
+    board_snapshots = build_board_snapshots(config or {"boards": []}, quotes)
+    raw_path = raw_snapshot_path(date, raw_dir)
+    raw_payload = load_json(raw_path, {"date": date, "samples": []})
+    raw_payload.setdefault("date", date)
+    raw_payload.setdefault("samples", []).append(
         {
             "time": sample_time.strftime("%Y-%m-%d %H:%M:%S"),
             "quotes": quotes,
             "alerts": alerts,
+            "boardSnapshots": board_snapshots,
         }
     )
-    payload["latestAlerts"] = alerts
-    payload["updatedAt"] = sample_time.strftime("%Y-%m-%d %H:%M:%S")
-    write_json(path, payload)
+    raw_payload["latestAlerts"] = alerts
+    raw_payload["updatedAt"] = sample_time.strftime("%Y-%m-%d %H:%M:%S")
+    write_json(raw_path, raw_payload)
+
+    summary_path = snapshot_path(date, snapshot_dir)
+    samples = [compact_sample(sample) for sample in raw_payload.get("samples", [])]
+    summary_payload = {
+        "date": date,
+        "updatedAt": raw_payload["updatedAt"],
+        "sampleCount": len(samples),
+        "samples": samples,
+        "latestAlerts": alerts,
+    }
+    write_json(summary_path, summary_payload)
 
 
 def alert_signature(alerts: list[dict[str, Any]]) -> str:
@@ -405,7 +461,7 @@ def maybe_notify(
 def run_once(args: argparse.Namespace) -> tuple[int, int]:
     now = datetime.now()
     config = load_json(CONFIG_PATH, {"boards": []})
-    dashboard = load_json(DASHBOARD_PATH, {})
+    dashboard = load_custom_board_payload(DASHBOARD_PATH)
     codes = collect_codes(config)
     if not codes:
         print("No stocks configured.")
@@ -425,8 +481,8 @@ def run_once(args: argparse.Namespace) -> tuple[int, int]:
         top_boards=args.top_boards,
         top_stocks=args.top_stocks,
     )
-    append_snapshot(args.date, now, quotes, alerts)
-    print(f"{now:%H:%M:%S} sampled={len(quotes)} alerts={len(alerts)} snapshot={snapshot_path(args.date)}")
+    append_snapshot(args.date, now, quotes, alerts, config=config)
+    print(f"{now:%H:%M:%S} sampled={len(quotes)} alerts={len(alerts)} snapshot={snapshot_path(args.date)} raw={raw_snapshot_path(args.date)}")
 
     if alerts and not args.no_notify and (args.force or now.time() >= parse_hhmm(args.notify_from)):
         sent = maybe_notify(alerts, now, args.date, args.webhook, force=args.once)

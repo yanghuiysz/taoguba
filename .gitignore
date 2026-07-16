@@ -12,3 +12,5 @@ logs/
 nul
 web/NUL
 .env
+web/data/custom_boards/intraday/
+web/data/auction_snapshots/raw/

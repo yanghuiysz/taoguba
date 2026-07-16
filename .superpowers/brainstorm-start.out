@@ -1,0 +1,5 @@
+{"type":"owner-pid-invalid","pid":1,"reason":"dead at startup"}
+{"type":"server-started","port":56364,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:56364","screen_dir":"D:\\github\\taoguba\\.superpowers\\brainstorm\\2045-1784163654\\content","state_dir":"D:\\github\\taoguba\\.superpowers\\brainstorm\\2045-1784163654\\state"}
+{"type":"screen-added","file":"D:\\github\\taoguba\\.superpowers\\brainstorm\\2045-1784163654\\content\\board-swing-tab-layout.html"}
+{"type":"screen-added","file":"D:\\github\\taoguba\\.superpowers\\brainstorm\\2045-1784163654\\content\\waiting-board-ranking.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -1,0 +1,55 @@
+<h2>新 Tab 的板块级波段排行，哪种布局更合适？</h2>
+<p class="subtitle">两种方案都复用当前板块历史数据；点击选择你更想要的版本。</p>
+
+<style>
+  #board-swing-layout .mock-table { width:100%; border-collapse:collapse; color:var(--foreground); }
+  #board-swing-layout .mock-table th, #board-swing-layout .mock-table td { padding:7px 6px; border-bottom:1px solid var(--border); text-align:right; white-space:nowrap; }
+  #board-swing-layout .mock-table th:nth-child(2), #board-swing-layout .mock-table td:nth-child(2) { text-align:left; }
+  #board-swing-layout .mock-table th { color:var(--muted-foreground); font-weight:500; }
+  #board-swing-layout .up { color:var(--destructive); }
+  #board-swing-layout .down { color:var(--viz-series-2); }
+  #board-swing-layout .signal { display:inline-block; padding:2px 7px; border-radius:999px; background:color-mix(in srgb, var(--viz-series-1) 14%, transparent); color:var(--foreground); }
+  #board-swing-layout .mock-tabs { display:flex; gap:6px; margin-bottom:10px; }
+  #board-swing-layout .mock-tabs span { padding:5px 10px; color:var(--muted-foreground); }
+  #board-swing-layout .mock-tabs .active { background:var(--primary); color:var(--primary-foreground); border-radius:6px; }
+  #board-swing-layout .table-wrap { overflow:hidden; }
+  #board-swing-layout .compact-note { color:var(--muted-foreground); margin-bottom:8px; }
+</style>
+
+<div id="board-swing-layout" class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-tabs"><span>板块概览</span><span>波段观察</span><span class="active">板块排行</span></div>
+      <div class="compact-note">按5日相对大盘、5日资金净流入和韧性分综合排序</div>
+      <div class="table-wrap">
+        <table class="mock-table text-small">
+          <thead><tr><th>排名</th><th>板块</th><th>综合</th><th>3日成交额</th><th>5日成交额</th><th>3日资金</th><th>5日资金</th><th>3日涨幅</th><th>5日涨幅</th><th>3日相对</th><th>5日相对</th><th>回撤</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><b>医药</b></td><td>92</td><td>1280亿</td><td>2094亿</td><td class="up">+86.4亿</td><td class="up">+119.8亿</td><td class="up">8.3%</td><td class="up">12.7%</td><td class="up">6.1%</td><td class="up">9.8%</td><td>3.2%</td><td><span class="signal">趋势增强</span></td></tr>
+            <tr><td>2</td><td><b>机器人</b></td><td>86</td><td>946亿</td><td>1582亿</td><td class="up">+31.7亿</td><td class="up">+48.2亿</td><td class="up">5.6%</td><td class="up">8.9%</td><td class="up">3.4%</td><td class="up">6.0%</td><td>4.8%</td><td><span class="signal">红柱扩张</span></td></tr>
+            <tr><td>3</td><td><b>光伏</b></td><td>71</td><td>735亿</td><td>1210亿</td><td class="down">-12.6亿</td><td class="down">-18.1亿</td><td class="up">2.1%</td><td class="up">3.8%</td><td class="down">-0.1%</td><td class="up">0.9%</td><td>6.5%</td><td><span class="signal">震荡修复</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-body"><h3>A · 完整横向表（推荐）</h3><p>与现有个股波段表结构一致，板块之间可以逐列比较；最适合排序和找最强方向。</p></div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mock-tabs"><span>板块概览</span><span>波段观察</span><span class="active">板块排行</span></div>
+      <div class="compact-note">主表只保留决策指标，点击板块再看完整明细</div>
+      <div class="table-wrap">
+        <table class="mock-table text-small">
+          <thead><tr><th>排名</th><th>板块</th><th>综合</th><th>5日资金</th><th>5日涨幅</th><th>5日相对</th><th>回撤</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><b>医药</b></td><td>92</td><td class="up">+119.8亿</td><td class="up">12.7%</td><td class="up">9.8%</td><td>3.2%</td><td><span class="signal">趋势增强</span></td></tr>
+            <tr><td>2</td><td><b>机器人</b></td><td>86</td><td class="up">+48.2亿</td><td class="up">8.9%</td><td class="up">6.0%</td><td>4.8%</td><td><span class="signal">红柱扩张</span></td></tr>
+            <tr><td>3</td><td><b>光伏</b></td><td>71</td><td class="down">-18.1亿</td><td class="up">3.8%</td><td class="up">0.9%</td><td>6.5%</td><td><span class="signal">震荡修复</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-body"><h3>B · 精简决策表</h3><p>页面更清爽，重点突出5日表现；但3日与5日之间的加速、转弱不如方案A直观。</p></div>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 # 题材数据看板
 
-这是一个本地运行的 A 股题材复盘与盘中观察工具。项目把自定义板块、盘中雷达、集合竞价预警、开盘啦强度和交易记录放到同一个看板里，方便在交易日快速刷新、筛选和复盘。
+这是一个本地运行的 A 股题材复盘与盘中观察工具。项目把自定义板块、盘中雷达、集合竞价预警和交易记录放到同一个看板里，方便在交易日快速刷新、筛选和复盘。
 
 主入口：
 
@@ -12,11 +12,10 @@ http://127.0.0.1:8765/web/
 
 | 页面 | 路径 | 说明 |
 | --- | --- | --- |
-| 总入口 | `web/index.html` | 标签页容器，整合盘中雷达、操作记录、自定义板块、开盘啦强度 |
+| 总入口 | `web/index.html` | 标签页容器，整合盘中雷达、操作记录、自定义板块 |
 | 盘中雷达 | `web/intraday.html` | 盘中机会、集合竞价预警、开盘后加速板块和核心股筛选 |
 | 自定义板块 | `web/custom.html` | 自定义板块维护、板块强度、波段状态和成员股观察 |
 | 操作记录 | `web/trades.html` | 本地交易/观察记录 |
-| 开盘啦强度 | `web/kpl.html` | 开盘啦板块强度数据展示 |
 
 ## 环境准备
 
@@ -85,7 +84,7 @@ python .\scripts\update_daily_data.py --date $date --intraday-custom --full-duri
 python .\scripts\validate_web_data.py
 ```
 
-完整更新会尝试刷新开盘啦、自定义板块和前端依赖数据。脚本会保留已有数据文件，并在可选数据源不可用时给出 warning。
+完整更新会尝试刷新自定义板块和前端依赖数据。脚本会保留已有数据文件，并在可选数据源不可用时给出 warning。
 
 ### 盘中快速刷新
 
@@ -122,6 +121,14 @@ python .\scripts\intraday_radar_daemon.py --once --force
 logs/intraday_radar.log
 ```
 
+守护脚本默认会在交易日 15:30 后自动补跑一次当天盘后数据更新，并只执行一次；执行记录写入
+`logs/closing_refresh_date.txt`。如需关闭或调整时间：
+
+```powershell
+python .\scripts\intraday_radar_daemon.py --disable-after-close-refresh
+python .\scripts\intraday_radar_daemon.py --after-close-time 15:40
+```
+
 ## 集合竞价探针
 
 集合竞价探针会在 `09:15-09:25` 采样自定义板块成分股行情，保存快照，并在 `09:20` 后按板块竞价强度推送提醒。
@@ -141,7 +148,8 @@ python .\scripts\auction_probe.py --once --force --no-notify
 输出文件：
 
 ```text
-web/data/auction_snapshots/YYYYMMDD.json
+web/data/auction_snapshots/YYYYMMDD.summary.json
+web/data/auction_snapshots/raw/YYYYMMDD.json
 ```
 
 盘中雷达页面会读取当天快照，在顶部展示最新集合竞价预警板块和锁定股。
@@ -176,10 +184,6 @@ python .\scripts\notify_intraday_radar.py --top 80
 | `scripts/intraday_radar_daemon.py` | 交易时段循环刷新和通知守护进程 |
 | `scripts/notify_intraday_radar.py` | 盘中雷达企业微信消息拼装 |
 | `scripts/auction_probe.py` | 集合竞价采样、预警评分和通知 |
-| `scripts/fetch_kpl_probe.py` | 抓取开盘啦原始板块数据 |
-| `scripts/build_kpl_plate_stock_links.py` | 生成开盘啦板块和个股关联 |
-| `scripts/build_kpl_web_data.py` | 生成开盘啦前端数据 |
-| `scripts/build_ths_limit_mapping.py` | 生成同花顺/东财涨停映射增强数据 |
 | `scripts/refresh_latest_after_close.py` | 启动前检查并执行收盘后补刷新 |
 | `scripts/notify_wecom.py` | 企业微信发送封装 |
 | `scripts/sync_position_stops.py` | 辅助同步持仓止损线数据 |
@@ -191,16 +195,28 @@ python .\scripts\notify_intraday_radar.py --top 80
 | 文件 | 说明 |
 | --- | --- |
 | `custom_boards.json` | 自定义板块主数据，盘中雷达和自定义板块页面都会读取 |
+| `custom_boards/index.json` | 自定义板块每日历史索引 |
+| `custom_boards/history/*.json` | 自定义板块按日期拆分保存的每日历史数据 |
+| `custom_boards/intraday/*.json` | 自定义板块盘中运行态快照，默认不提交 |
 | `custom_boards_config.json` | 自定义板块配置 |
 | `custom_board_membership.json` | 板块成员覆盖关系 |
 | `custom_board_labels.json` | 板块标签 |
 | `custom_resonance_config.json` | 共振观察相关配置 |
-| `kpl_dashboard.json` | 开盘啦看板数据 |
-| `kpl/index.json` | 开盘啦历史索引 |
-| `kpl/history/*.json` | 开盘啦按日期保存的历史数据 |
-| `auction_snapshots/YYYYMMDD.json` | 集合竞价采样快照 |
+| `auction_snapshots/YYYYMMDD.summary.json` | 集合竞价前端/复盘用瘦身快照 |
+| `auction_snapshots/raw/YYYYMMDD.json` | 集合竞价原始采样，默认不提交 |
 | `trades.json` | 操作记录页面数据 |
 | `positions.json` | 持仓辅助数据，主要给脚本维护使用 |
+
+### 资金净流入
+
+板块趋势页直接读取东方财富个股历史资金流接口，将每只成分股的历史数据缓存到
+`data/custom_fund_flow/YYYYMMDD/CODE.json`，页面显示最近 15 个交易日的“资金净流入
+（东方财富口径）”。首次运行会逐只回填成分股，之后优先复用缓存；Python 网络请求失败时
+自动回退系统 `curl.exe`，单股抓取失败则读取最近一次有效缓存，不把失败写成 0。
+
+每日板块净额由同一天有数据的成分股求和。有效覆盖率不足 80% 时该日净额保持 `null`，
+折线在该日断开并提示覆盖不足。东方财富的资金流分类口径不等同于机构、量化资金的真实持仓变化。
+同花顺全市场快照缓存仍保留给其他数据消费者，但不会与趋势折线混用。
 
 ## 推荐工作流
 
@@ -229,5 +245,5 @@ python .\scripts\validate_web_data.py
 
 - 修改脚本或数据结构后，优先运行 `python .\scripts\validate_web_data.py`。
 - 不要手动提交 `.env`，企业微信 webhook 只保存在本地。
-- `web/data/custom_boards.json`、`web/data/kpl_dashboard.json`、`web/data/auction_snapshots/*.json` 属于生成数据，提交前确认日期和内容是否符合预期。
+- `web/data/custom_boards.json`、`web/data/custom_boards/index.json`、`web/data/custom_boards/history/*.json`、`web/data/auction_snapshots/*.summary.json` 属于生成数据，提交前确认日期和内容是否符合预期。
 - 页面入口统一从 `web/index.html` 维护，新增页面时同步更新标签页和 README。

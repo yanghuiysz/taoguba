@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Optional, Any
 import json
 
+try:
+    from custom_board_history import load_custom_board_payload
+except ModuleNotFoundError:
+    from scripts.custom_board_history import load_custom_board_payload
+
 STOCK_SELECTION_DAYS = 3
 
 
@@ -1024,7 +1029,6 @@ def load_radar_data(json_path: Path) -> dict:
     if not json_path.exists():
         return {}
     try:
-        with open(json_path, encoding="utf-8") as f:
-            return json.load(f)
+        return load_custom_board_payload(json_path)
     except Exception:
         return {}

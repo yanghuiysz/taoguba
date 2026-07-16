@@ -2,11 +2,14 @@
 
 const state = {
   data: null,
+  fullATurnover: null,
+  fullATurnoverCache: new Map(),
   labels: [],
   membership: { overrides: [] },
   selectedCode: null,
   sortMode: 'avg_change',
   sortDate: null,
+  fullATurnoverSort: { key: 'displayAmount', direction: 'desc' },
   profitSort: { key: 'profitScore', direction: 'desc' },
   stockListSort: { key: 'displayChangePercent', direction: 'desc' },
   detailTab: 'overview',
@@ -46,6 +49,14 @@ const signedValueClass = (value) => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed === 0) return '';
   return parsed > 0 ? 'rise' : 'fall';
+};
+
+const signedFundFlowText = (value) => {
+  const parsed = Number(value);
+  if (value === null || value === undefined || value === '' || !Number.isFinite(parsed)) return '暂无';
+  const prefix = parsed > 0 ? '+' : '';
+  const text = `${prefix}${number(parsed / 100000000)}亿`;
+  return text;
 };
 
 const sortChangeValue = (value) => {
@@ -151,12 +162,31 @@ const rowTotalTurnover = (row) => {
 };
 
 const rowMainNetInflow = (row) => {
-  const parsed = Number(row?.mainNetInflow);
+  const value = row?.mainNetInflow;
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const sidebarBoardFundFlow = (board, date) => {
+  const row = (board?.trend || []).find((item) => item.date === date);
+  if (row?.fundFlowSource !== 'eastmoney_stock_individual_fund_flow') {
+    return { label: '资金暂无', tone: 'missing' };
+  }
+  const value = rowMainNetInflow(row);
+  if (value === null) return { label: '资金暂无', tone: 'missing' };
+  const direction = value < 0 ? '主力净流出' : '主力净流入';
+  const prefix = value > 0 ? '+' : '';
+  return {
+    label: `${direction} ${prefix}${amountText(value)}`,
+    tone: value < 0 ? 'outflow' : 'inflow',
+  };
+};
+
 const stockMainNetInflow = (stock) => {
-  const parsed = Number(stock?.mainNetInflow ?? stock?.latestMainNetInflow);
+  const value = stock?.mainNetInflow ?? stock?.latestMainNetInflow;
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
 
@@ -166,18 +196,189 @@ const fundFlowDateText = (date, quoteDate) => {
   return quoteDate && date !== quoteDate ? `资金${short}` : short;
 };
 
+const fundFlowSourceText = (row) => {
+  if (row?.fundFlowSource === 'eastmoney_stock_individual_fund_flow') return '东方财富口径';
+  if (row?.fundFlowSource === 'ths_stock_fund_flow_individual') return '同花顺口径';
+  return '资金来源暂无';
+};
+
 const todayFundFlowCell = (value) => {
+  if (value === null || value === undefined || value === '') return '暂无';
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return '';
+  if (!Number.isFinite(parsed)) return '暂无';
   return `<span class="${signedValueClass(parsed)}">${amountText(parsed)}</span>`;
 };
 
 const fundFlowCoverageText = (row) => {
   const count = Number(row?.fundFlowStockCount);
-  const total = Number(row?.stockCount);
+  const total = Array.isArray(row?.stocks) ? row.stocks.length : Number(row?.stockCount);
   if (!Number.isFinite(count) || !Number.isFinite(total) || total <= 0) return '覆盖暂无';
-  return `覆盖 ${count}/${total}`;
+  const warning = count / total < 0.8 ? '，覆盖不足' : '';
+  return `覆盖 ${count}/${total}${warning}`;
 };
+
+async function fetchJsonNoStore(path) {
+  const response = await fetch(`${path}?v=${Date.now()}`, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${path}`);
+  return response.json();
+}
+
+async function fetchJsonCached(path) {
+  const response = await fetch(path, { cache: 'default' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${path}`);
+  return response.json();
+}
+
+function mergeRowsByDate(existing = [], additions = []) {
+  const rows = new Map();
+  existing.filter((row) => row?.date).forEach((row) => rows.set(String(row.date), row));
+  additions.filter((row) => row?.date).forEach((row) => rows.set(String(row.date), row));
+  return [...rows.keys()].sort().map((date) => rows.get(date));
+}
+
+function hydrateCustomBoardHistory(payload, histories) {
+  for (const history of [...histories].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')))) {
+    ['marketIndex', 'secondaryMarketIndex'].forEach((key) => {
+      if (!payload[key] && !history?.[key]) return;
+      payload[key] = payload[key] || {};
+      payload[key].trend = mergeRowsByDate(payload[key].trend || [], history?.[key]?.trend || []);
+    });
+    const historyBoards = new Map((history?.boards || []).map((board) => [String(board.code), board]));
+    (payload.boards || []).forEach((board) => {
+      const historyBoard = historyBoards.get(String(board.code));
+      if (!historyBoard) return;
+      board.trend = mergeRowsByDate(board.trend || [], historyBoard.trend || []);
+      board.boardNewHighTrend = mergeRowsByDate(board.boardNewHighTrend || [], historyBoard.boardNewHighTrend || []);
+    });
+  }
+  return payload;
+}
+
+async function loadCustomBoardData(daysOverride = null) {
+  const payload = await fetchJsonNoStore('./data/custom_boards.json');
+  if (!payload.historyIndex) return payload;
+  const index = await fetchJsonNoStore(payload.historyIndex);
+  const days = daysOverride || Number(payload.days) || 15;
+  const items = Array.isArray(index.items) ? index.items.slice(0, days) : [];
+  const histories = await Promise.all(
+    [...items]
+      .reverse()
+      .filter((item) => item?.path)
+      .map((item) => fetchJsonCached(item.path)),
+  );
+  if (payload.intradayPath) {
+    try {
+      histories.push(await fetchJsonNoStore(payload.intradayPath));
+    } catch (error) {
+      // Intraday snapshots are runtime-only; archived history is enough when absent.
+    }
+  }
+  return hydrateCustomBoardHistory(payload, histories);
+}
+
+async function loadAdditionalCustomBoardHistory(payload, loadedDays) {
+  if (!payload?.historyIndex) return payload;
+  const index = await fetchJsonNoStore(payload.historyIndex);
+  const days = Number(payload.days) || 15;
+  const items = Array.isArray(index.items) ? index.items.slice(loadedDays, days) : [];
+  if (!items.length) return payload;
+  const histories = await Promise.all(
+    [...items]
+      .reverse()
+      .filter((item) => item?.path)
+      .map((item) => fetchJsonCached(item.path)),
+  );
+  return hydrateCustomBoardHistory(payload, histories);
+}
+
+const compactDateKey = (date) => String(date || '').replaceAll('-', '');
+
+async function loadFullATurnoverData(date = null) {
+  const dateKey = compactDateKey(date);
+  const cacheKey = dateKey || 'latest';
+  if (state.fullATurnoverCache.has(cacheKey)) return state.fullATurnoverCache.get(cacheKey);
+  const latestPath = './data/full_a_turnover_top20.json';
+  try {
+    const path = dateKey
+      ? `./data/full_a_turnover_top20_history/${dateKey}.json`
+      : latestPath;
+    const payload = await fetchJsonNoStore(path);
+    state.fullATurnoverCache.set(cacheKey, payload);
+    return payload;
+  } catch (error) {
+    if (dateKey) {
+      try {
+        const fallback = await fetchJsonNoStore(latestPath);
+        const payload = {
+          ...fallback,
+          requestedDate: date,
+          isFallback: true,
+        };
+        state.fullATurnoverCache.set(cacheKey, payload);
+        return payload;
+      } catch (fallbackError) {
+        error = fallbackError;
+      }
+    }
+    const payload = {
+      date: date || null,
+      stocks: [],
+      error: error.message,
+    };
+    state.fullATurnoverCache.set(cacheKey, payload);
+    return payload;
+  }
+}
+
+async function syncFullATurnoverForDate(date) {
+  state.fullATurnover = await loadFullATurnoverData(date);
+}
+
+async function setSortDate(date, options = {}) {
+  if (!date) return;
+  state.sortDate = date;
+  if (options.detailTab) state.detailTab = options.detailTab;
+  selectTopBoard();
+  if (state.detailTab === 'full-a-turnover') {
+    await syncFullATurnoverForDate(state.sortDate);
+  }
+  render();
+}
+
+function scheduleBackgroundTask(callback) {
+  setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(callback, { timeout: 1500 });
+      return;
+    }
+    callback();
+  }, 1200);
+}
+
+async function loadLabels(today) {
+  try {
+    const labelResponse = await fetch(`./data/custom_board_labels.json?v=${Date.now()}`, { cache: 'no-store' });
+    const labelPayload = await labelResponse.json();
+    const rawLabels = Array.isArray(labelPayload.labels) ? labelPayload.labels : [];
+    return rawLabels.map((item) => {
+      if (item?.date === today && item?.label === '强2') {
+        return { ...item, label: '强1' };
+      }
+      return item;
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function loadMembership() {
+  try {
+    const membershipResponse = await fetch(`./data/custom_board_membership.json?v=${Date.now()}`, { cache: 'no-store' });
+    return membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
+  } catch {
+    return { overrides: [] };
+  }
+}
 
 function volumePriceState(change, currentTurnover, previousTurnover) {
   const parsedChange = Number(change);
@@ -1126,8 +1327,8 @@ function labelFor(board, date) {
     ));
 }
 
-function renderTrendChart(board) {
-  const trend = trendValues(board)
+function chartTrendRows(board) {
+  return trendValues(board)
     .map((item) => {
       const indexRow = marketIndexRowByDate(item.date);
       return {
@@ -1139,14 +1340,18 @@ function renderTrendChart(board) {
     .filter((item) =>
       item.displayAverageChange !== null
       && item.displayAverageChange !== undefined
-      && item.indexChange !== null
-      && item.indexChange !== undefined
     );
+}
+
+const chartPointX = (index, length, width, pad) => pad.left + (length === 1 ? (width - pad.left - pad.right) / 2 : (index / (length - 1)) * (width - pad.left - pad.right));
+
+function renderTrendChart(board) {
+  const trend = chartTrendRows(board);
   if (!trend.length) {
     return `
       <div>
         <strong>暂无走势</strong>
-        <p>这个板块最近没有可用行情或指数数据。</p>
+        <p>这个板块最近没有可用行情数据。</p>
       </div>
     `;
   }
@@ -1165,9 +1370,8 @@ function renderTrendChart(board) {
   const plotHeight = height - pad.top - pad.bottom;
   const points = trend.map((item, index) => {
     const change = Number(item.displayAverageChange) || 0;
-    const x = pad.left + (trend.length === 1 ? plotWidth / 2 : (index / (trend.length - 1)) * plotWidth);
+    const x = chartPointX(index, trend.length, width, pad);
     const yAvg = pad.top + ((valueMax - change) / valueRange) * plotHeight;
-    const label = boardLabelFor(board, item.date) || labelFor(board, item.date);
     return {
       ...item,
       change,
@@ -1175,7 +1379,6 @@ function renderTrendChart(board) {
       x,
       yAvg,
       yAvgLabel: yAvg - 10,
-      tag: label?.displayLabel || label?.label || null,
     };
   });
   const avgLine = points.map((point) => `${point.x},${point.yAvg}`).join(' ');
@@ -1197,9 +1400,89 @@ function renderTrendChart(board) {
         <g>
           <circle cx="${point.x}" cy="${point.yAvg}" r="${point.selected ? 6.2 : 4.5}" style="fill:#fff;stroke:#0b7893;stroke-width:${point.selected ? 3 : 2.2};"></circle>
           <text x="${point.x}" y="${point.yAvgLabel}" text-anchor="middle" class="value-label">${number(point.change)}%</text>
-          ${point.tag ? `<text x="${point.x}" y="${height - 30}" text-anchor="middle" class="tag-label">${point.tag}</text>` : ''}
           <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
           <title>${point.date} 板块平均涨跌幅 ${number(point.change)}% | 有效股票 ${point.stockCount}</title>
+        </g>
+      `).join('')}
+    </svg>
+  `;
+}
+
+function fundFlowLineSegments(points, zeroY) {
+  const segments = [];
+  for (let index = 1; index < points.length; index += 1) {
+    const previous = points[index - 1];
+    const current = points[index];
+    if (previous.value === null || current.value === null || previous.y === null || current.y === null) continue;
+    if (previous.value === 0 || current.value === 0) {
+      const tone = previous.value < 0 || current.value < 0 ? 'outflow' : 'inflow';
+      segments.push({ x1: previous.x, y1: previous.y, x2: current.x, y2: current.y, tone });
+      continue;
+    }
+    const previousTone = previous.value >= 0 ? 'inflow' : 'outflow';
+    const currentTone = current.value >= 0 ? 'inflow' : 'outflow';
+    if (previousTone === currentTone) {
+      segments.push({ x1: previous.x, y1: previous.y, x2: current.x, y2: current.y, tone: previousTone });
+      continue;
+    }
+    const ratio = Math.abs(previous.value) / (Math.abs(previous.value) + Math.abs(current.value));
+    const zeroX = previous.x + (current.x - previous.x) * ratio;
+    segments.push({ x1: previous.x, y1: previous.y, x2: zeroX, y2: zeroY, tone: previousTone });
+    segments.push({ x1: zeroX, y1: zeroY, x2: current.x, y2: current.y, tone: currentTone });
+  }
+  return segments;
+}
+
+const fundFlowLabelY = (pointY, padTop, axisBottom) => pointY - 12 >= padTop + 11 ? pointY - 12 : Math.min(axisBottom - 4, pointY + 18);
+
+function renderFundFlowTrendChart(board) {
+  const rows = chartTrendRows(board)
+    .map((item) => ({ ...item, value: rowMainNetInflow(item) }));
+  const validValues = rows.map((item) => item.value).filter((value) => value !== null);
+  if (!validValues.length) {
+    return `
+      <div>
+        <strong>暂无资金净流入数据</strong>
+        <p>这个板块最近没有可用的每日资金净流入数据。</p>
+      </div>
+    `;
+  }
+
+  const width = 760;
+  const height = 240;
+  const pad = { top: 34, right: 48, bottom: 46, left: 52 };
+  const plotWidth = width - pad.left - pad.right;
+  const plotHeight = height - pad.top - pad.bottom;
+  const axisBottom = height - pad.bottom;
+  const maxAbs = Math.max(...validValues.map((value) => Math.abs(value)), 1);
+  const valueLimit = maxAbs * 1.16;
+  const zeroY = pad.top + plotHeight / 2;
+  const points = rows.map((item, index) => {
+    const x = chartPointX(index, rows.length, width, pad);
+    const y = item.value === null ? null : zeroY - (item.value / valueLimit) * (plotHeight / 2);
+    return { ...item, x, y, selected: item.date === state.sortDate };
+  });
+  const segments = fundFlowLineSegments(points, zeroY);
+
+  return `
+    <svg class="fund-flow-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 每日资金净流入走势">
+      ${points.filter((point) => point.selected).map((point) => `
+        <rect class="selected-date-band" x="${point.x - 18}" y="${pad.top - 12}" width="36" height="${plotHeight + 24}" rx="8"></rect>
+      `).join('')}
+      <line class="chart-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${axisBottom}"></line>
+      <line class="zero-line" x1="${pad.left}" y1="${zeroY}" x2="${width - pad.right}" y2="${zeroY}"></line>
+      <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${signedFundFlowText(valueLimit)}</text>
+      <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0</text>
+      <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${signedFundFlowText(-valueLimit)}</text>
+      ${segments.map((segment) => `<line class="fund-flow-line ${segment.tone}" x1="${segment.x1}" y1="${segment.y1}" x2="${segment.x2}" y2="${segment.y2}"></line>`).join('')}
+      ${points.map((point) => `
+        <g>
+          ${point.value === null ? '' : `
+            <circle class="fund-flow-dot ${point.value >= 0 ? 'inflow' : 'outflow'}" cx="${point.x}" cy="${point.y}" r="${point.selected ? 6.2 : 4.5}"></circle>
+            <text x="${point.x}" y="${fundFlowLabelY(point.y, pad.top, axisBottom)}" text-anchor="middle" class="fund-flow-value ${point.value >= 0 ? 'inflow' : 'outflow'}">${signedFundFlowText(point.value)}</text>
+            <title>${point.date} | 资金净流入 ${signedFundFlowText(point.value)} | ${fundFlowSourceText(point)} | ${fundFlowCoverageText(point)}</title>
+          `}
+          <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
         </g>
       `).join('')}
     </svg>
@@ -1695,26 +1978,118 @@ function renderProfitPanel(board) {
   `;
 }
 
-function renderStocksTable(board) {
-  const snapshot = stockSnapshotByDate(board, state.sortDate);
-  const hasDateSnapshot = boardHasDateSnapshot(board, state.sortDate);
-  const stocks = [...(board?.stocks || [])]
+function stockDisplayForDate(board, stock, date) {
+  const snapshot = stockSnapshotByDate(board, date);
+  const hasDateSnapshot = boardHasDateSnapshot(board, date);
+  const current = snapshot.get(String(stock?.code || ''));
+  const useDateSnapshot = Boolean(date && hasDateSnapshot);
+  return {
+    ...stock,
+    displayDate: useDateSnapshot ? date : stock?.latestDate,
+    displayClose: useDateSnapshot ? (current?.close ?? null) : stock?.latestClose,
+    displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock?.latestChangePercent,
+    displayAmount: useDateSnapshot ? stockTurnover(current) : (stock?.latestTurnover ?? stock?.latestAmount),
+    displayMainNetInflow: useDateSnapshot ? stockMainNetInflow(current) : stock?.latestMainNetInflow,
+    displayHighStatus: useDateSnapshot ? (current?.highStatus ?? null) : stock?.latestHighStatus,
+  };
+}
+
+function customBoardStockCodes() {
+  return new Set(customBoardStockMap().keys());
+}
+
+function customBoardStockMap() {
+  const rows = new Map();
+  (state.data?.boards || []).forEach((board) => {
+    (board?.stocks || []).forEach((stock) => {
+      const code = String(stock?.code || '');
+      if (!code) return;
+      const boards = rows.get(code) || [];
+      if (board?.name && !boards.includes(board.name)) boards.push(board.name);
+      rows.set(code, boards);
+    });
+  });
+  return rows;
+}
+
+function fullATopTurnoverRows(date, limit = 20) {
+  const customMap = customBoardStockMap();
+  return [...(state.fullATurnover?.stocks || [])]
     .map((stock) => {
-      const current = snapshot.get(String(stock.code || ''));
-      const useDateSnapshot = Boolean(state.sortDate && hasDateSnapshot);
+      const boardNames = customMap.get(String(stock.code || '')) || [];
       return {
         ...stock,
-        displayDate: useDateSnapshot ? state.sortDate : stock.latestDate,
-        displayClose: useDateSnapshot ? (current?.close ?? null) : stock.latestClose,
-        displayChangePercent: useDateSnapshot ? (current?.changePercent ?? null) : stock.latestChangePercent,
-        displayAmount: useDateSnapshot ? stockTurnover(current) : (stock.latestTurnover ?? stock.latestAmount),
-        displayMainNetInflow: useDateSnapshot ? stockMainNetInflow(current) : stock.latestMainNetInflow,
-        displayFundFlowDate: useDateSnapshot ? current?.fundFlowDate : stock.latestFundFlowDate,
-        displayDistanceToHigh100: useDateSnapshot ? (current?.distanceToHigh100 ?? null) : stock.latestDistanceToHigh100,
-        displayIsHigh100: useDateSnapshot ? (current?.isHigh100 ?? null) : stock.latestIsHigh100,
-        displayIsNearHigh100: useDateSnapshot ? (current?.isNearHigh100 ?? null) : stock.latestIsNearHigh100,
-        displayPosition100: useDateSnapshot ? (current?.position100 ?? null) : stock.latestPosition100,
-        displayHighStatus: useDateSnapshot ? (current?.highStatus ?? null) : stock.latestHighStatus,
+        displayDate: stock.date || state.fullATurnover?.date || date,
+        displayClose: stock.close,
+        displayChangePercent: stock.changePercent,
+        displayAmount: stock.turnover ?? stock.amount,
+        displayBoardLabel: boardNames.length ? boardNames.join('、') : '未纳入',
+        displayBoardSort: boardNames.length ? boardNames.join('、') : 'zzz未纳入',
+        isNew: Boolean(stock.isNew),
+        isOutsideCustomBoards: !boardNames.length,
+      };
+    })
+    .filter((stock) => numericSortValue(stock.displayAmount) !== null)
+    .sort((a, b) =>
+      compareFullATurnoverRows(a, b, state.fullATurnoverSort.key, state.fullATurnoverSort.direction)
+      || compareNumeric(a, b, 'displayAmount', 'desc')
+      || String(a.name || '').localeCompare(String(b.name || ''), 'zh-Hans-CN'))
+    .slice(0, limit);
+}
+
+function compareFullATurnoverRows(a, b, key, direction = 'desc') {
+  if (key === 'displayBoardSort') {
+    const multiplier = direction === 'asc' ? 1 : -1;
+    return multiplier * String(a.displayBoardSort || '').localeCompare(String(b.displayBoardSort || ''), 'zh-Hans-CN');
+  }
+  return compareNumeric(a, b, key, direction);
+}
+
+function renderFullATurnoverPanel() {
+  const stocks = fullATopTurnoverRows(state.sortDate, 20);
+  const snapshotDate = state.fullATurnover?.date || state.sortDate || '最新';
+  const compareDate = state.fullATurnover?.compareDate;
+  const outsideCount = stocks.filter((stock) => stock.isOutsideCustomBoards).length;
+  return `
+    <section class="card section-card">
+      <div class="section-head">
+        <div>
+          <h2>全A · 成交额前20</h2>
+          <p class="muted">按 ${snapshotDate} 全市场实时行情统计${compareDate ? `，红色为较 ${compareDate} 新进入前20` : ''}，橙色为未纳入当前自定义板块池${state.fullATurnover?.isFallback ? `，所选${state.fullATurnover?.requestedDate}快照暂缺，显示最近可用数据` : ''}，数据源：${state.fullATurnover?.source?.name || '暂无'}${state.fullATurnover?.error ? `，加载失败：${state.fullATurnover.error}` : ''}。</p>
+        </div>
+        <div class="count-pill">${stocks.length} 只 · 未纳入 ${outsideCount}</div>
+      </div>
+      <div class="table-wrap full-a-turnover-wrap">
+        <table class="full-a-turnover-table">
+          <thead>
+            <tr>
+              <th>股票</th>
+              <th><button class="table-sort-btn" type="button" data-full-a-sort-key="displayBoardSort">板块${sortLabel(state.fullATurnoverSort, 'displayBoardSort')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-full-a-sort-key="displayChangePercent">涨跌幅${sortLabel(state.fullATurnoverSort, 'displayChangePercent')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-full-a-sort-key="displayAmount">成交额${sortLabel(state.fullATurnoverSort, 'displayAmount')}</button></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${stocks.length ? stocks.map((stock, index) => `
+              <tr class="${stock.isNew ? 'full-a-new-row' : ''}${stock.isOutsideCustomBoards ? ' full-a-outside-row' : ''}">
+                <td class="stock-name-nowrap"><strong title="${stock.name || ''}">${index + 1}. ${stock.name || '暂无'}</strong> <span class="code">${stock.code}</span></td>
+                <td class="full-a-board-cell">${stock.isOutsideCustomBoards ? '<span class="full-a-status-badge">未纳入</span>' : stock.displayBoardLabel}</td>
+                <td class="${signedClass(stock.displayChangePercent)}">${number(stock.displayChangePercent)}%</td>
+                <td><strong>${amountText(stock.displayAmount)}</strong></td>
+              </tr>
+            `).join('') : '<tr><td colspan="4" class="empty">暂无可统计的全A成交额数据</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function renderStocksTable(board) {
+  const stocks = [...(board?.stocks || [])]
+    .map((stock) => {
+      return {
+        ...stockDisplayForDate(board, stock, state.sortDate),
         membership: membershipAssessment(board, stock, state.sortDate),
       };
     })
@@ -1740,7 +2115,7 @@ function renderStocksTable(board) {
               <th>归属</th>
               <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayChangePercent">涨跌幅${sortLabel(state.stockListSort, 'displayChangePercent')}</button></th>
               <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayAmount">成交额${sortLabel(state.stockListSort, 'displayAmount')}</button></th>
-              <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayMainNetInflow">主力净流入${sortLabel(state.stockListSort, 'displayMainNetInflow')}</button></th>
+              <th><button class="table-sort-btn" type="button" data-stock-list-sort-key="displayMainNetInflow">资金净流入${sortLabel(state.stockListSort, 'displayMainNetInflow')}</button></th>
               <th>新高状态</th>
               <th>依据</th>
               ${actionColumn}
@@ -1783,6 +2158,7 @@ function renderDetail(board) {
   const isOverviewTab = state.detailTab === 'overview';
   const isTrendTab = state.detailTab === 'trend';
   const isProfitTab = state.detailTab === 'profit';
+  const isFullATurnoverTab = state.detailTab === 'full-a-turnover';
 
   return `
     <div class="stack">
@@ -1792,6 +2168,7 @@ function renderDetail(board) {
           <button class="detail-tab-btn${isTrendTab ? ' active' : ''}" type="button" data-detail-tab="trend" role="tab" aria-selected="${isTrendTab}">趋势曲线</button>
           <button class="detail-tab-btn${isProfitTab ? ' active' : ''}" type="button" data-detail-tab="profit" role="tab" aria-selected="${isProfitTab}">盈利评分</button>
           <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
+          <button class="detail-tab-btn${isFullATurnoverTab ? ' active' : ''}" type="button" data-detail-tab="full-a-turnover" role="tab" aria-selected="${isFullATurnoverTab}">成交额前20</button>
         </div>
       </section>
       ${isOverviewTab ? `
@@ -1802,7 +2179,7 @@ function renderDetail(board) {
         <div class="section-head">
           <div>
             <h2>${board.name} · 趋势曲线</h2>
-            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}，主力净流入 ${amountText(selectedMainNetInflow)}（${fundFlowDateText(selectedRow?.fundFlowLatestDate, selectedRow?.date)}，${fundFlowCoverageText(selectedRow)}）。板块 ${boardFlow?.label || '暂无'}，指数 ${marketFlow?.label || '暂无'}，${resonance?.label || '暂无判断'}。</p>
+            <p class="muted">当前日期 ${state.sortDate || '最新'}：正宗股涨幅 ${number(selectedAverageChange)}%，涨停 ${limitUpCountByDate(board, state.sortDate)}，成交额 ${amountText(rowTotalTurnover(selectedRow))}，资金净流入 ${amountText(selectedMainNetInflow)}（${fundFlowSourceText(selectedRow)}，${fundFlowDateText(selectedRow?.fundFlowLatestDate, selectedRow?.date)}，${fundFlowCoverageText(selectedRow)}）。板块 ${boardFlow?.label || '暂无'}，指数 ${marketFlow?.label || '暂无'}，${resonance?.label || '暂无判断'}。</p>
           </div>
           <div class="badges">
             <span class="badge">蓝线：板块涨幅</span>
@@ -1818,6 +2195,13 @@ function renderDetail(board) {
           </div>
           <div class="chart-panel">
             <div class="chart-panel-head">
+              <strong>资金净流入</strong>
+              <span>东方财富口径 · 正值流入 / 负值流出</span>
+            </div>
+            <div class="chart-box fund-flow-chart-box">${renderFundFlowTrendChart(board)}</div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-panel-head">
               <strong>正宗股成交额</strong>
               <span>合计成交额</span>
             </div>
@@ -1828,6 +2212,7 @@ function renderDetail(board) {
       ` : ''}
       ${isProfitTab ? renderProfitPanel(board) : ''}
       ${state.detailTab === 'stocks' ? renderStocksTable(board) : ''}
+      ${isFullATurnoverTab ? renderFullATurnoverPanel() : ''}
     </div>
   `;
 }
@@ -1863,11 +2248,13 @@ function render() {
           ${boards.map((item) => {
             const selectedAverageChange = averageChangeByDate(item, state.sortDate);
             const setup = boardSetup(item, state.sortDate);
+            const fundFlow = sidebarBoardFundFlow(item, state.sortDate);
             return `
             <button class="board-button${item.code === board?.code ? ' active' : ''}" data-code="${item.code}">
               <span>
                 <strong>${item.name}</strong>
                 <small>${setup.label} · 正宗 ${percentText(setup.todayStats?.averageChange)}</small>
+                <small class="board-fund-flow ${fundFlow.tone}">${fundFlow.label}</small>
               </span>
               <span class="board-score">
                 <small>涨停 ${limitUpCountByDate(item, state.sortDate)}</small>
@@ -1909,25 +2296,36 @@ function render() {
   });
 
   document.querySelector('#sortDateSelect')?.addEventListener('change', (event) => {
-    state.sortDate = event.target.value;
-    selectTopBoard();
-    render();
+    setSortDate(event.target.value);
   });
   document.querySelector('#sortDatePrevBtn')?.addEventListener('click', () => {
     if (!prevDate) return;
-    state.sortDate = prevDate;
-    selectTopBoard();
-    render();
+    setSortDate(prevDate);
   });
   document.querySelector('#sortDateNextBtn')?.addEventListener('click', () => {
     if (!nextDate) return;
-    state.sortDate = nextDate;
-    selectTopBoard();
-    render();
+    setSortDate(nextDate);
   });
   document.querySelectorAll('.detail-tab-btn').forEach((button) => {
     button.addEventListener('click', () => {
       state.detailTab = button.dataset.detailTab;
+      if (state.detailTab === 'full-a-turnover') {
+        loadFullATurnoverData(state.sortDate).then((payload) => {
+          state.fullATurnover = payload;
+          render();
+        });
+        return;
+      }
+      render();
+    });
+  });
+  document.querySelectorAll('[data-full-a-sort-key]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const key = button.dataset.fullASortKey;
+      state.fullATurnoverSort = {
+        key,
+        direction: state.fullATurnoverSort.key === key && state.fullATurnoverSort.direction === 'desc' ? 'asc' : 'desc',
+      };
       render();
     });
   });
@@ -1954,9 +2352,7 @@ function render() {
   document.querySelectorAll('.new-high-point').forEach((point) => {
     const selectDate = () => {
       if (!point.dataset.highDate) return;
-      state.sortDate = point.dataset.highDate;
-      state.detailTab = 'stocks';
-      render();
+      setSortDate(point.dataset.highDate, { detailTab: 'stocks' });
     };
     point.addEventListener('click', selectDate);
     point.addEventListener('keydown', (event) => {
@@ -1990,34 +2386,32 @@ function render() {
 
 async function boot() {
   await detectEditingApi();
-  const response = await fetch(`./data/custom_boards.json?v=${Date.now()}`, { cache: 'no-store' });
-  state.data = await response.json();
-  try {
-    const labelResponse = await fetch(`./data/custom_board_labels.json?v=${Date.now()}`, { cache: 'no-store' });
-    const labelPayload = await labelResponse.json();
-    const rawLabels = Array.isArray(labelPayload.labels) ? labelPayload.labels : [];
-    const today = state.data?.date;
-    state.labels = rawLabels.map((item) => {
-      if (item?.date === today && item?.label === '强2') {
-        return { ...item, label: '强1' };
-      }
-      return item;
-    });
-  } catch {
-    state.labels = [];
-  }
-  try {
-    const membershipResponse = await fetch(`./data/custom_board_membership.json?v=${Date.now()}`, { cache: 'no-store' });
-    state.membership = membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
-  } catch {
-    state.membership = { overrides: [] };
-  }
+  state.data = await loadCustomBoardData(5);
+  [state.labels, state.membership] = await Promise.all([
+    loadLabels(state.data?.date),
+    loadMembership(),
+  ]);
   const dates = availableTrendDates();
   state.sortDate = dates[0] || state.data.date || null;
+  await syncFullATurnoverForDate(state.sortDate);
   selectTopBoard();
   render();
   // 确保波段观察面板能被注入
   setTimeout(() => app.dispatchEvent(new Event('dashboard:rendered')), 0);
+  scheduleBackgroundTask(() => {
+    loadAdditionalCustomBoardHistory(state.data, 5).then((fullData) => {
+      state.data = fullData;
+      const fullDates = availableTrendDates();
+      if (!state.sortDate || !fullDates.includes(state.sortDate)) {
+        state.sortDate = fullDates[0] || state.data.date || null;
+        if (state.detailTab === 'full-a-turnover') {
+          syncFullATurnoverForDate(state.sortDate).then(render).catch(() => {});
+        }
+      }
+      render();
+      setTimeout(() => app.dispatchEvent(new Event('dashboard:rendered')), 0);
+    }).catch(() => {});
+  });
 }
 
 boot().catch((error) => {

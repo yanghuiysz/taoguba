@@ -38,6 +38,114 @@
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
+  async function fetchJsonNoStore(path) {
+    const response = await fetch(`${path}?v=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${path}`);
+    return response.json();
+  }
+
+  async function fetchJsonCached(path) {
+    const response = await fetch(path, { cache: "default" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${path}`);
+    return response.json();
+  }
+
+  function mergeRowsByDate(existing = [], additions = []) {
+    const rows = new Map();
+    existing.filter((row) => row?.date).forEach((row) => rows.set(String(row.date), row));
+    additions.filter((row) => row?.date).forEach((row) => rows.set(String(row.date), row));
+    return [...rows.keys()].sort().map((date) => rows.get(date));
+  }
+
+  function hydrateCustomBoardHistory(payload, histories) {
+    for (const history of [...histories].sort((a, b) => String(a?.date || "").localeCompare(String(b?.date || "")))) {
+      ["marketIndex", "secondaryMarketIndex"].forEach((key) => {
+        if (!payload[key] && !history?.[key]) return;
+        payload[key] = payload[key] || {};
+        payload[key].trend = mergeRowsByDate(payload[key].trend || [], history?.[key]?.trend || []);
+      });
+      const historyBoards = new Map((history?.boards || []).map((board) => [String(board.code), board]));
+      (payload.boards || []).forEach((board) => {
+        const historyBoard = historyBoards.get(String(board.code));
+        if (!historyBoard) return;
+        board.trend = mergeRowsByDate(board.trend || [], historyBoard.trend || []);
+        board.boardNewHighTrend = mergeRowsByDate(board.boardNewHighTrend || [], historyBoard.boardNewHighTrend || []);
+      });
+    }
+    return payload;
+  }
+
+  async function loadCustomBoardData(daysOverride = null) {
+    const payload = await fetchJsonNoStore(DATA_URL);
+    if (!payload.historyIndex) return payload;
+    const index = await fetchJsonNoStore(payload.historyIndex);
+    const days = daysOverride || Number(payload.days) || 15;
+    const items = Array.isArray(index.items) ? index.items.slice(0, days) : [];
+    const histories = await Promise.all(
+      [...items]
+        .reverse()
+        .filter((item) => item?.path)
+        .map((item) => fetchJsonCached(item.path)),
+    );
+    if (payload.intradayPath) {
+      try {
+        histories.push(await fetchJsonNoStore(payload.intradayPath));
+      } catch (error) {
+        // Intraday snapshots are runtime-only; archived history is enough when absent.
+      }
+    }
+    return hydrateCustomBoardHistory(payload, histories);
+  }
+
+  async function loadAdditionalCustomBoardHistory(payload, loadedDays) {
+    if (!payload?.historyIndex) return payload;
+    const index = await fetchJsonNoStore(payload.historyIndex);
+    const days = Number(payload.days) || 15;
+    const items = Array.isArray(index.items) ? index.items.slice(loadedDays, days) : [];
+    if (!items.length) return payload;
+    const histories = await Promise.all(
+      [...items]
+        .reverse()
+        .filter((item) => item?.path)
+        .map((item) => fetchJsonCached(item.path)),
+    );
+    return hydrateCustomBoardHistory(payload, histories);
+  }
+
+  function scheduleBackgroundTask(callback) {
+    setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(callback, { timeout: 1500 });
+        return;
+      }
+      callback();
+    }, 1200);
+  }
+
+  async function loadMembership() {
+    try {
+      const membershipResponse = await fetch(`${MEMBERSHIP_URL}?v=${Date.now()}`, { cache: "no-store" });
+      return membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
+    } catch (error) {
+      return { overrides: [] };
+    }
+  }
+
+  async function loadAuctionSnapshot() {
+    const auctionDates = [...new Set([todayCompactDate(), compactDate(latestDataDate())].filter(Boolean))];
+    for (const auctionDate of auctionDates) {
+      const auctionResponse = await fetch(`./data/auction_snapshots/${auctionDate}.summary.json?v=${Date.now()}`, { cache: "no-store" });
+      if (auctionResponse.ok) {
+        return { auction: await auctionResponse.json(), error: "" };
+      }
+      if (auctionResponse.status === 404) {
+        continue;
+      }
+      throw new Error(`HTTP ${auctionResponse.status}`);
+    }
+    return { auction: null, error: "" };
+  }
+
   const scoreRange = (value, min, max) => {
     const parsed = safeNumber(value);
     if (parsed === null) return 0;
@@ -396,6 +504,15 @@
   }
 
   function boardAuctionSnapshot(board, sample) {
+    const summary = sample?.boardSnapshots?.[String(board?.code || "")];
+    if (summary) {
+      return {
+        stockCount: safeNumber(summary.stockCount),
+        averageChange: safeNumber(summary.averageChange),
+        redRate: safeNumber(summary.redRate),
+        totalTurnover: safeNumber(summary.totalTurnover),
+      };
+    }
     const stocks = (board?.stocks || [])
       .map((stock) => sample?.quotes?.[normalizeCode(stock.code)] || null)
       .filter(Boolean);
@@ -1220,40 +1337,25 @@
   async function load() {
     render();
     try {
-      const response = await fetch(`${DATA_URL}?v=${Date.now()}`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      state.data = await response.json();
+      state.data = await loadCustomBoardData(5);
       state.error = "";
     } catch (error) {
       state.error = error.message || String(error);
     }
-    try {
-      const membershipResponse = await fetch(`${MEMBERSHIP_URL}?v=${Date.now()}`, { cache: "no-store" });
-      state.membership = membershipResponse.ok ? await membershipResponse.json() : { overrides: [] };
-    } catch (error) {
-      state.membership = { overrides: [] };
-    }
-    try {
-      const auctionDates = [...new Set([todayCompactDate(), compactDate(latestDataDate())].filter(Boolean))];
-      for (const auctionDate of auctionDates) {
-        const auctionResponse = await fetch(`./data/auction_snapshots/${auctionDate}.json?v=${Date.now()}`, { cache: "no-store" });
-        if (auctionResponse.ok) {
-          state.auction = await auctionResponse.json();
-          state.auctionError = "";
-          break;
-        } else if (auctionResponse.status === 404) {
-          state.auction = null;
-          state.auctionError = "";
-          continue;
-        } else {
-          throw new Error(`HTTP ${auctionResponse.status}`);
-        }
-      }
-    } catch (error) {
-      state.auction = null;
-      state.auctionError = error.message || String(error);
-    }
+    const [membership, auctionResult] = await Promise.all([
+      loadMembership(),
+      loadAuctionSnapshot().catch((error) => ({ auction: null, error: error.message || String(error) })),
+    ]);
+    state.membership = membership;
+    state.auction = auctionResult.auction;
+    state.auctionError = auctionResult.error;
     render();
+    scheduleBackgroundTask(() => {
+      loadAdditionalCustomBoardHistory(state.data, 5).then((fullData) => {
+        state.data = fullData;
+        render();
+      }).catch(() => {});
+    });
   }
 
   app.addEventListener("click", (event) => {

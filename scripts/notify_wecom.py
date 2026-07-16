@@ -28,6 +28,11 @@ from typing import Optional
 import urllib.request
 import urllib.error
 
+try:
+    from custom_board_history import load_custom_board_payload
+except ModuleNotFoundError:
+    from scripts.custom_board_history import load_custom_board_payload
+
 
 # ── 自动加载 .env 文件（无需第三方库）─────────────────────────────────────
 def _load_env_file(env_path: Path) -> None:
@@ -240,8 +245,7 @@ def load_custom_boards(json_path: Path) -> list[dict]:
     if not json_path.exists():
         return []
     try:
-        with open(json_path, encoding="utf-8") as f:
-            data = json.load(f)
+        data = load_custom_board_payload(json_path)
 
         if isinstance(data, dict):
             boards = data.get("boards", [])
