@@ -384,21 +384,50 @@
 }
 
 .board-ranking-table table {
-  min-width: 1420px;
-  font-size: 13px;
+  min-width: 1080px;
+  font-size: 12px;
+  line-height: 1.22;
 }
 
 .board-ranking-table th,
 .board-ranking-table td {
-  padding: 9px 8px;
+  padding: 6px 6px;
   white-space: nowrap;
   text-align: right;
 }
 
+.board-ranking-table th {
+  font-size: 11px;
+  letter-spacing: -0.1px;
+}
+
+.board-ranking-table td small,
+.board-ranking-table th small {
+  font-size: 10px;
+  line-height: 1.05;
+}
+
+.board-ranking-table th:first-child,
+.board-ranking-table td:first-child {
+  width: 34px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+}
+
 .board-ranking-table th:nth-child(2),
 .board-ranking-table td:nth-child(2) {
-  min-width: 104px;
+  min-width: 82px;
   text-align: left;
+}
+
+.board-ranking-table .text-link {
+  font-size: 12px;
+}
+
+.board-ranking-table .board-ranking-status {
+  padding: 2px 5px;
+  font-size: 10px;
 }
 
 .board-ranking-status {
@@ -492,7 +521,7 @@
   }
 
   .board-ranking-table table {
-    min-width: 1320px;
-    font-size: 12px;
+    min-width: 1040px;
+    font-size: 11px;
   }
 }

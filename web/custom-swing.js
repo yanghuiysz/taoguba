@@ -39,6 +39,7 @@
   ]);
 
   function safeNumber(value) {
+    if (value === null || value === undefined || value === '') return null;
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
   }
@@ -480,15 +481,33 @@
       };
     }
 
+    function fundFlowWindowMetric(days) {
+      const completedRows = rows
+        .map((row) => ({ row, value: rowMainNetInflowValue(row) }))
+        .filter((item) => item.value !== null)
+        .slice(-days);
+      if (completedRows.length < days) return null;
+      return {
+        amount: completedRows.reduce((sum, item) => sum + item.value, 0),
+        latestDate: completedRows.at(-1)?.row?.date || '',
+      };
+    }
+
     const window3 = windowMetric(3);
     const window5 = windowMetric(5);
+    const fundFlow3 = fundFlowWindowMetric(3);
+    const fundFlow5 = fundFlowWindowMetric(5);
+    const currentRow = rows.at(-1) || null;
     return {
       board,
-      date: rows.at(-1)?.date || '',
+      date: currentRow?.date || '',
+      amountToday: currentRow ? getRowTurnover(currentRow) : null,
+      mainNetInflowToday: currentRow ? rowMainNetInflowValue(currentRow) : null,
       amount3: window3?.amount ?? null,
       amount5: window5?.amount ?? null,
-      mainNetInflow3: window3?.mainNetInflow ?? null,
-      mainNetInflow5: window5?.mainNetInflow ?? null,
+      mainNetInflow3: fundFlow3?.amount ?? null,
+      mainNetInflow5: fundFlow5?.amount ?? null,
+      fundFlowLatestDate: fundFlow5?.latestDate || fundFlow3?.latestDate || '',
       return3: window3?.boardReturn ?? null,
       return5: window5?.boardReturn ?? null,
       relative3: window3?.relative ?? null,
@@ -838,15 +857,14 @@
               <tr>
                 <th>排名</th>
                 <th>板块</th>
-                <th>${sortableHeader('sortScore', '综合排序')}</th>
+                <th>${sortableHeader('amountToday', '当日成交额')}</th>
+                <th>${sortableHeader('mainNetInflowToday', '当日资金净流入')}</th>
                 <th>${sortableHeader('amount3', '3日成交额')}</th>
                 <th>${sortableHeader('amount5', '5日成交额')}</th>
-                <th>${sortableHeader('mainNetInflow3', '3日资金净流入')}</th>
-                <th>${sortableHeader('mainNetInflow5', '5日资金净流入')}</th>
+                <th>${sortableHeader('mainNetInflow3', '3日资金净流入')}<br><small>完整交易日</small></th>
+                <th>${sortableHeader('mainNetInflow5', '5日资金净流入')}<br><small>完整交易日</small></th>
                 <th>${sortableHeader('return3', '3日涨幅')}</th>
                 <th>${sortableHeader('return5', '5日涨幅')}</th>
-                <th>${sortableHeader('relative3', '3日相对大盘')}</th>
-                <th>${sortableHeader('relative5', '5日相对大盘')}</th>
                 <th>${sortableHeader('drawdown', '最大回撤')}</th>
                 <th>状态</th>
               </tr>
@@ -856,15 +874,14 @@
                 <tr>
                   <td>${index + 1}</td>
                   <td><button class="text-link swing-board-jump" type="button" data-board-ranking-code="${item.board.code}" data-board-code="${item.board.code}" data-target-tab="${SWING_TAB}">${item.board.name}</button></td>
-                  <td><strong>${item.sortScore === null ? '暂无' : fmt(item.sortScore, 0)}</strong></td>
+                  <td>${fmtAmount(item.amountToday)}</td>
+                  <td class="${deltaClass(item.mainNetInflowToday)}">${fmtAmount(item.mainNetInflowToday)}</td>
                   <td>${fmtAmount(item.amount3)}</td>
                   <td>${fmtAmount(item.amount5)}</td>
-                  <td class="${deltaClass(item.mainNetInflow3)}">${fmtAmount(item.mainNetInflow3)}</td>
-                  <td class="${deltaClass(item.mainNetInflow5)}">${fmtAmount(item.mainNetInflow5)}</td>
+                  <td class="${deltaClass(item.mainNetInflow3)}">${fmtAmount(item.mainNetInflow3)}${item.fundFlowLatestDate ? `<br><small>截至 ${fmtDate(item.fundFlowLatestDate)}</small>` : ''}</td>
+                  <td class="${deltaClass(item.mainNetInflow5)}">${fmtAmount(item.mainNetInflow5)}${item.fundFlowLatestDate ? `<br><small>截至 ${fmtDate(item.fundFlowLatestDate)}</small>` : ''}</td>
                   <td class="${deltaClass(item.return3)}">${fmtPercent(item.return3)}</td>
                   <td class="${deltaClass(item.return5)}">${fmtPercent(item.return5)}</td>
-                  <td class="${deltaClass(item.relative3)}">${fmtPercent(item.relative3)}</td>
-                  <td class="${deltaClass(item.relative5)}">${fmtPercent(item.relative5)}</td>
                   <td>${fmtPercent(item.drawdown)}</td>
                   <td><span class="swing-badge board-ranking-status ${boardRankingStatusTone(item.status)}">${item.status}</span></td>
                 </tr>

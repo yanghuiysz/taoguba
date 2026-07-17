@@ -1408,32 +1408,9 @@ function renderTrendChart(board) {
   `;
 }
 
-function fundFlowLineSegments(points, zeroY) {
-  const segments = [];
-  for (let index = 1; index < points.length; index += 1) {
-    const previous = points[index - 1];
-    const current = points[index];
-    if (previous.value === null || current.value === null || previous.y === null || current.y === null) continue;
-    if (previous.value === 0 || current.value === 0) {
-      const tone = previous.value < 0 || current.value < 0 ? 'outflow' : 'inflow';
-      segments.push({ x1: previous.x, y1: previous.y, x2: current.x, y2: current.y, tone });
-      continue;
-    }
-    const previousTone = previous.value >= 0 ? 'inflow' : 'outflow';
-    const currentTone = current.value >= 0 ? 'inflow' : 'outflow';
-    if (previousTone === currentTone) {
-      segments.push({ x1: previous.x, y1: previous.y, x2: current.x, y2: current.y, tone: previousTone });
-      continue;
-    }
-    const ratio = Math.abs(previous.value) / (Math.abs(previous.value) + Math.abs(current.value));
-    const zeroX = previous.x + (current.x - previous.x) * ratio;
-    segments.push({ x1: previous.x, y1: previous.y, x2: zeroX, y2: zeroY, tone: previousTone });
-    segments.push({ x1: zeroX, y1: zeroY, x2: current.x, y2: current.y, tone: currentTone });
-  }
-  return segments;
-}
-
-const fundFlowLabelY = (pointY, padTop, axisBottom) => pointY - 12 >= padTop + 11 ? pointY - 12 : Math.min(axisBottom - 4, pointY + 18);
+const fundFlowBarLabelY = (value, pointY, padTop, axisBottom) => value >= 0
+  ? Math.max(padTop + 11, pointY - 8)
+  : Math.min(axisBottom - 3, pointY + 15);
 
 function renderFundFlowTrendChart(board) {
   const rows = chartTrendRows(board)
@@ -1457,12 +1434,12 @@ function renderFundFlowTrendChart(board) {
   const maxAbs = Math.max(...validValues.map((value) => Math.abs(value)), 1);
   const valueLimit = maxAbs * 1.16;
   const zeroY = pad.top + plotHeight / 2;
+  const barWidth = Math.max(8, Math.min(28, plotWidth / Math.max(rows.length, 1) * 0.56));
   const points = rows.map((item, index) => {
     const x = chartPointX(index, rows.length, width, pad);
     const y = item.value === null ? null : zeroY - (item.value / valueLimit) * (plotHeight / 2);
     return { ...item, x, y, selected: item.date === state.sortDate };
   });
-  const segments = fundFlowLineSegments(points, zeroY);
 
   return `
     <svg class="fund-flow-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${board.name} 每日资金净流入走势">
@@ -1474,12 +1451,11 @@ function renderFundFlowTrendChart(board) {
       <text x="${pad.left - 10}" y="${pad.top + 4}" text-anchor="end" class="axis-label">${signedFundFlowText(valueLimit)}</text>
       <text x="${pad.left - 10}" y="${zeroY + 4}" text-anchor="end" class="axis-label">0</text>
       <text x="${pad.left - 10}" y="${axisBottom + 4}" text-anchor="end" class="axis-label">${signedFundFlowText(-valueLimit)}</text>
-      ${segments.map((segment) => `<line class="fund-flow-line ${segment.tone}" x1="${segment.x1}" y1="${segment.y1}" x2="${segment.x2}" y2="${segment.y2}"></line>`).join('')}
       ${points.map((point) => `
         <g>
           ${point.value === null ? '' : `
-            <circle class="fund-flow-dot ${point.value >= 0 ? 'inflow' : 'outflow'}" cx="${point.x}" cy="${point.y}" r="${point.selected ? 6.2 : 4.5}"></circle>
-            <text x="${point.x}" y="${fundFlowLabelY(point.y, pad.top, axisBottom)}" text-anchor="middle" class="fund-flow-value ${point.value >= 0 ? 'inflow' : 'outflow'}">${signedFundFlowText(point.value)}</text>
+            <rect class="fund-flow-bar ${point.value >= 0 ? 'inflow' : 'outflow'}${point.selected ? ' selected' : ''}" x="${point.x - barWidth / 2}" y="${Math.min(point.y, zeroY)}" width="${barWidth}" height="${Math.max(1, Math.abs(zeroY - point.y))}" rx="3"></rect>
+            <text x="${point.x}" y="${fundFlowBarLabelY(point.value, point.y, pad.top, axisBottom)}" text-anchor="middle" class="fund-flow-value ${point.value >= 0 ? 'inflow' : 'outflow'}">${signedFundFlowText(point.value)}</text>
             <title>${point.date} | 资金净流入 ${signedFundFlowText(point.value)} | ${fundFlowSourceText(point)} | ${fundFlowCoverageText(point)}</title>
           `}
           <text x="${point.x}" y="${height - 16}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>

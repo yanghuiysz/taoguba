@@ -100,19 +100,35 @@ def load_or_fetch_snapshot(
     minimum_rows: int = 3000,
     today: str | None = None,
     now: str | None = None,
+    max_age_seconds: int = 0,
+    fetch_attempts: int = 1,
+    target_rows: int = 4800,
 ) -> dict[str, Any]:
     formatted_date = format_trade_date(trade_date)
     path = snapshot_path(root, formatted_date)
     captured_at = datetime.fromisoformat(now) if now else datetime.now()
-    if path.exists() and not force:
+    cached: dict[str, Any] | None = None
+    if path.exists():
         try:
             cached = json.loads(path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             cached = None
+        captured_text = cached.get("capturedAt") if isinstance(cached, dict) else None
+        try:
+            cache_age = (captured_at - datetime.fromisoformat(str(captured_text))).total_seconds()
+        except (TypeError, ValueError):
+            cache_age = None
+        fresh_intraday = (
+            max_age_seconds > 0
+            and cache_age is not None
+            and 0 <= cache_age < max_age_seconds
+        )
         if (
+            not force
+            and
             isinstance(cached, dict)
             and snapshot_is_valid(cached, formatted_date, minimum_rows)
-            and cached.get("marketClosed") is True
+            and (cached.get("marketClosed") is True or fresh_intraday)
         ):
             return cached
 
@@ -122,7 +138,23 @@ def load_or_fetch_snapshot(
             f"historical THS snapshot is missing for {formatted_date}; live data is {current_date}"
         )
 
-    rows = normalize_ths_rows(fetcher(), formatted_date)
+    # The THS endpoint is paginated internally and occasionally drops different
+    # pages on each call. Keep the previous same-day rows and union a small
+    # number of calls instead of turning missing stocks into zero fund flow.
+    rows_by_code: dict[str, dict[str, Any]] = {}
+    if isinstance(cached, dict) and cached.get("date") == formatted_date:
+        for row in cached.get("rows") or []:
+            code = normalize_code(row.get("code"))
+            if code:
+                rows_by_code[code] = row
+
+    for _ in range(max(1, fetch_attempts)):
+        fetched_rows = normalize_ths_rows(fetcher(), formatted_date)
+        for row in fetched_rows:
+            rows_by_code[row["code"]] = row
+        if len(rows_by_code) >= target_rows:
+            break
+    rows = list(rows_by_code.values())
     payload = {
         "date": formatted_date,
         "source": SOURCE_NAME,

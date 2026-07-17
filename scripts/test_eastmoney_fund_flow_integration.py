@@ -63,18 +63,18 @@ class EastmoneyFundFlowIntegrationTest(unittest.TestCase):
         self.assertIsNone(row.get("fundFlowDate"))
         self.assertIsNone(row.get("mainNetInflow"))
 
-    def test_fast_summary_requires_same_day_eastmoney_and_eighty_percent(self) -> None:
+    def test_fast_summary_accepts_same_day_eastmoney_or_ths_with_eighty_percent(self) -> None:
         def stock(source=SOURCE_NAME, flow_date="2026-07-15", value=10):
             return {"fundFlowSource": source, "fundFlowDate": flow_date, "mainNetInflow": value,
                     "superLargeNetInflow": value, "largeNetInflow": value,
                     "mediumNetInflow": value, "smallNetInflow": value}
         low = summarize_fast_intraday_board_row("2026-07-15", [stock(), stock(), stock(), stock(flow_date="2026-07-14"), stock(source="ths_stock_fund_flow_individual")])
-        self.assertEqual(low["fundFlowStockCount"], 3)
-        for key in ("mainNetInflow", "superLargeNetInflow", "largeNetInflow", "mediumNetInflow", "smallNetInflow"):
-            self.assertIsNone(low[key])
+        self.assertEqual(low["fundFlowStockCount"], 4)
+        self.assertEqual(low["mainNetInflow"], 40)
+        self.assertEqual(low["fundFlowSource"], "mixed")
         high = summarize_fast_intraday_board_row("2026-07-15", [stock(), stock(), stock(), stock(), stock(source="ths_stock_fund_flow_individual")])
-        self.assertEqual(high["mainNetInflow"], 40)
-        self.assertEqual(high["fundFlowSource"], SOURCE_NAME)
+        self.assertEqual(high["mainNetInflow"], 50)
+        self.assertEqual(high["fundFlowSource"], "mixed")
 
     def test_coverage_requires_all_five_flow_fields_and_syncs_source(self) -> None:
         complete = {"fundFlowSource": SOURCE_NAME, "fundFlowDate": "2026-07-15", "mainNetInflow": 1,
@@ -93,7 +93,7 @@ class EastmoneyFundFlowIntegrationTest(unittest.TestCase):
         self.assertEqual(validate_fund_flow_row(valid), [])
         invalid = {**valid, "fundFlowStockCount": 3}
         self.assertIn("fund flow amount present below 80% coverage", validate_fund_flow_row(invalid))
-        for bad_source in (None, "ths_stock_fund_flow_individual"):
+        for bad_source in (None, "unknown_fund_flow_source"):
             self.assertIn("fund flow source mismatch", validate_fund_flow_row({**valid, "fundFlowSource": bad_source}))
 
     def test_board_aggregates_each_day_with_eighty_percent_gate(self) -> None:

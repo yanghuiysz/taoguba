@@ -47,7 +47,10 @@ def validate_fund_flow_row(row: dict[str, Any]) -> list[str]:
     if amount is not None and flow_date != row.get("date"):
         errors.append("fund flow date mismatch")
     source = row.get("fundFlowSource")
-    if amount is not None and source != "eastmoney_stock_individual_fund_flow":
+    if amount is not None and source not in {
+        "eastmoney_stock_individual_fund_flow",
+        "ths_stock_fund_flow_individual",
+    }:
         errors.append("fund flow source mismatch")
     count = number_or_none(row.get("fundFlowStockCount"))
     stocks = row.get("stocks")

@@ -869,13 +869,31 @@ def enrich_fast_intraday_stock_row(row: dict[str, Any], spot: dict[str, Any] | N
     return updated
 
 
+def apply_intraday_fund_flow(stock: dict[str, Any], flow: dict[str, Any] | None) -> dict[str, Any]:
+    updated = dict(stock)
+    if not flow:
+        return updated
+    updated.update({
+        "fundFlowDate": flow.get("date"),
+        "fundFlowSource": flow.get("source"),
+        "mainNetInflow": flow.get("mainNetInflow"),
+        "inflow": flow.get("inflow"),
+        "outflow": flow.get("outflow"),
+    })
+    return updated
+
+
 def aggregate_daily_fund_flow(stocks: list[dict[str, Any]], date: str) -> dict[str, Any]:
     flow_keys = ("mainNetInflow", "superLargeNetInflow", "largeNetInflow", "mediumNetInflow", "smallNetInflow")
     eligible = [
         stock for stock in stocks
         if stock.get("fundFlowDate") == date
-        and stock.get("fundFlowSource") == EASTMONEY_FUND_FLOW_SOURCE
-        and all(number_or_none(stock.get(key)) is not None for key in flow_keys)
+        and stock.get("fundFlowSource") in {EASTMONEY_FUND_FLOW_SOURCE, THS_FUND_FLOW_SOURCE}
+        and number_or_none(stock.get("mainNetInflow")) is not None
+        and (
+            stock.get("fundFlowSource") == THS_FUND_FLOW_SOURCE
+            or all(number_or_none(stock.get(key)) is not None for key in flow_keys)
+        )
     ]
     count = len(eligible)
     coverage_ok = bool(stocks) and count / len(stocks) >= 0.8
@@ -886,6 +904,7 @@ def aggregate_daily_fund_flow(stocks: list[dict[str, Any]], date: str) -> dict[s
         values = [float(value) for value in (number_or_none(stock.get(key)) for stock in eligible) if value is not None]
         return round(sum(values), 2) if values else None
 
+    sources = {str(stock.get("fundFlowSource")) for stock in eligible if stock.get("fundFlowSource")}
     return {
         "mainNetInflow": total("mainNetInflow"),
         "superLargeNetInflow": total("superLargeNetInflow"),
@@ -894,7 +913,7 @@ def aggregate_daily_fund_flow(stocks: list[dict[str, Any]], date: str) -> dict[s
         "smallNetInflow": total("smallNetInflow"),
         "fundFlowStockCount": count,
         "fundFlowLatestDate": date if count else None,
-        "fundFlowSource": EASTMONEY_FUND_FLOW_SOURCE if count else None,
+        "fundFlowSource": next(iter(sources)) if count and len(sources) == 1 else ("mixed" if count else None),
     }
 
 
@@ -1004,6 +1023,27 @@ def fast_intraday_refresh(config_path: Path, out_path: Path, date: str) -> None:
         }
     )
     spot_rows = fetch_tencent_spot(set(codes), date)
+    fund_flow_rows: dict[str, dict[str, Any]] = {}
+    try:
+        fund_payload = load_or_fetch_snapshot(
+            date,
+            THS_FUND_FLOW_CACHE_DIR,
+            minimum_rows=3000,
+            max_age_seconds=300,
+            fetch_attempts=2,
+            target_rows=4800,
+        )
+        fund_flow_rows = {
+            code: rows[0]
+            for code, rows in ths_fund_flow_map(fund_payload, set(codes), formatted_date).items()
+            if rows
+        }
+        print(
+            f"Intraday THS fund flow: selected={len(fund_flow_rows)}/{len(codes)}, "
+            f"capturedAt={fund_payload.get('capturedAt')}"
+        )
+    except Exception as exc:  # noqa: BLE001 - realtime quotes must continue when the optional flow source fails.
+        print(f"WARNING: intraday THS fund flow unavailable; keeping price refresh: {exc}")
 
     for board in payload.get("boards", []):
         trend = board.setdefault("trend", [])
@@ -1021,7 +1061,8 @@ def fast_intraday_refresh(config_path: Path, out_path: Path, date: str) -> None:
                 "profitLabel": stock.get("profitLabel"),
                 "profitMetrics": stock.get("profitMetrics"),
             }
-            updated_stocks.append(enrich_fast_intraday_stock_row(base, spot_rows.get(code), previous_stocks.get(code)))
+            realtime_row = enrich_fast_intraday_stock_row(base, spot_rows.get(code), previous_stocks.get(code))
+            updated_stocks.append(apply_intraday_fund_flow(realtime_row, fund_flow_rows.get(code)))
         latest_row = summarize_fast_intraday_board_row(formatted_date, updated_stocks)
         trend[:] = [row for row in trend if row.get("date") != formatted_date]
         trend.append(latest_row)
@@ -1616,6 +1657,27 @@ def ths_fund_flow_map(
     return result
 
 
+def merge_fund_flow_fallback(
+    primary: dict[str, list[dict[str, Any]]],
+    fallback: dict[str, list[dict[str, Any]]],
+    date: str,
+) -> dict[str, list[dict[str, Any]]]:
+    """Fill a missing target date without replacing an official history row."""
+    target = format_date(date)
+    codes = set(primary) | set(fallback)
+    merged: dict[str, list[dict[str, Any]]] = {}
+    for code in codes:
+        rows = list(primary.get(code) or [])
+        has_primary = any(str(row.get("date") or "") == target for row in rows)
+        if not has_primary:
+            rows.extend(
+                row for row in (fallback.get(code) or [])
+                if str(row.get("date") or "") == target
+            )
+        merged[code] = sorted(rows, key=lambda row: str(row.get("date") or ""))
+    return merged
+
+
 def merge_ths_fund_flow_snapshots(
     root: Path,
     codes: set[str],
@@ -2205,6 +2267,24 @@ def main() -> None:
             }
             fund_flows = {code: [] for code in codes}
         target_date = format_date(args.date)
+        try:
+            ths_payload = load_or_fetch_snapshot(
+                args.date,
+                args.ths_fund_flow_cache_dir,
+                minimum_rows=3000,
+                fetch_attempts=2,
+                target_rows=4800,
+            )
+            ths_rows = ths_fund_flow_map(ths_payload, set(codes), target_date)
+            fund_flows = merge_fund_flow_fallback(fund_flows, ths_rows, target_date)
+            fallback_count = sum(
+                1 for rows in ths_rows.values()
+                if any(str(row.get("date") or "") == target_date for row in rows)
+            )
+            print(f"THS target-date fallback rows: {fallback_count}/{len(codes)} ({target_date})")
+        except Exception as exc:  # noqa: BLE001 - official history remains usable without the fallback.
+            warnings["thsFundFlowFallback"] = {"source": THS_FUND_FLOW_SOURCE, "error": str(exc)}
+            print(f"WARNING: THS target-date fallback unavailable: {exc}")
         target_count = sum(
             1 for rows in fund_flows.values()
             if any(str(row.get("date") or "") == target_date for row in rows)

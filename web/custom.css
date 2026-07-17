@@ -867,31 +867,15 @@ p { line-height: 1.55; }
   min-height: 300px;
 }
 
-.fund-flow-line {
-  stroke-linecap: round;
-  stroke-width: 3;
+.fund-flow-bar {
+  opacity: 0.82;
+  transition: opacity 160ms ease, filter 160ms ease;
 }
 
-.fund-flow-line.inflow {
-  stroke: var(--red);
-}
-
-.fund-flow-line.outflow {
-  stroke: var(--green);
-}
-
-.fund-flow-dot {
-  fill: #fff;
-  stroke-width: 2.5;
-}
-
-.fund-flow-dot.inflow {
-  stroke: var(--red);
-}
-
-.fund-flow-dot.outflow {
-  stroke: var(--green);
-}
+.fund-flow-bar.inflow { fill: var(--red); }
+.fund-flow-bar.outflow { fill: var(--green); }
+.fund-flow-bar.selected { opacity: 1; filter: drop-shadow(0 2px 3px rgba(24, 48, 54, 0.18)); }
+.fund-flow-bar:hover { opacity: 1; }
 
 .fund-flow-value {
   font-size: 11px;

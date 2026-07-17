@@ -2,10 +2,12 @@ import json
 import tempfile
 from pathlib import Path
 
+import ths_fund_flow
 from ths_fund_flow import (
     load_or_fetch_snapshot,
     normalize_ths_rows,
     parse_amount_yuan,
+    snapshot_path,
 )
 
 
@@ -43,6 +45,45 @@ def test_normalize_ths_rows_uses_six_digit_codes_and_yuan_amounts():
             "source": "ths_stock_fund_flow_individual",
         }
     ]
+
+
+def test_snapshot_merges_partial_calls_and_existing_same_day_cache(tmp_path, monkeypatch):
+    root = tmp_path / "flow"
+    path = snapshot_path(root, "20260716")
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        json.dumps(
+            {
+                "date": "2026-07-16",
+                "source": "ths_stock_fund_flow_individual",
+                "capturedAt": "2026-07-16T10:00:00",
+                "marketClosed": False,
+                "rows": [{"date": "2026-07-16", "code": "000001", "mainNetInflow": 1}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    calls = iter(
+        [
+            [{"date": "2026-07-16", "code": "000002", "mainNetInflow": 2}],
+            [{"date": "2026-07-16", "code": "000003", "mainNetInflow": 3}],
+        ]
+    )
+    monkeypatch.setattr(ths_fund_flow, "normalize_ths_rows", lambda rows, _date: rows)
+
+    payload = load_or_fetch_snapshot(
+        "20260716",
+        root,
+        fetcher=lambda: next(calls),
+        force=True,
+        minimum_rows=3,
+        fetch_attempts=2,
+        target_rows=3,
+        today="20260716",
+        now="2026-07-16 11:00:00",
+    )
+
+    assert {row["code"] for row in payload["rows"]} == {"000001", "000002", "000003"}
 
 
 def test_load_or_fetch_snapshot_reuses_valid_same_day_cache():
@@ -107,6 +148,29 @@ def test_load_or_fetch_snapshot_refreshes_an_intraday_cache():
         assert payload["rows"][0]["mainNetInflow"] == 20_000.0
 
 
+def test_load_or_fetch_snapshot_reuses_a_fresh_intraday_cache():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "20260715" / "all.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(
+            json.dumps({
+                "date": "2026-07-15",
+                "source": "ths_stock_fund_flow_individual",
+                "capturedAt": "2026-07-15T10:30:00",
+                "marketClosed": False,
+                "rows": [{"date": "2026-07-15", "code": "000021", "mainNetInflow": 1.0}],
+            }),
+            encoding="utf-8",
+        )
+        calls = []
+        payload = load_or_fetch_snapshot(
+            "20260715", Path(tmp), lambda: calls.append(True), minimum_rows=1,
+            now="2026-07-15 10:34:59", max_age_seconds=300,
+        )
+        assert calls == []
+        assert payload["capturedAt"] == "2026-07-15T10:30:00"
+
+
 def test_load_or_fetch_snapshot_does_not_write_cache_when_fetch_fails():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -115,7 +179,7 @@ def test_load_or_fetch_snapshot_does_not_write_cache_when_fetch_fails():
             raise RuntimeError("offline")
 
         try:
-            load_or_fetch_snapshot("20260715", root, fail, minimum_rows=1)
+            load_or_fetch_snapshot("20260715", root, fail, minimum_rows=1, today="20260715")
         except RuntimeError as exc:
             assert str(exc) == "offline"
         else:

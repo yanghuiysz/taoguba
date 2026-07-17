@@ -41,6 +41,18 @@ def test_validate_fund_flow_row_allows_coverage_above_price_stock_count():
     assert errors == []
 
 
+def test_validate_fund_flow_row_accepts_intraday_ths_source():
+    errors = validate_fund_flow_row({
+        "date": "2026-07-16",
+        "mainNetInflow": 10.0,
+        "fundFlowLatestDate": "2026-07-16",
+        "fundFlowSource": "ths_stock_fund_flow_individual",
+        "fundFlowStockCount": 9,
+        "stockCount": 10,
+    })
+    assert errors == []
+
+
 def test_validate_fund_flow_row_rejects_coverage_above_member_rows():
     errors = validate_fund_flow_row(
         {
@@ -56,13 +68,13 @@ def test_validate_fund_flow_row_rejects_coverage_above_member_rows():
     assert "fund flow coverage exceeds stock count" in errors
 
 
-def test_validate_fund_flow_row_rejects_non_eastmoney_source_for_present_amount():
+def test_validate_fund_flow_row_rejects_unknown_source_for_present_amount():
     errors = validate_fund_flow_row(
         {
             "date": "2026-07-15",
             "mainNetInflow": 10.0,
             "fundFlowLatestDate": "2026-07-15",
-            "fundFlowSource": "ths_stock_fund_flow_individual",
+            "fundFlowSource": "unknown_fund_flow_source",
             "fundFlowStockCount": 1,
             "stocks": [{}],
         }
