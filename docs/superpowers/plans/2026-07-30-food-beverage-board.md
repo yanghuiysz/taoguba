@@ -26,7 +26,7 @@ Check authoritative exchange or company disclosure sources for the 25 A-share co
 600132 重庆啤酒    000729 燕京啤酒    605499 东鹏饮料
 600887 伊利股份    002946 新乳业      600597 光明乳业
 603288 海天味业    603027 千禾味业    600305 恒顺醋业
-600298 安琪酵母    002847 盐津铺子    603517 绝味食品
+600298 安琪酵母    002847 盐津铺子    003000 劲仔食品
 300783 三只松鼠    002991 甘源食品    000895 双汇发展
 603345 安井食品    002507 涪陵榨菜    001215 千味央厨
 603043 广州酒家
@@ -84,7 +84,7 @@ Add this object to the `boards` array, preserving UTF-8 JSON formatting:
     {"code": "600305", "name": "恒顺醋业"},
     {"code": "600298", "name": "安琪酵母"},
     {"code": "002847", "name": "盐津铺子"},
-    {"code": "603517", "name": "绝味食品"},
+    {"code": "003000", "name": "劲仔食品"},
     {"code": "300783", "name": "三只松鼠"},
     {"code": "002991", "name": "甘源食品"},
     {"code": "000895", "name": "双汇发展"},
@@ -186,4 +186,3 @@ git diff --stat
 ```
 
 Expected: configuration and generated custom-board data are changed; unrelated pre-existing workspace changes remain untouched.
-
