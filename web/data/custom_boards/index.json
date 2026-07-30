@@ -1,6 +1,42 @@
 {
-  "latest": "2026-07-17",
+  "latest": "2026-07-30",
   "items": [
+    {
+      "date": "2026-07-30",
+      "path": "./data/custom_boards/history/20260730.json"
+    },
+    {
+      "date": "2026-07-29",
+      "path": "./data/custom_boards/history/20260729.json"
+    },
+    {
+      "date": "2026-07-28",
+      "path": "./data/custom_boards/history/20260728.json"
+    },
+    {
+      "date": "2026-07-27",
+      "path": "./data/custom_boards/history/20260727.json"
+    },
+    {
+      "date": "2026-07-24",
+      "path": "./data/custom_boards/history/20260724.json"
+    },
+    {
+      "date": "2026-07-23",
+      "path": "./data/custom_boards/history/20260723.json"
+    },
+    {
+      "date": "2026-07-22",
+      "path": "./data/custom_boards/history/20260722.json"
+    },
+    {
+      "date": "2026-07-21",
+      "path": "./data/custom_boards/history/20260721.json"
+    },
+    {
+      "date": "2026-07-20",
+      "path": "./data/custom_boards/history/20260720.json"
+    },
     {
       "date": "2026-07-17",
       "path": "./data/custom_boards/history/20260717.json"
