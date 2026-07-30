@@ -53,6 +53,18 @@ def test_validate_fund_flow_row_accepts_intraday_ths_source():
     assert errors == []
 
 
+def test_validate_fund_flow_row_accepts_mixed_known_sources():
+    errors = validate_fund_flow_row({
+        "date": "2026-07-30",
+        "mainNetInflow": 10.0,
+        "fundFlowLatestDate": "2026-07-30",
+        "fundFlowSource": "mixed",
+        "fundFlowStockCount": 5,
+        "stocks": [{}, {}, {}, {}, {}],
+    })
+    assert errors == []
+
+
 def test_validate_fund_flow_row_rejects_coverage_above_member_rows():
     errors = validate_fund_flow_row(
         {
