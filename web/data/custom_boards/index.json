@@ -1,6 +1,10 @@
 {
-  "latest": "2026-07-30",
+  "latest": "2026-07-31",
   "items": [
+    {
+      "date": "2026-07-31",
+      "path": "./data/custom_boards/history/20260731.json"
+    },
     {
       "date": "2026-07-30",
       "path": "./data/custom_boards/history/20260730.json"
