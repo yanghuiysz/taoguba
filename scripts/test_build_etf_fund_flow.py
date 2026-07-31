@@ -1,0 +1,636 @@
+import json
+import math
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import requests
+
+from scripts.build_etf_fund_flow import (
+    _call_with_retries,
+    build_row,
+    build_snapshot,
+    classify_flow,
+    compute_net_subscription,
+    fetch_market_history,
+    fetch_nav,
+    fetch_sse_shares,
+    fetch_szse_latest_shares,
+    main,
+    write_json_atomic,
+)
+
+
+class ConfirmedFlowMathTest(unittest.TestCase):
+    def test_confirmed_subscription_uses_share_delta_times_nav(self):
+        self.assertEqual(compute_net_subscription(1_200_000, 1_000_000, 1.25), 250_000)
+
+    def test_any_missing_input_returns_none(self):
+        self.assertIsNone(compute_net_subscription(None, 1_000_000, 1.25))
+        self.assertIsNone(compute_net_subscription(1_200_000, None, 1.25))
+        self.assertIsNone(compute_net_subscription(1_200_000, 1_000_000, None))
+
+    def test_four_flow_labels_and_pending(self):
+        self.assertEqual(classify_flow(1.2, 10), "资金强化")
+        self.assertEqual(classify_flow(-1.2, 10), "逆势承接")
+        self.assertEqual(classify_flow(1.2, -10), "上涨兑现")
+        self.assertEqual(classify_flow(-1.2, -10), "资金撤退")
+        self.assertEqual(classify_flow(1.2, None), "待确认")
+
+    def test_non_finite_input_is_never_emitted_as_a_number(self):
+        self.assertIsNone(compute_net_subscription(math.nan, 1_000_000, 1.25))
+
+
+class SourceAdapterTest(unittest.TestCase):
+    def test_exchange_share_adapters_retry_and_normalize_authoritative_rows(self):
+        class FakeAkshare:
+            def __init__(self):
+                self.sse_calls = 0
+
+            def fund_etf_scale_sse(self, date):
+                self.sse_calls += 1
+                if self.sse_calls == 1:
+                    raise TimeoutError("temporary")
+                return [
+                    {"基金代码": "510300", "基金份额": 1_200_000, "统计日期": "2026-07-31"},
+                    {"基金代码": "bad", "基金份额": math.nan, "统计日期": "2026-07-31"},
+                ]
+
+            def fund_etf_scale_szse(self):
+                return [
+                    {"基金代码": "159915", "基金份额": "2,000,000"},
+                    {
+                        "基金代码": "159916",
+                        "基金份额": "3,000,000",
+                        "统计日期": "2026-07-31",
+                    },
+                ]
+
+        fake = FakeAkshare()
+        with (
+            patch("scripts.build_etf_fund_flow._load_akshare", return_value=fake),
+            patch("scripts.build_etf_fund_flow._sleep"),
+        ):
+            sse = fetch_sse_shares("20260731")
+            szse = fetch_szse_latest_shares()
+
+        self.assertEqual(fake.sse_calls, 2)
+        self.assertEqual(sse, {"510300": {"shares": 1_200_000.0, "sharesDate": "2026-07-31"}})
+        self.assertEqual(
+            szse,
+            {
+                "159915": {"shares": 2_000_000.0, "sharesDate": None},
+                "159916": {"shares": 3_000_000.0, "sharesDate": "2026-07-31"},
+            },
+        )
+
+    def test_retry_boundary_injects_explicit_request_timeout(self):
+        observed = []
+
+        def fake_request(session, method, url, **kwargs):
+            observed.append(kwargs.get("timeout"))
+            return object()
+
+        with patch("requests.sessions.Session.request", new=fake_request):
+            _call_with_retries(
+                lambda: requests.get("https://example.invalid"),
+                attempts=1,
+                timeout_seconds=7,
+            )
+
+        self.assertEqual(observed, [7])
+
+    def test_nav_and_market_adapters_expose_normalized_date_keyed_values(self):
+        class FakeAkshare:
+            def fund_etf_fund_info_em(self, fund, start_date, end_date):
+                return [{"净值日期": "2026-07-31", "单位净值": 1.25}]
+
+            def fund_etf_hist_em(self, symbol, period, start_date, end_date, adjust):
+                return [
+                    {"日期": "2026-07-31", "收盘": 1.3, "涨跌幅": 1.2, "成交额": 500_000},
+                ]
+
+        with patch("scripts.build_etf_fund_flow._load_akshare", return_value=FakeAkshare()):
+            nav = fetch_nav("510300", "20260701", "20260731")
+            market = fetch_market_history("510300", "20260701", "20260731")
+
+        self.assertEqual(nav, {"2026-07-31": {"nav": 1.25, "navDate": "2026-07-31"}})
+        self.assertEqual(
+            market,
+            {
+                "2026-07-31": {
+                    "close": 1.3,
+                    "changePercent": 1.2,
+                    "turnover": 500_000.0,
+                }
+            },
+        )
+
+
+class ConfirmedRowTest(unittest.TestCase):
+    def setUp(self):
+        self.config = {
+            "code": "510300",
+            "name": "沪深300ETF",
+            "scope": "broad",
+            "category": "大盘核心",
+            "direction": "沪深300",
+            "exchange": "SSE",
+        }
+        self.dates = ["2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"]
+        self.history = [
+            {
+                "code": "510300",
+                "date": date,
+                "status": "confirmed",
+                "netSubscription1d": value,
+                "changePercent": 1.0,
+                "turnover": 100.0,
+            }
+            for date, value in zip(self.dates, (10.0, 20.0, 30.0, 40.0))
+        ]
+
+    def test_strict_dates_build_confirmed_row_and_complete_windows(self):
+        current = {
+            "date": "2026-07-31",
+            "previousDate": "2026-07-30",
+            "shares": 1_200_000.0,
+            "sharesDate": "2026-07-31",
+            "nav": 1.25,
+            "navDate": "2026-07-31",
+            "close": 1.3,
+            "changePercent": 1.0,
+            "turnover": 150.0,
+            "marketDate": "2026-07-31",
+        }
+        previous = {"shares": 1_000_000.0, "sharesDate": "2026-07-30"}
+        benchmarks = {date: 0.5 for date in self.dates + ["2026-07-31"]}
+
+        row = build_row(self.config, current, previous, self.history, benchmarks)
+
+        self.assertEqual(row["status"], "confirmed")
+        self.assertEqual(row["shareChange"], 200_000.0)
+        self.assertEqual(row["netSubscription1d"], 250_000.0)
+        self.assertEqual(row["netSubscription5d"], 250_100.0)
+        self.assertEqual(row["windowDays5d"], 5)
+        self.assertEqual(row["windowDays20d"], 5)
+        self.assertEqual(row["positiveFlowDays5d"], 5)
+        self.assertEqual(row["persistenceLabel"], "持续流入")
+        self.assertGreater(row["excessReturn5d"], 0)
+        self.assertEqual(row["turnoverVs5d"], 1.3636)
+
+    def test_misaligned_nav_date_preserves_null_confirmed_values(self):
+        current = {
+            "date": "2026-07-31",
+            "previousDate": "2026-07-30",
+            "shares": 1_200_000.0,
+            "sharesDate": "2026-07-31",
+            "nav": 1.25,
+            "navDate": "2026-07-30",
+            "close": 1.3,
+            "changePercent": 1.0,
+            "turnover": 150.0,
+            "marketDate": "2026-07-31",
+        }
+
+        row = build_row(
+            self.config,
+            current,
+            {"shares": 1_000_000.0, "sharesDate": "2026-07-30"},
+            self.history,
+            {},
+        )
+
+        self.assertEqual(row["status"], "pending")
+        self.assertIsNone(row["shareChange"])
+        self.assertIsNone(row["scale"])
+        self.assertIsNone(row["netSubscription1d"])
+        self.assertIsNone(row["netSubscription5d"])
+        self.assertEqual(row["flowLabel"], "待确认")
+
+    def test_missing_day_inside_available_window_nulls_the_sum(self):
+        current = {
+            "date": "2026-07-31",
+            "previousDate": "2026-07-30",
+            "shares": 1_200_000.0,
+            "sharesDate": "2026-07-31",
+            "nav": 1.25,
+            "navDate": "2026-07-31",
+            "close": 1.3,
+            "changePercent": 1.0,
+            "turnover": 150.0,
+            "marketDate": "2026-07-31",
+        }
+        history = [dict(row) for row in self.history]
+        history[2]["netSubscription1d"] = None
+        history[2]["status"] = "pending"
+
+        row = build_row(
+            self.config,
+            current,
+            {"shares": 1_000_000.0, "sharesDate": "2026-07-30"},
+            history,
+            {},
+        )
+
+        self.assertEqual(row["windowDays5d"], 5)
+        self.assertIsNone(row["netSubscription5d"])
+        self.assertIsNone(row["positiveFlowDays5d"])
+        self.assertIsNone(row["persistenceLabel"])
+
+    def test_omitted_archived_session_cannot_be_replaced_by_an_older_row(self):
+        current = {
+            "date": "2026-07-31",
+            "previousDate": "2026-07-30",
+            "shares": 1_200_000.0,
+            "sharesDate": "2026-07-31",
+            "nav": 1.25,
+            "navDate": "2026-07-31",
+            "close": 1.3,
+            "changePercent": 1.0,
+            "turnover": 150.0,
+            "marketDate": "2026-07-31",
+        }
+        history = [
+            {
+                "code": "510300",
+                "date": date,
+                "status": "confirmed",
+                "netSubscription1d": 10.0,
+                "changePercent": 1.0,
+                "turnover": 100.0,
+            }
+            for date in ("2026-07-24", "2026-07-27", "2026-07-28", "2026-07-30")
+        ]
+        benchmark = {
+            date: 0.5
+            for date in (
+                "2026-07-24",
+                "2026-07-27",
+                "2026-07-28",
+                "2026-07-29",
+                "2026-07-30",
+                "2026-07-31",
+            )
+        }
+
+        row = build_row(
+            self.config,
+            current,
+            {"shares": 1_000_000.0, "sharesDate": "2026-07-30"},
+            history,
+            benchmark,
+        )
+
+        self.assertEqual(row["windowDays5d"], 5)
+        self.assertIsNone(row["netSubscription5d"])
+        self.assertIsNone(row["positiveFlowDays5d"])
+        self.assertIsNone(row["turnoverVs5d"])
+        self.assertIsNone(row["excessReturn5d"])
+
+
+class SnapshotBuilderTest(unittest.TestCase):
+    def setUp(self):
+        self.dates = ["2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31"]
+        self.config = {
+            "version": 1,
+            "benchmarkCode": "510300",
+            "boardMappings": {"159999": ["demo"]},
+            "etfs": [
+                {
+                    "code": "510300",
+                    "name": "沪深300ETF",
+                    "scope": "broad",
+                    "category": "大盘核心",
+                    "direction": "沪深300",
+                    "exchange": "SSE",
+                },
+                {
+                    "code": "159999",
+                    "name": "行业ETF",
+                    "scope": "industry",
+                    "category": "测试",
+                    "direction": "测试行业",
+                    "exchange": "SZSE",
+                },
+            ],
+        }
+        self.history = []
+        for index, date in enumerate(self.dates[:-1]):
+            self.history.append(
+                {
+                    "date": date,
+                    "etfs": [
+                        {
+                            "code": "510300",
+                            "date": date,
+                            "status": "confirmed",
+                            "shares": 1_000_000.0,
+                            "netSubscription1d": 10.0 + index,
+                            "changePercent": 1.0,
+                            "turnover": 100.0,
+                        }
+                    ],
+                }
+            )
+
+    def _providers(self):
+        market = {
+            date: {"close": 1.0 + index / 100, "changePercent": 1.0, "turnover": 100.0}
+            for index, date in enumerate(self.dates)
+        }
+
+        def sse_shares(date):
+            normalized = date.replace("-", "")
+            shares = 1_200_000.0 if normalized == "20260731" else 1_000_000.0
+            return {"510300": {"shares": shares, "sharesDate": date}}
+
+        return {
+            "fetch_sse_shares": sse_shares,
+            "fetch_szse_latest_shares": lambda: {
+                "159999": {"shares": 2_000_000.0, "sharesDate": "2026-07-31"}
+            },
+            "fetch_nav": lambda code, start, end: {
+                "2026-07-31": {"nav": 1.25, "navDate": "2026-07-31"}
+            },
+            "fetch_market_history": lambda code, start, end: dict(market),
+        }
+
+    def test_fakes_build_confirmed_sse_and_pending_szse_baseline_offline(self):
+        custom_boards = {
+            "date": "2026-07-31",
+            "boards": [
+                {
+                    "code": "demo",
+                    "stocks": [
+                        {"code": "1", "latestDate": "2026-07-31", "latestChangePercent": 2.0},
+                        {"code": "2", "latestDate": "2026-07-31", "latestChangePercent": -1.0},
+                    ],
+                }
+            ],
+        }
+
+        snapshot = build_snapshot(
+            "20260731",
+            self.config,
+            history=self.history,
+            custom_boards=custom_boards,
+            providers=self._providers(),
+        )
+
+        self.assertIsNone(snapshot["etfs"][1]["netSubscription1d"])
+        self.assertEqual(snapshot["etfs"][1]["flowLabel"], "待确认")
+        self.assertEqual(snapshot["summary"]["broad"]["confirmedCount"], 1)
+        self.assertEqual(snapshot["summary"]["industry"]["confirmedCount"], 0)
+        self.assertFalse(math.isnan(snapshot["etfs"][0]["netSubscription1d"]))
+        self.assertEqual(snapshot["etfs"][1]["shares"], 2_000_000.0)
+        self.assertIsNone(snapshot["etfs"][1]["previousShares"])
+        self.assertEqual(snapshot["etfs"][1]["stockBreadth"], 0.5)
+        self.assertTrue(snapshot["etfs"][1]["breadthConfirmed"])
+        self.assertFalse(snapshot["etfs"][1]["mainlineCandidate"])
+
+    def test_szse_confirms_after_a_dated_archived_baseline_when_provider_is_authoritative(self):
+        history = json.loads(json.dumps(self.history))
+        history[-1]["etfs"].append(
+            {
+                "code": "159999",
+                "date": "2026-07-30",
+                "status": "pending",
+                "shares": 1_900_000.0,
+                "netSubscription1d": None,
+                "changePercent": 0.5,
+                "turnover": 80.0,
+            }
+        )
+
+        snapshot = build_snapshot(
+            "20260731",
+            self.config,
+            history=history,
+            custom_boards=None,
+            providers=self._providers(),
+        )
+
+        industry = snapshot["etfs"][1]
+        self.assertEqual(industry["status"], "confirmed")
+        self.assertEqual(industry["previousShares"], 1_900_000.0)
+        self.assertEqual(industry["netSubscription1d"], 125_000.0)
+        self.assertEqual([error for error in snapshot["errors"] if error["code"] == "159999"], [])
+
+    def test_stale_custom_board_date_never_confirms_breadth(self):
+        snapshot = build_snapshot(
+            "20260731",
+            self.config,
+            history=self.history,
+            custom_boards={"date": "2026-07-30", "boards": [{"code": "demo", "stocks": []}]},
+            providers=self._providers(),
+        )
+
+        industry = snapshot["etfs"][1]
+        self.assertIsNone(industry["stockBreadth"])
+        self.assertFalse(industry["breadthConfirmed"])
+        self.assertFalse(industry["mainlineCandidate"])
+
+    def test_mainline_candidate_requires_and_accepts_all_confirmed_evidence(self):
+        config = json.loads(json.dumps(self.config))
+        config["etfs"][1]["exchange"] = "SSE"
+        history = []
+        for date in self.dates[:-1]:
+            history.append(
+                {
+                    "date": date,
+                    "etfs": [
+                        {
+                            "code": "510300",
+                            "date": date,
+                            "status": "confirmed",
+                            "shares": 1_000_000.0,
+                            "netSubscription1d": 1.0,
+                            "changePercent": 0.0,
+                            "turnover": 100.0,
+                        },
+                        {
+                            "code": "159999",
+                            "date": date,
+                            "status": "confirmed",
+                            "shares": 1_000_000.0,
+                            "netSubscription1d": 10.0,
+                            "changePercent": 1.0,
+                            "turnover": 100.0,
+                        },
+                    ],
+                }
+            )
+
+        def market(code, start, end):
+            return {
+                date: {
+                    "close": 1.0,
+                    "changePercent": 0.0 if code == "510300" else (2.0 if date == "2026-07-31" else 1.0),
+                    "turnover": 200.0 if code == "159999" and date == "2026-07-31" else 100.0,
+                }
+                for date in self.dates
+            }
+
+        def shares(date):
+            current = date.replace("-", "") == "20260731"
+            return {
+                "510300": {"shares": 1_100_000.0 if current else 1_000_000.0, "sharesDate": date},
+                "159999": {"shares": 1_200_000.0 if current else 1_000_000.0, "sharesDate": date},
+            }
+
+        snapshot = build_snapshot(
+            "20260731",
+            config,
+            history=history,
+            custom_boards={
+                "date": "2026-07-31",
+                "boards": [
+                    {
+                        "code": "demo",
+                        "stocks": [
+                            {"latestDate": "2026-07-31", "latestChangePercent": 1.0},
+                            {"latestDate": "2026-07-31", "latestChangePercent": -1.0},
+                        ],
+                    }
+                ],
+            },
+            providers={
+                "fetch_sse_shares": shares,
+                "fetch_szse_latest_shares": lambda: {},
+                "fetch_nav": lambda code, start, end: {
+                    "2026-07-31": {"nav": 1.0, "navDate": "2026-07-31"}
+                },
+                "fetch_market_history": market,
+            },
+        )
+
+        industry = snapshot["etfs"][1]
+        self.assertEqual(industry["positiveFlowDays5d"], 5)
+        self.assertGreater(industry["excessReturn5d"], 0)
+        self.assertGreaterEqual(industry["turnoverVs5d"], 1)
+        self.assertTrue(industry["mainlineCandidate"])
+
+    def test_one_code_failure_is_recorded_without_aborting_confirmed_peer(self):
+        providers = self._providers()
+        original_nav = providers["fetch_nav"]
+
+        def selective_nav(code, start, end):
+            if code == "159999":
+                raise TimeoutError("nav unavailable")
+            return original_nav(code, start, end)
+
+        providers["fetch_nav"] = selective_nav
+        snapshot = build_snapshot(
+            "20260731",
+            self.config,
+            history=self.history,
+            custom_boards=None,
+            providers=providers,
+        )
+
+        self.assertEqual(snapshot["etfs"][0]["status"], "confirmed")
+        self.assertEqual(snapshot["etfs"][1]["status"], "pending")
+        self.assertEqual(snapshot["errors"][0]["code"], "159999")
+        self.assertEqual(snapshot["errors"][0]["source"], "nav")
+
+    def test_empty_provider_results_are_recorded_as_missing_source_errors(self):
+        empty = {
+            "fetch_sse_shares": lambda date: {},
+            "fetch_szse_latest_shares": lambda: {},
+            "fetch_nav": lambda code, start, end: {},
+            "fetch_market_history": lambda code, start, end: {},
+        }
+
+        snapshot = build_snapshot(
+            "20260731",
+            self.config,
+            history=self.history,
+            custom_boards=None,
+            providers=empty,
+        )
+
+        self.assertEqual(snapshot["summary"]["all"]["confirmedCount"], 0)
+        self.assertTrue(snapshot["errors"])
+        self.assertIn("missing", {error["source"] for error in snapshot["errors"]})
+
+    def test_stale_nav_date_is_recorded_and_cannot_silently_replace_latest(self):
+        providers = self._providers()
+        providers["fetch_nav"] = lambda code, start, end: {
+            "2026-07-31": {"nav": 1.25, "navDate": "2026-07-30"}
+        }
+
+        snapshot = build_snapshot(
+            "20260731",
+            self.config,
+            history=self.history,
+            custom_boards=None,
+            providers=providers,
+        )
+
+        self.assertEqual(snapshot["summary"]["all"]["confirmedCount"], 0)
+        self.assertEqual(
+            {error["code"] for error in snapshot["errors"] if error["source"] == "missing"},
+            {"510300", "159999"},
+        )
+
+
+class AtomicOutputTest(unittest.TestCase):
+    def test_successful_write_replaces_destination_without_leaving_temp_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "latest.json"
+            destination.write_text('{"old": true}', encoding="utf-8")
+
+            write_json_atomic({"new": True}, destination)
+
+            self.assertEqual(json.loads(destination.read_text(encoding="utf-8")), {"new": True})
+            self.assertEqual(list(destination.parent.glob(f".{destination.name}.*.tmp")), [])
+
+    def test_nan_serialization_failure_preserves_previous_destination(self):
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "latest.json"
+            destination.write_text('{"old": true}', encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                write_json_atomic({"bad": math.nan}, destination)
+
+            self.assertEqual(json.loads(destination.read_text(encoding="utf-8")), {"old": True})
+            self.assertEqual(list(destination.parent.glob(f".{destination.name}.*.tmp")), [])
+
+    def test_failed_cli_refresh_preserves_previous_latest_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "config.json"
+            output = root / "latest.json"
+            history = root / "history"
+            config.write_text('{"version": 1, "etfs": []}', encoding="utf-8")
+            output.write_text('{"old": true}', encoding="utf-8")
+            failed_snapshot = {
+                "errors": [{"source": "missing"}],
+                "summary": {"all": {"confirmedCount": 0}},
+            }
+
+            with (
+                patch("scripts.build_etf_fund_flow.build_snapshot", return_value=failed_snapshot),
+                self.assertRaises(RuntimeError),
+            ):
+                main(
+                    [
+                        "--date",
+                        "20260731",
+                        "--config",
+                        str(config),
+                        "--out",
+                        str(output),
+                        "--history-dir",
+                        str(history),
+                    ]
+                )
+
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8")), {"old": True})
+            self.assertFalse(history.exists())
+
+
+if __name__ == "__main__":
+    unittest.main()
