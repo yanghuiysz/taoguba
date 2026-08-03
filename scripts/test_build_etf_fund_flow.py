@@ -2,6 +2,7 @@ import json
 import math
 import tempfile
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -289,6 +290,87 @@ class ConfirmedRowTest(unittest.TestCase):
         self.assertIsNone(row["turnoverVs5d"])
         self.assertIsNone(row["excessReturn5d"])
 
+    def test_sixth_session_with_only_four_records_nulls_five_day_sum(self):
+        dates = [
+            (datetime(2026, 1, 1) + timedelta(days=offset)).date().isoformat()
+            for offset in range(6)
+        ]
+        history = [
+            {
+                "code": "510300",
+                "date": date,
+                "status": "confirmed",
+                "netSubscription1d": 10.0,
+                "changePercent": 1.0,
+                "turnover": 100.0,
+            }
+            for date in dates[-4:-1]
+        ]
+        current = {
+            "date": dates[-1],
+            "previousDate": dates[-2],
+            "shares": 1_200_000.0,
+            "sharesDate": dates[-1],
+            "nav": 1.25,
+            "navDate": dates[-1],
+            "close": 1.3,
+            "changePercent": 1.0,
+            "turnover": 100.0,
+            "marketDate": dates[-1],
+        }
+
+        row = build_row(
+            self.config,
+            current,
+            {"shares": 1_000_000.0, "sharesDate": dates[-2]},
+            history,
+            {date: 0.5 for date in dates},
+        )
+
+        self.assertEqual(row["windowDays5d"], 4)
+        self.assertIsNone(row["netSubscription5d"])
+        self.assertIsNone(row["positiveFlowDays5d"])
+
+    def test_twenty_first_session_with_only_nineteen_records_nulls_twenty_day_sum(self):
+        dates = [
+            (datetime(2026, 1, 1) + timedelta(days=offset)).date().isoformat()
+            for offset in range(21)
+        ]
+        history = [
+            {
+                "code": "510300",
+                "date": date,
+                "status": "confirmed",
+                "netSubscription1d": 10.0,
+                "changePercent": 1.0,
+                "turnover": 100.0,
+            }
+            for date in dates[-19:-1]
+        ]
+        current = {
+            "date": dates[-1],
+            "previousDate": dates[-2],
+            "shares": 1_200_000.0,
+            "sharesDate": dates[-1],
+            "nav": 1.25,
+            "navDate": dates[-1],
+            "close": 1.3,
+            "changePercent": 1.0,
+            "turnover": 100.0,
+            "marketDate": dates[-1],
+        }
+
+        row = build_row(
+            self.config,
+            current,
+            {"shares": 1_000_000.0, "sharesDate": dates[-2]},
+            history,
+            {date: 0.5 for date in dates},
+        )
+
+        self.assertEqual(row["windowDays20d"], 19)
+        self.assertIsNone(row["netSubscription20d"])
+
 
 class SnapshotBuilderTest(unittest.TestCase):
     def setUp(self):
@@ -379,6 +461,8 @@ class SnapshotBuilderTest(unittest.TestCase):
             providers=self._providers(),
         )
 
+        self.assertEqual(snapshot["historySessionCount"], 5)
+        self.assertEqual(snapshot["etfs"][0]["historySessionCount"], 5)
         self.assertIsNone(snapshot["etfs"][1]["netSubscription1d"])
         self.assertEqual(snapshot["etfs"][1]["flowLabel"], "待确认")
         self.assertEqual(snapshot["summary"]["broad"]["confirmedCount"], 1)

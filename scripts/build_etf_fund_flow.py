@@ -239,12 +239,20 @@ def _dated_history(history: list[dict], current_date: str) -> list[dict]:
 
 
 def _complete_flow_window(
-    rows: list[dict], size: int, expected_dates: list[str]
+    rows: list[dict],
+    size: int,
+    expected_dates: list[str],
+    history_session_count: int,
 ) -> tuple[int, list[float] | None]:
     window = rows[-size:]
-    if expected_dates:
-        expected = expected_dates[-min(len(window), size, len(expected_dates)) :]
-        actual = [row["date"] for row in window[-len(expected) :]]
+    required_days = min(size, history_session_count)
+    if len(window) < required_days:
+        return len(window), None
+    if expected_dates and required_days:
+        expected = expected_dates[-required_days:]
+        actual = [row["date"] for row in window[-required_days:]]
+        if len(expected) != required_days:
+            return len(window), None
         if actual != expected:
             return len(window), None
     values: list[float] = []
@@ -322,8 +330,18 @@ def build_row(
         for key in benchmark_returns
         if (normalized := _normal_date(key)) is not None and normalized <= requested_date
     )
-    window_days_5d, flow_values_5d = _complete_flow_window(window_rows, 5, expected_dates)
-    window_days_20d, flow_values_20d = _complete_flow_window(window_rows, 20, expected_dates)
+    explicit_session_count = _finite_float(current.get("historySessionCount"))
+    history_session_count = (
+        max(1, int(explicit_session_count))
+        if explicit_session_count is not None
+        else len(expected_dates) or len(window_rows)
+    )
+    window_days_5d, flow_values_5d = _complete_flow_window(
+        window_rows, 5, expected_dates, history_session_count
+    )
+    window_days_20d, flow_values_20d = _complete_flow_window(
+        window_rows, 20, expected_dates, history_session_count
+    )
     net_5d = sum(flow_values_5d) if flow_values_5d is not None else None
     net_20d = sum(flow_values_20d) if flow_values_20d is not None else None
     positive_days = (
@@ -387,6 +405,7 @@ def build_row(
         "netSubscription1d": net_subscription,
         "netSubscription5d": net_5d,
         "netSubscription20d": net_20d,
+        "historySessionCount": history_session_count,
         "windowDays5d": window_days_5d,
         "windowDays20d": window_days_20d,
         "excessReturn5d": excess_return_5d,
@@ -443,6 +462,31 @@ def _history_by_code(history: list[dict], target_date: str) -> dict[str, list[di
     for rows in result.values():
         rows.sort(key=lambda row: row["date"])
     return result
+
+
+def _next_history_session_count(history: list[dict], target_date: str) -> int:
+    prior_snapshots = [
+        item
+        for item in history
+        if isinstance(item, dict)
+        and _normal_date(item.get("date")) is not None
+        and _normal_date(item.get("date")) < target_date
+    ]
+    if not prior_snapshots:
+        return 1
+    prior_snapshots.sort(key=lambda item: _normal_date(item.get("date")) or "")
+    latest = prior_snapshots[-1]
+    persisted = _finite_float(latest.get("historySessionCount"))
+    if persisted is None:
+        row_counts = [
+            _finite_float(row.get("historySessionCount"))
+            for row in latest.get("etfs", [])
+            if isinstance(row, dict)
+        ]
+        persisted = max((value for value in row_counts if value is not None), default=None)
+    if persisted is not None:
+        return int(persisted) + 1
+    return len({_normal_date(item.get("date")) for item in prior_snapshots}) + 1
 
 
 def _board_breadth(
@@ -507,6 +551,7 @@ def build_snapshot(
         raise ValueError(f"invalid snapshot date: {date!r}")
     target_compact = target_date.replace("-", "")
     history_by_code = _history_by_code(history or [], target_date)
+    history_session_count = _next_history_session_count(history or [], target_date)
     errors: list[dict] = []
     etf_configs = config.get("etfs", [])
     start_compact = (datetime.strptime(target_compact, "%Y%m%d") - timedelta(days=60)).strftime(
@@ -655,6 +700,7 @@ def build_snapshot(
         current = {
             "date": target_date,
             "previousDate": previous_date,
+            "historySessionCount": history_session_count,
             **current_share,
             "nav": _finite_float(nav_today.get("nav")),
             "navDate": _normal_date(nav_today.get("navDate")),
@@ -702,6 +748,7 @@ def build_snapshot(
             else "pending"
         ),
         "benchmarkCode": benchmark_code,
+        "historySessionCount": history_session_count,
         "summary": {
             "all": _summary(rows),
             "broad": _summary(broad_rows),
