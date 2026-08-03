@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import sys
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +17,8 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 WEB_DATA = ROOT / "web/data"
 FULL_A_TURNOVER = WEB_DATA / "full_a_turnover_top20.json"
+ETF_FUND_FLOW_CONFIG = WEB_DATA / "etf_fund_flow_config.json"
+ETF_FUND_FLOW = WEB_DATA / "etf_fund_flow.json"
 
 
 def load_json(path: Path) -> Any:
@@ -38,6 +43,198 @@ def number_or_none(value: Any) -> float | None:
         return number
     except (TypeError, ValueError):
         return None
+
+
+def _is_iso_date(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        return date.fromisoformat(value).isoformat() == value
+    except ValueError:
+        return False
+
+
+def _is_iso_datetime(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return "T" in value
+    except ValueError:
+        return False
+
+
+def _is_finite_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _non_finite_paths(value: Any, path: str = "payload") -> list[str]:
+    errors: list[str] = []
+    if isinstance(value, float) and not math.isfinite(value):
+        errors.append(f"{path} contains non-finite number")
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            errors.extend(_non_finite_paths(item, f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            errors.extend(_non_finite_paths(item, f"{path}[{index}]"))
+    return errors
+
+
+def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
+    errors: list[str] = []
+    try:
+        config = load_json(config_path)
+    except (FileNotFoundError, ValueError) as exc:
+        return [str(exc)]
+
+    configured_rows = config.get("etfs") if isinstance(config, dict) else None
+    if not isinstance(configured_rows, list):
+        return [f"{config_path} must contain etfs[]"]
+    if len(configured_rows) != 30:
+        errors.append(f"ETF config must contain exactly 30 rows; found {len(configured_rows)}")
+
+    configured_codes = [
+        str(row.get("code") or "") if isinstance(row, dict) else ""
+        for row in configured_rows
+    ]
+    invalid_config_codes = sorted(
+        {code or "<missing>" for code in configured_codes if len(code) != 6 or not code.isdigit()}
+    )
+    if invalid_config_codes:
+        errors.append("invalid ETF code in config: " + ", ".join(invalid_config_codes))
+    duplicate_config_codes = sorted(
+        {code or "<missing>" for code in configured_codes if configured_codes.count(code) > 1}
+    )
+    if duplicate_config_codes:
+        errors.append("duplicate ETF code in config: " + ", ".join(duplicate_config_codes))
+
+    broad_count = sum(
+        isinstance(row, dict) and row.get("scope") == "broad" for row in configured_rows
+    )
+    industry_count = sum(
+        isinstance(row, dict) and row.get("scope") == "industry" for row in configured_rows
+    )
+    if (broad_count, industry_count) != (5, 25):
+        errors.append(
+            "ETF config must contain 5 broad and 25 industry rows; "
+            f"found {broad_count} broad and {industry_count} industry"
+        )
+
+    if not latest_path.exists():
+        print(
+            f"WARNING: ETF fund-flow latest file not generated yet: {latest_path}",
+            file=sys.stderr,
+            flush=True,
+        )
+        return errors
+
+    try:
+        latest = load_json(latest_path)
+    except (FileNotFoundError, ValueError) as exc:
+        return errors + [str(exc)]
+    if not isinstance(latest, dict):
+        return errors + [f"{latest_path} must contain a JSON object"]
+
+    rows = latest.get("etfs")
+    if not isinstance(rows, list):
+        return errors + [f"{latest_path} must contain etfs[]"]
+    if len(rows) != 30:
+        errors.append(f"ETF output must contain exactly 30 rows; found {len(rows)}")
+
+    output_codes = [
+        str(row.get("code") or "") if isinstance(row, dict) else "" for row in rows
+    ]
+    invalid_output_codes = sorted(
+        {code or "<missing>" for code in output_codes if len(code) != 6 or not code.isdigit()}
+    )
+    if invalid_output_codes:
+        errors.append("invalid ETF code in output: " + ", ".join(invalid_output_codes))
+    duplicate_output_codes = sorted(
+        {code or "<missing>" for code in output_codes if output_codes.count(code) > 1}
+    )
+    if duplicate_output_codes:
+        errors.append("duplicate ETF code in output: " + ", ".join(duplicate_output_codes))
+    if set(output_codes) != set(configured_codes):
+        errors.append("output/config ETF codes differ")
+
+    if not _is_iso_date(latest.get("date")):
+        errors.append("payload.date has invalid ISO date")
+    if not _is_iso_datetime(latest.get("generatedAt")):
+        errors.append("payload.generatedAt has invalid ISO datetime")
+    errors.extend(_non_finite_paths(latest))
+
+    confirmed_fields = {
+        "date": "date",
+        "shares": "shares",
+        "sharesDate": "shares date",
+        "previousShares": "previous shares",
+        "previousSharesDate": "previous shares date",
+        "nav": "NAV",
+        "navDate": "NAV date",
+        "close": "close",
+        "marketDate": "market date",
+        "changePercent": "change percent",
+        "turnover": "turnover",
+    }
+    numeric_fields = (
+        "shares",
+        "previousShares",
+        "shareChange",
+        "nav",
+        "scale",
+        "close",
+        "changePercent",
+        "turnover",
+        "turnoverVs5d",
+        "netSubscription1d",
+        "netSubscription5d",
+        "netSubscription20d",
+        "historySessionCount",
+        "windowDays5d",
+        "windowDays20d",
+        "excessReturn5d",
+        "positiveFlowDays5d",
+        "stockBreadth",
+    )
+    pending_null_fields = (
+        "shareChange",
+        "netSubscription1d",
+        "netSubscription5d",
+        "netSubscription20d",
+        "positiveFlowDays5d",
+        "persistenceLabel",
+    )
+    date_fields = ("date", "sharesDate", "previousSharesDate", "navDate", "marketDate")
+    for index, row in enumerate(rows):
+        row_path = f"etfs[{index}]"
+        if not isinstance(row, dict):
+            errors.append(f"{row_path} must be an object")
+            continue
+        for field in date_fields:
+            value = row.get(field)
+            if value is not None and not _is_iso_date(value):
+                errors.append(f"{row_path}.{field} has invalid ISO date")
+        for field in numeric_fields:
+            value = row.get(field)
+            if value is not None and not _is_finite_number(value):
+                errors.append(f"{row_path}.{field} must be a finite number")
+
+        status = row.get("status")
+        if status == "confirmed":
+            for field, label in confirmed_fields.items():
+                value = row.get(field)
+                if value is None:
+                    errors.append(f"{row_path} confirmed row missing {label}")
+                elif field in numeric_fields and not _is_finite_number(value):
+                    errors.append(f"{row_path} confirmed row invalid {label}")
+        elif status == "pending":
+            for field in pending_null_fields:
+                if row.get(field) is not None:
+                    errors.append(f"{row_path} pending row must preserve null {field}")
+        else:
+            errors.append(f"{row_path} has invalid status: {status!r}")
+    return errors
 
 
 def validate_fund_flow_row(row: dict[str, Any]) -> list[str]:
@@ -151,6 +348,11 @@ def main() -> None:
 
     custom = validate_custom(args.web_data)
     full_a = validate_full_a_turnover(args.web_data)
+    etf_errors = validate_etf_fund_flow(
+        args.web_data / ETF_FUND_FLOW_CONFIG.name,
+        args.web_data / ETF_FUND_FLOW.name,
+    )
+    require(not etf_errors, "Invalid ETF fund-flow data: " + "; ".join(etf_errors[:20]))
     print(
         "Custom board data OK: date={date}, boards={boards}, configBoards={configBoards}, membershipOverrides={membershipOverrides}".format(
             **custom
@@ -160,6 +362,8 @@ def main() -> None:
         print("Full-A turnover data skipped: web/data/full_a_turnover_top20.json not generated yet")
     else:
         print("Full-A turnover data OK: date={date}, stocks={stocks}".format(**full_a))
+    if (args.web_data / ETF_FUND_FLOW.name).exists():
+        print("ETF fund-flow data OK")
 
 
 if __name__ == "__main__":
