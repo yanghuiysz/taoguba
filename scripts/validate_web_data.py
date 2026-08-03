@@ -228,6 +228,20 @@ def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
                     errors.append(f"{row_path} confirmed row missing {label}")
                 elif field in numeric_fields and not _is_finite_number(value):
                     errors.append(f"{row_path} confirmed row invalid {label}")
+            row_date = row.get("date")
+            if _is_iso_date(row_date):
+                for field in ("sharesDate", "navDate", "marketDate"):
+                    value = row.get(field)
+                    if _is_iso_date(value) and value != row_date:
+                        errors.append(f"{row_path} confirmed row {field} must match row.date")
+                previous_shares_date = row.get("previousSharesDate")
+                if (
+                    _is_iso_date(previous_shares_date)
+                    and previous_shares_date >= row_date
+                ):
+                    errors.append(
+                        f"{row_path} confirmed row previousSharesDate must be earlier than row.date"
+                    )
         elif status == "pending":
             for field in pending_null_fields:
                 if row.get(field) is not None:

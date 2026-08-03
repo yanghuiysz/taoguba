@@ -125,6 +125,25 @@ class EtfFundFlowValidationTest(unittest.TestCase):
         self.assertIn("confirmed row invalid NAV", errors)
         self.assertIn("confirmed row invalid turnover", errors)
 
+    def test_confirmed_row_requires_current_input_dates_to_match_row_date(self) -> None:
+        for field in ("sharesDate", "navDate", "marketDate"):
+            with self.subTest(field=field):
+                invalid = copy.deepcopy(self.payload)
+                invalid["etfs"][0][field] = "2026-07-30"
+                errors = "\n".join(self.validate(payload=invalid))
+                self.assertIn(f"confirmed row {field} must match row.date", errors)
+
+    def test_confirmed_row_requires_previous_shares_date_before_row_date(self) -> None:
+        for previous_date in ("2026-07-31", "2026-08-01"):
+            with self.subTest(previous_date=previous_date):
+                invalid = copy.deepcopy(self.payload)
+                invalid["etfs"][0]["previousSharesDate"] = previous_date
+                errors = "\n".join(self.validate(payload=invalid))
+                self.assertIn(
+                    "confirmed row previousSharesDate must be earlier than row.date",
+                    errors,
+                )
+
     def test_requires_exact_universe_scope_split_and_matching_output_codes(self) -> None:
         short = copy.deepcopy(self.config)
         short["etfs"].pop()
