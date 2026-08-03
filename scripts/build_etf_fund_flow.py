@@ -10,6 +10,7 @@ import threading
 import time
 from datetime import date as date_type
 from datetime import datetime, timedelta, timezone
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -145,7 +146,32 @@ def fetch_sse_shares(date: str) -> dict[str, dict]:
 
 def fetch_szse_latest_shares() -> dict[str, dict]:
     """Use akshare.fund_etf_scale_szse(); return code -> {shares, sharesDate}."""
-    frame = _call_with_retries(lambda: _load_akshare().fund_etf_scale_szse())
+    try:
+        frame = _call_with_retries(lambda: _load_akshare().fund_etf_scale_szse())
+    except Exception:
+        import pandas as pd
+        import requests
+
+        def fetch_workbook():
+            response = requests.get(
+                "https://fund.szse.cn/api/report/ShowReport",
+                params={
+                    "SHOWTYPE": "xlsx",
+                    "CATALOGID": "1000_lf",
+                    "TABKEY": "tab1",
+                    "random": "0.07610353191740105",
+                },
+                headers={
+                    "Referer": "https://fund.szse.cn/marketdata/fundslist/index.html",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 Chrome/88.0.4324.150 Safari/537.36",
+                },
+            )
+            response.raise_for_status()
+            workbook = pd.read_excel(BytesIO(response.content), engine="openpyxl")
+            return workbook.rename(columns={"当前规模(份)": "基金份额"})
+
+        frame = _call_with_retries(fetch_workbook)
     result: dict[str, dict] = {}
     for record in _records(frame):
         code = _normal_code(record.get("基金代码"))
@@ -163,17 +189,45 @@ def fetch_szse_latest_shares() -> dict[str, dict]:
 
 def fetch_nav(code: str, start_date: str, end_date: str) -> dict[str, dict]:
     """Use akshare.fund_etf_fund_info_em; return date -> {nav, navDate}."""
-    frame = _call_with_retries(
-        lambda: _load_akshare().fund_etf_fund_info_em(
-            fund=code,
-            start_date=_compact_date(start_date),
-            end_date=_compact_date(end_date),
+    start_compact = _compact_date(start_date)
+    end_compact = _compact_date(end_date)
+    try:
+        frame = _call_with_retries(
+            lambda: _load_akshare().fund_etf_fund_info_em(
+                fund=code,
+                start_date=start_compact,
+                end_date=end_compact,
+            )
         )
-    )
+    except Exception:
+        import requests
+
+        def fetch_live_json():
+            response = requests.get(
+                "https://api.fund.eastmoney.com/f10/lsjz",
+                params={
+                    "fundCode": code,
+                    "pageIndex": "1",
+                    "pageSize": "100",
+                    "startDate": f"{start_compact[:4]}-{start_compact[4:6]}-{start_compact[6:]}",
+                    "endDate": f"{end_compact[:4]}-{end_compact[4:6]}-{end_compact[6:]}",
+                    "_": round(time.time() * 1000),
+                },
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 Chrome/80.0.3987.149 Safari/537.36",
+                    "Referer": f"https://fundf10.eastmoney.com/jjjz_{code}.html",
+                },
+            )
+            response.raise_for_status()
+            payload = response.json()
+            return (payload.get("Data") or {}).get("LSJZList") or []
+
+        frame = _call_with_retries(fetch_live_json)
     result: dict[str, dict] = {}
     for record in _records(frame):
-        nav_date = _normal_date(record.get("净值日期"))
-        nav = _finite_float(record.get("单位净值"))
+        nav_date = _normal_date(record.get("净值日期") or record.get("FSRQ"))
+        nav = _finite_float(record.get("单位净值") or record.get("DWJZ"))
         if nav_date is not None and nav is not None:
             result[nav_date] = {"nav": nav, "navDate": nav_date}
     return result
@@ -181,24 +235,48 @@ def fetch_nav(code: str, start_date: str, end_date: str) -> dict[str, dict]:
 
 def fetch_market_history(code: str, start_date: str, end_date: str) -> dict[str, dict]:
     """Use akshare.fund_etf_hist_em; return date -> {close, changePercent, turnover}."""
-    frame = _call_with_retries(
-        lambda: _load_akshare().fund_etf_hist_em(
-            symbol=code,
-            period="daily",
-            start_date=_compact_date(start_date),
-            end_date=_compact_date(end_date),
-            adjust="",
+    start_normalized = _normal_date(start_date)
+    end_normalized = _normal_date(end_date)
+    akshare = _load_akshare()
+    try:
+        frame = _call_with_retries(
+            lambda: akshare.fund_etf_hist_em(
+                symbol=code,
+                period="daily",
+                start_date=_compact_date(start_date),
+                end_date=_compact_date(end_date),
+                adjust="",
+            )
         )
-    )
+    except Exception:
+        exchange_prefix = "sh" if code.startswith("5") else "sz"
+        frame = _call_with_retries(
+            lambda: akshare.fund_etf_hist_sina(symbol=f"{exchange_prefix}{code}")
+        )
     result: dict[str, dict] = {}
-    for record in _records(frame):
-        market_date = _normal_date(record.get("日期"))
+    records = sorted(
+        _records(frame),
+        key=lambda record: _normal_date(record.get("日期") or record.get("date")) or "",
+    )
+    previous_close = None
+    for record in records:
+        market_date = _normal_date(record.get("日期") or record.get("date"))
         if market_date is None:
             continue
+        close = _finite_float(record.get("收盘") or record.get("close"))
+        change_percent = _finite_float(record.get("涨跌幅") or record.get("changePercent"))
+        if change_percent is None and close is not None and previous_close not in (None, 0):
+            change_percent = round((close / previous_close - 1.0) * 100.0, 4)
+        if close is not None:
+            previous_close = close
+        if start_normalized is not None and market_date < start_normalized:
+            continue
+        if end_normalized is not None and market_date > end_normalized:
+            continue
         result[market_date] = {
-            "close": _finite_float(record.get("收盘")),
-            "changePercent": _finite_float(record.get("涨跌幅")),
-            "turnover": _finite_float(record.get("成交额")),
+            "close": close,
+            "changePercent": change_percent,
+            "turnover": _finite_float(record.get("成交额") or record.get("amount")),
         }
     return result
 

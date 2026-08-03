@@ -3,10 +3,12 @@ import math
 import tempfile
 import unittest
 from datetime import datetime, timedelta
+from io import BytesIO
 from pathlib import Path
 from unittest.mock import patch
 
 import requests
+from openpyxl import Workbook
 
 from scripts.build_etf_fund_flow import (
     _call_with_retries,
@@ -127,6 +129,104 @@ class SourceAdapterTest(unittest.TestCase):
                 }
             },
         )
+
+    def test_nav_adapter_parses_live_json_when_akshare_schema_breaks(self):
+        class BrokenAkshare:
+            def fund_etf_fund_info_em(self, fund, start_date, end_date):
+                raise ValueError("Length mismatch: Expected axis has 14 elements, new values have 13 elements")
+
+        class FakeResponse:
+            def raise_for_status(self):
+                return None
+
+            def json(self):
+                return {
+                    "TotalCount": 1,
+                    "Data": {
+                        "LSJZList": [
+                            {
+                                "FSRQ": "2026-07-31",
+                                "DWJZ": "4.6473",
+                                "LJJZ": "2.0503",
+                                "SDATE": None,
+                                "ACTUALSYI": "",
+                                "NAVTYPE": "1",
+                                "JZZZL": "0.88",
+                                "SGZT": "open",
+                                "SHZT": "open",
+                                "FHFCZ": "",
+                                "FHFCZ10": "",
+                                "FHFCBZ": "",
+                                "DTYPE": None,
+                                "FHSP": "",
+                            }
+                        ]
+                    },
+                }
+
+        with (
+            patch("scripts.build_etf_fund_flow._load_akshare", return_value=BrokenAkshare()),
+            patch("requests.get", return_value=FakeResponse()),
+            patch("scripts.build_etf_fund_flow._sleep"),
+        ):
+            nav = fetch_nav("510300", "20260701", "20260731")
+
+        self.assertEqual(nav, {"2026-07-31": {"nav": 4.6473, "navDate": "2026-07-31"}})
+
+    def test_market_adapter_falls_back_to_sina_when_eastmoney_is_unreachable(self):
+        class FallbackAkshare:
+            def fund_etf_hist_em(self, symbol, period, start_date, end_date, adjust):
+                raise requests.exceptions.ProxyError("eastmoney unavailable")
+
+            def fund_etf_hist_sina(self, symbol):
+                self.symbol = symbol
+                return [
+                    {"date": "2026-07-30", "close": 4.605, "amount": 6_953_209_405},
+                    {"date": "2026-07-31", "close": 4.653, "amount": 7_016_550_822},
+                ]
+
+        fake = FallbackAkshare()
+        with (
+            patch("scripts.build_etf_fund_flow._load_akshare", return_value=fake),
+            patch("scripts.build_etf_fund_flow._sleep"),
+        ):
+            market = fetch_market_history("510300", "20260701", "20260731")
+
+        self.assertEqual(fake.symbol, "sh510300")
+        self.assertAlmostEqual(market["2026-07-31"]["changePercent"], 1.0423, places=4)
+        self.assertEqual(market["2026-07-31"]["turnover"], 7_016_550_822.0)
+
+    def test_szse_adapter_parses_official_xlsx_when_akshare_requires_filelike(self):
+        class BrokenAkshare:
+            def fund_etf_scale_szse(self):
+                raise TypeError("Expected file path name or file-like object, got <class 'bytes'> type")
+
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append([
+            "\u57fa\u91d1\u4ee3\u7801",
+            "\u57fa\u91d1\u7b80\u79f0",
+            "\u5f53\u524d\u89c4\u6a21(\u4efd)",
+            "\u51c0\u503c",
+        ])
+        sheet.append(["159915", "\u521b\u4e1a\u677fETF", "2,000,000", 1.25])
+        content = BytesIO()
+        workbook.save(content)
+
+        class FakeResponse:
+            def raise_for_status(self):
+                return None
+
+        FakeResponse.content = content.getvalue()
+
+        with (
+            patch("scripts.build_etf_fund_flow._load_akshare", return_value=BrokenAkshare()),
+            patch("requests.get", return_value=FakeResponse()),
+            patch("scripts.build_etf_fund_flow._sleep"),
+        ):
+            shares = fetch_szse_latest_shares()
+
+        self.assertEqual(shares, {"159915": {"shares": 2_000_000.0, "sharesDate": None}})
 
 
 class ConfirmedRowTest(unittest.TestCase):
