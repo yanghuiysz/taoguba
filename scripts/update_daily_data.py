@@ -104,6 +104,25 @@ def load_json(path: Path, fallback: object) -> object:
         return fallback
 
 
+def etf_latest_satisfies_publication_policy(path: Path, target_date: str) -> bool:
+    payload = load_json(path, None)
+    if not isinstance(payload, dict) or payload.get("date") != format_date(target_date):
+        return False
+    summary = payload.get("summary")
+    all_summary = summary.get("all") if isinstance(summary, dict) else None
+    if not isinstance(all_summary, dict):
+        return False
+    count = all_summary.get("count")
+    confirmed = all_summary.get("confirmedCount")
+    pending = all_summary.get("pendingCount")
+    if any(isinstance(value, bool) or not isinstance(value, int) for value in (count, confirmed, pending)):
+        return False
+    if count != 30 or not (0 < confirmed <= count) or pending != count - confirmed:
+        return False
+    expected_status = "confirmed" if confirmed == count else "partial"
+    return payload.get("status") == expected_status
+
+
 def archive_intraday_fallback(date: str) -> bool:
     formatted_date = format_date(date)
     history_path = custom_history_path_for_date(CUSTOM_HISTORY_DIR, formatted_date)
@@ -215,6 +234,14 @@ def main() -> None:
             )
 
     run_script(["scripts/validate_web_data.py"])
+
+    if not radar_only and not etf_latest_satisfies_publication_policy(
+        ETF_FUND_FLOW, args.date
+    ):
+        raise RuntimeError(
+            f"ETF fund-flow latest is not publishable for {format_date(args.date)}; "
+            "after-close refresh remains retryable"
+        )
 
     print("\nDaily data update complete.")
 

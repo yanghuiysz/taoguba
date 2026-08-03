@@ -35,6 +35,14 @@
         正在读取最新 ETF 份额数据…
       </div>
 
+      <section class="source-error-panel" aria-labelledby="source-error-title">
+        <div>
+          <span class="method-index">数据源 / ERRORS</span>
+          <h2 id="source-error-title">当日数据源摘要</h2>
+        </div>
+        <ul id="source-errors" class="source-error-list" aria-live="polite"></ul>
+      </section>
+
       <aside class="method-note" aria-label="口径说明">
         <span class="method-index">口径 / 01</span>
         <p>ETF成交额不等于资金净流入，本页按份额变化×单位净值计算</p>
@@ -95,7 +103,9 @@
                 <th><button type="button" data-sort="shareChange">份额变化</button></th>
                 <th><button type="button" data-sort="status">申购确认</button></th>
                 <th><button type="button" data-sort="changePercent">涨跌幅</button></th>
+                <th><button type="button" data-sort="excessReturn1d">1日超额</button></th>
                 <th><button type="button" data-sort="excessReturn5d">5日超额</button></th>
+                <th><button type="button" data-sort="turnover">当日成交额</button></th>
                 <th><button type="button" data-sort="turnoverVs5d">成交额/5日均值</button></th>
                 <th><button type="button" data-sort="flowLabel">资金标签</button></th>
               </tr>

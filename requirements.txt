@@ -1,4 +1,4 @@
-akshare>=1.18.46
+akshare>=1.18.81
 beautifulsoup4>=4.12.2
 pandas>=3.0.0
 playwright>=1.43.0

@@ -10,6 +10,7 @@ from unittest.mock import patch
 import requests
 from openpyxl import Workbook
 
+from scripts import build_etf_fund_flow as etf_builder
 from scripts.build_etf_fund_flow import (
     _call_with_retries,
     build_row,
@@ -41,11 +42,48 @@ class ConfirmedFlowMathTest(unittest.TestCase):
         self.assertEqual(classify_flow(-1.2, -10), "资金撤退")
         self.assertEqual(classify_flow(1.2, None), "待确认")
 
+    def test_zero_net_subscription_is_neutral(self):
+        self.assertEqual(classify_flow(1.2, 0), "无净申赎")
+        self.assertEqual(classify_flow(-1.2, 0), "无净申赎")
+
     def test_non_finite_input_is_never_emitted_as_a_number(self):
         self.assertIsNone(compute_net_subscription(math.nan, 1_000_000, 1.25))
 
 
 class SourceAdapterTest(unittest.TestCase):
+    def test_dated_szse_adapter_normalizes_each_requested_baseline_date(self):
+        class FakeAkshare:
+            def __init__(self):
+                self.calls = []
+
+            def fund_scale_daily_szse(self, start_date, end_date, symbol):
+                self.calls.append((start_date, end_date, symbol))
+                return [
+                    {
+                        "日期": datetime.strptime(start_date, "%Y%m%d").date(),
+                        "基金代码": "159915",
+                        "基金份额": "2,000,000",
+                    }
+                ]
+
+        fake = FakeAkshare()
+        with patch("scripts.build_etf_fund_flow._load_akshare", return_value=fake):
+            baseline = etf_builder.fetch_szse_shares("20260730")
+            next_day = etf_builder.fetch_szse_shares("20260731")
+
+        self.assertEqual(
+            fake.calls,
+            [("20260730", "20260730", "ETF"), ("20260731", "20260731", "ETF")],
+        )
+        self.assertEqual(
+            baseline,
+            {"159915": {"shares": 2_000_000.0, "sharesDate": "2026-07-30"}},
+        )
+        self.assertEqual(
+            next_day,
+            {"159915": {"shares": 2_000_000.0, "sharesDate": "2026-07-31"}},
+        )
+
     def test_exchange_share_adapters_retry_and_normalize_authoritative_rows(self):
         class FakeAkshare:
             def __init__(self):
@@ -185,6 +223,12 @@ class SourceAdapterTest(unittest.TestCase):
                     {"date": "2026-07-31", "close": 4.653, "amount": 7_016_550_822},
                 ]
 
+            def tool_trade_date_hist_sina(self):
+                return [
+                    {"trade_date": "2026-07-30"},
+                    {"trade_date": "2026-07-31"},
+                ]
+
         fake = FallbackAkshare()
         with (
             patch("scripts.build_etf_fund_flow._load_akshare", return_value=fake),
@@ -195,6 +239,31 @@ class SourceAdapterTest(unittest.TestCase):
         self.assertEqual(fake.symbol, "sh510300")
         self.assertAlmostEqual(market["2026-07-31"]["changePercent"], 1.0423, places=4)
         self.assertEqual(market["2026-07-31"]["turnover"], 7_016_550_822.0)
+
+    def test_sina_fallback_never_compresses_a_missing_exchange_session(self):
+        class GappedAkshare:
+            def fund_etf_hist_em(self, symbol, period, start_date, end_date, adjust):
+                raise requests.exceptions.ProxyError("eastmoney unavailable")
+
+            def fund_etf_hist_sina(self, symbol):
+                return [
+                    {"date": "2026-07-29", "close": 4.60, "amount": 600_000},
+                    {"date": "2026-07-31", "close": 4.80, "amount": 800_000},
+                ]
+
+            def tool_trade_date_hist_sina(self):
+                return [
+                    {"trade_date": "2026-07-29"},
+                    {"trade_date": "2026-07-30"},
+                    {"trade_date": "2026-07-31"},
+                ]
+
+        with patch(
+            "scripts.build_etf_fund_flow._load_akshare", return_value=GappedAkshare()
+        ):
+            market = fetch_market_history("510300", "20260701", "20260731")
+
+        self.assertIsNone(market["2026-07-31"]["changePercent"])
 
     def test_szse_adapter_parses_official_xlsx_when_akshare_requires_filelike(self):
         class BrokenAkshare:
@@ -278,8 +347,40 @@ class ConfirmedRowTest(unittest.TestCase):
         self.assertEqual(row["windowDays20d"], 5)
         self.assertEqual(row["positiveFlowDays5d"], 5)
         self.assertEqual(row["persistenceLabel"], "持续流入")
+        self.assertEqual(row["excessReturn1d"], 0.5)
         self.assertGreater(row["excessReturn5d"], 0)
         self.assertEqual(row["turnoverVs5d"], 1.3636)
+
+    def test_fund_flow_confirms_without_complete_market_observation(self):
+        current = {
+            "date": "2026-07-31",
+            "previousDate": "2026-07-30",
+            "shares": 1_200_000.0,
+            "sharesDate": "2026-07-31",
+            "nav": 1.25,
+            "navDate": "2026-07-31",
+            "close": None,
+            "changePercent": None,
+            "turnover": None,
+            "marketDate": None,
+        }
+
+        row = build_row(
+            self.config,
+            current,
+            {"shares": 1_000_000.0, "sharesDate": "2026-07-30"},
+            self.history,
+            {date: 0.5 for date in self.dates + ["2026-07-31"]},
+        )
+
+        self.assertEqual(row["status"], "confirmed")
+        self.assertEqual(row["shareChange"], 200_000.0)
+        self.assertEqual(row["netSubscription1d"], 250_000.0)
+        self.assertEqual(row["scale"], 1_500_000.0)
+        self.assertEqual(row["flowLabel"], "待确认")
+        self.assertIsNone(row["excessReturn1d"])
+        self.assertIsNone(row["excessReturn5d"])
+        self.assertIsNone(row["turnoverVs5d"])
 
     def test_misaligned_nav_date_preserves_null_confirmed_values(self):
         current = {
@@ -530,7 +631,7 @@ class SnapshotBuilderTest(unittest.TestCase):
 
         return {
             "fetch_sse_shares": sse_shares,
-            "fetch_szse_latest_shares": lambda: {
+            "fetch_szse_shares": lambda date: {
                 "159999": {"shares": 2_000_000.0, "sharesDate": "2026-07-31"}
             },
             "fetch_nav": lambda code, start, end: {
@@ -567,6 +668,8 @@ class SnapshotBuilderTest(unittest.TestCase):
         self.assertEqual(snapshot["etfs"][1]["flowLabel"], "待确认")
         self.assertEqual(snapshot["summary"]["broad"]["confirmedCount"], 1)
         self.assertEqual(snapshot["summary"]["industry"]["confirmedCount"], 0)
+        self.assertNotIn("netSubscription1d", snapshot["summary"]["all"])
+        self.assertEqual(snapshot["summary"]["broad"]["netSubscription1d"], 250_000.0)
         self.assertFalse(math.isnan(snapshot["etfs"][0]["netSubscription1d"]))
         self.assertEqual(snapshot["etfs"][1]["shares"], 2_000_000.0)
         self.assertIsNone(snapshot["etfs"][1]["previousShares"])
@@ -682,7 +785,7 @@ class SnapshotBuilderTest(unittest.TestCase):
             },
             providers={
                 "fetch_sse_shares": shares,
-                "fetch_szse_latest_shares": lambda: {},
+                "fetch_szse_shares": lambda date: {},
                 "fetch_nav": lambda code, start, end: {
                     "2026-07-31": {"nav": 1.0, "navDate": "2026-07-31"}
                 },
@@ -719,7 +822,7 @@ class SnapshotBuilderTest(unittest.TestCase):
         self.assertEqual(snapshot["errors"][0]["code"], "159999")
         self.assertEqual(snapshot["errors"][0]["source"], "nav")
 
-    def test_dated_incomplete_market_row_is_pending_and_records_missing_error(self):
+    def test_dated_incomplete_market_row_keeps_flow_confirmed_and_records_market_error(self):
         for missing_field in ("close", "changePercent", "turnover"):
             with self.subTest(missing_field=missing_field):
                 providers = self._providers()
@@ -741,9 +844,10 @@ class SnapshotBuilderTest(unittest.TestCase):
                 )
 
                 broad = snapshot["etfs"][0]
-                self.assertEqual(broad["status"], "pending")
-                self.assertIsNone(broad["shareChange"])
-                self.assertIsNone(broad["netSubscription1d"])
+                self.assertEqual(broad["status"], "confirmed")
+                self.assertEqual(broad["shareChange"], 200_000.0)
+                self.assertEqual(broad["netSubscription1d"], 250_000.0)
+                self.assertFalse(broad["mainlineCandidate"])
                 self.assertTrue(
                     any(
                         error["code"] == "510300" and error["source"] == "missing"
@@ -751,10 +855,47 @@ class SnapshotBuilderTest(unittest.TestCase):
                     )
                 )
 
+    def test_independent_calendar_prevents_compressed_share_delta_across_market_gap(self):
+        providers = self._providers()
+        original_market = providers["fetch_market_history"]
+
+        def gapped_market(code, start, end):
+            market = original_market(code, start, end)
+            market.pop("2026-07-30")
+            market["2026-07-31"]["changePercent"] = None
+            return market
+
+        def shares(date):
+            if date == "20260731":
+                return {"510300": {"shares": 1_200_000.0, "sharesDate": "2026-07-31"}}
+            if date == "20260729":
+                return {"510300": {"shares": 1_000_000.0, "sharesDate": "2026-07-29"}}
+            return {}
+
+        providers["fetch_market_history"] = gapped_market
+        providers["fetch_sse_shares"] = shares
+        providers["fetch_trading_sessions"] = lambda start, end: list(self.dates)
+
+        snapshot = build_snapshot(
+            "20260731",
+            {**self.config, "etfs": [self.config["etfs"][0]]},
+            history=[item for item in self.history if item["date"] != "2026-07-30"],
+            custom_boards=None,
+            providers=providers,
+        )
+
+        row = snapshot["etfs"][0]
+        self.assertEqual(row["status"], "pending")
+        self.assertIsNone(row["previousShares"])
+        self.assertIsNone(row["netSubscription1d"])
+        self.assertTrue(
+            any("previous shares missing for 2026-07-30" in error["message"] for error in snapshot["errors"])
+        )
+
     def test_empty_provider_results_are_recorded_as_missing_source_errors(self):
         empty = {
             "fetch_sse_shares": lambda date: {},
-            "fetch_szse_latest_shares": lambda: {},
+            "fetch_szse_shares": lambda date: {},
             "fetch_nav": lambda code, start, end: {},
             "fetch_market_history": lambda code, start, end: {},
         }

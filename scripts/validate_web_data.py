@@ -81,6 +81,95 @@ def _non_finite_paths(value: Any, path: str = "payload") -> list[str]:
     return errors
 
 
+ETF_PAYLOAD_KEYS = {
+    "version",
+    "date",
+    "generatedAt",
+    "status",
+    "benchmarkCode",
+    "historySessionCount",
+    "summary",
+    "etfs",
+    "errors",
+}
+ETF_ROW_KEYS = {
+    "code",
+    "name",
+    "scope",
+    "category",
+    "direction",
+    "exchange",
+    "date",
+    "status",
+    "shares",
+    "sharesDate",
+    "previousShares",
+    "previousSharesDate",
+    "shareChange",
+    "nav",
+    "navDate",
+    "scale",
+    "close",
+    "marketDate",
+    "changePercent",
+    "turnover",
+    "turnoverVs5d",
+    "netSubscription1d",
+    "netSubscription5d",
+    "netSubscription20d",
+    "historySessionCount",
+    "windowDays5d",
+    "windowDays20d",
+    "excessReturn1d",
+    "excessReturn5d",
+    "positiveFlowDays5d",
+    "flowLabel",
+    "persistenceLabel",
+    "stockBreadth",
+    "breadthConfirmed",
+    "mainlineCandidate",
+}
+ETF_NUMERIC_FIELDS = {
+    "shares",
+    "previousShares",
+    "shareChange",
+    "nav",
+    "scale",
+    "close",
+    "changePercent",
+    "turnover",
+    "turnoverVs5d",
+    "netSubscription1d",
+    "netSubscription5d",
+    "netSubscription20d",
+    "historySessionCount",
+    "windowDays5d",
+    "windowDays20d",
+    "excessReturn1d",
+    "excessReturn5d",
+    "positiveFlowDays5d",
+    "stockBreadth",
+}
+
+
+def _numbers_close(actual: Any, expected: float) -> bool:
+    return _is_finite_number(actual) and math.isclose(
+        float(actual), float(expected), rel_tol=1e-9, abs_tol=1e-6
+    )
+
+
+def _expected_flow_label(change: Any, flow: Any) -> str:
+    if not _is_finite_number(flow):
+        return "待确认"
+    if flow == 0:
+        return "无净申赎"
+    if not _is_finite_number(change):
+        return "待确认"
+    if flow > 0:
+        return "资金强化" if change >= 0 else "逆势承接"
+    return "上涨兑现" if change >= 0 else "资金撤退"
+
+
 def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
     errors: list[str] = []
     try:
@@ -121,6 +210,27 @@ def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
             f"found {broad_count} broad and {industry_count} industry"
         )
 
+    config_version = config.get("version")
+    if isinstance(config_version, bool) or not isinstance(config_version, int):
+        errors.append("ETF config version must be an integer")
+    benchmark_code = str(config.get("benchmarkCode") or "")
+    if benchmark_code not in configured_codes:
+        errors.append("ETF config benchmarkCode must identify a configured ETF")
+    config_by_code = {
+        str(row.get("code")): row
+        for row in configured_rows
+        if isinstance(row, dict) and row.get("code") is not None
+    }
+    for index, row in enumerate(configured_rows):
+        if not isinstance(row, dict):
+            errors.append(f"config.etfs[{index}] must be an object")
+            continue
+        for field in ("code", "name", "scope", "category", "direction", "exchange"):
+            if not isinstance(row.get(field), str) or not row[field]:
+                errors.append(f"config.etfs[{index}].{field} must be a non-empty string")
+        if row.get("exchange") not in {"SSE", "SZSE"}:
+            errors.append(f"config.etfs[{index}].exchange is invalid")
+
     if not latest_path.exists():
         print(
             f"WARNING: ETF fund-flow latest file not generated yet: {latest_path}",
@@ -135,6 +245,12 @@ def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
         return errors + [str(exc)]
     if not isinstance(latest, dict):
         return errors + [f"{latest_path} must contain a JSON object"]
+    if set(latest) != ETF_PAYLOAD_KEYS:
+        errors.append("ETF payload does not match stable schema")
+    if latest.get("version") != config_version:
+        errors.append("payload.version must match config")
+    if latest.get("benchmarkCode") != benchmark_code:
+        errors.append("payload.benchmarkCode must match config")
 
     rows = latest.get("etfs")
     if not isinstance(rows, list):
@@ -163,40 +279,14 @@ def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
     if not _is_iso_datetime(latest.get("generatedAt")):
         errors.append("payload.generatedAt has invalid ISO datetime")
     errors.extend(_non_finite_paths(latest))
+    payload_session_count = latest.get("historySessionCount")
+    if (
+        isinstance(payload_session_count, bool)
+        or not isinstance(payload_session_count, int)
+        or payload_session_count < 1
+    ):
+        errors.append("payload.historySessionCount must be a positive integer")
 
-    confirmed_fields = {
-        "date": "date",
-        "shares": "shares",
-        "sharesDate": "shares date",
-        "previousShares": "previous shares",
-        "previousSharesDate": "previous shares date",
-        "nav": "NAV",
-        "navDate": "NAV date",
-        "close": "close",
-        "marketDate": "market date",
-        "changePercent": "change percent",
-        "turnover": "turnover",
-    }
-    numeric_fields = (
-        "shares",
-        "previousShares",
-        "shareChange",
-        "nav",
-        "scale",
-        "close",
-        "changePercent",
-        "turnover",
-        "turnoverVs5d",
-        "netSubscription1d",
-        "netSubscription5d",
-        "netSubscription20d",
-        "historySessionCount",
-        "windowDays5d",
-        "windowDays20d",
-        "excessReturn5d",
-        "positiveFlowDays5d",
-        "stockBreadth",
-    )
     pending_null_fields = (
         "shareChange",
         "netSubscription1d",
@@ -206,31 +296,71 @@ def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
         "persistenceLabel",
     )
     date_fields = ("date", "sharesDate", "previousSharesDate", "navDate", "marketDate")
+    rows_by_code = {
+        str(row.get("code")): row
+        for row in rows
+        if isinstance(row, dict) and row.get("code") is not None
+    }
+    benchmark_row = rows_by_code.get(benchmark_code, {})
+    benchmark_change = benchmark_row.get("changePercent")
     for index, row in enumerate(rows):
         row_path = f"etfs[{index}]"
         if not isinstance(row, dict):
             errors.append(f"{row_path} must be an object")
             continue
+        if set(row) != ETF_ROW_KEYS:
+            errors.append(f"{row_path} does not match stable schema")
+        config_row = config_by_code.get(str(row.get("code")))
+        if config_row is not None and any(
+            row.get(field) != config_row.get(field)
+            for field in ("name", "scope", "category", "direction", "exchange")
+        ):
+            errors.append(f"{row_path} metadata differs from config")
+        if row.get("date") != latest.get("date"):
+            errors.append(f"{row_path}.date must match payload.date")
         for field in date_fields:
             value = row.get(field)
             if value is not None and not _is_iso_date(value):
                 errors.append(f"{row_path}.{field} has invalid ISO date")
-        for field in numeric_fields:
+        for field in ETF_NUMERIC_FIELDS:
             value = row.get(field)
             if value is not None and not _is_finite_number(value):
                 errors.append(f"{row_path}.{field} must be a finite number")
+        for field in ("breadthConfirmed", "mainlineCandidate"):
+            if not isinstance(row.get(field), bool):
+                errors.append(f"{row_path}.{field} must be boolean")
 
         status = row.get("status")
         if status == "confirmed":
+            confirmed_fields = {
+                "date": "date",
+                "shares": "shares",
+                "sharesDate": "shares date",
+                "previousShares": "previous shares",
+                "previousSharesDate": "previous shares date",
+                "nav": "NAV",
+                "navDate": "NAV date",
+                "shareChange": "share change",
+                "scale": "scale",
+                "netSubscription1d": "net subscription",
+            }
             for field, label in confirmed_fields.items():
                 value = row.get(field)
                 if value is None:
                     errors.append(f"{row_path} confirmed row missing {label}")
-                elif field in numeric_fields and not _is_finite_number(value):
+                elif field in ETF_NUMERIC_FIELDS and not _is_finite_number(value):
+                    errors.append(f"{row_path} confirmed row invalid {label}")
+            optional_market_labels = {
+                "close": "close",
+                "changePercent": "change percent",
+                "turnover": "turnover",
+            }
+            for field, label in optional_market_labels.items():
+                if row.get(field) is not None and not _is_finite_number(row.get(field)):
                     errors.append(f"{row_path} confirmed row invalid {label}")
             row_date = row.get("date")
             if _is_iso_date(row_date):
-                for field in ("sharesDate", "navDate", "marketDate"):
+                for field in ("sharesDate", "navDate"):
                     value = row.get(field)
                     if _is_iso_date(value) and value != row_date:
                         errors.append(f"{row_path} confirmed row {field} must match row.date")
@@ -248,6 +378,196 @@ def validate_etf_fund_flow(config_path: Path, latest_path: Path) -> list[str]:
                     errors.append(f"{row_path} pending row must preserve null {field}")
         else:
             errors.append(f"{row_path} has invalid status: {status!r}")
+
+        row_date = row.get("date")
+        market_date = row.get("marketDate")
+        if _is_iso_date(market_date) and _is_iso_date(row_date) and market_date != row_date:
+            errors.append(f"{row_path}.marketDate must match row.date")
+        if any(row.get(field) is not None for field in ("close", "changePercent", "turnover")):
+            if market_date is None:
+                errors.append(f"{row_path}.marketDate is required for market values")
+
+        shares = row.get("shares")
+        previous_shares = row.get("previousShares")
+        nav = row.get("nav")
+        current_aligned = (
+            _is_finite_number(shares)
+            and _is_finite_number(nav)
+            and row.get("sharesDate") == row_date
+            and row.get("navDate") == row_date
+        )
+        previous_aligned = (
+            _is_finite_number(previous_shares)
+            and _is_iso_date(row.get("previousSharesDate"))
+            and _is_iso_date(row_date)
+            and row["previousSharesDate"] < row_date
+        )
+        expected_scale = shares * nav if current_aligned else None
+        if expected_scale is None:
+            if row.get("scale") is not None:
+                errors.append(f"{row_path}.scale formula requires aligned shares and NAV")
+        elif not _numbers_close(row.get("scale"), expected_scale):
+            errors.append(f"{row_path}.scale formula mismatch")
+
+        if status == "confirmed" and current_aligned and previous_aligned:
+            expected_change = shares - previous_shares
+            if not _numbers_close(row.get("shareChange"), expected_change):
+                errors.append(f"{row_path}.shareChange formula mismatch")
+            expected_subscription = expected_change * nav
+            if not _numbers_close(row.get("netSubscription1d"), expected_subscription):
+                errors.append(f"{row_path}.netSubscription1d formula mismatch")
+
+        expected_excess_1d = None
+        if _is_finite_number(row.get("changePercent")) and _is_finite_number(benchmark_change):
+            expected_excess_1d = row["changePercent"] - benchmark_change
+        if expected_excess_1d is None:
+            if row.get("excessReturn1d") is not None:
+                errors.append(f"{row_path}.excessReturn1d formula requires both returns")
+        elif not _numbers_close(row.get("excessReturn1d"), expected_excess_1d):
+            errors.append(f"{row_path}.excessReturn1d formula mismatch")
+
+        expected_label = _expected_flow_label(
+            row.get("changePercent"), row.get("netSubscription1d")
+        )
+        if row.get("flowLabel") != expected_label:
+            errors.append(f"{row_path}.flowLabel must be {expected_label}")
+
+        row_session_count = row.get("historySessionCount")
+        if row_session_count != payload_session_count:
+            errors.append(f"{row_path}.historySessionCount must match payload")
+        for field, maximum in (("windowDays5d", 5), ("windowDays20d", 20)):
+            value = row.get(field)
+            allowed = min(maximum, payload_session_count) if isinstance(payload_session_count, int) else 0
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value < 1
+                or value > allowed
+            ):
+                errors.append(f"{row_path}.{field} is outside the available window")
+        window_5d = row.get("windowDays5d")
+        positive_days = row.get("positiveFlowDays5d")
+        if positive_days is not None and (
+            isinstance(positive_days, bool)
+            or not isinstance(positive_days, int)
+            or not isinstance(window_5d, int)
+            or not (0 <= positive_days <= window_5d)
+        ):
+            errors.append(f"{row_path}.positiveFlowDays5d exceeds its window")
+        if (row.get("netSubscription5d") is None) != (positive_days is None):
+            errors.append(f"{row_path} 5-day flow and positiveFlowDays5d must share availability")
+        if payload_session_count == 1 and status == "confirmed":
+            if not _numbers_close(row.get("netSubscription5d"), row["netSubscription1d"]):
+                errors.append(f"{row_path}.netSubscription5d first-session invariant failed")
+            if not _numbers_close(row.get("netSubscription20d"), row["netSubscription1d"]):
+                errors.append(f"{row_path}.netSubscription20d first-session invariant failed")
+        if isinstance(window_5d, int) and window_5d < 5:
+            if row.get("turnoverVs5d") is not None or row.get("excessReturn5d") is not None:
+                errors.append(f"{row_path} incomplete 5-day market window must stay null")
+            if row.get("persistenceLabel") is not None:
+                errors.append(f"{row_path} incomplete 5-day persistence must stay null")
+        if row.get("persistenceLabel") not in {None, "持续流入", "持续流出"}:
+            errors.append(f"{row_path}.persistenceLabel is invalid")
+
+        breadth = row.get("stockBreadth")
+        breadth_confirmed = row.get("breadthConfirmed")
+        if breadth is not None and (
+            not _is_finite_number(breadth) or not 0 <= breadth <= 1
+        ):
+            errors.append(f"{row_path}.stockBreadth must be between 0 and 1")
+        if breadth_confirmed is True and not _is_finite_number(breadth):
+            errors.append(f"{row_path}.breadthConfirmed requires stockBreadth")
+        if breadth_confirmed is False and breadth is not None:
+            errors.append(f"{row_path}.stockBreadth must be null when breadth is unconfirmed")
+
+        if row.get("mainlineCandidate") is True:
+            mainline_conditions = (
+                row.get("scope") == "industry"
+                and status == "confirmed"
+                and window_5d == 5
+                and _is_finite_number(row.get("netSubscription1d"))
+                and row["netSubscription1d"] > 0
+                and _is_finite_number(row.get("netSubscription5d"))
+                and row["netSubscription5d"] > 0
+                and _is_finite_number(row.get("excessReturn5d"))
+                and row["excessReturn5d"] > 0
+                and isinstance(positive_days, int)
+                and positive_days >= 3
+                and _is_finite_number(row.get("turnoverVs5d"))
+                and row["turnoverVs5d"] >= 1
+                and breadth_confirmed is True
+                and _is_finite_number(breadth)
+                and breadth >= 0.5
+            )
+            if not mainline_conditions:
+                errors.append(f"{row_path}.mainlineCandidate lacks required evidence")
+
+    summary = latest.get("summary")
+    if not isinstance(summary, dict) or set(summary) != {"all", "broad", "industry"}:
+        errors.append("payload.summary does not match stable schema")
+    else:
+        confirmed_count = sum(
+            isinstance(row, dict) and row.get("status") == "confirmed" for row in rows
+        )
+        expected_status = (
+            "confirmed"
+            if rows and confirmed_count == len(rows)
+            else "partial"
+            if confirmed_count
+            else "pending"
+        )
+        if latest.get("status") != expected_status:
+            errors.append("payload.status does not match confirmed counts")
+        for scope, scoped_rows in (
+            ("all", rows),
+            ("broad", [row for row in rows if isinstance(row, dict) and row.get("scope") == "broad"]),
+            ("industry", [row for row in rows if isinstance(row, dict) and row.get("scope") == "industry"]),
+        ):
+            actual = summary.get(scope)
+            expected_counts = {
+                "count": len(scoped_rows),
+                "confirmedCount": sum(row.get("status") == "confirmed" for row in scoped_rows),
+                "pendingCount": sum(row.get("status") != "confirmed" for row in scoped_rows),
+            }
+            expected_keys = set(expected_counts) if scope == "all" else set(expected_counts) | {"netSubscription1d"}
+            if not isinstance(actual, dict) or set(actual) != expected_keys:
+                if scope == "all":
+                    errors.append("summary.all must contain counts only")
+                else:
+                    errors.append(f"summary.{scope} does not match stable schema")
+                continue
+            if any(actual.get(key) != value for key, value in expected_counts.items()):
+                errors.append(f"summary.{scope} counts do not match rows")
+            if scope != "all":
+                flows = [
+                    row.get("netSubscription1d")
+                    for row in scoped_rows
+                    if row.get("status") == "confirmed"
+                    and _is_finite_number(row.get("netSubscription1d"))
+                ]
+                expected_flow = sum(flows) if flows else None
+                if expected_flow is None:
+                    if actual.get("netSubscription1d") is not None:
+                        errors.append(f"summary.{scope} netSubscription1d must be null")
+                elif not _numbers_close(actual.get("netSubscription1d"), expected_flow):
+                    errors.append(f"summary.{scope} netSubscription1d does not match rows")
+
+    error_rows = latest.get("errors")
+    if not isinstance(error_rows, list):
+        errors.append("payload.errors must be a list")
+    else:
+        for index, item in enumerate(error_rows):
+            path = f"errors[{index}]"
+            if not isinstance(item, dict) or set(item) != {"code", "source", "message"}:
+                errors.append(f"{path} does not match stable schema")
+                continue
+            code = item.get("code")
+            if code is not None and code not in configured_codes:
+                errors.append(f"{path}.code must be null or a configured ETF code")
+            if not isinstance(item.get("source"), str) or not item["source"].strip():
+                errors.append(f"{path}.source must be non-empty")
+            if not isinstance(item.get("message"), str) or not item["message"].strip():
+                errors.append(f"{path}.message must be non-empty")
     return errors
 
 

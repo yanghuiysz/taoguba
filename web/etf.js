@@ -47,6 +47,7 @@
 
   function sortEtfs(rows, key, direction = "desc") {
     const multiplier = direction === "asc" ? 1 : -1;
+    const windowSizes = { netSubscription5d: 5, netSubscription20d: 20 };
     return [...(Array.isArray(rows) ? rows : [])].sort((left, right) => {
       const a = left?.[key];
       const b = right?.[key];
@@ -55,6 +56,13 @@
       if (aMissing && bMissing) return String(left?.code || "").localeCompare(String(right?.code || ""), "zh-CN");
       if (aMissing) return 1;
       if (bMissing) return -1;
+      const windowSize = windowSizes[key];
+      if (windowSize) {
+        const windowKey = key === "netSubscription5d" ? "windowDays5d" : "windowDays20d";
+        const aCoverage = isFiniteNumber(left?.[windowKey]) ? Math.min(left[windowKey], windowSize) : 0;
+        const bCoverage = isFiniteNumber(right?.[windowKey]) ? Math.min(right[windowKey], windowSize) : 0;
+        if (aCoverage !== bCoverage) return bCoverage - aCoverage;
+      }
       if (typeof a === "number" && typeof b === "number") return (a - b) * multiplier;
       return String(a).localeCompare(String(b), "zh-CN", { numeric: true }) * multiplier;
     });
@@ -91,6 +99,27 @@
 
   function statusText(status) {
     return status === "confirmed" ? "已确认" : "待确认";
+  }
+
+  function windowLabel(days, size, suffix = "") {
+    return isFiniteNumber(days) ? `${days}/${size}日${suffix}` : `${size}日${suffix}`;
+  }
+
+  function renderSourceErrors(payload) {
+    const container = document.getElementById("source-errors");
+    container.textContent = "";
+    const errors = Array.isArray(payload?.errors) ? payload.errors : [];
+    if (!errors.length) {
+      container.appendChild(el("li", "source-error-empty", "当前日期未记录数据源异常"));
+      return;
+    }
+    errors.forEach((error) => {
+      const item = el("li", "source-error-item");
+      item.appendChild(el("strong", "source-error-code", error?.code || "全局"));
+      item.appendChild(el("span", "source-error-source", error?.source || "unknown"));
+      item.appendChild(el("span", "source-error-message", error?.message || "未知错误"));
+      container.appendChild(item);
+    });
   }
 
   function renderHeader(payload) {
@@ -145,7 +174,7 @@
 
       const secondary = el("div", "card-secondary");
       const fiveDay = el("div");
-      fiveDay.appendChild(el("span", "metric-label", "5日累计"));
+      fiveDay.appendChild(el("span", "metric-label", windowLabel(row.windowDays5d, 5, "累计")));
       appendPendingValue(fiveDay, row.netSubscription5d, formatMoney);
       const change = el("div");
       change.appendChild(el("span", "metric-label", "当日涨跌"));
@@ -217,6 +246,17 @@
     cell.className = pending ? "pending-cell" : options.tone === false ? "neutral" : valueClass(value);
     cell.textContent = formatter(value);
     if (pending && options.confirm !== false) cell.appendChild(el("small", "", "待确认"));
+    if (!pending && options.coverage) {
+      const { days, size } = options.coverage;
+      const partial = isFiniteNumber(days) && days < size;
+      cell.appendChild(
+        el(
+          "small",
+          `window-coverage ${partial ? "is-partial" : "is-full"}`,
+          windowLabel(days, size),
+        ),
+      );
+    }
     rowNode.appendChild(cell);
   }
 
@@ -227,7 +267,7 @@
     if (!sorted.length) {
       const row = el("tr");
       const cell = el("td", "table-empty", "暂无行业 ETF 数据");
-      cell.colSpan = 11;
+      cell.colSpan = 13;
       row.appendChild(cell);
       body.appendChild(row);
       return;
@@ -239,8 +279,12 @@
       identity.appendChild(el("span", "", `${item.code || "—"} · ${item.category || "—"} · ${item.direction || "—"}`));
       row.appendChild(identity);
       appendDataCell(row, item.netSubscription1d, formatMoney);
-      appendDataCell(row, item.netSubscription5d, formatMoney);
-      appendDataCell(row, item.netSubscription20d, formatMoney);
+      appendDataCell(row, item.netSubscription5d, formatMoney, {
+        coverage: { days: item.windowDays5d, size: 5 },
+      });
+      appendDataCell(row, item.netSubscription20d, formatMoney, {
+        coverage: { days: item.windowDays20d, size: 20 },
+      });
       appendDataCell(row, item.scale, formatMoney, { tone: false });
       appendDataCell(row, item.shareChange, formatShares);
 
@@ -248,12 +292,19 @@
       status.appendChild(el("span", `status-pill ${item.status === "confirmed" ? "" : "pending"}`.trim(), statusText(item.status)));
       row.appendChild(status);
       appendDataCell(row, item.changePercent, formatPercent);
+      appendDataCell(row, item.excessReturn1d, formatPercent);
       appendDataCell(row, item.excessReturn5d, formatPercent);
+      appendDataCell(row, item.turnover, formatMoney, { tone: false });
       appendDataCell(row, item.turnoverVs5d, formatRatio, { tone: false });
 
       const labelCell = el("td");
       const labels = el("div", "label-stack");
-      addLabel(labels, item.flowLabel || "待确认", item.flowLabel === "待确认" ? "pending" : "");
+      const flowClass = item.flowLabel === "待确认"
+        ? "pending"
+        : item.flowLabel === "无净申赎"
+          ? "neutral-label"
+          : "";
+      addLabel(labels, item.flowLabel || "待确认", flowClass);
       addLabel(labels, item.persistenceLabel);
       if (item.mainlineCandidate) addLabel(labels, "主线候选", "mainline-label");
       labelCell.appendChild(labels);
@@ -272,7 +323,9 @@
       shareChange: "份额变化",
       status: "申购确认",
       changePercent: "涨跌幅",
+      excessReturn1d: "1日超额",
       excessReturn5d: "5日超额",
+      turnover: "当日成交额",
       turnoverVs5d: "成交额/5日均值",
       flowLabel: "资金标签",
     };
@@ -293,6 +346,7 @@
     const industry = rows.filter((row) => row?.scope === "industry");
     state.payload = payload || {};
     renderHeader(state.payload);
+    renderSourceErrors(state.payload);
     renderBroad(broad);
     renderRankList("industry-inflow", industry, "inflow");
     renderRankList("industry-outflow", industry, "outflow");

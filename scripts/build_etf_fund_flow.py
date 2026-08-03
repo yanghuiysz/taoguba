@@ -144,6 +144,48 @@ def fetch_sse_shares(date: str) -> dict[str, dict]:
     return result
 
 
+def fetch_trading_sessions(start_date: str, end_date: str) -> list[str]:
+    """Return the independent official exchange-session sequence for a date range."""
+    start_normalized = _normal_date(start_date)
+    end_normalized = _normal_date(end_date)
+    frame = _call_with_retries(lambda: _load_akshare().tool_trade_date_hist_sina())
+    sessions = {
+        normalized
+        for record in _records(frame)
+        if (
+            normalized := _normal_date(
+                record.get("trade_date") or record.get("交易日期") or record.get("日期")
+            )
+        )
+        is not None
+        and (start_normalized is None or normalized >= start_normalized)
+        and (end_normalized is None or normalized <= end_normalized)
+    }
+    return sorted(sessions)
+
+
+def fetch_szse_shares(date: str) -> dict[str, dict]:
+    """Use the dated SZSE daily fund-scale API for one authoritative session."""
+    compact = _compact_date(date)
+    frame = _call_with_retries(
+        lambda: _load_akshare().fund_scale_daily_szse(
+            start_date=compact,
+            end_date=compact,
+            symbol="ETF",
+        )
+    )
+    result: dict[str, dict] = {}
+    for record in _records(frame):
+        code = _normal_code(record.get("基金代码"))
+        shares = _finite_float(record.get("基金份额"))
+        shares_date = _normal_date(
+            record.get("日期") or record.get("统计日期") or record.get("数据日期")
+        )
+        if code is not None and shares is not None and shares_date == _normal_date(date):
+            result[code] = {"shares": shares, "sharesDate": shares_date}
+    return result
+
+
 def fetch_szse_latest_shares() -> dict[str, dict]:
     """Use akshare.fund_etf_scale_szse(); return code -> {shares, sharesDate}."""
     try:
@@ -238,6 +280,7 @@ def fetch_market_history(code: str, start_date: str, end_date: str) -> dict[str,
     start_normalized = _normal_date(start_date)
     end_normalized = _normal_date(end_date)
     akshare = _load_akshare()
+    used_sina = False
     try:
         frame = _call_with_retries(
             lambda: akshare.fund_etf_hist_em(
@@ -249,26 +292,58 @@ def fetch_market_history(code: str, start_date: str, end_date: str) -> dict[str,
             )
         )
     except Exception:
+        used_sina = True
         exchange_prefix = "sh" if code.startswith("5") else "sz"
         frame = _call_with_retries(
             lambda: akshare.fund_etf_hist_sina(symbol=f"{exchange_prefix}{code}")
         )
+    trading_dates: list[str] = []
+    if used_sina:
+        try:
+            trading_dates = sorted(
+                {
+                    normalized
+                    for record in _records(
+                        _call_with_retries(lambda: akshare.tool_trade_date_hist_sina())
+                    )
+                    if (
+                        normalized := _normal_date(
+                            record.get("trade_date") or record.get("交易日期") or record.get("日期")
+                        )
+                    )
+                    is not None
+                }
+            )
+        except Exception:
+            trading_dates = []
+    previous_session = {
+        trading_dates[index]: trading_dates[index - 1]
+        for index in range(1, len(trading_dates))
+    }
     result: dict[str, dict] = {}
     records = sorted(
         _records(frame),
         key=lambda record: _normal_date(record.get("日期") or record.get("date")) or "",
     )
     previous_close = None
+    previous_market_date = None
     for record in records:
         market_date = _normal_date(record.get("日期") or record.get("date"))
         if market_date is None:
             continue
         close = _finite_float(record.get("收盘") or record.get("close"))
         change_percent = _finite_float(record.get("涨跌幅") or record.get("changePercent"))
-        if change_percent is None and close is not None and previous_close not in (None, 0):
+        adjacent = not used_sina or previous_session.get(market_date) == previous_market_date
+        if (
+            change_percent is None
+            and adjacent
+            and close is not None
+            and previous_close not in (None, 0)
+        ):
             change_percent = round((close / previous_close - 1.0) * 100.0, 4)
         if close is not None:
             previous_close = close
+            previous_market_date = market_date
         if start_normalized is not None and market_date < start_normalized:
             continue
         if end_normalized is not None and market_date > end_normalized:
@@ -298,9 +373,13 @@ def compute_net_subscription(
 def classify_flow(change_pct: float | None, net_subscription: float | None) -> str:
     change = _finite_float(change_pct)
     flow = _finite_float(net_subscription)
-    if change is None or flow is None:
+    if flow is None:
         return "待确认"
-    if flow >= 0:
+    if flow == 0:
+        return "无净申赎"
+    if change is None:
+        return "待确认"
+    if flow > 0:
         return "资金强化" if change >= 0 else "逆势承接"
     return "上涨兑现" if change >= 0 else "资金撤退"
 
@@ -354,7 +433,7 @@ def build_row(
     current: dict,
     previous: dict | None,
     history: list[dict],
-    benchmark_returns: dict[str, float],
+    benchmark_returns: dict[str, float | None],
 ) -> dict:
     requested_date = _normal_date(current.get("date"))
     if requested_date is None:
@@ -378,15 +457,8 @@ def build_row(
         previous_aligned = previous_shares_date == expected_previous_date
 
     current_values_aligned = shares_date == requested_date and nav_date == requested_date
-    market_aligned = (
-        market_date == requested_date
-        and close is not None
-        and change_percent is not None
-        and turnover is not None
-    )
     confirmed = (
         current_values_aligned
-        and market_aligned
         and previous_aligned
         and shares is not None
         and previous_shares is not None
@@ -443,7 +515,14 @@ def build_row(
     if market_window_aligned and expected_dates:
         market_window_aligned = [row["date"] for row in market_window] == expected_dates[-5:]
     turnover_vs_5d = None
+    excess_return_1d = None
     excess_return_5d = None
+    normalized_benchmark = {
+        _normal_date(key): _finite_float(value) for key, value in benchmark_returns.items()
+    }
+    benchmark_today = normalized_benchmark.get(requested_date)
+    if change_percent is not None and benchmark_today is not None:
+        excess_return_1d = round(change_percent - benchmark_today, 4)
     if market_window_aligned:
         turnovers = [_finite_float(row.get("turnover")) for row in market_window]
         if all(value is not None for value in turnovers) and turnover is not None:
@@ -452,9 +531,6 @@ def build_row(
                 turnover_vs_5d = round(turnover / mean_turnover, 4)
 
         etf_returns = [_finite_float(row.get("changePercent")) for row in market_window]
-        normalized_benchmark = {
-            _normal_date(key): _finite_float(value) for key, value in benchmark_returns.items()
-        }
         benchmark_values = [normalized_benchmark.get(row["date"]) for row in market_window]
         if all(value is not None for value in etf_returns + benchmark_values):
             etf_compound = _compound_percent([value for value in etf_returns if value is not None])
@@ -491,6 +567,7 @@ def build_row(
         "historySessionCount": history_session_count,
         "windowDays5d": window_days_5d,
         "windowDays20d": window_days_20d,
+        "excessReturn1d": excess_return_1d,
         "excessReturn5d": excess_return_5d,
         "positiveFlowDays5d": positive_days,
         "flowLabel": classify_flow(change_percent, net_subscription),
@@ -507,6 +584,18 @@ def _get_provider(providers: Mapping[str, Callable] | Any | None, name: str) -> 
     if isinstance(providers, Mapping):
         return providers[name]
     return getattr(providers, name)
+
+
+def _get_optional_provider(
+    providers: Mapping[str, Callable] | Any | None, name: str
+) -> Callable | None:
+    if providers is None:
+        return globals()[name]
+    if isinstance(providers, Mapping):
+        provider = providers.get(name)
+        return provider if callable(provider) else None
+    provider = getattr(providers, name, None)
+    return provider if callable(provider) else None
 
 
 def _lookup_dated(mapping: Mapping[Any, dict], target_date: str) -> dict:
@@ -606,19 +695,21 @@ def _board_breadth(
     return round(sum(breadths) / len(breadths), 4), True
 
 
-def _summary(rows: list[dict]) -> dict:
+def _summary(rows: list[dict], *, include_flow: bool = True) -> dict:
     confirmed = [row for row in rows if row.get("status") == "confirmed"]
     flows = [
         value
         for row in confirmed
         if (value := _finite_float(row.get("netSubscription1d"))) is not None
     ]
-    return {
+    summary = {
         "count": len(rows),
         "confirmedCount": len(confirmed),
         "pendingCount": len(rows) - len(confirmed),
-        "netSubscription1d": sum(flows) if flows else None,
     }
+    if include_flow:
+        summary["netSubscription1d"] = sum(flows) if flows else None
+    return summary
 
 
 def build_snapshot(
@@ -680,13 +771,32 @@ def build_snapshot(
         if (normalized := _normal_date(key)) is not None
         and (change := _finite_float(record.get("changePercent"))) is not None
     }
-    calendar_markets = [benchmark_market] if benchmark_market else list(market_by_code.values())
-    trading_dates = sorted(
-        normalized
-        for market in calendar_markets
-        for key in market
-        if (normalized := _normal_date(key)) is not None and normalized <= target_date
-    )
+    calendar_provider = _get_optional_provider(providers, "fetch_trading_sessions")
+    trading_dates: list[str] = []
+    if calendar_provider is not None:
+        try:
+            trading_dates = sorted(
+                {
+                    normalized
+                    for value in calendar_provider(start_compact, target_compact)
+                    if (normalized := _normal_date(value)) is not None
+                    and normalized <= target_date
+                }
+            )
+        except Exception as error:
+            errors.append({"code": None, "source": "tradingCalendar", "message": str(error)})
+    elif providers is not None:
+        calendar_markets = [benchmark_market] if benchmark_market else list(market_by_code.values())
+        trading_dates = sorted(
+            {
+                normalized
+                for market in calendar_markets
+                for key in market
+                if (normalized := _normal_date(key)) is not None and normalized <= target_date
+            }
+        )
+    for trading_date in trading_dates:
+        benchmark_returns.setdefault(trading_date, None)
     prior_dates = [value for value in set(trading_dates) if value < target_date]
     previous_date = max(prior_dates) if prior_dates else None
 
@@ -707,7 +817,7 @@ def build_snapshot(
                 errors.append({"code": None, "source": "ssePreviousShares", "message": str(error)})
     if any(etf.get("exchange") == "SZSE" for etf in etf_configs):
         try:
-            current_szse = _get_provider(providers, "fetch_szse_latest_shares")()
+            current_szse = _get_provider(providers, "fetch_szse_shares")(target_compact)
         except Exception as error:
             errors.append({"code": None, "source": "szseShares", "message": str(error)})
 
@@ -779,7 +889,7 @@ def build_snapshot(
                         "message": f"previous shares missing for {previous_date}",
                     }
                 )
-        elif etf.get("exchange") == "SZSE" and previous_date is not None and prior_rows:
+        elif etf.get("exchange") == "SZSE" and previous_date is not None:
             if (
                 normalized_previous["shares"] is None
                 or observed_previous_date != previous_date
@@ -845,7 +955,7 @@ def build_snapshot(
         "benchmarkCode": benchmark_code,
         "historySessionCount": history_session_count,
         "summary": {
-            "all": _summary(rows),
+            "all": _summary(rows, include_flow=False),
             "broad": _summary(broad_rows),
             "industry": _summary(industry_rows),
         },

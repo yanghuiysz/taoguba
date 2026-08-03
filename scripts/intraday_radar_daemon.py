@@ -206,6 +206,13 @@ def run_after_close_refresh(date_str: str, log_path: Path) -> bool:
     return True
 
 
+def attempt_after_close_refresh(date_str: str, log_path: Path) -> bool:
+    if not run_after_close_refresh(date_str, log_path):
+        return False
+    save_last_closing_refresh_date(date_str)
+    return True
+
+
 def run_notify(top_n: int, log_path: Path) -> bool:
     notify_cmd = [
         PYTHON,
@@ -295,8 +302,7 @@ def main() -> None:
             ):
                 if acquire_lock():
                     try:
-                        if run_after_close_refresh(date_str, log_path):
-                            save_last_closing_refresh_date(date_str)
+                        attempt_after_close_refresh(date_str, log_path)
                     finally:
                         release_lock()
                 else:
