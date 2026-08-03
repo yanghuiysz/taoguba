@@ -378,7 +378,12 @@ def build_row(
         previous_aligned = previous_shares_date == expected_previous_date
 
     current_values_aligned = shares_date == requested_date and nav_date == requested_date
-    market_aligned = market_date == requested_date
+    market_aligned = (
+        market_date == requested_date
+        and close is not None
+        and change_percent is not None
+        and turnover is not None
+    )
     confirmed = (
         current_values_aligned
         and market_aligned
@@ -643,12 +648,24 @@ def build_snapshot(
             market_by_code[code] = _get_provider(providers, "fetch_market_history")(
                 code, start_compact, target_compact
             )
-            if not _lookup_dated(market_by_code[code], target_date):
+            market_today = _lookup_dated(market_by_code[code], target_date)
+            if not market_today:
                 errors.append(
                     {
                         "code": code,
                         "source": "missing",
                         "message": f"market observation missing for {target_date}",
+                    }
+                )
+            elif any(
+                _finite_float(market_today.get(field)) is None
+                for field in ("close", "changePercent", "turnover")
+            ):
+                errors.append(
+                    {
+                        "code": code,
+                        "source": "missing",
+                        "message": f"complete market observation missing for {target_date}",
                     }
                 )
         except Exception as error:

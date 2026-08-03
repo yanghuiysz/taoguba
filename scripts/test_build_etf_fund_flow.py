@@ -719,6 +719,38 @@ class SnapshotBuilderTest(unittest.TestCase):
         self.assertEqual(snapshot["errors"][0]["code"], "159999")
         self.assertEqual(snapshot["errors"][0]["source"], "nav")
 
+    def test_dated_incomplete_market_row_is_pending_and_records_missing_error(self):
+        for missing_field in ("close", "changePercent", "turnover"):
+            with self.subTest(missing_field=missing_field):
+                providers = self._providers()
+                original_market = providers["fetch_market_history"]
+
+                def incomplete_market(code, start, end):
+                    market = original_market(code, start, end)
+                    if code == "510300":
+                        market["2026-07-31"][missing_field] = None
+                    return market
+
+                providers["fetch_market_history"] = incomplete_market
+                snapshot = build_snapshot(
+                    "20260731",
+                    self.config,
+                    history=self.history,
+                    custom_boards=None,
+                    providers=providers,
+                )
+
+                broad = snapshot["etfs"][0]
+                self.assertEqual(broad["status"], "pending")
+                self.assertIsNone(broad["shareChange"])
+                self.assertIsNone(broad["netSubscription1d"])
+                self.assertTrue(
+                    any(
+                        error["code"] == "510300" and error["source"] == "missing"
+                        for error in snapshot["errors"]
+                    )
+                )
+
     def test_empty_provider_results_are_recorded_as_missing_source_errors(self):
         empty = {
             "fetch_sse_shares": lambda date: {},
