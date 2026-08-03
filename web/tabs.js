@@ -4,6 +4,7 @@ const panels = Object.fromEntries(
 );
 const frameSrc = {
   custom: "./custom.html?v=20260525-selected-date-highlight-v1",
+  etf: "./etf.html?v=20260731-etf-v1",
   intraday: "./intraday.html?v=20260520-stock-pick-v1",
 };
 const AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
