@@ -15,7 +15,7 @@ class ValidationTests(unittest.TestCase):
 
     def test_valid_snapshot(self):
         result = validate_high_dividend(self.payload)
-        self.assertEqual(result["stocks"], 8)
+        self.assertEqual(result["stocks"], len(self.payload["stocks"]))
 
     def test_rejects_duplicate_code_and_invalid_enum(self):
         duplicate = copy.deepcopy(self.payload)

@@ -53,7 +53,7 @@ def normalized_dividend(dividends: list[float], pool: str) -> float | None:
         if len(recent) >= 2 and recent[-1] < recent[-2] * 0.8:
             return recent[-1]
         return float(baseline)
-    if pool == "cyclical" and len(clean) >= 5:
+    if pool == "cyclical" and len(clean) >= 4:
         return _percentile(clean[-5:], 0.25)
     return None
 
@@ -115,7 +115,9 @@ def evaluate_stock(stock: dict[str, Any], config: dict[str, Any], as_of: date) -
         missing.append("10年期国债数据已超过7日")
     if pool == "unclassified":
         missing.append("行业尚未分入稳定或周期池")
-    if pool == "cyclical" and len(dividends) < 5:
+    listing_date_for_history = _parse_date(stock.get("listingDate"))
+    required_cyclical_years = min(5, max(3, as_of.year - listing_date_for_history.year)) if listing_date_for_history else 5
+    if pool == "cyclical" and len(dividends) < required_cyclical_years:
         missing.append("周期池需要至少5年分红记录")
     if len(dividends) < 3:
         missing.append("缺少至少3年分红记录")

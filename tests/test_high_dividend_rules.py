@@ -70,6 +70,14 @@ class RulesTests(unittest.TestCase):
         self.assertIn("价格高于目标关注价", result["reasons"])
         self.assertFalse(any("股息率明显低于" in reason for reason in result["reasons"]))
 
+    def test_recently_listed_cyclical_stock_uses_all_available_report_years(self):
+        result = evaluate_stock(stock(
+            code="600938", industry="石油石化", listingDate="2022-04-21",
+            dividends=[1.3, 1.25, 1.4, 1.45], dividendYears=[2022, 2023, 2024, 2025],
+            ttmDividend=1.45,
+        ), {**CONFIG, "poolOverrides": {"600938": "cyclical"}}, date(2026, 8, 4))
+        self.assertNotEqual(result["state"], "数据不足")
+
 
 if __name__ == "__main__":
     unittest.main()

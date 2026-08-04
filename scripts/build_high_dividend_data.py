@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import tempfile
 from collections import Counter
 from datetime import date, datetime, timedelta
@@ -97,7 +98,53 @@ def _clean_number(value: Any, scale: float = 1.0) -> float | None:
         return None
 
 
-def fetch_live_source(target_date: str) -> dict[str, Any]:
+def parse_dividend_history(frame: Any, start_year: int, end_year: int) -> tuple[list[float], list[int]]:
+    cash_by_year: dict[int, float] = {}
+    if frame is None or getattr(frame, "empty", True):
+        return [], []
+    for _, row in frame.iterrows():
+        match = re.search(r"(20\d{2})", str(row.get("报告时间", "")))
+        cash = _clean_number(row.get("派息比例"))
+        if not match or cash is None:
+            continue
+        year = int(match.group(1))
+        if start_year <= year <= end_year:
+            cash_by_year[year] = cash_by_year.get(year, 0.0) + cash / 10
+    years = sorted(cash_by_year)
+    return [round(cash_by_year[year], 6) for year in years], years
+
+
+def parse_financial_quality(frame: Any) -> dict[str, float | None]:
+    if frame is None or getattr(frame, "empty", True):
+        return {"latestProfit": None, "payoutRatio": None, "qualityScore": None}
+    annual = frame.copy()
+    annual["_date"] = annual["日期"].astype(str)
+    annual = annual[annual["_date"].str.endswith("12-31")].sort_values("_date", ascending=False)
+    if annual.empty:
+        return {"latestProfit": None, "payoutRatio": None, "qualityScore": None}
+    row = annual.iloc[0]
+    profit = _clean_number(row.get("每股收益_调整后(元)"))
+    roe = _clean_number(row.get("净资产收益率(%)"))
+    payout_percent = _clean_number(row.get("股息发放率(%)"))
+    payout = payout_percent / 100 if payout_percent is not None else None
+    score = None
+    if profit is not None and roe is not None:
+        score = min(100.0, 60.0 + min(max(roe, 0), 20.0) + (10.0 if payout is not None and 0.2 <= payout <= 0.8 else 0.0))
+    return {"latestProfit": profit, "payoutRatio": payout, "qualityScore": score}
+
+
+def retry_fetch(operation: Any, attempts: int = 3) -> Any:
+    last_error: Exception | None = None
+    for _ in range(attempts):
+        try:
+            return operation()
+        except Exception as exc:
+            last_error = exc
+    assert last_error is not None
+    raise last_error
+
+
+def _fetch_legacy_broad_market_source(target_date: str) -> dict[str, Any]:
     """Best-effort broad-market seed. Missing detail is explicit and never zero-filled."""
     import akshare as ak
 
@@ -144,6 +191,81 @@ def fetch_live_source(target_date: str) -> dict[str, Any]:
     }
 
 
+def fetch_live_source(target_date: str, config: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Fetch only the curated production watchlist; fixtures never enter this path."""
+    import akshare as ak
+
+    config = config or load_json(DEFAULT_CONFIG)
+    catalog = config.get("watchlistCatalog", [])
+    errors: list[str] = []
+    try:
+        spot = ak.stock_zh_a_spot()
+    except Exception as exc:
+        errors.append(f"新浪全A实时行情不可用: {exc}")
+        try:
+            spot = ak.stock_zh_a_spot_em()
+        except Exception as fallback_exc:
+            errors.append(f"东方财富全A实时行情也不可用: {fallback_exc}")
+            spot = None
+
+    start = (datetime.strptime(target_date, "%Y-%m-%d").date() - timedelta(days=30)).strftime("%Y%m%d")
+    bonds = ak.bond_zh_us_rate(start_date=start)
+    latest_bond = bonds.dropna(subset=["中国国债收益率10年"]).iloc[-1]
+    bond_yield = float(latest_bond["中国国债收益率10年"]) / 100
+    bond_date = str(latest_bond["日期"])
+    spot_map: dict[str, Any] = {}
+    if spot is not None:
+        for _, quote in spot.iterrows():
+            code_match = re.search(r"(\d{6})$", str(quote.iloc[0]))
+            if code_match:
+                spot_map[code_match.group(1)] = quote
+
+    rows: list[dict[str, Any]] = []
+    as_of = datetime.strptime(target_date, "%Y-%m-%d").date()
+    for watched in catalog:
+        code = str(watched["code"])
+        quote = spot_map.get(code)
+        price = _clean_number(quote.iloc[2]) if quote is not None and len(quote) > 2 else None
+        turnover = _clean_number(quote.iloc[12]) if quote is not None and len(quote) > 12 else None
+        try:
+            dividend_frame = retry_fetch(lambda: ak.stock_dividend_cninfo(code))
+            dividends, dividend_years = parse_dividend_history(dividend_frame, as_of.year - 5, as_of.year - 1)
+        except Exception as exc:
+            errors.append(f"{code} 分红数据不可用: {exc}")
+            dividends, dividend_years = [], []
+        try:
+            financial = parse_financial_quality(retry_fetch(lambda: ak.stock_financial_analysis_indicator(code, str(as_of.year - 5))))
+        except Exception as exc:
+            errors.append(f"{code} 财务数据不可用: {exc}")
+            financial = {"latestProfit": None, "payoutRatio": None, "qualityScore": None}
+        rows.append({
+            "code": code,
+            "name": watched["name"],
+            "industry": watched["industry"],
+            "price": price,
+            "listingDate": watched.get("listingDate", ""),
+            "avgTurnover20": turnover,
+            "dividends": dividends,
+            "dividendYears": dividend_years,
+            "ttmDividend": dividends[-1] if dividends else None,
+            **financial,
+        })
+    return {
+        "date": target_date,
+        "bondYield": bond_yield,
+        "bondDate": bond_date,
+        "stocks": rows,
+        "errors": errors,
+        "source": {
+            "kind": "akshare-live",
+            "quoteAsOf": target_date,
+            "financialAsOf": target_date,
+            "dividendAsOf": target_date,
+            "note": "实时行情：新浪/东方财富；分红：巨潮资讯；财务：新浪财经",
+        },
+    }
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build high-dividend radar snapshot")
     parser.add_argument("--date", default=date.today().isoformat())
@@ -159,7 +281,7 @@ def main(argv: list[str] | None = None) -> int:
     previous = args.output.read_bytes() if args.output.exists() else None
     try:
         config = load_json(args.config)
-        source = load_json(args.source_json) if args.source_json else fetch_live_source(args.date)
+        source = load_json(args.source_json) if args.source_json else fetch_live_source(args.date, config)
         snapshot = build_snapshot(source, config, args.date)
         if not args.source_json and not snapshot_is_usable(snapshot):
             raise RuntimeError("实时数据缺少足够的逐年分红和财务明细，拒绝覆盖现有有效快照")

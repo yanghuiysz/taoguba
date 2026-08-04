@@ -3,7 +3,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.build_high_dividend_data import build_snapshot, main, snapshot_is_usable
+import pandas as pd
+
+from scripts.build_high_dividend_data import (
+    build_snapshot,
+    main,
+    parse_dividend_history,
+    parse_financial_quality,
+    retry_fetch,
+    snapshot_is_usable,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,6 +66,37 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(stock["code"], "600941")
         self.assertTrue(stock["watchlisted"])
         self.assertEqual(stock["state"], "数据不足")
+
+    def test_dividend_parser_aggregates_cash_by_report_year(self):
+        frame = pd.DataFrame([
+            {"派息比例": 5.0, "报告时间": "2024中报"},
+            {"派息比例": 10.0, "报告时间": "2024年报"},
+            {"派息比例": 12.0, "报告时间": "2025年报"},
+        ])
+        dividends, years = parse_dividend_history(frame, 2024, 2025)
+        self.assertEqual(years, [2024, 2025])
+        self.assertEqual(dividends, [1.5, 1.2])
+
+    def test_financial_parser_uses_latest_annual_profitability(self):
+        frame = pd.DataFrame([
+            {"日期": "2025-09-30", "每股收益_调整后(元)": 2.0, "净资产收益率(%)": 12.0, "股息发放率(%)": 60.0},
+            {"日期": "2024-12-31", "每股收益_调整后(元)": 1.5, "净资产收益率(%)": 10.0, "股息发放率(%)": 55.0},
+            {"日期": "2025-12-31", "每股收益_调整后(元)": 1.8, "净资产收益率(%)": 11.0, "股息发放率(%)": 58.0},
+        ])
+        result = parse_financial_quality(frame)
+        self.assertEqual(result["latestProfit"], 1.8)
+        self.assertEqual(result["payoutRatio"], 0.58)
+        self.assertGreaterEqual(result["qualityScore"], 70)
+
+    def test_retry_fetch_recovers_from_transient_provider_error(self):
+        attempts = []
+        def flaky():
+            attempts.append(1)
+            if len(attempts) < 3:
+                raise ValueError("temporary")
+            return "ok"
+        self.assertEqual(retry_fetch(flaky, attempts=3), "ok")
+        self.assertEqual(len(attempts), 3)
 
 
 if __name__ == "__main__":

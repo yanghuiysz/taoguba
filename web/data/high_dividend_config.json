@@ -15,23 +15,40 @@
     "600938": "cyclical",
     "600028": "cyclical",
     "601225": "cyclical"
+    ,"601398": "stable"
+    ,"601288": "stable"
+    ,"601988": "stable"
+    ,"600350": "stable"
+    ,"600018": "stable"
+    ,"601318": "stable"
+    ,"000895": "stable"
+    ,"600585": "cyclical"
   },
   "watchlist": [
     "600036", "601939", "600941", "600900", "601006", "600377",
-    "000429", "600461", "601088", "600938", "600028", "601225"
+    "000429", "600461", "601088", "600938", "600028", "601225",
+    "601398", "601288", "601988", "600350", "600018", "601318", "000895", "600585"
   ],
   "watchlistCatalog": [
-    {"code": "600036", "name": "招商银行", "industry": "银行"},
-    {"code": "601939", "name": "建设银行", "industry": "银行"},
-    {"code": "600941", "name": "中国移动", "industry": "电信运营"},
-    {"code": "600900", "name": "长江电力", "industry": "水电"},
-    {"code": "601006", "name": "大秦铁路", "industry": "铁路运输"},
-    {"code": "600377", "name": "宁沪高速", "industry": "高速公路"},
-    {"code": "000429", "name": "粤高速A", "industry": "高速公路"},
-    {"code": "600461", "name": "洪城环境", "industry": "公用事业"},
-    {"code": "601088", "name": "中国神华", "industry": "煤炭"},
-    {"code": "600938", "name": "中国海油", "industry": "石油石化"},
-    {"code": "600028", "name": "中国石化", "industry": "石油石化"},
-    {"code": "601225", "name": "陕西煤业", "industry": "煤炭"}
+    {"code": "600036", "name": "招商银行", "industry": "银行", "listingDate": "2002-04-09"},
+    {"code": "601939", "name": "建设银行", "industry": "银行", "listingDate": "2007-09-25"},
+    {"code": "600941", "name": "中国移动", "industry": "电信运营", "listingDate": "2022-01-05"},
+    {"code": "600900", "name": "长江电力", "industry": "水电", "listingDate": "2003-11-18"},
+    {"code": "601006", "name": "大秦铁路", "industry": "铁路运输", "listingDate": "2006-08-01"},
+    {"code": "600377", "name": "宁沪高速", "industry": "高速公路", "listingDate": "2001-01-16"},
+    {"code": "000429", "name": "粤高速A", "industry": "高速公路", "listingDate": "1998-02-20"},
+    {"code": "600461", "name": "洪城环境", "industry": "公用事业", "listingDate": "2004-06-01"},
+    {"code": "601088", "name": "中国神华", "industry": "煤炭", "listingDate": "2007-10-09"},
+    {"code": "600938", "name": "中国海油", "industry": "石油石化", "listingDate": "2022-04-21"},
+    {"code": "600028", "name": "中国石化", "industry": "石油石化", "listingDate": "2001-08-08"},
+    {"code": "601225", "name": "陕西煤业", "industry": "煤炭", "listingDate": "2014-01-28"},
+    {"code": "601398", "name": "工商银行", "industry": "银行", "listingDate": "2006-10-27"},
+    {"code": "601288", "name": "农业银行", "industry": "银行", "listingDate": "2010-07-15"},
+    {"code": "601988", "name": "中国银行", "industry": "银行", "listingDate": "2006-07-05"},
+    {"code": "600350", "name": "山东高速", "industry": "高速公路", "listingDate": "2002-03-18"},
+    {"code": "600018", "name": "上港集团", "industry": "港口", "listingDate": "2006-10-26"},
+    {"code": "601318", "name": "中国平安", "industry": "保险", "listingDate": "2007-03-01"},
+    {"code": "000895", "name": "双汇发展", "industry": "食品饮料", "listingDate": "1998-12-10"},
+    {"code": "600585", "name": "海螺水泥", "industry": "建材", "listingDate": "2002-02-07"}
   ]
 }
