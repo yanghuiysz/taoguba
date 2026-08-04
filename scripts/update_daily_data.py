@@ -15,7 +15,6 @@ PYTHON = sys.executable
 
 CUSTOM_DASHBOARD = ROOT / "web/data/custom_boards.json"
 FULL_A_TURNOVER = ROOT / "web/data/full_a_turnover_top20.json"
-ETF_FUND_FLOW = ROOT / "web/data/etf_fund_flow.json"
 CUSTOM_HISTORY_DIR = ROOT / "web/data/custom_boards/history"
 CUSTOM_INTRADAY_DIR = ROOT / "web/data/custom_boards/intraday"
 CUSTOM_HISTORY_INDEX = ROOT / "web/data/custom_boards/index.json"
@@ -102,25 +101,6 @@ def load_json(path: Path, fallback: object) -> object:
         return json.loads(path.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return fallback
-
-
-def etf_latest_satisfies_publication_policy(path: Path, target_date: str) -> bool:
-    payload = load_json(path, None)
-    if not isinstance(payload, dict) or payload.get("date") != format_date(target_date):
-        return False
-    summary = payload.get("summary")
-    all_summary = summary.get("all") if isinstance(summary, dict) else None
-    if not isinstance(all_summary, dict):
-        return False
-    count = all_summary.get("count")
-    confirmed = all_summary.get("confirmedCount")
-    pending = all_summary.get("pendingCount")
-    if any(isinstance(value, bool) or not isinstance(value, int) for value in (count, confirmed, pending)):
-        return False
-    if count != 30 or not (0 < confirmed <= count) or pending != count - confirmed:
-        return False
-    expected_status = "confirmed" if confirmed == count else "partial"
-    return payload.get("status") == expected_status
 
 
 def archive_intraday_fallback(date: str) -> bool:
@@ -222,26 +202,7 @@ def main() -> None:
     else:
         print("\nSkipping full-A turnover top20 refresh for historical date.", flush=True)
 
-    if not radar_only:
-        try:
-            run_optional(["scripts/build_etf_fund_flow.py", "--date", args.date], ETF_FUND_FLOW)
-        except subprocess.CalledProcessError:
-            print(
-                "\nWARNING: ETF fund-flow latest file is not available yet; "
-                "continuing with existing data validation.",
-                file=sys.stderr,
-                flush=True,
-            )
-
     run_script(["scripts/validate_web_data.py"])
-
-    if not radar_only and not etf_latest_satisfies_publication_policy(
-        ETF_FUND_FLOW, args.date
-    ):
-        raise RuntimeError(
-            f"ETF fund-flow latest is not publishable for {format_date(args.date)}; "
-            "after-close refresh remains retryable"
-        )
 
     print("\nDaily data update complete.")
 
