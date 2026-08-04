@@ -42,10 +42,30 @@ def build_snapshot(source: dict[str, Any], config: dict[str, Any], target_date: 
     bond_yield = source.get("bondYield")
     bond_date = source.get("bondDate")
     stocks = []
-    for raw in source.get("stocks", []):
+    raw_stocks = list(source.get("stocks", []))
+    known_codes = {str(stock.get("code")) for stock in raw_stocks}
+    for watched in config.get("watchlistCatalog", []):
+        code = str(watched.get("code"))
+        if code and code not in known_codes:
+            raw_stocks.append({
+                "code": code,
+                "name": watched.get("name", code),
+                "industry": watched.get("industry", ""),
+                "listingDate": watched.get("listingDate", ""),
+                "price": None,
+                "avgTurnover20": None,
+                "dividends": [],
+                "dividendYears": [],
+                "ttmDividend": None,
+                "latestProfit": None,
+                "payoutRatio": None,
+                "qualityScore": None,
+            })
+    watchlist = set(config.get("watchlist", []))
+    for raw in raw_stocks:
         item = {**raw, "bondYield": raw.get("bondYield", bond_yield), "bondDate": raw.get("bondDate", bond_date)}
         evaluated = evaluate_stock(item, config, as_of)
-        evaluated["watchlisted"] = str(item.get("code")) in set(config.get("watchlist", []))
+        evaluated["watchlisted"] = str(item.get("code")) in watchlist
         stocks.append(evaluated)
     state_counts = Counter(stock["state"] for stock in stocks)
     pool_counts = Counter(stock["pool"] for stock in stocks)

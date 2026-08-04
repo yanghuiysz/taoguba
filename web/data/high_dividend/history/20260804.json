@@ -1,23 +1,23 @@
 {
   "version": 1,
   "date": "2026-08-04",
-  "generatedAt": "2026-08-04T18:25:59+08:00",
+  "generatedAt": "2026-08-04T19:01:38+08:00",
   "bond": {
     "yield": 0.017126,
     "date": "2026-08-04",
     "name": "中国10年期国债"
   },
   "summary": {
-    "total": 8,
+    "total": 17,
     "states": {
       "可关注": 2,
       "偏贵": 2,
       "风险观察": 3,
-      "数据不足": 1
+      "数据不足": 10
     },
     "pools": {
-      "stable": 6,
-      "cyclical": 2
+      "stable": 12,
+      "cyclical": 5
     }
   },
   "stocks": [
@@ -94,7 +94,7 @@
           "price": 29.23076923076923
         }
       ],
-      "watchlisted": false
+      "watchlisted": true
     },
     {
       "code": "600900",
@@ -168,7 +168,7 @@
           "price": 13.076923076923077
         }
       ],
-      "watchlisted": false
+      "watchlisted": true
     },
     {
       "code": "601088",
@@ -243,7 +243,7 @@
           "price": 28.000000000000004
         }
       ],
-      "watchlisted": false
+      "watchlisted": true
     },
     {
       "code": "601919",
@@ -469,6 +469,783 @@
         }
       ],
       "watchlisted": false
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "industry": "银行",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "600941",
+      "name": "中国移动",
+      "industry": "电信运营",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "601006",
+      "name": "大秦铁路",
+      "industry": "铁路运输",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "600377",
+      "name": "宁沪高速",
+      "industry": "高速公路",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "000429",
+      "name": "粤高速A",
+      "industry": "高速公路",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "600461",
+      "name": "洪城环境",
+      "industry": "公用事业",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "600938",
+      "name": "中国海油",
+      "industry": "石油石化",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "cyclical",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "周期池需要至少5年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "600028",
+      "name": "中国石化",
+      "industry": "石油石化",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "cyclical",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "周期池需要至少5年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
+    },
+    {
+      "code": "601225",
+      "name": "陕西煤业",
+      "industry": "煤炭",
+      "listingDate": "",
+      "price": null,
+      "avgTurnover20": null,
+      "dividends": [],
+      "dividendYears": [],
+      "ttmDividend": null,
+      "latestProfit": null,
+      "payoutRatio": null,
+      "qualityScore": null,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "cyclical",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格",
+        "缺少近20日平均成交额",
+        "缺少上市日期",
+        "缺少最近完整财年归母净利润",
+        "缺少近12个月每股分红"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近20日平均成交额"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少上市日期"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少最近完整财年归母净利润"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少近12个月每股分红"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少质量评分"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "周期池需要至少5年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3年分红记录"
+        },
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少至少3个有效分红年度"
+        }
+      ],
+      "watchlisted": true
     }
   ],
   "source": {

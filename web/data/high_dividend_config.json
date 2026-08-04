@@ -2,6 +2,36 @@
   "version": 1,
   "stableIndustries": ["银行", "保险", "电信运营", "公用事业", "水电", "高速公路"],
   "cyclicalIndustries": ["煤炭", "石油石化", "航运", "钢铁", "有色", "化工", "建材"],
-  "poolOverrides": {},
-  "watchlist": []
+  "poolOverrides": {
+    "600036": "stable",
+    "601939": "stable",
+    "600941": "stable",
+    "600900": "stable",
+    "601006": "stable",
+    "600377": "stable",
+    "000429": "stable",
+    "600461": "stable",
+    "601088": "cyclical",
+    "600938": "cyclical",
+    "600028": "cyclical",
+    "601225": "cyclical"
+  },
+  "watchlist": [
+    "600036", "601939", "600941", "600900", "601006", "600377",
+    "000429", "600461", "601088", "600938", "600028", "601225"
+  ],
+  "watchlistCatalog": [
+    {"code": "600036", "name": "招商银行", "industry": "银行"},
+    {"code": "601939", "name": "建设银行", "industry": "银行"},
+    {"code": "600941", "name": "中国移动", "industry": "电信运营"},
+    {"code": "600900", "name": "长江电力", "industry": "水电"},
+    {"code": "601006", "name": "大秦铁路", "industry": "铁路运输"},
+    {"code": "600377", "name": "宁沪高速", "industry": "高速公路"},
+    {"code": "000429", "name": "粤高速A", "industry": "高速公路"},
+    {"code": "600461", "name": "洪城环境", "industry": "公用事业"},
+    {"code": "601088", "name": "中国神华", "industry": "煤炭"},
+    {"code": "600938", "name": "中国海油", "industry": "石油石化"},
+    {"code": "600028", "name": "中国石化", "industry": "石油石化"},
+    {"code": "601225", "name": "陕西煤业", "industry": "煤炭"}
+  ]
 }
