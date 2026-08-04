@@ -751,7 +751,7 @@
   }
 
   function renderStockTable(board) {
-    const rows = sortedStockRows(board).slice(0, 12);
+    const rows = sortedStockRows(board);
     if (!rows.length) return '<div class="empty">暂无韧性股数据</div>';
     const hasFundFlow3 = rows.some((item) => safeNumber(item.mainNetInflow3) !== null);
     const hasFundFlow5 = rows.some((item) => safeNumber(item.mainNetInflow5) !== null);
@@ -807,7 +807,7 @@
       <section class="card section-card swing-panel">
         <div class="swing-section-title">
           <strong>板块内韧性股排行</strong>
-          <span>按 5 日成交额与 5 日涨幅综合排序，韧性分作为参考</span>
+          <span>展示板块全部有效成员；按 5 日成交额与 5 日涨幅综合排序</span>
         </div>
         ${renderStockTable(board)}
       </section>
