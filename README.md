@@ -15,6 +15,7 @@ http://127.0.0.1:8765/web/
 | 总入口 | `web/index.html` | 标签页容器，整合盘中雷达、操作记录、自定义板块 |
 | 盘中雷达 | `web/intraday.html` | 盘中机会、集合竞价预警、开盘后加速板块和核心股筛选 |
 | 自定义板块 | `web/custom.html` | 自定义板块维护、板块强度、波段状态和成员股观察 |
+| 高股息雷达 | `web/high-dividend.html` | 全A高股息筛选、稳定/周期分池、双锚估值和观察状态 |
 | 操作记录 | `web/trades.html` | 本地交易/观察记录 |
 
 ## 环境准备
@@ -206,6 +207,18 @@ python .\scripts\notify_intraday_radar.py --top 80
 | `auction_snapshots/raw/YYYYMMDD.json` | 集合竞价原始采样，默认不提交 |
 | `trades.json` | 操作记录页面数据 |
 | `positions.json` | 持仓辅助数据，主要给脚本维护使用 |
+
+### 高股息雷达
+
+高股息 Tab 将候选分为“稳定收息池”和“周期高息池”，使用固定收益率底线与中国 10 年期国债利差的双锚估值。页面只输出“可关注、等待、偏贵、风险观察、数据不足”，不输出买卖或仓位建议。
+
+开发环境可用固定夹具生成一份可复现快照：
+
+```powershell
+python .\scripts\build_high_dividend_data.py --date 2026-08-04 --source-json .\tests\fixtures\high_dividend_source.json
+```
+
+不带 `--source-json` 时，构建器尝试从 AKShare 获取全 A 股行情、分红概览和国债收益率。上游数据不可用或个股缺少逐年分红、财务明细时，系统保留缺失状态，不将缺失值写成 0。配置位于 `web/data/high_dividend_config.json`，可维护观察名单和人工分池覆盖；快照位于 `web/data/high_dividend/latest.json` 与 `web/data/high_dividend/history/`。
 
 ### 资金净流入
 

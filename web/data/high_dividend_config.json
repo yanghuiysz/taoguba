@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "stableIndustries": ["银行", "保险", "电信运营", "公用事业", "水电", "高速公路"],
+  "cyclicalIndustries": ["煤炭", "石油石化", "航运", "钢铁", "有色", "化工", "建材"],
+  "poolOverrides": {},
+  "watchlist": []
+}

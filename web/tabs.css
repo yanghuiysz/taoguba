@@ -89,6 +89,7 @@ iframe {
 
   .tabs {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
   }
 }

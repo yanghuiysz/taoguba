@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 import threading
 from datetime import datetime
 from http import HTTPStatus
@@ -16,6 +18,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "web/data/custom_boards_config.json"
 DATA_PATH = ROOT / "web/data/custom_boards.json"
+HIGH_DIVIDEND_CONFIG = ROOT / "web/data/high_dividend_config.json"
 BUILDER = ROOT / "scripts/build_custom_board_data.py"
 BUILD_LOCK = threading.Lock()
 USE_INTRADAY = True
@@ -42,7 +45,47 @@ def load_json(path: Path, fallback: dict[str, Any]) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    fd, temp_name = tempfile.mkstemp(prefix=path.name, suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+        os.replace(temp_name, path)
+    finally:
+        if os.path.exists(temp_name):
+            os.unlink(temp_name)
+
+
+def mutate_high_dividend_config(config: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
+    action = str(payload.get("action") or "").strip()
+    raw_code = str(payload.get("code") or "").strip()
+    if not re.fullmatch(r"(?:00|30|60|68)\d{4}", raw_code):
+        raise ValueError("请输入6位沪深股票代码")
+    code = raw_code
+    result = json.loads(json.dumps(config, ensure_ascii=False))
+    watchlist = result.setdefault("watchlist", [])
+    overrides = result.setdefault("poolOverrides", {})
+    if action == "add":
+        if code not in watchlist:
+            watchlist.append(code)
+        watchlist.sort()
+    elif action == "remove":
+        result["watchlist"] = [item for item in watchlist if item != code]
+    elif action == "set-pool":
+        pool = str(payload.get("pool") or "")
+        if pool not in {"stable", "cyclical", "unclassified"}:
+            raise ValueError("pool 必须是 stable、cyclical 或 unclassified")
+        overrides[code] = pool
+    else:
+        raise ValueError("action 必须是 add、remove 或 set-pool")
+    return result
+
+
+def update_high_dividend_config(payload: dict[str, Any]) -> dict[str, Any]:
+    with BUILD_LOCK:
+        config = load_json(HIGH_DIVIDEND_CONFIG, {"version": 1, "watchlist": [], "poolOverrides": {}})
+        config = mutate_high_dividend_config(config, payload)
+        write_json(HIGH_DIVIDEND_CONFIG, config)
+    return {"ok": True, "config": config}
 
 
 def find_board(config: dict[str, Any], board_code: str) -> dict[str, Any]:
@@ -162,11 +205,12 @@ class CustomBoardHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self) -> None:  # noqa: N802 - http.server API
-        if self.path != "/api/custom-boards/stock":
+        if self.path not in {"/api/custom-boards/stock", "/api/high-dividend/config"}:
             self.send_error(HTTPStatus.NOT_FOUND)
             return
         try:
-            result = update_stock(self.read_json())
+            payload = self.read_json()
+            result = update_high_dividend_config(payload) if self.path == "/api/high-dividend/config" else update_stock(payload)
         except subprocess.CalledProcessError as exc:
             self.send_json(
                 HTTPStatus.INTERNAL_SERVER_ERROR,

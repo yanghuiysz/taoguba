@@ -1,0 +1,15 @@
+{
+  "date": "2026-08-04",
+  "bondYield": 0.017126,
+  "bondDate": "2026-08-04",
+  "stocks": [
+    {"code":"600036","name":"招商银行","industry":"银行","price":30,"listingDate":"2002-04-09","avgTurnover20":900000000,"dividends":[1.52,1.68,1.75,1.90,2.00],"dividendYears":[2021,2022,2023,2024,2025],"ttmDividend":2.0,"latestProfit":100,"payoutRatio":0.55,"qualityScore":84},
+    {"code":"600900","name":"长江电力","industry":"公用事业","price":27,"listingDate":"2003-11-18","avgTurnover20":800000000,"dividends":[0.68,0.72,0.82,0.85,0.90],"dividendYears":[2021,2022,2023,2024,2025],"ttmDividend":0.9,"latestProfit":80,"payoutRatio":0.70,"qualityScore":88},
+    {"code":"601088","name":"中国神华","industry":"煤炭","price":31,"listingDate":"2007-10-09","avgTurnover20":700000000,"dividends":[1.8,2.5,2.55,2.26,2.10],"dividendYears":[2021,2022,2023,2024,2025],"ttmDividend":2.1,"latestProfit":90,"payoutRatio":0.72,"qualityScore":78},
+    {"code":"601919","name":"中远海控","industry":"航运","price":15,"listingDate":"2007-06-26","avgTurnover20":600000000,"dividends":[0.0,2.01,1.39,0.75,0.52],"dividendYears":[2022,2023,2024,2025],"ttmDividend":0.52,"latestProfit":40,"payoutRatio":0.50,"qualityScore":68},
+    {"code":"600001","name":"ST样本","industry":"银行","price":4,"listingDate":"2000-01-01","avgTurnover20":80000000,"dividends":[0.3,0.3,0.3],"dividendYears":[2023,2024,2025],"ttmDividend":0.3,"latestProfit":1,"qualityScore":50},
+    {"code":"600002","name":"低流动性","industry":"公用事业","price":5,"listingDate":"2000-01-01","avgTurnover20":10000000,"dividends":[0.3,0.3,0.3],"dividendYears":[2023,2024,2025],"ttmDividend":0.3,"latestProfit":1,"qualityScore":70},
+    {"code":"600003","name":"新股样本","industry":"公用事业","price":10,"listingDate":"2025-01-01","avgTurnover20":80000000,"dividends":[0.5,0.5,0.5],"dividendYears":[2023,2024,2025],"ttmDividend":0.5,"latestProfit":1,"qualityScore":70},
+    {"code":"600004","name":"数据缺失","industry":"银行","price":null,"listingDate":"2000-01-01","avgTurnover20":80000000,"dividends":[0.5,0.5,0.5],"dividendYears":[2023,2024,2025],"ttmDividend":0.5,"latestProfit":1,"qualityScore":70}
+  ]
+}

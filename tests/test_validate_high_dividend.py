@@ -1,0 +1,38 @@
+import copy
+import json
+import unittest
+from pathlib import Path
+
+from scripts.validate_web_data import validate_high_dividend
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class ValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.payload = json.loads((ROOT / "web/data/high_dividend/latest.json").read_text(encoding="utf-8"))
+
+    def test_valid_snapshot(self):
+        result = validate_high_dividend(self.payload)
+        self.assertEqual(result["stocks"], 8)
+
+    def test_rejects_duplicate_code_and_invalid_enum(self):
+        duplicate = copy.deepcopy(self.payload)
+        duplicate["stocks"].append(copy.deepcopy(duplicate["stocks"][0]))
+        with self.assertRaises(ValueError):
+            validate_high_dividend(duplicate)
+        invalid = copy.deepcopy(self.payload)
+        invalid["stocks"][0]["state"] = "买入"
+        with self.assertRaises(ValueError):
+            validate_high_dividend(invalid)
+
+    def test_rejects_empty_reasons(self):
+        invalid = copy.deepcopy(self.payload)
+        invalid["stocks"][0]["reasons"] = []
+        with self.assertRaises(ValueError):
+            validate_high_dividend(invalid)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -15,6 +15,7 @@ PYTHON = sys.executable
 
 CUSTOM_DASHBOARD = ROOT / "web/data/custom_boards.json"
 FULL_A_TURNOVER = ROOT / "web/data/full_a_turnover_top20.json"
+HIGH_DIVIDEND = ROOT / "web/data/high_dividend/latest.json"
 CUSTOM_HISTORY_DIR = ROOT / "web/data/custom_boards/history"
 CUSTOM_INTRADAY_DIR = ROOT / "web/data/custom_boards/intraday"
 CUSTOM_HISTORY_INDEX = ROOT / "web/data/custom_boards/index.json"
@@ -201,6 +202,13 @@ def main() -> None:
             run_optional(["scripts/build_full_a_turnover_top20.py", "--date", args.date], FULL_A_TURNOVER)
     else:
         print("\nSkipping full-A turnover top20 refresh for historical date.", flush=True)
+
+    if not radar_only:
+        dividend_args = ["scripts/build_high_dividend_data.py", "--date", format_date(args.date)]
+        if args.strict_custom:
+            run_script(dividend_args)
+        else:
+            run_optional(dividend_args, HIGH_DIVIDEND)
 
     run_script(["scripts/validate_web_data.py"])
 

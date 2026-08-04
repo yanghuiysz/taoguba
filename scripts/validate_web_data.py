@@ -14,6 +14,9 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 WEB_DATA = ROOT / "web/data"
 FULL_A_TURNOVER = WEB_DATA / "full_a_turnover_top20.json"
+HIGH_DIVIDEND = WEB_DATA / "high_dividend/latest.json"
+HIGH_DIVIDEND_STATES = {"可关注", "等待", "偏贵", "风险观察", "数据不足"}
+HIGH_DIVIDEND_POOLS = {"stable", "cyclical", "unclassified"}
 
 
 def load_json(path: Path) -> Any:
@@ -144,6 +147,27 @@ def validate_full_a_turnover(web_data: Path) -> dict[str, Any]:
     }
 
 
+def validate_high_dividend(data: dict[str, Any]) -> dict[str, Any]:
+    require(data.get("version") == 1, "high-dividend version must be 1")
+    require(bool(data.get("date")), "high-dividend date is required")
+    stocks = data.get("stocks")
+    require(isinstance(stocks, list), "high-dividend stocks must be a list")
+    seen: set[str] = set()
+    for index, stock in enumerate(stocks, start=1):
+        code = str(stock.get("code") or "")
+        require(code.isdigit() and len(code) == 6, f"high-dividend row {index} invalid code")
+        require(code not in seen, f"high-dividend duplicate code: {code}")
+        seen.add(code)
+        require(stock.get("pool") in HIGH_DIVIDEND_POOLS, f"high-dividend {code} invalid pool")
+        require(stock.get("state") in HIGH_DIVIDEND_STATES, f"high-dividend {code} invalid state")
+        reasons = stock.get("reasons")
+        require(isinstance(reasons, list) and bool(reasons), f"high-dividend {code} reasons required")
+        for key in ("currentYield", "targetYield"):
+            value = number_or_none(stock.get(key))
+            require(value is None or 0 <= value <= 1, f"high-dividend {code} invalid {key}")
+    return {"date": data.get("date"), "stocks": len(stocks)}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate web dashboard JSON files required by the frontend.")
     parser.add_argument("--web-data", type=Path, default=WEB_DATA)
@@ -151,6 +175,8 @@ def main() -> None:
 
     custom = validate_custom(args.web_data)
     full_a = validate_full_a_turnover(args.web_data)
+    high_dividend_path = args.web_data / "high_dividend/latest.json"
+    high_dividend = validate_high_dividend(load_json(high_dividend_path)) if high_dividend_path.exists() else {"date": "missing", "stocks": 0}
     print(
         "Custom board data OK: date={date}, boards={boards}, configBoards={configBoards}, membershipOverrides={membershipOverrides}".format(
             **custom
@@ -160,6 +186,7 @@ def main() -> None:
         print("Full-A turnover data skipped: web/data/full_a_turnover_top20.json not generated yet")
     else:
         print("Full-A turnover data OK: date={date}, stocks={stocks}".format(**full_a))
+    print("High-dividend data OK: date={date}, stocks={stocks}".format(**high_dividend))
 
 
 if __name__ == "__main__":

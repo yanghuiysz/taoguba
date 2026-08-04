@@ -1,0 +1,480 @@
+{
+  "version": 1,
+  "date": "2026-08-04",
+  "generatedAt": "2026-08-04T18:25:59+08:00",
+  "bond": {
+    "yield": 0.017126,
+    "date": "2026-08-04",
+    "name": "中国10年期国债"
+  },
+  "summary": {
+    "total": 8,
+    "states": {
+      "可关注": 2,
+      "偏贵": 2,
+      "风险观察": 3,
+      "数据不足": 1
+    },
+    "pools": {
+      "stable": 6,
+      "cyclical": 2
+    }
+  },
+  "stocks": [
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "industry": "银行",
+      "price": 30,
+      "listingDate": "2002-04-09",
+      "avgTurnover20": 900000000,
+      "dividends": [
+        1.52,
+        1.68,
+        1.75,
+        1.9,
+        2.0
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 2.0,
+      "latestProfit": 100,
+      "payoutRatio": 0.55,
+      "qualityScore": 84,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "可关注",
+      "reasons": [
+        "质量等级达到A/B",
+        "当前股息率达到双锚目标",
+        "价格不高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 84.0,
+          "threshold": 70,
+          "reason": "质量分为84"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.06666666666666667,
+          "threshold": 0.05,
+          "reason": "当前6.67%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 1.9,
+      "currentYield": 0.06666666666666667,
+      "targetYield": 0.05,
+      "attentionPrice": 37.99999999999999,
+      "distanceToAttention": -0.21052631578947356,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 37.99999999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 34.54545454545455
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 31.666666666666664
+        },
+        {
+          "yield": 0.065,
+          "price": 29.23076923076923
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "industry": "公用事业",
+      "price": 27,
+      "listingDate": "2003-11-18",
+      "avgTurnover20": 800000000,
+      "dividends": [
+        0.68,
+        0.72,
+        0.82,
+        0.85,
+        0.9
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.9,
+      "latestProfit": 80,
+      "payoutRatio": 0.7,
+      "qualityScore": 88,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 88.0,
+          "threshold": 70,
+          "reason": "质量分为88"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03333333333333333,
+          "threshold": 0.05,
+          "reason": "当前3.33%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.85,
+      "currentYield": 0.03333333333333333,
+      "targetYield": 0.05,
+      "attentionPrice": 17.0,
+      "distanceToAttention": 0.588235294117647,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 17.0
+        },
+        {
+          "yield": 0.055,
+          "price": 15.454545454545453
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 14.166666666666664
+        },
+        {
+          "yield": 0.065,
+          "price": 13.076923076923077
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "601088",
+      "name": "中国神华",
+      "industry": "煤炭",
+      "price": 31,
+      "listingDate": "2007-10-09",
+      "avgTurnover20": 700000000,
+      "dividends": [
+        1.8,
+        2.5,
+        2.55,
+        2.26,
+        2.1
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 2.1,
+      "latestProfit": 90,
+      "payoutRatio": 0.72,
+      "qualityScore": 78,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "cyclical",
+      "state": "可关注",
+      "reasons": [
+        "质量等级达到A/B",
+        "当前股息率达到双锚目标",
+        "价格不高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 78.0,
+          "threshold": 70,
+          "reason": "质量分为78"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.06774193548387097,
+          "threshold": 0.06,
+          "reason": "当前6.77%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 2.1,
+      "currentYield": 0.06774193548387097,
+      "targetYield": 0.06,
+      "attentionPrice": 35.0,
+      "distanceToAttention": -0.11428571428571432,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 35.0
+        },
+        {
+          "yield": 0.065,
+          "price": 32.30769230769231
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 30.000000000000004
+        },
+        {
+          "yield": 0.075,
+          "price": 28.000000000000004
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "601919",
+      "name": "中远海控",
+      "industry": "航运",
+      "price": 15,
+      "listingDate": "2007-06-26",
+      "avgTurnover20": 600000000,
+      "dividends": [
+        0.0,
+        2.01,
+        1.39,
+        0.75,
+        0.52
+      ],
+      "dividendYears": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.52,
+      "latestProfit": 40,
+      "payoutRatio": 0.5,
+      "qualityScore": 68,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "cyclical",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 68.0,
+          "threshold": 70,
+          "reason": "质量分为68"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.034666666666666665,
+          "threshold": 0.06,
+          "reason": "当前3.47%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 0.52,
+      "currentYield": 0.034666666666666665,
+      "targetYield": 0.06,
+      "attentionPrice": 8.666666666666668,
+      "distanceToAttention": 0.7307692307692306,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 8.666666666666668
+        },
+        {
+          "yield": 0.065,
+          "price": 8.0
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 7.42857142857143
+        },
+        {
+          "yield": 0.075,
+          "price": 6.933333333333334
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "600001",
+      "name": "ST样本",
+      "industry": "银行",
+      "price": 4,
+      "listingDate": "2000-01-01",
+      "avgTurnover20": 80000000,
+      "dividends": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "dividendYears": [
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.3,
+      "latestProfit": 1,
+      "qualityScore": 50,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "风险观察",
+      "reasons": [
+        "属于ST或退市风险股票"
+      ],
+      "checks": [
+        {
+          "status": "fail",
+          "label": "质量门槛",
+          "value": null,
+          "threshold": null,
+          "reason": "属于ST或退市风险股票"
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "600002",
+      "name": "低流动性",
+      "industry": "公用事业",
+      "price": 5,
+      "listingDate": "2000-01-01",
+      "avgTurnover20": 10000000,
+      "dividends": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "dividendYears": [
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.3,
+      "latestProfit": 1,
+      "qualityScore": 70,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "风险观察",
+      "reasons": [
+        "近20日平均成交额低于5000万元"
+      ],
+      "checks": [
+        {
+          "status": "fail",
+          "label": "质量门槛",
+          "value": null,
+          "threshold": null,
+          "reason": "近20日平均成交额低于5000万元"
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "600003",
+      "name": "新股样本",
+      "industry": "公用事业",
+      "price": 10,
+      "listingDate": "2025-01-01",
+      "avgTurnover20": 80000000,
+      "dividends": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "dividendYears": [
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.5,
+      "latestProfit": 1,
+      "qualityScore": 70,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "风险观察",
+      "reasons": [
+        "上市不足3年或上市日期缺失"
+      ],
+      "checks": [
+        {
+          "status": "fail",
+          "label": "质量门槛",
+          "value": null,
+          "threshold": null,
+          "reason": "上市不足3年或上市日期缺失"
+        }
+      ],
+      "watchlisted": false
+    },
+    {
+      "code": "600004",
+      "name": "数据缺失",
+      "industry": "银行",
+      "price": null,
+      "listingDate": "2000-01-01",
+      "avgTurnover20": 80000000,
+      "dividends": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "dividendYears": [
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.5,
+      "latestProfit": 1,
+      "qualityScore": 70,
+      "bondYield": 0.017126,
+      "bondDate": "2026-08-04",
+      "pool": "stable",
+      "state": "数据不足",
+      "reasons": [
+        "缺少有效价格"
+      ],
+      "checks": [
+        {
+          "status": "missing",
+          "label": "数据完整性",
+          "value": null,
+          "threshold": null,
+          "reason": "缺少有效价格"
+        }
+      ],
+      "watchlisted": false
+    }
+  ],
+  "source": {
+    "kind": "fixture",
+    "financialAsOf": "2026-08-04",
+    "dividendAsOf": "2026-08-04"
+  },
+  "errors": []
+}
