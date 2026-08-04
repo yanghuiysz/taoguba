@@ -5,6 +5,7 @@ __pycache__/
 .idea/
 .codebuddy/
 .workbuddy/
+.worktrees/
 .codex-run/
 .codex-http-*.log
 .codex-serve-*.log
