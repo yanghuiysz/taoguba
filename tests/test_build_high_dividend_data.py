@@ -13,6 +13,7 @@ from scripts.build_high_dividend_data import (
     parse_financial_quality,
     parse_valuation,
     retry_fetch,
+    refresh_quotes_snapshot,
     snapshot_is_usable,
 )
 
@@ -132,6 +133,19 @@ class BuilderTests(unittest.TestCase):
         self.assertIn(guide["signal"], {"低吸观察", "持有等待", "高抛观察"})
         self.assertIsNotNone(guide["ma20"])
         self.assertIsNotNone(guide["ma60"])
+
+    def test_quote_refresh_preserves_fundamentals_and_recalculates_yield(self):
+        source = json.loads((ROOT / "tests/fixtures/high_dividend_source.json").read_text(encoding="utf-8"))
+        config = json.loads((ROOT / "web/data/high_dividend_config.json").read_text(encoding="utf-8"))
+        previous = build_snapshot(source, config, "2026-08-04")
+        before = next(stock for stock in previous["stocks"] if stock["code"] == "600036")
+        before["peTtm"] = 6.5
+        refreshed = refresh_quotes_snapshot(previous, {"600036": {"price": 40.0, "turnover": 1_000_000_000}}, config, "2026-08-05")
+        after = next(stock for stock in refreshed["stocks"] if stock["code"] == "600036")
+        self.assertEqual(after["price"], 40.0)
+        self.assertEqual(after["peTtm"], 6.5)
+        self.assertEqual(after["currentYield"], 0.05)
+        self.assertEqual(refreshed["source"]["quoteAsOf"], "2026-08-05")
 
 
 if __name__ == "__main__":

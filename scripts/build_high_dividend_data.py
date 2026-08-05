@@ -373,6 +373,51 @@ def fetch_live_source(target_date: str, config: dict[str, Any] | None = None) ->
     }
 
 
+def fetch_live_quotes() -> dict[str, dict[str, float | None]]:
+    import akshare as ak
+
+    try:
+        spot = retry_fetch(lambda: ak.stock_zh_a_spot())
+    except Exception:
+        spot = retry_fetch(lambda: ak.stock_zh_a_spot_em())
+    quotes: dict[str, dict[str, float | None]] = {}
+    for _, row in spot.iterrows():
+        code_match = re.search(r"(\d{6})$", str(row.iloc[0]))
+        if not code_match:
+            continue
+        quotes[code_match.group(1)] = {
+            "price": _clean_number(row.iloc[2]) if len(row) > 2 else None,
+            "turnover": _clean_number(row.iloc[12]) if len(row) > 12 else None,
+        }
+    return quotes
+
+
+def refresh_quotes_snapshot(previous: dict[str, Any], quotes: dict[str, dict[str, float | None]], config: dict[str, Any], target_date: str) -> dict[str, Any]:
+    stocks = []
+    missing_codes = []
+    for stock in previous.get("stocks", []):
+        quote = quotes.get(str(stock.get("code")))
+        updated = dict(stock)
+        if quote and quote.get("price") is not None:
+            updated["price"] = quote["price"]
+            if quote.get("turnover") is not None:
+                updated["avgTurnover20"] = quote["turnover"]
+        else:
+            missing_codes.append(str(stock.get("code")))
+        stocks.append(updated)
+    source_meta = dict(previous.get("source") or {})
+    source_meta["quoteAsOf"] = target_date
+    source_meta["note"] = "轻量行情更新；财务、分红、估值历史与技术区间沿用最近完整快照"
+    source = {
+        "bondYield": (previous.get("bond") or {}).get("yield"),
+        "bondDate": (previous.get("bond") or {}).get("date"),
+        "stocks": stocks,
+        "source": source_meta,
+        "errors": [f"以下股票未取得最新报价，保留上一价格: {', '.join(missing_codes)}"] if missing_codes else [],
+    }
+    return build_snapshot(source, config, target_date)
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build high-dividend radar snapshot")
     parser.add_argument("--date", default=date.today().isoformat())
@@ -380,6 +425,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--quotes-only", action="store_true", help="Refresh latest prices without refetching fundamentals or valuation history")
     return parser.parse_args(argv)
 
 
@@ -388,8 +434,13 @@ def main(argv: list[str] | None = None) -> int:
     previous = args.output.read_bytes() if args.output.exists() else None
     try:
         config = load_json(args.config)
-        source = load_json(args.source_json) if args.source_json else fetch_live_source(args.date, config)
-        snapshot = build_snapshot(source, config, args.date)
+        if args.quotes_only:
+            if not args.output.exists():
+                raise RuntimeError("轻量行情更新需要已有完整快照")
+            snapshot = refresh_quotes_snapshot(load_json(args.output), fetch_live_quotes(), config, args.date)
+        else:
+            source = load_json(args.source_json) if args.source_json else fetch_live_source(args.date, config)
+            snapshot = build_snapshot(source, config, args.date)
         if not args.source_json and not snapshot_is_usable(snapshot):
             raise RuntimeError("实时数据缺少足够的逐年分红和财务明细，拒绝覆盖现有有效快照")
         atomic_write_json(args.output, snapshot)
