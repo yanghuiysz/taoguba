@@ -165,6 +165,17 @@ def validate_high_dividend(data: dict[str, Any]) -> dict[str, Any]:
         for key in ("currentYield", "targetYield"):
             value = number_or_none(stock.get(key))
             require(value is None or 0 <= value <= 1, f"high-dividend {code} invalid {key}")
+        pe = number_or_none(stock.get("peTtm"))
+        pb = number_or_none(stock.get("pb"))
+        fit_score = number_or_none(stock.get("fitScore"))
+        require(pe is not None, f"high-dividend {code} peTtm required")
+        require(pb is not None and pb > 0, f"high-dividend {code} pb required")
+        require(fit_score is not None and 0 <= fit_score <= 100, f"high-dividend {code} invalid fitScore")
+        guide = stock.get("technicalGuide")
+        require(isinstance(guide, dict), f"high-dividend {code} technicalGuide required")
+        require(guide.get("signal") in {"低吸观察", "持有等待", "高抛观察"}, f"high-dividend {code} invalid technical signal")
+        for key in ("support20", "resistance20", "ma20", "rsi14"):
+            require(number_or_none(guide.get(key)) is not None, f"high-dividend {code} technical {key} required")
     return {"date": data.get("date"), "stocks": len(stocks)}
 
 

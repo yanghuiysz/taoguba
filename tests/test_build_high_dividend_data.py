@@ -7,9 +7,11 @@ import pandas as pd
 
 from scripts.build_high_dividend_data import (
     build_snapshot,
+    calculate_technical_guide,
     main,
     parse_dividend_history,
     parse_financial_quality,
+    parse_valuation,
     retry_fetch,
     snapshot_is_usable,
 )
@@ -97,6 +99,29 @@ class BuilderTests(unittest.TestCase):
             return "ok"
         self.assertEqual(retry_fetch(flaky, attempts=3), "ok")
         self.assertEqual(len(attempts), 3)
+
+    def test_valuation_parser_uses_latest_available_value(self):
+        frame = pd.DataFrame([
+            {"date": "2026-08-03", "value": 12.4},
+            {"date": "2026-08-04", "value": 11.8},
+        ])
+        self.assertEqual(parse_valuation(frame), {"value": 11.8, "date": "2026-08-04"})
+
+    def test_technical_guide_returns_price_zone_and_risk_controls(self):
+        closes = [10 + index * 0.05 for index in range(60)]
+        frame = pd.DataFrame({
+            "date": pd.date_range("2026-05-01", periods=60),
+            "close": closes,
+            "high": [value + 0.2 for value in closes],
+            "low": [value - 0.2 for value in closes],
+            "amount": [100_000_000] * 60,
+        })
+        guide = calculate_technical_guide(frame)
+        self.assertEqual(guide["asOf"], "2026-06-29")
+        self.assertGreater(guide["resistance20"], guide["support20"])
+        self.assertIn(guide["signal"], {"低吸观察", "持有等待", "高抛观察"})
+        self.assertIsNotNone(guide["ma20"])
+        self.assertIsNotNone(guide["ma60"])
 
 
 if __name__ == "__main__":

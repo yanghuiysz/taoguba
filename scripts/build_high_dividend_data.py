@@ -67,7 +67,7 @@ def build_snapshot(source: dict[str, Any], config: dict[str, Any], target_date: 
         item = {**raw, "bondYield": raw.get("bondYield", bond_yield), "bondDate": raw.get("bondDate", bond_date)}
         evaluated = evaluate_stock(item, config, as_of)
         evaluated["watchlisted"] = str(item.get("code")) in watchlist
-        stocks.append(evaluated)
+        stocks.append(add_fit_score(evaluated))
     state_counts = Counter(stock["state"] for stock in stocks)
     pool_counts = Counter(stock["pool"] for stock in stocks)
     return {
@@ -142,6 +142,76 @@ def retry_fetch(operation: Any, attempts: int = 3) -> Any:
             last_error = exc
     assert last_error is not None
     raise last_error
+
+
+def parse_valuation(frame: Any) -> dict[str, Any]:
+    if frame is None or getattr(frame, "empty", True):
+        return {"value": None, "date": None}
+    clean = frame.dropna(subset=["value"])
+    if clean.empty:
+        return {"value": None, "date": None}
+    row = clean.sort_values("date").iloc[-1]
+    return {"value": _clean_number(row.get("value")), "date": str(row.get("date"))[:10]}
+
+
+def calculate_technical_guide(frame: Any) -> dict[str, Any]:
+    if frame is None or getattr(frame, "empty", True) or len(frame) < 20:
+        return {"signal": "数据不足", "asOf": None}
+    data = frame.sort_values("date").copy()
+    close = data["close"].astype(float)
+    high = data["high"].astype(float)
+    low = data["low"].astype(float)
+    recent = data.tail(20)
+    delta = close.diff()
+    gains = delta.clip(lower=0).tail(14).mean()
+    losses = -delta.clip(upper=0).tail(14).mean()
+    rsi = 100.0 if losses == 0 else 100.0 - 100.0 / (1.0 + gains / losses)
+    last_close = float(close.iloc[-1])
+    support = float(recent["low"].min())
+    resistance = float(recent["high"].max())
+    ma20 = float(close.tail(20).mean())
+    ma60 = float(close.tail(60).mean()) if len(close) >= 60 else None
+    volatility = float(((high - low) / close).tail(20).mean())
+    if last_close <= support * 1.03 and rsi <= 45:
+        signal = "低吸观察"
+    elif last_close >= resistance * 0.97 or rsi >= 68:
+        signal = "高抛观察"
+    else:
+        signal = "持有等待"
+    return {
+        "signal": signal,
+        "asOf": str(data.iloc[-1]["date"])[:10],
+        "close": last_close,
+        "support20": support,
+        "resistance20": resistance,
+        "ma20": ma20,
+        "ma60": ma60,
+        "rsi14": float(rsi),
+        "volatility20": volatility,
+        "avgTurnover20": _clean_number(recent["amount"].mean()) if "amount" in recent else None,
+    }
+
+
+def add_fit_score(stock: dict[str, Any]) -> dict[str, Any]:
+    quality = _clean_number(stock.get("qualityScore")) or 0
+    current_yield = _clean_number(stock.get("currentYield")) or 0
+    target = _clean_number(stock.get("targetYield")) or 0.05
+    pe = _clean_number(stock.get("peTtm"))
+    yield_score = min(30.0, max(0.0, current_yield / target * 30.0))
+    if pe is None or pe <= 0:
+        valuation_score = 6.0
+    elif pe <= 12:
+        valuation_score = 20.0
+    elif pe <= 20:
+        valuation_score = 15.0
+    elif pe <= 30:
+        valuation_score = 8.0
+    else:
+        valuation_score = 2.0
+    technical_score = {"低吸观察": 10.0, "持有等待": 6.0, "高抛观察": 3.0}.get((stock.get("technicalGuide") or {}).get("signal"), 0.0)
+    score = round(min(100.0, quality * 0.4 + yield_score + valuation_score + technical_score), 1)
+    label = "优先研究" if score >= 75 and stock.get("state") != "偏贵" else "耐心等待" if score >= 60 else "谨慎观察"
+    return {**stock, "fitScore": score, "fitLabel": label}
 
 
 def _fetch_legacy_broad_market_source(target_date: str) -> dict[str, Any]:
@@ -238,6 +308,28 @@ def fetch_live_source(target_date: str, config: dict[str, Any] | None = None) ->
         except Exception as exc:
             errors.append(f"{code} 财务数据不可用: {exc}")
             financial = {"latestProfit": None, "payoutRatio": None, "qualityScore": None}
+        try:
+            pe_result = parse_valuation(retry_fetch(lambda: ak.stock_zh_valuation_baidu(code, "市盈率(TTM)", "近一年")))
+            pb_result = parse_valuation(retry_fetch(lambda: ak.stock_zh_valuation_baidu(code, "市净率", "近一年")))
+        except Exception as exc:
+            errors.append(f"{code} 估值数据不可用: {exc}")
+            pe_result, pb_result = {"value": None, "date": None}, {"value": None, "date": None}
+        try:
+            market_code = ("sh" if code.startswith("6") else "sz") + code
+            history = retry_fetch(lambda: ak.stock_zh_a_daily(
+                symbol=market_code,
+                start_date=(as_of - timedelta(days=130)).strftime("%Y%m%d"),
+                end_date=as_of.strftime("%Y%m%d"),
+                adjust="qfq",
+            ))
+            technical = calculate_technical_guide(history)
+            if price is None and technical.get("close") is not None:
+                price = technical["close"]
+            if technical.get("avgTurnover20") is not None:
+                turnover = technical["avgTurnover20"]
+        except Exception as exc:
+            errors.append(f"{code} 技术数据不可用: {exc}")
+            technical = {"signal": "数据不足", "asOf": None}
         rows.append({
             "code": code,
             "name": watched["name"],
@@ -248,6 +340,10 @@ def fetch_live_source(target_date: str, config: dict[str, Any] | None = None) ->
             "dividends": dividends,
             "dividendYears": dividend_years,
             "ttmDividend": dividends[-1] if dividends else None,
+            "peTtm": pe_result["value"],
+            "pb": pb_result["value"],
+            "valuationDate": pe_result["date"] or pb_result["date"],
+            "technicalGuide": technical,
             **financial,
         })
     return {

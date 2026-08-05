@@ -3,38 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>高股息雷达</title>
-  <link rel="stylesheet" href="./high-dividend.css?v=20260804-v1">
+  <title>高股息决策雷达</title>
+  <link rel="stylesheet" href="./high-dividend.css?v=20260805-v2">
 </head>
 <body>
   <main class="dividend-shell">
     <header class="hero">
-      <div><p class="eyebrow">DIVIDEND RADAR · 全A自动筛选</p><h1>先确认分红能力，再等待合适收益率。</h1><p id="data-note" class="muted">正在读取快照…</p></div>
+      <div><p class="eyebrow">DIVIDEND · VALUATION · TRADING ZONE</p><h1>先选好公司，再等好价格。</h1><p id="data-note" class="muted">正在读取快照…</p></div>
       <div id="bond-card" class="bond-card"></div>
     </header>
     <section id="summary" class="summary-grid" aria-label="状态概览"></section>
     <section class="toolbar">
       <div class="pool-tabs" role="tablist"><button class="pool-tab active" data-pool="stable">稳定收息池</button><button class="pool-tab" data-pool="cyclical">周期高息池</button></div>
-      <div class="filters">
-        <input id="search-input" type="search" placeholder="搜索名称或代码" aria-label="搜索股票">
-        <select id="status-filter" aria-label="观察状态"><option value="">全部状态</option></select>
-        <select id="industry-filter" aria-label="所属行业"><option value="">全部行业</option></select>
-        <label class="watch-toggle"><input id="watch-only" type="checkbox"> 只看观察名单</label>
-      </div>
+      <div class="filters"><input id="search-input" type="search" placeholder="搜索名称或代码" aria-label="搜索股票"><select id="status-filter" aria-label="观察状态"></select><select id="industry-filter" aria-label="所属行业"></select><label class="watch-toggle"><input id="watch-only" type="checkbox"> 只看观察名单</label></div>
     </section>
     <section class="content-grid">
       <div class="radar-panel">
-        <div class="panel-head"><h2>候选雷达</h2><span id="result-count" class="muted"></span></div>
-        <div class="table-wrap"><table><thead><tr><th data-sort="name">标的</th><th data-sort="currentYield">当前股息率</th><th data-sort="targetYield">目标股息率</th><th data-sort="qualityScore">质量</th><th data-sort="distanceToAttention">距关注价</th><th data-sort="state">观察状态</th></tr></thead><tbody id="stock-rows"></tbody></table></div>
+        <div class="panel-head"><div><h2>候选决策台</h2><small class="muted">综合分结合质量、股息、PE 与技术位置</small></div><span id="result-count" class="muted"></span></div>
+        <div class="table-wrap"><table><thead><tr><th data-sort="name">标的</th><th data-sort="currentYield">股息率</th><th data-sort="peTtm">PE TTM</th><th data-sort="fitScore">综合适配</th><th data-sort="tSignal">做T位置</th><th data-sort="state">观察状态</th></tr></thead><tbody id="stock-rows"></tbody></table></div>
         <div id="stock-cards" class="stock-cards"></div>
       </div>
-      <aside id="stock-detail" class="detail-panel" aria-live="polite">
-        <div class="empty-detail"><p>选择一只股票</p><span>查看质量、分红历史、双锚估值与判断原因。</span></div>
-        <section class="detail-section"><h3>质量检查</h3></section>
-        <section class="detail-section"><h3>股息率价格阶梯</h3></section>
-      </aside>
+      <aside id="stock-detail" class="detail-panel" aria-live="polite"><div class="empty-detail"><p>选择一只股票</p><span>查看股息、估值、质量和做 T 条件。</span></div></aside>
     </section>
   </main>
-  <script src="./high-dividend.js?v=20260804-v1"></script>
+  <script src="./high-dividend.js?v=20260805-v2"></script>
 </body>
 </html>

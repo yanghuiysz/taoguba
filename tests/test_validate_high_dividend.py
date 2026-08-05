@@ -33,6 +33,13 @@ class ValidationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_high_dividend(invalid)
 
+    def test_rejects_missing_valuation_or_trading_guide(self):
+        for field in ["peTtm", "pb", "fitScore", "technicalGuide"]:
+            invalid = copy.deepcopy(self.payload)
+            invalid["stocks"][0].pop(field, None)
+            with self.assertRaises(ValueError, msg=field):
+                validate_high_dividend(invalid)
+
 
 if __name__ == "__main__":
     unittest.main()
