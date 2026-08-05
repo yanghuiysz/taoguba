@@ -7,6 +7,7 @@ const el = (id) => document.getElementById(id);
 const pct = (value) => value == null ? "—" : `${(Number(value) * 100).toFixed(2)}%`;
 const money = (value) => value == null ? "—" : `¥${Number(value).toFixed(2)}`;
 const number = (value, digits = 1) => value == null ? "—" : Number(value).toFixed(digits);
+const signedPct = (value) => value == null ? "—" : `${Number(value) > 0 ? "+" : ""}${(Number(value) * 100).toFixed(1)}%`;
 const safe = (value, fallback = "—") => value == null || value === "" ? fallback : String(value);
 
 function statePill(state) { return `<span class="state-pill state-${state}">${state}</span>`; }
@@ -38,10 +39,10 @@ function renderList() {
   el("result-count").textContent = `${stocks.length} 只`;
   el("stock-rows").innerHTML = stocks.length ? stocks.map(s => `<tr data-code="${s.code}" class="${selectedCode === s.code ? "selected" : ""}">
     <td class="name-cell"><b>${safe(s.name)}</b><small>${s.code} · ${safe(s.industry)}</small></td>
-    <td>${pct(s.currentYield)}</td><td>${number(s.peTtm)}</td><td><b class="fit-score">${number(s.fitScore)}</b><small class="fit-label">${safe(s.fitLabel)}</small></td>
+    <td class="yield-compare"><b>${pct(s.currentYield)}</b><small>目标 ${pct(s.targetYield)}</small></td><td class="distance-cell ${Number(s.distanceToAttention) <= 0 ? "inside" : "outside"}">${signedPct(s.distanceToAttention)}</td><td>${number(s.peTtm)}</td><td><b class="fit-score">${number(s.fitScore)}</b><small class="fit-label">${safe(s.fitLabel)}</small></td>
     <td>${signalPill(s.technicalGuide?.signal)}</td><td>${statePill(s.state)}<div><small class="muted">${reasonText(s)}</small></div></td>
-  </tr>`).join("") : '<tr><td colspan="6" class="empty-row">当前筛选没有结果</td></tr>';
-  el("stock-cards").innerHTML = stocks.map(s => `<article class="stock-card" data-code="${s.code}"><div class="stock-card-top"><b>${safe(s.name)} <small>${s.code}</small></b>${statePill(s.state)}</div><div class="stock-card-metrics"><span>股息 ${pct(s.currentYield)}</span><span>PE ${number(s.peTtm)}</span><span>综合 ${number(s.fitScore)}</span></div>${signalPill(s.technicalGuide?.signal)} <small class="muted">${reasonText(s)}</small></article>`).join("");
+  </tr>`).join("") : '<tr><td colspan="7" class="empty-row">当前筛选没有结果</td></tr>';
+  el("stock-cards").innerHTML = stocks.map(s => `<article class="stock-card" data-code="${s.code}"><div class="stock-card-top"><b>${safe(s.name)} <small>${s.code}</small></b>${statePill(s.state)}</div><div class="stock-card-metrics"><span>股息 ${pct(s.currentYield)} / ${pct(s.targetYield)}</span><span>距关注价 ${signedPct(s.distanceToAttention)}</span><span>PE ${number(s.peTtm)}</span><span>综合 ${number(s.fitScore)}</span></div>${signalPill(s.technicalGuide?.signal)} <small class="muted">${reasonText(s)}</small></article>`).join("");
   document.querySelectorAll("[data-code]").forEach(node => node.addEventListener("click", () => selectStock(node.dataset.code)));
 }
 function tGuidance(stock) {

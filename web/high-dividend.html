@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>高股息决策雷达</title>
-  <link rel="stylesheet" href="./high-dividend.css?v=20260805-v2">
+  <link rel="stylesheet" href="./high-dividend.css?v=20260805-v3">
 </head>
 <body>
   <main class="dividend-shell">
@@ -20,12 +20,12 @@
     <section class="content-grid">
       <div class="radar-panel">
         <div class="panel-head"><div><h2>候选决策台</h2><small class="muted">综合分结合质量、股息、PE 与技术位置</small></div><span id="result-count" class="muted"></span></div>
-        <div class="table-wrap"><table><thead><tr><th data-sort="name">标的</th><th data-sort="currentYield">股息率</th><th data-sort="peTtm">PE TTM</th><th data-sort="fitScore">综合适配</th><th data-sort="tSignal">做T位置</th><th data-sort="state">观察状态</th></tr></thead><tbody id="stock-rows"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th data-sort="name">标的</th><th data-sort="currentYield">当前 / 目标股息率</th><th data-sort="distanceToAttention">距关注价</th><th data-sort="peTtm">PE TTM</th><th data-sort="fitScore">综合适配</th><th data-sort="tSignal">做T位置</th><th data-sort="state">观察状态</th></tr></thead><tbody id="stock-rows"></tbody></table></div>
         <div id="stock-cards" class="stock-cards"></div>
       </div>
       <aside id="stock-detail" class="detail-panel" aria-live="polite"><div class="empty-detail"><p>选择一只股票</p><span>查看股息、估值、质量和做 T 条件。</span></div></aside>
     </section>
   </main>
-  <script src="./high-dividend.js?v=20260805-v2"></script>
+  <script src="./high-dividend.js?v=20260805-v3"></script>
 </body>
 </html>
