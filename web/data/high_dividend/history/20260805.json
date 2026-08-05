@@ -1,7 +1,7 @@
 {
   "version": 1,
   "date": "2026-08-05",
-  "generatedAt": "2026-08-05T08:44:16+08:00",
+  "generatedAt": "2026-08-05T09:01:20+08:00",
   "bond": {
     "yield": 0.017126,
     "date": "2026-08-04",
@@ -43,6 +43,10 @@
       ],
       "ttmDividend": 2.016,
       "peTtm": 6.57,
+      "pePercentile5y": 44.6,
+      "peHistoryLow5y": 4.7,
+      "peHistoryHigh5y": 12.58,
+      "peHistorySamples5y": 913,
       "pb": 0.87,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -109,7 +113,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 84.7,
+      "fitScore": 78.7,
       "fitLabel": "优先研究"
     },
     {
@@ -135,6 +139,10 @@
       ],
       "ttmDividend": 0.3887,
       "peTtm": 7.85,
+      "pePercentile5y": 97.5,
+      "peHistoryLow5y": 4.18,
+      "peHistoryHigh5y": 8.44,
+      "peHistorySamples5y": 913,
       "pb": 0.74,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -200,8 +208,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 76.8,
-      "fitLabel": "耐心等待"
+      "fitScore": 58.8,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "600941",
@@ -226,6 +234,10 @@
       ],
       "ttmDividend": 4.7037,
       "peTtm": 15.4,
+      "pePercentile5y": 41.7,
+      "peHistoryLow5y": 10.45,
+      "peHistoryHigh5y": 18.53,
+      "peHistorySamples5y": 1672,
       "pb": 1.47,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -291,7 +303,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 78.2,
+      "fitScore": 77.2,
       "fitLabel": "优先研究"
     },
     {
@@ -317,6 +329,10 @@
       ],
       "ttmDividend": 1.0,
       "peTtm": 19.19,
+      "pePercentile5y": 25.0,
+      "peHistoryLow5y": 16.17,
+      "peHistoryHigh5y": 29.73,
+      "peHistorySamples5y": 913,
       "pb": 3.04,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -382,7 +398,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 72.4,
+      "fitScore": 77.4,
       "fitLabel": "耐心等待"
     },
     {
@@ -408,6 +424,10 @@
       ],
       "ttmDividend": 0.22169,
       "peTtm": 17.0,
+      "pePercentile5y": 95.2,
+      "peHistoryLow5y": 7.01,
+      "peHistoryHigh5y": 19.36,
+      "peHistorySamples5y": 913,
       "pb": 0.58,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -473,7 +493,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 73.6,
+      "fitScore": 60.6,
       "fitLabel": "耐心等待"
     },
     {
@@ -499,6 +519,10 @@
       ],
       "ttmDividend": 0.49,
       "peTtm": 12.73,
+      "pePercentile5y": 53.3,
+      "peHistoryLow5y": 9.06,
+      "peHistoryHigh5y": 17.24,
+      "peHistorySamples5y": 913,
       "pb": 1.39,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -564,7 +588,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 73.9,
+      "fitScore": 72.9,
       "fitLabel": "耐心等待"
     },
     {
@@ -590,6 +614,10 @@
       ],
       "ttmDividend": 0.604,
       "peTtm": 18.79,
+      "pePercentile5y": 98.5,
+      "peHistoryLow5y": 7.53,
+      "peHistoryHigh5y": 19.73,
+      "peHistorySamples5y": 913,
       "pb": 2.6,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -654,7 +682,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 76.8,
+      "fitScore": 63.8,
       "fitLabel": "耐心等待"
     },
     {
@@ -680,6 +708,10 @@
       ],
       "ttmDividend": 0.467,
       "peTtm": 9.88,
+      "pePercentile5y": 46.0,
+      "peHistoryLow5y": 7.69,
+      "peHistoryHigh5y": 13.36,
+      "peHistorySamples5y": 913,
       "pb": 1.14,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -746,7 +778,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 88.8,
+      "fitScore": 82.8,
       "fitLabel": "优先研究"
     },
     {
@@ -772,6 +804,10 @@
       ],
       "ttmDividend": 2.01,
       "peTtm": 18.15,
+      "pePercentile5y": 93.4,
+      "peHistoryLow5y": 7.78,
+      "peHistoryHigh5y": 20.61,
+      "peHistorySamples5y": 913,
       "pb": 1.95,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -836,7 +872,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 73.5,
+      "fitScore": 60.5,
       "fitLabel": "耐心等待"
     },
     {
@@ -860,6 +896,10 @@
       ],
       "ttmDividend": 1.14493,
       "peTtm": 12.03,
+      "pePercentile5y": 89.1,
+      "peHistoryLow5y": 5.54,
+      "peHistoryHigh5y": 16.74,
+      "peHistorySamples5y": 1566,
       "pb": 1.79,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -925,8 +965,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 69.2,
-      "fitLabel": "耐心等待"
+      "fitScore": 56.2,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "600028",
@@ -951,6 +991,10 @@
       ],
       "ttmDividend": 0.2,
       "peTtm": 17.35,
+      "pePercentile5y": 84.4,
+      "peHistoryLow5y": 5.33,
+      "peHistoryHigh5y": 26.23,
+      "peHistorySamples5y": 913,
       "pb": 0.74,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1015,8 +1059,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 66.1,
-      "fitLabel": "耐心等待"
+      "fitScore": 53.1,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "601225",
@@ -1041,6 +1085,10 @@
       ],
       "ttmDividend": 0.948,
       "peTtm": 14.34,
+      "pePercentile5y": 94.2,
+      "peHistoryLow5y": 4.28,
+      "peHistoryHigh5y": 16.27,
+      "peHistorySamples5y": 913,
       "pb": 2.27,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1105,8 +1153,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 71.7,
-      "fitLabel": "耐心等待"
+      "fitScore": 58.7,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "601398",
@@ -1131,6 +1179,10 @@
       ],
       "ttmDividend": 0.3103,
       "peTtm": 7.59,
+      "pePercentile5y": 94.0,
+      "peHistoryLow5y": 3.99,
+      "peHistoryHigh5y": 8.08,
+      "peHistorySamples5y": 913,
       "pb": 0.69,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1196,8 +1248,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 77.8,
-      "fitLabel": "优先研究"
+      "fitScore": 59.8,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "601288",
@@ -1222,6 +1274,10 @@
       ],
       "ttmDividend": 0.2495,
       "peTtm": 7.86,
+      "pePercentile5y": 83.9,
+      "peHistoryLow5y": 3.78,
+      "peHistoryHigh5y": 10.38,
+      "peHistorySamples5y": 913,
       "pb": 0.82,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1287,8 +1343,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 76.2,
-      "fitLabel": "耐心等待"
+      "fitScore": 58.2,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "601988",
@@ -1313,6 +1369,10 @@
       ],
       "ttmDividend": 0.2263,
       "peTtm": 7.65,
+      "pePercentile5y": 91.7,
+      "peHistoryLow5y": 3.92,
+      "peHistoryHigh5y": 8.45,
+      "peHistorySamples5y": 913,
       "pb": 0.69,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1377,8 +1437,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 76.5,
-      "fitLabel": "耐心等待"
+      "fitScore": 58.5,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "600350",
@@ -1403,6 +1463,10 @@
       ],
       "ttmDividend": 0.42,
       "peTtm": 16.33,
+      "pePercentile5y": 93.0,
+      "peHistoryLow5y": 7.72,
+      "peHistoryHigh5y": 18.33,
+      "peHistorySamples5y": 913,
       "pb": 1.72,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1468,7 +1532,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 75.0,
+      "fitScore": 62.0,
       "fitLabel": "耐心等待"
     },
     {
@@ -1494,6 +1558,10 @@
       ],
       "ttmDividend": 0.195,
       "peTtm": 8.84,
+      "pePercentile5y": 48.8,
+      "peHistoryLow5y": 6.49,
+      "peHistoryHigh5y": 12.76,
+      "peHistorySamples5y": 913,
       "pb": 0.83,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1559,7 +1627,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 73.4,
+      "fitScore": 67.4,
       "fitLabel": "耐心等待"
     },
     {
@@ -1585,6 +1653,10 @@
       ],
       "ttmDividend": 2.7,
       "peTtm": 7.35,
+      "pePercentile5y": 11.9,
+      "peHistoryLow5y": 6.37,
+      "peHistoryHigh5y": 11.59,
+      "peHistorySamples5y": 913,
       "pb": 0.96,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1676,6 +1748,10 @@
       ],
       "ttmDividend": 1.45,
       "peTtm": 16.81,
+      "pePercentile5y": 35.9,
+      "peHistoryLow5y": 14.43,
+      "peHistoryHigh5y": 24.24,
+      "peHistorySamples5y": 913,
       "pb": 3.9,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1742,7 +1818,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 83.0,
+      "fitScore": 82.0,
       "fitLabel": "优先研究"
     },
     {
@@ -1768,6 +1844,10 @@
       ],
       "ttmDividend": 0.85,
       "peTtm": 12.09,
+      "pePercentile5y": 56.5,
+      "peHistoryLow5y": 5.0,
+      "peHistoryHigh5y": 20.66,
+      "peHistorySamples5y": 913,
       "pb": 0.48,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1833,7 +1913,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 70.6,
+      "fitScore": 69.6,
       "fitLabel": "耐心等待"
     },
     {
@@ -1859,6 +1939,10 @@
       ],
       "ttmDividend": 1.38,
       "peTtm": 13.8,
+      "pePercentile5y": 9.3,
+      "peHistoryLow5y": 11.12,
+      "peHistoryHigh5y": 30.14,
+      "peHistorySamples5y": 913,
       "pb": 2.8,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -1924,7 +2008,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 83.0,
+      "fitScore": 88.0,
       "fitLabel": "优先研究"
     },
     {
@@ -1950,6 +2034,10 @@
       ],
       "ttmDividend": 0.2718,
       "peTtm": 5.05,
+      "pePercentile5y": 88.9,
+      "peHistoryLow5y": 3.48,
+      "peHistoryHigh5y": 5.63,
+      "peHistorySamples5y": 913,
       "pb": 0.39,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2015,8 +2103,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 80.2,
-      "fitLabel": "优先研究"
+      "fitScore": 62.2,
+      "fitLabel": "耐心等待"
     },
     {
       "code": "600019",
@@ -2041,6 +2129,10 @@
       ],
       "ttmDividend": 0.3,
       "peTtm": 12.76,
+      "pePercentile5y": 54.2,
+      "peHistoryLow5y": 5.26,
+      "peHistoryHigh5y": 21.21,
+      "peHistorySamples5y": 913,
       "pb": 0.62,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2105,7 +2197,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 72.3,
+      "fitScore": 71.3,
       "fitLabel": "耐心等待"
     },
     {
@@ -2131,6 +2223,10 @@
       ],
       "ttmDividend": 0.205,
       "peTtm": 21.69,
+      "pePercentile5y": 79.4,
+      "peHistoryLow5y": 16.08,
+      "peHistoryHigh5y": 27.91,
+      "peHistorySamples5y": 913,
       "pb": 2.61,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2222,6 +2318,10 @@
       ],
       "ttmDividend": 0.5,
       "peTtm": 15.85,
+      "pePercentile5y": 29.4,
+      "peHistoryLow5y": 14.07,
+      "peHistoryHigh5y": 21.6,
+      "peHistorySamples5y": 913,
       "pb": 1.62,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2287,7 +2387,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 68.8,
+      "fitScore": 73.8,
       "fitLabel": "耐心等待"
     },
     {
@@ -2313,6 +2413,10 @@
       ],
       "ttmDividend": 2.5,
       "peTtm": 12.9,
+      "pePercentile5y": 4.3,
+      "peHistoryLow5y": 10.56,
+      "peHistoryHigh5y": 50.91,
+      "peHistorySamples5y": 913,
       "pb": 4.34,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2378,7 +2482,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 83.0,
+      "fitScore": 88.0,
       "fitLabel": "优先研究"
     },
     {
@@ -2404,6 +2508,10 @@
       ],
       "ttmDividend": 0.5,
       "peTtm": 19.4,
+      "pePercentile5y": 36.9,
+      "peHistoryLow5y": 15.41,
+      "peHistoryHigh5y": 27.22,
+      "peHistorySamples5y": 913,
       "pb": 2.65,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2469,7 +2577,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 76.5,
+      "fitScore": 75.5,
       "fitLabel": "优先研究"
     },
     {
@@ -2495,6 +2603,10 @@
       ],
       "ttmDividend": 0.3454,
       "peTtm": 11.07,
+      "pePercentile5y": 85.5,
+      "peHistoryLow5y": 7.9,
+      "peHistoryHigh5y": 12.89,
+      "peHistorySamples5y": 913,
       "pb": 1.23,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2560,8 +2672,8 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 74.8,
-      "fitLabel": "耐心等待"
+      "fitScore": 56.8,
+      "fitLabel": "谨慎观察"
     },
     {
       "code": "600741",
@@ -2586,6 +2698,10 @@
       ],
       "ttmDividend": 1.0,
       "peTtm": 7.1,
+      "pePercentile5y": 7.2,
+      "peHistoryLow5y": 5.95,
+      "peHistoryHigh5y": 13.4,
+      "peHistorySamples5y": 913,
       "pb": 0.75,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2677,6 +2793,10 @@
       ],
       "ttmDividend": 0.66,
       "peTtm": 15.26,
+      "pePercentile5y": 81.1,
+      "peHistoryLow5y": 6.32,
+      "peHistoryHigh5y": 19.2,
+      "peHistorySamples5y": 913,
       "pb": 2.13,
       "valuationDate": "2026-08-04",
       "technicalGuide": {
@@ -2742,7 +2862,7 @@
         }
       ],
       "watchlisted": true,
-      "fitScore": 74.7,
+      "fitScore": 61.7,
       "fitLabel": "耐心等待"
     }
   ],

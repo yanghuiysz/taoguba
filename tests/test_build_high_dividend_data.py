@@ -105,7 +105,17 @@ class BuilderTests(unittest.TestCase):
             {"date": "2026-08-03", "value": 12.4},
             {"date": "2026-08-04", "value": 11.8},
         ])
-        self.assertEqual(parse_valuation(frame), {"value": 11.8, "date": "2026-08-04"})
+        self.assertEqual(parse_valuation(frame), {"value": 11.8, "date": "2026-08-04", "percentile": 50.0, "low": 11.8, "high": 12.4, "samples": 2})
+
+    def test_valuation_percentile_places_latest_value_in_history(self):
+        frame = pd.DataFrame([
+            {"date": f"2026-08-0{index + 1}", "value": value}
+            for index, value in enumerate([8.0, 10.0, 12.0, 14.0, 10.0])
+        ])
+        result = parse_valuation(frame)
+        self.assertEqual(result["value"], 10.0)
+        self.assertEqual(result["percentile"], 60.0)
+        self.assertEqual(result["samples"], 5)
 
     def test_technical_guide_returns_price_zone_and_risk_controls(self):
         closes = [10 + index * 0.05 for index in range(60)]

@@ -169,6 +169,8 @@ def validate_high_dividend(data: dict[str, Any]) -> dict[str, Any]:
         pb = number_or_none(stock.get("pb"))
         fit_score = number_or_none(stock.get("fitScore"))
         require(pe is not None, f"high-dividend {code} peTtm required")
+        pe_percentile = number_or_none(stock.get("pePercentile5y"))
+        require(pe_percentile is not None and 0 <= pe_percentile <= 100, f"high-dividend {code} invalid pePercentile5y")
         require(pb is not None and pb > 0, f"high-dividend {code} pb required")
         require(fit_score is not None and 0 <= fit_score <= 100, f"high-dividend {code} invalid fitScore")
         guide = stock.get("technicalGuide")

@@ -146,12 +146,16 @@ def retry_fetch(operation: Any, attempts: int = 3) -> Any:
 
 def parse_valuation(frame: Any) -> dict[str, Any]:
     if frame is None or getattr(frame, "empty", True):
-        return {"value": None, "date": None}
+        return {"value": None, "date": None, "percentile": None, "low": None, "high": None, "samples": 0}
     clean = frame.dropna(subset=["value"])
     if clean.empty:
-        return {"value": None, "date": None}
+        return {"value": None, "date": None, "percentile": None, "low": None, "high": None, "samples": 0}
+    clean = clean.copy()
+    clean["value"] = clean["value"].astype(float)
     row = clean.sort_values("date").iloc[-1]
-    return {"value": _clean_number(row.get("value")), "date": str(row.get("date"))[:10]}
+    value = float(row["value"])
+    percentile = round(float((clean["value"] <= value).mean() * 100), 1)
+    return {"value": value, "date": str(row.get("date"))[:10], "percentile": percentile, "low": float(clean["value"].min()), "high": float(clean["value"].max()), "samples": len(clean)}
 
 
 def calculate_technical_guide(frame: Any) -> dict[str, Any]:
@@ -197,8 +201,11 @@ def add_fit_score(stock: dict[str, Any]) -> dict[str, Any]:
     current_yield = _clean_number(stock.get("currentYield")) or 0
     target = _clean_number(stock.get("targetYield")) or 0.05
     pe = _clean_number(stock.get("peTtm"))
+    pe_percentile = _clean_number(stock.get("pePercentile5y"))
     yield_score = min(30.0, max(0.0, current_yield / target * 30.0))
-    if pe is None or pe <= 0:
+    if pe_percentile is not None:
+        valuation_score = 20.0 if pe_percentile <= 30 else 14.0 if pe_percentile <= 60 else 8.0 if pe_percentile <= 80 else 2.0
+    elif pe is None or pe <= 0:
         valuation_score = 6.0
     elif pe <= 12:
         valuation_score = 20.0
@@ -309,8 +316,8 @@ def fetch_live_source(target_date: str, config: dict[str, Any] | None = None) ->
             errors.append(f"{code} 财务数据不可用: {exc}")
             financial = {"latestProfit": None, "payoutRatio": None, "qualityScore": None}
         try:
-            pe_result = parse_valuation(retry_fetch(lambda: ak.stock_zh_valuation_baidu(code, "市盈率(TTM)", "近一年")))
-            pb_result = parse_valuation(retry_fetch(lambda: ak.stock_zh_valuation_baidu(code, "市净率", "近一年")))
+            pe_result = parse_valuation(retry_fetch(lambda: ak.stock_zh_valuation_baidu(code, "市盈率(TTM)", "近五年")))
+            pb_result = parse_valuation(retry_fetch(lambda: ak.stock_zh_valuation_baidu(code, "市净率", "近五年")))
         except Exception as exc:
             errors.append(f"{code} 估值数据不可用: {exc}")
             pe_result, pb_result = {"value": None, "date": None}, {"value": None, "date": None}
@@ -341,6 +348,10 @@ def fetch_live_source(target_date: str, config: dict[str, Any] | None = None) ->
             "dividendYears": dividend_years,
             "ttmDividend": dividends[-1] if dividends else None,
             "peTtm": pe_result["value"],
+            "pePercentile5y": pe_result["percentile"],
+            "peHistoryLow5y": pe_result["low"],
+            "peHistoryHigh5y": pe_result["high"],
+            "peHistorySamples5y": pe_result["samples"],
             "pb": pb_result["value"],
             "valuationDate": pe_result["date"] or pb_result["date"],
             "technicalGuide": technical,
