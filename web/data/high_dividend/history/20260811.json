@@ -1,0 +1,2879 @@
+{
+  "version": 1,
+  "date": "2026-08-11",
+  "generatedAt": "2026-08-11T15:37:51+08:00",
+  "bond": {
+    "yield": 0.017074,
+    "date": "2026-08-10",
+    "name": "中国10年期国债"
+  },
+  "summary": {
+    "total": 30,
+    "states": {
+      "可关注": 4,
+      "偏贵": 14,
+      "等待": 12
+    },
+    "pools": {
+      "stable": 24,
+      "cyclical": 6
+    }
+  },
+  "stocks": [
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "industry": "银行",
+      "price": 38.95,
+      "listingDate": "2002-04-09",
+      "avgTurnover20": 4101654375.2,
+      "dividends": [
+        1.522,
+        1.738,
+        1.972,
+        2.0,
+        2.016
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 2.016,
+      "peTtm": 6.51,
+      "pePercentile5y": 42.6,
+      "peHistoryLow5y": 4.7,
+      "peHistoryHigh5y": 12.58,
+      "peHistorySamples5y": 913,
+      "pb": 0.87,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 38.91,
+        "support20": 36.75,
+        "resistance20": 40.55,
+        "ma20": 38.90149999999999,
+        "ma60": 37.35816666666666,
+        "rsi14": 57.23270440251568,
+        "volatility20": 0.019754908183024597,
+        "avgTurnover20": 4101654375.2
+      },
+      "latestProfit": 5.7,
+      "payoutRatio": null,
+      "qualityScore": 71.8,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "可关注",
+      "reasons": [
+        "质量等级达到A/B",
+        "当前股息率达到双锚目标",
+        "价格不高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 71.8,
+          "threshold": 70,
+          "reason": "质量分为72"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.0517586649550706,
+          "threshold": 0.05,
+          "reason": "当前5.18%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 2.0,
+      "currentYield": 0.0517586649550706,
+      "targetYield": 0.05,
+      "attentionPrice": 40.0,
+      "distanceToAttention": -0.026249999999999885,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 40.0
+        },
+        {
+          "yield": 0.055,
+          "price": 36.36363636363637
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 33.33333333333333
+        },
+        {
+          "yield": 0.065,
+          "price": 30.769230769230766
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 78.7,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "industry": "银行",
+      "price": 10.23,
+      "listingDate": "2007-09-25",
+      "avgTurnover20": 1643952308.4,
+      "dividends": [
+        0.364,
+        0.389,
+        0.4,
+        0.403,
+        0.3887
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.3887,
+      "peTtm": 7.88,
+      "pePercentile5y": 97.8,
+      "peHistoryLow5y": 4.18,
+      "peHistoryHigh5y": 8.44,
+      "peHistorySamples5y": 913,
+      "pb": 0.75,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 10.13,
+        "support20": 9.74,
+        "resistance20": 10.98,
+        "ma20": 10.281,
+        "ma60": 9.986666666666668,
+        "rsi14": 48.54368932038838,
+        "volatility20": 0.028823719139312524,
+        "avgTurnover20": 1643952308.4
+      },
+      "latestProfit": 1.3,
+      "payoutRatio": null,
+      "qualityScore": 69.25,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 69.25,
+          "threshold": 70,
+          "reason": "质量分为69"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.0379960899315738,
+          "threshold": 0.05,
+          "reason": "当前3.80%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.4,
+      "currentYield": 0.0379960899315738,
+      "targetYield": 0.05,
+      "attentionPrice": 8.0,
+      "distanceToAttention": 0.27875000000000005,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 8.0
+        },
+        {
+          "yield": 0.055,
+          "price": 7.272727272727273
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 6.666666666666666
+        },
+        {
+          "yield": 0.065,
+          "price": 6.153846153846154
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 58.5,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "600941",
+      "name": "中国移动",
+      "industry": "电信运营",
+      "price": 96.42,
+      "listingDate": "2022-01-05",
+      "avgTurnover20": 1334951515.45,
+      "dividends": [
+        2.0939,
+        3.8738,
+        4.4096,
+        4.6705,
+        4.7037
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 4.7037,
+      "peTtm": 15.44,
+      "pePercentile5y": 43.3,
+      "peHistoryLow5y": 10.45,
+      "peHistoryHigh5y": 18.53,
+      "peHistorySamples5y": 1678,
+      "pb": 1.47,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "高抛观察",
+        "asOf": "2026-08-10",
+        "close": 96.7,
+        "support20": 90.68,
+        "resistance20": 99.41,
+        "ma20": 95.459,
+        "ma60": 93.80783333333332,
+        "rsi14": 56.06896551724139,
+        "volatility20": 0.020802230422026807,
+        "avgTurnover20": 1334951515.45
+      },
+      "latestProfit": 6.35,
+      "payoutRatio": null,
+      "qualityScore": 69.84,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 69.84,
+          "threshold": 70,
+          "reason": "质量分为70"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.04878344741754823,
+          "threshold": 0.05,
+          "reason": "当前4.88%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 4.6705,
+      "currentYield": 0.04878344741754823,
+      "targetYield": 0.05,
+      "attentionPrice": 93.40999999999998,
+      "distanceToAttention": 0.032223530671234624,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 93.40999999999998
+        },
+        {
+          "yield": 0.055,
+          "price": 84.91818181818181
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 77.84166666666665
+        },
+        {
+          "yield": 0.065,
+          "price": 71.85384615384615
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 74.2,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "industry": "水电",
+      "price": 28.31,
+      "listingDate": "2003-11-18",
+      "avgTurnover20": 4382408940.3,
+      "dividends": [
+        0.8153,
+        0.8533,
+        0.82,
+        0.943,
+        1.0
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 1.0,
+      "peTtm": 19.02,
+      "pePercentile5y": 23.5,
+      "peHistoryLow5y": 16.21,
+      "peHistoryHigh5y": 29.73,
+      "peHistorySamples5y": 913,
+      "pb": 3.01,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "低吸观察",
+        "asOf": "2026-08-10",
+        "close": 28.05,
+        "support20": 27.34,
+        "resistance20": 29.57,
+        "ma20": 28.464999999999996,
+        "ma60": 27.15533333333333,
+        "rsi14": 42.5438596491228,
+        "volatility20": 0.023729519007833717,
+        "avgTurnover20": 4382408940.3
+      },
+      "latestProfit": 1.4101,
+      "payoutRatio": 0.0014910000000000001,
+      "qualityScore": 75.59,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 75.59,
+          "threshold": 70,
+          "reason": "质量分为76"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03532320734722713,
+          "threshold": 0.05,
+          "reason": "当前3.53%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.943,
+      "currentYield": 0.03532320734722713,
+      "targetYield": 0.05,
+      "attentionPrice": 18.86,
+      "distanceToAttention": 0.5010604453870626,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 18.86
+        },
+        {
+          "yield": 0.055,
+          "price": 17.145454545454545
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 15.716666666666665
+        },
+        {
+          "yield": 0.065,
+          "price": 14.507692307692306
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 81.4,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "601006",
+      "name": "大秦铁路",
+      "industry": "铁路运输",
+      "price": 4.76,
+      "listingDate": "2006-08-01",
+      "avgTurnover20": 636727336.3,
+      "dividends": [
+        0.48,
+        0.48,
+        0.38193,
+        0.26924,
+        0.22169
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.22169,
+      "peTtm": 16.62,
+      "pePercentile5y": 91.8,
+      "peHistoryLow5y": 7.01,
+      "peHistoryHigh5y": 19.36,
+      "peHistorySamples5y": 913,
+      "pb": 0.57,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 4.78,
+        "support20": 4.6,
+        "resistance20": 5.06,
+        "ma20": 4.842,
+        "ma60": 4.8613333333333335,
+        "rsi14": 48.64864864864868,
+        "volatility20": 0.02074298132373624,
+        "avgTurnover20": 636727336.3
+      },
+      "latestProfit": 0.3,
+      "payoutRatio": 0.00014000000000000001,
+      "qualityScore": 63.59,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 63.59,
+          "threshold": 70,
+          "reason": "质量分为64"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.04657352941176471,
+          "threshold": 0.05,
+          "reason": "当前4.66%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.26924,
+      "currentYield": 0.04657352941176471,
+      "targetYield": 0.05,
+      "attentionPrice": 5.384799999999999,
+      "distanceToAttention": -0.11603030753231314,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 5.384799999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 4.895272727272727
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 4.487333333333333
+        },
+        {
+          "yield": 0.065,
+          "price": 4.142153846153846
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 61.4,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600377",
+      "name": "宁沪高速",
+      "industry": "高速公路",
+      "price": 12.07,
+      "listingDate": "2001-01-16",
+      "avgTurnover20": 165391119.45,
+      "dividends": [
+        0.46,
+        0.46,
+        0.47,
+        0.49,
+        0.49
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.49,
+      "peTtm": 12.7,
+      "pePercentile5y": 53.0,
+      "peHistoryLow5y": 9.06,
+      "peHistoryHigh5y": 17.24,
+      "peHistorySamples5y": 913,
+      "pb": 1.39,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 11.97,
+        "support20": 11.74,
+        "resistance20": 12.52,
+        "ma20": 12.100000000000001,
+        "ma60": 11.929666666666668,
+        "rsi14": 46.76258992805757,
+        "volatility20": 0.02419226143498877,
+        "avgTurnover20": 165391119.45
+      },
+      "latestProfit": 0.9119,
+      "payoutRatio": null,
+      "qualityScore": 71.08,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 71.08,
+          "threshold": 70,
+          "reason": "质量分为71"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.04059652029826015,
+          "threshold": 0.05,
+          "reason": "当前4.06%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.49,
+      "currentYield": 0.04059652029826015,
+      "targetYield": 0.05,
+      "attentionPrice": 9.799999999999999,
+      "distanceToAttention": 0.2316326530612247,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 9.799999999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 8.909090909090908
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 8.166666666666666
+        },
+        {
+          "yield": 0.065,
+          "price": 7.538461538461538
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 72.8,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "000429",
+      "name": "粤高速A",
+      "industry": "高速公路",
+      "price": 13.29,
+      "listingDate": "1998-02-20",
+      "avgTurnover20": 153594814.65,
+      "dividends": [
+        0.57,
+        0.428,
+        0.547,
+        0.523,
+        0.604
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.604,
+      "peTtm": 17.36,
+      "pePercentile5y": 90.5,
+      "peHistoryLow5y": 7.53,
+      "peHistoryHigh5y": 19.73,
+      "peHistorySamples5y": 913,
+      "pb": 2.4,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 13.25,
+        "support20": 12.81,
+        "resistance20": 14.68,
+        "ma20": 13.806999999999999,
+        "ma60": 13.345333333333334,
+        "rsi14": 44.54976303317535,
+        "volatility20": 0.03594681666007553,
+        "avgTurnover20": 153594814.65
+      },
+      "latestProfit": 0.86,
+      "payoutRatio": 0.00014800000000000002,
+      "qualityScore": 76.2,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 76.2,
+          "threshold": 70,
+          "reason": "质量分为76"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.0454477050413845,
+          "threshold": 0.05,
+          "reason": "当前4.54%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.547,
+      "currentYield": 0.0454477050413845,
+      "targetYield": 0.05,
+      "attentionPrice": 10.94,
+      "distanceToAttention": 0.21480804387568564,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 10.94
+        },
+        {
+          "yield": 0.055,
+          "price": 9.945454545454545
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 9.116666666666667
+        },
+        {
+          "yield": 0.065,
+          "price": 8.415384615384616
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 65.7,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600461",
+      "name": "洪城环境",
+      "industry": "公用事业",
+      "price": 9.03,
+      "listingDate": "2004-06-01",
+      "avgTurnover20": 116927989.8,
+      "dividends": [
+        0.49999,
+        0.434,
+        0.44073,
+        0.464,
+        0.467
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.467,
+      "peTtm": 9.8,
+      "pePercentile5y": 40.6,
+      "peHistoryLow5y": 7.69,
+      "peHistoryHigh5y": 13.36,
+      "peHistorySamples5y": 913,
+      "pb": 1.13,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "低吸观察",
+        "asOf": "2026-08-10",
+        "close": 8.99,
+        "support20": 8.86,
+        "resistance20": 9.5,
+        "ma20": 9.1805,
+        "ma60": 9.184666666666665,
+        "rsi14": 39.534883720930274,
+        "volatility20": 0.024399855983030815,
+        "avgTurnover20": 116927989.8
+      },
+      "latestProfit": 0.93,
+      "payoutRatio": 0.0033239999999999997,
+      "qualityScore": 71.94,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "可关注",
+      "reasons": [
+        "质量等级达到A/B",
+        "当前股息率达到双锚目标",
+        "价格不高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 71.94,
+          "threshold": 70,
+          "reason": "质量分为72"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.05171650055370986,
+          "threshold": 0.05,
+          "reason": "当前5.17%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.464,
+      "currentYield": 0.05171650055370986,
+      "targetYield": 0.05,
+      "attentionPrice": 9.28,
+      "distanceToAttention": -0.026939655172413812,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 9.28
+        },
+        {
+          "yield": 0.055,
+          "price": 8.436363636363637
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 7.733333333333333
+        },
+        {
+          "yield": 0.065,
+          "price": 7.138461538461539
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 82.8,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "601088",
+      "name": "中国神华",
+      "industry": "煤炭",
+      "price": 44.7,
+      "listingDate": "2007-10-09",
+      "avgTurnover20": 1724875745.5,
+      "dividends": [
+        2.54,
+        2.55,
+        2.26,
+        2.26,
+        2.01
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 2.01,
+      "peTtm": 18.79,
+      "pePercentile5y": 94.9,
+      "peHistoryLow5y": 7.78,
+      "peHistoryHigh5y": 20.61,
+      "peHistorySamples5y": 913,
+      "pb": 2.02,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 44.68,
+        "support20": 42.38,
+        "resistance20": 46.8,
+        "ma20": 44.5595,
+        "ma60": 43.553,
+        "rsi14": 47.32142857142856,
+        "volatility20": 0.030410539006558636,
+        "avgTurnover20": 1724875745.5
+      },
+      "latestProfit": 2.66,
+      "payoutRatio": null,
+      "qualityScore": 72.92,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "cyclical",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 72.92,
+          "threshold": 70,
+          "reason": "质量分为73"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.04496644295302012,
+          "threshold": 0.06,
+          "reason": "当前4.50%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 2.26,
+      "currentYield": 0.04496644295302012,
+      "targetYield": 0.06,
+      "attentionPrice": 37.666666666666664,
+      "distanceToAttention": 0.1867256637168142,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 37.666666666666664
+        },
+        {
+          "yield": 0.065,
+          "price": 34.76923076923077
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 32.285714285714285
+        },
+        {
+          "yield": 0.075,
+          "price": 30.133333333333333
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 59.7,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "600938",
+      "name": "中国海油",
+      "industry": "石油石化",
+      "price": 33.7,
+      "listingDate": "2022-04-21",
+      "avgTurnover20": 2087179642.75,
+      "dividends": [
+        1.28498,
+        1.14146,
+        1.28159,
+        1.14493
+      ],
+      "dividendYears": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 1.14493,
+      "peTtm": 12.2,
+      "pePercentile5y": 89.8,
+      "peHistoryLow5y": 5.54,
+      "peHistoryHigh5y": 16.74,
+      "peHistorySamples5y": 1572,
+      "pb": 1.82,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 32.0,
+        "support20": 28.7,
+        "resistance20": 33.83,
+        "ma20": 31.244000000000007,
+        "ma60": 31.436833333333333,
+        "rsi14": 56.58056580565806,
+        "volatility20": 0.03326624384012945,
+        "avgTurnover20": 2087179642.75
+      },
+      "latestProfit": 2.57,
+      "payoutRatio": null,
+      "qualityScore": 75.21000000000001,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "cyclical",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 75.21000000000001,
+          "threshold": 70,
+          "reason": "质量分为75"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.033974183976261126,
+          "threshold": 0.06,
+          "reason": "当前3.40%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 1.14146,
+      "currentYield": 0.033974183976261126,
+      "targetYield": 0.06,
+      "attentionPrice": 19.02433333333333,
+      "distanceToAttention": 0.7714155555166193,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 19.02433333333333
+        },
+        {
+          "yield": 0.065,
+          "price": 17.560923076923075
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 16.30657142857143
+        },
+        {
+          "yield": 0.075,
+          "price": 15.219466666666666
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 55.1,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "600028",
+      "name": "中国石化",
+      "industry": "石油石化",
+      "price": 5.11,
+      "listingDate": "2001-08-08",
+      "avgTurnover20": 1480125854.6,
+      "dividends": [
+        0.47,
+        0.355,
+        0.345,
+        0.286,
+        0.2
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.2,
+      "peTtm": 17.42,
+      "pePercentile5y": 84.6,
+      "peHistoryLow5y": 5.33,
+      "peHistoryHigh5y": 26.23,
+      "peHistorySamples5y": 913,
+      "pb": 0.74,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 5.12,
+        "support20": 4.89,
+        "resistance20": 5.33,
+        "ma20": 5.1345,
+        "ma60": 4.881833333333334,
+        "rsi14": 50.0,
+        "volatility20": 0.02192518648594898,
+        "avgTurnover20": 1480125854.6
+      },
+      "latestProfit": 0.262,
+      "payoutRatio": null,
+      "qualityScore": 63.83,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "cyclical",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 63.83,
+          "threshold": 70,
+          "reason": "质量分为64"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03913894324853229,
+          "threshold": 0.06,
+          "reason": "当前3.91%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 0.286,
+      "currentYield": 0.03913894324853229,
+      "targetYield": 0.06,
+      "attentionPrice": 4.766666666666667,
+      "distanceToAttention": 0.07202797202797218,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 4.766666666666667
+        },
+        {
+          "yield": 0.065,
+          "price": 4.3999999999999995
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 4.085714285714285
+        },
+        {
+          "yield": 0.075,
+          "price": 3.813333333333333
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 53.1,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "601225",
+      "name": "陕西煤业",
+      "industry": "煤炭",
+      "price": 25.93,
+      "listingDate": "2014-01-28",
+      "avgTurnover20": 1196540860.0,
+      "dividends": [
+        1.35,
+        2.18,
+        1.315,
+        1.348,
+        0.948
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.948,
+      "peTtm": 15.61,
+      "pePercentile5y": 98.6,
+      "peHistoryLow5y": 4.28,
+      "peHistoryHigh5y": 16.27,
+      "peHistorySamples5y": 913,
+      "pb": 2.47,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "高抛观察",
+        "asOf": "2026-08-10",
+        "close": 26.04,
+        "support20": 23.37,
+        "resistance20": 26.19,
+        "ma20": 24.612000000000002,
+        "ma60": 23.776666666666667,
+        "rsi14": 68.45878136200714,
+        "volatility20": 0.03725246569050606,
+        "avgTurnover20": 1196540860.0
+      },
+      "latestProfit": 1.73,
+      "payoutRatio": 5.999999999999999e-06,
+      "qualityScore": 77.3,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "cyclical",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 77.3,
+          "threshold": 70,
+          "reason": "质量分为77"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03655996914770536,
+          "threshold": 0.06,
+          "reason": "当前3.66%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 1.315,
+      "currentYield": 0.03655996914770536,
+      "targetYield": 0.06,
+      "attentionPrice": 21.916666666666668,
+      "distanceToAttention": 0.18311787072243346,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 21.916666666666668
+        },
+        {
+          "yield": 0.065,
+          "price": 20.23076923076923
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 18.78571428571429
+        },
+        {
+          "yield": 0.075,
+          "price": 17.533333333333335
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 54.2,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "industry": "银行",
+      "price": 7.6,
+      "listingDate": "2006-10-27",
+      "avgTurnover20": 3683500901.0,
+      "dividends": [
+        0.2933,
+        0.3035,
+        0.3064,
+        0.308,
+        0.3103
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.3103,
+      "peTtm": 7.46,
+      "pePercentile5y": 89.8,
+      "peHistoryLow5y": 3.99,
+      "peHistoryHigh5y": 8.08,
+      "peHistorySamples5y": 913,
+      "pb": 0.68,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 7.53,
+        "support20": 7.36,
+        "resistance20": 8.16,
+        "ma20": 7.6930000000000005,
+        "ma60": 7.418833333333333,
+        "rsi14": 48.92086330935254,
+        "volatility20": 0.02358381696513317,
+        "avgTurnover20": 3683500901.0
+      },
+      "latestProfit": 1.0,
+      "payoutRatio": null,
+      "qualityScore": 68.68,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 68.68,
+          "threshold": 70,
+          "reason": "质量分为69"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.040828947368421055,
+          "threshold": 0.05,
+          "reason": "当前4.08%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.308,
+      "currentYield": 0.040828947368421055,
+      "targetYield": 0.05,
+      "attentionPrice": 6.159999999999999,
+      "distanceToAttention": 0.23376623376623384,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 6.159999999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 5.6
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 5.133333333333333
+        },
+        {
+          "yield": 0.065,
+          "price": 4.7384615384615385
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 60.0,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "601288",
+      "name": "农业银行",
+      "industry": "银行",
+      "price": 6.48,
+      "listingDate": "2010-07-15",
+      "avgTurnover20": 3209867939.45,
+      "dividends": [
+        0.2068,
+        0.2222,
+        0.2309,
+        0.2419,
+        0.2495
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.2495,
+      "peTtm": 7.68,
+      "pePercentile5y": 81.7,
+      "peHistoryLow5y": 3.78,
+      "peHistoryHigh5y": 10.38,
+      "peHistorySamples5y": 913,
+      "pb": 0.8,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 6.46,
+        "support20": 6.21,
+        "resistance20": 7.11,
+        "ma20": 6.6135,
+        "ma60": 6.450166666666667,
+        "rsi14": 51.048951048951054,
+        "volatility20": 0.025597831573438496,
+        "avgTurnover20": 3209867939.45
+      },
+      "latestProfit": 0.78,
+      "payoutRatio": 0.000631,
+      "qualityScore": 68.99,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 68.99,
+          "threshold": 70,
+          "reason": "质量分为69"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.038503086419753085,
+          "threshold": 0.05,
+          "reason": "当前3.85%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.2419,
+      "currentYield": 0.038503086419753085,
+      "targetYield": 0.05,
+      "attentionPrice": 4.838,
+      "distanceToAttention": 0.3393964448119058,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 4.838
+        },
+        {
+          "yield": 0.055,
+          "price": 4.398181818181818
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 4.031666666666666
+        },
+        {
+          "yield": 0.065,
+          "price": 3.7215384615384615
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 58.7,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "601988",
+      "name": "中国银行",
+      "industry": "银行",
+      "price": 5.88,
+      "listingDate": "2006-07-05",
+      "avgTurnover20": 1947140723.15,
+      "dividends": [
+        0.221,
+        0.232,
+        0.2364,
+        0.2424,
+        0.2263
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.2263,
+      "peTtm": 7.65,
+      "pePercentile5y": 91.7,
+      "peHistoryLow5y": 3.92,
+      "peHistoryHigh5y": 8.45,
+      "peHistorySamples5y": 913,
+      "pb": 0.69,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 5.82,
+        "support20": 5.7,
+        "resistance20": 6.14,
+        "ma20": 5.933,
+        "ma60": 5.832833333333334,
+        "rsi14": 47.000000000000014,
+        "volatility20": 0.023155031133008003,
+        "avgTurnover20": 1947140723.15
+      },
+      "latestProfit": 0.74,
+      "payoutRatio": null,
+      "qualityScore": 67.93,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 67.93,
+          "threshold": 70,
+          "reason": "质量分为68"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03848639455782313,
+          "threshold": 0.05,
+          "reason": "当前3.85%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.2364,
+      "currentYield": 0.03848639455782313,
+      "targetYield": 0.05,
+      "attentionPrice": 4.728,
+      "distanceToAttention": 0.24365482233502544,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 4.728
+        },
+        {
+          "yield": 0.055,
+          "price": 4.298181818181818
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 3.9399999999999995
+        },
+        {
+          "yield": 0.065,
+          "price": 3.6369230769230767
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 58.3,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "600350",
+      "name": "山东高速",
+      "industry": "高速公路",
+      "price": 10.86,
+      "listingDate": "2002-03-18",
+      "avgTurnover20": 166104236.6,
+      "dividends": [
+        0.4,
+        0.4,
+        0.42,
+        0.42,
+        0.42
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.42,
+      "peTtm": 16.0,
+      "pePercentile5y": 90.5,
+      "peHistoryLow5y": 7.72,
+      "peHistoryHigh5y": 18.33,
+      "peHistorySamples5y": 913,
+      "pb": 1.69,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "低吸观察",
+        "asOf": "2026-08-10",
+        "close": 10.7,
+        "support20": 10.58,
+        "resistance20": 12.55,
+        "ma20": 11.442499999999999,
+        "ma60": 11.320666666666664,
+        "rsi14": 29.60526315789474,
+        "volatility20": 0.04579931838062661,
+        "avgTurnover20": 166104236.6
+      },
+      "latestProfit": 0.545,
+      "payoutRatio": 0.000807,
+      "qualityScore": 67.21,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 67.21,
+          "threshold": 70,
+          "reason": "质量分为67"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03867403314917127,
+          "threshold": 0.05,
+          "reason": "当前3.87%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.42,
+      "currentYield": 0.03867403314917127,
+      "targetYield": 0.05,
+      "attentionPrice": 8.399999999999999,
+      "distanceToAttention": 0.2928571428571429,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 8.399999999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 7.636363636363636
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 6.999999999999999
+        },
+        {
+          "yield": 0.065,
+          "price": 6.461538461538461
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 62.1,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600018",
+      "name": "上港集团",
+      "industry": "港口",
+      "price": 5.15,
+      "listingDate": "2006-10-26",
+      "avgTurnover20": 316737971.05,
+      "dividends": [
+        0.18996,
+        0.14,
+        0.172,
+        0.195,
+        0.195
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.195,
+      "peTtm": 8.79,
+      "pePercentile5y": 44.7,
+      "peHistoryLow5y": 6.49,
+      "peHistoryHigh5y": 12.76,
+      "peHistorySamples5y": 913,
+      "pb": 0.83,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 5.16,
+        "support20": 4.94,
+        "resistance20": 5.33,
+        "ma20": 5.15,
+        "ma60": 4.952000000000001,
+        "rsi14": 58.33333333333333,
+        "volatility20": 0.01834378770770643,
+        "avgTurnover20": 316737971.05
+      },
+      "latestProfit": 0.5837,
+      "payoutRatio": 0.0008160000000000001,
+      "qualityScore": 69.62,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 69.62,
+          "threshold": 70,
+          "reason": "质量分为70"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.037864077669902914,
+          "threshold": 0.05,
+          "reason": "当前3.79%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.195,
+      "currentYield": 0.037864077669902914,
+      "targetYield": 0.05,
+      "attentionPrice": 3.9,
+      "distanceToAttention": 0.3205128205128207,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 3.9
+        },
+        {
+          "yield": 0.055,
+          "price": 3.5454545454545454
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 3.25
+        },
+        {
+          "yield": 0.065,
+          "price": 3.0
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 70.6,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "601318",
+      "name": "中国平安",
+      "industry": "保险",
+      "price": 52.55,
+      "listingDate": "2007-03-01",
+      "avgTurnover20": 4938836441.5,
+      "dividends": [
+        2.38,
+        2.42,
+        2.43,
+        2.55,
+        2.7
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 2.7,
+      "peTtm": 7.27,
+      "pePercentile5y": 8.8,
+      "peHistoryLow5y": 6.37,
+      "peHistoryHigh5y": 11.59,
+      "peHistorySamples5y": 913,
+      "pb": 0.95,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 53.32,
+        "support20": 48.5,
+        "resistance20": 55.8,
+        "ma20": 53.330999999999996,
+        "ma60": 51.830333333333336,
+        "rsi14": 52.48554913294798,
+        "volatility20": 0.02360398699139173,
+        "avgTurnover20": 4938836441.5
+      },
+      "latestProfit": 7.68,
+      "payoutRatio": null,
+      "qualityScore": 73.47,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 73.47,
+          "threshold": 70,
+          "reason": "质量分为73"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.051379638439581356,
+          "threshold": 0.05,
+          "reason": "当前5.14%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 2.55,
+      "currentYield": 0.051379638439581356,
+      "targetYield": 0.05,
+      "attentionPrice": 50.99999999999999,
+      "distanceToAttention": 0.030392156862745212,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 50.99999999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 46.36363636363636
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 42.49999999999999
+        },
+        {
+          "yield": 0.065,
+          "price": 39.230769230769226
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 85.4,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "000895",
+      "name": "双汇发展",
+      "industry": "食品饮料",
+      "price": 24.89,
+      "listingDate": "1998-12-10",
+      "avgTurnover20": 419933892.0,
+      "dividends": [
+        1.298,
+        1.6,
+        1.45,
+        1.41,
+        1.45
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 1.45,
+      "peTtm": 16.44,
+      "pePercentile5y": 31.0,
+      "peHistoryLow5y": 14.43,
+      "peHistoryHigh5y": 24.24,
+      "peHistorySamples5y": 913,
+      "pb": 3.82,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 24.95,
+        "support20": 23.26,
+        "resistance20": 26.87,
+        "ma20": 25.149499999999996,
+        "ma60": 24.41316666666667,
+        "rsi14": 51.315789473684205,
+        "volatility20": 0.02699331338132745,
+        "avgTurnover20": 419933892.0
+      },
+      "latestProfit": 1.4733,
+      "payoutRatio": 2.8999999999999997e-05,
+      "qualityScore": 80.0,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "可关注",
+      "reasons": [
+        "质量等级达到A/B",
+        "当前股息率达到双锚目标",
+        "价格不高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 80.0,
+          "threshold": 70,
+          "reason": "质量分为80"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.058256327842507026,
+          "threshold": 0.05,
+          "reason": "当前5.83%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 1.45,
+      "currentYield": 0.058256327842507026,
+      "targetYield": 0.05,
+      "attentionPrice": 28.999999999999996,
+      "distanceToAttention": -0.14172413793103433,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 28.999999999999996
+        },
+        {
+          "yield": 0.055,
+          "price": 26.363636363636363
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 24.166666666666664
+        },
+        {
+          "yield": 0.065,
+          "price": 22.307692307692307
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 82.0,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "600585",
+      "name": "海螺水泥",
+      "industry": "建材",
+      "price": 17.62,
+      "listingDate": "2002-02-07",
+      "avgTurnover20": 602806813.6,
+      "dividends": [
+        2.38,
+        1.48,
+        0.96,
+        0.71,
+        0.85
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.85,
+      "peTtm": 12.12,
+      "pePercentile5y": 57.0,
+      "peHistoryLow5y": 5.0,
+      "peHistoryHigh5y": 20.66,
+      "peHistorySamples5y": 913,
+      "pb": 0.49,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 17.84,
+        "support20": 16.66,
+        "resistance20": 18.67,
+        "ma20": 17.871,
+        "ma60": 17.905166666666666,
+        "rsi14": 54.26621160409556,
+        "volatility20": 0.024129296803713143,
+        "avgTurnover20": 602806813.6
+      },
+      "latestProfit": 1.54,
+      "payoutRatio": null,
+      "qualityScore": 64.22,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "cyclical",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 64.22,
+          "threshold": 70,
+          "reason": "质量分为64"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.048240635641316684,
+          "threshold": 0.06,
+          "reason": "当前4.82%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 0.85,
+      "currentYield": 0.048240635641316684,
+      "targetYield": 0.06,
+      "attentionPrice": 14.166666666666666,
+      "distanceToAttention": 0.2437647058823531,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 14.166666666666666
+        },
+        {
+          "yield": 0.065,
+          "price": 13.076923076923077
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 12.142857142857144
+        },
+        {
+          "yield": 0.075,
+          "price": 11.333333333333334
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 69.8,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600887",
+      "name": "伊利股份",
+      "industry": "食品饮料",
+      "price": 26.1,
+      "listingDate": "1996-03-12",
+      "avgTurnover20": 1926930329.75,
+      "dividends": [
+        0.96,
+        1.04,
+        1.2,
+        1.22,
+        1.38
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 1.38,
+      "peTtm": 13.74,
+      "pePercentile5y": 9.4,
+      "peHistoryLow5y": 11.12,
+      "peHistoryHigh5y": 30.14,
+      "peHistorySamples5y": 913,
+      "pb": 2.79,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 26.26,
+        "support20": 24.91,
+        "resistance20": 27.7,
+        "ma20": 26.622999999999998,
+        "ma60": 25.675166666666662,
+        "rsi14": 41.61490683229815,
+        "volatility20": 0.022782101665569356,
+        "avgTurnover20": 1926930329.75
+      },
+      "latestProfit": 1.83,
+      "payoutRatio": 0.000277,
+      "qualityScore": 80.0,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 80.0,
+          "threshold": 70,
+          "reason": "质量分为80"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.0528735632183908,
+          "threshold": 0.05,
+          "reason": "当前5.29%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 1.22,
+      "currentYield": 0.0528735632183908,
+      "targetYield": 0.05,
+      "attentionPrice": 24.4,
+      "distanceToAttention": 0.069672131147541,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 24.4
+        },
+        {
+          "yield": 0.055,
+          "price": 22.18181818181818
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 20.333333333333332
+        },
+        {
+          "yield": 0.065,
+          "price": 18.769230769230766
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 88.0,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "601668",
+      "name": "中国建筑",
+      "industry": "建筑",
+      "price": 4.52,
+      "listingDate": "2009-07-29",
+      "avgTurnover20": 1326629790.05,
+      "dividends": [
+        0.25,
+        0.2527,
+        0.27145,
+        0.2715,
+        0.2718
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.2718,
+      "peTtm": 4.94,
+      "pePercentile5y": 82.3,
+      "peHistoryLow5y": 3.48,
+      "peHistoryHigh5y": 5.63,
+      "peHistorySamples5y": 913,
+      "pb": 0.38,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 4.54,
+        "support20": 4.35,
+        "resistance20": 4.76,
+        "ma20": 4.6095,
+        "ma60": 4.464166666666667,
+        "rsi14": 42.105263157894754,
+        "volatility20": 0.019837213827646107,
+        "avgTurnover20": 1326629790.05
+      },
+      "latestProfit": 0.94,
+      "payoutRatio": null,
+      "qualityScore": 67.95,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 67.95,
+          "threshold": 70,
+          "reason": "质量分为68"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.060132743362831864,
+          "threshold": 0.05,
+          "reason": "当前6.01%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.2715,
+      "currentYield": 0.060132743362831864,
+      "targetYield": 0.05,
+      "attentionPrice": 5.43,
+      "distanceToAttention": -0.1675874769797422,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 5.43
+        },
+        {
+          "yield": 0.055,
+          "price": 4.9363636363636365
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 4.525
+        },
+        {
+          "yield": 0.065,
+          "price": 4.176923076923077
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 65.2,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600019",
+      "name": "宝钢股份",
+      "industry": "钢铁",
+      "price": 5.73,
+      "listingDate": "2000-12-12",
+      "avgTurnover20": 654277237.4,
+      "dividends": [
+        0.6,
+        0.28,
+        0.31,
+        0.21,
+        0.3
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.3,
+      "peTtm": 12.42,
+      "pePercentile5y": 48.6,
+      "peHistoryLow5y": 5.26,
+      "peHistoryHigh5y": 21.21,
+      "peHistorySamples5y": 913,
+      "pb": 0.6,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 5.78,
+        "support20": 5.47,
+        "resistance20": 6.28,
+        "ma20": 5.8965,
+        "ma60": 5.721166666666666,
+        "rsi14": 48.623853211009205,
+        "volatility20": 0.024055343334099456,
+        "avgTurnover20": 654277237.4
+      },
+      "latestProfit": 0.48,
+      "payoutRatio": 1.6e-05,
+      "qualityScore": 65.02,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "cyclical",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "warning",
+          "label": "质量分",
+          "value": 65.02,
+          "threshold": 70,
+          "reason": "质量分为65"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.05235602094240837,
+          "threshold": 0.06,
+          "reason": "当前5.24%，目标6.00%"
+        }
+      ],
+      "normalizedDividend": 0.28,
+      "currentYield": 0.05235602094240837,
+      "targetYield": 0.06,
+      "attentionPrice": 4.666666666666667,
+      "distanceToAttention": 0.22785714285714298,
+      "yieldLadder": [
+        {
+          "yield": 0.06,
+          "price": 4.666666666666667
+        },
+        {
+          "yield": 0.065,
+          "price": 4.307692307692308
+        },
+        {
+          "yield": 0.06999999999999999,
+          "price": 4.000000000000001
+        },
+        {
+          "yield": 0.075,
+          "price": 3.733333333333334
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 72.2,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600025",
+      "name": "华能水电",
+      "industry": "水电",
+      "price": 9.78,
+      "listingDate": "2017-12-15",
+      "avgTurnover20": 361601047.15,
+      "dividends": [
+        0.17,
+        0.175,
+        0.18,
+        0.2,
+        0.205
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.205,
+      "peTtm": 21.25,
+      "pePercentile5y": 71.2,
+      "peHistoryLow5y": 16.08,
+      "peHistoryHigh5y": 27.91,
+      "peHistorySamples5y": 913,
+      "pb": 2.56,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "低吸观察",
+        "asOf": "2026-08-10",
+        "close": 9.74,
+        "support20": 9.64,
+        "resistance20": 10.38,
+        "ma20": 9.950000000000001,
+        "ma60": 9.542666666666667,
+        "rsi14": 30.434782608695713,
+        "volatility20": 0.022837784779138028,
+        "avgTurnover20": 361601047.15
+      },
+      "latestProfit": 0.45,
+      "payoutRatio": 0.000453,
+      "qualityScore": 70.38,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 70.38,
+          "threshold": 70,
+          "reason": "质量分为70"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.020961145194274028,
+          "threshold": 0.05,
+          "reason": "当前2.10%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.2,
+      "currentYield": 0.020961145194274028,
+      "targetYield": 0.05,
+      "attentionPrice": 4.0,
+      "distanceToAttention": 1.4449999999999998,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 4.0
+        },
+        {
+          "yield": 0.055,
+          "price": 3.6363636363636367
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 3.333333333333333
+        },
+        {
+          "yield": 0.065,
+          "price": 3.076923076923077
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 58.7,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "600674",
+      "name": "川投能源",
+      "industry": "水电",
+      "price": 15.22,
+      "listingDate": "1993-09-24",
+      "avgTurnover20": 686781807.35,
+      "dividends": [
+        0.4,
+        0.4,
+        0.4,
+        0.4,
+        0.5
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.5,
+      "peTtm": 15.52,
+      "pePercentile5y": 17.1,
+      "peHistoryLow5y": 14.07,
+      "peHistoryHigh5y": 21.6,
+      "peHistorySamples5y": 913,
+      "pb": 1.58,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 15.05,
+        "support20": 14.49,
+        "resistance20": 15.98,
+        "ma20": 15.422500000000003,
+        "ma60": 14.740499999999999,
+        "rsi14": 34.53608247422679,
+        "volatility20": 0.022826249142170435,
+        "avgTurnover20": 686781807.35
+      },
+      "latestProfit": 0.9753,
+      "payoutRatio": 0.000215,
+      "qualityScore": 70.59,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 70.59,
+          "threshold": 70,
+          "reason": "质量分为71"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.0328515111695138,
+          "threshold": 0.05,
+          "reason": "当前3.29%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.4,
+      "currentYield": 0.0328515111695138,
+      "targetYield": 0.05,
+      "attentionPrice": 8.0,
+      "distanceToAttention": 0.9025000000000001,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 8.0
+        },
+        {
+          "yield": 0.055,
+          "price": 7.272727272727273
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 6.666666666666666
+        },
+        {
+          "yield": 0.065,
+          "price": 6.153846153846154
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 73.9,
+      "fitLabel": "耐心等待"
+    },
+    {
+      "code": "600066",
+      "name": "宇通客车",
+      "industry": "汽车",
+      "price": 30.35,
+      "listingDate": "1997-05-08",
+      "avgTurnover20": 617237683.35,
+      "dividends": [
+        0.5,
+        1.0,
+        1.5,
+        1.5,
+        2.5
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 2.5,
+      "peTtm": 13.37,
+      "pePercentile5y": 8.2,
+      "peHistoryLow5y": 10.56,
+      "peHistoryHigh5y": 50.91,
+      "peHistorySamples5y": 913,
+      "pb": 4.5,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 32.97,
+        "support20": 27.92,
+        "resistance20": 34.17,
+        "ma20": 31.649,
+        "ma60": 30.249833333333335,
+        "rsi14": 57.784743991640546,
+        "volatility20": 0.04366386587666309,
+        "avgTurnover20": 617237683.35
+      },
+      "latestProfit": 2.51,
+      "payoutRatio": null,
+      "qualityScore": 80.0,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 80.0,
+          "threshold": 70,
+          "reason": "质量分为80"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.08237232289950576,
+          "threshold": 0.05,
+          "reason": "当前8.24%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 1.5,
+      "currentYield": 0.08237232289950576,
+      "targetYield": 0.05,
+      "attentionPrice": 30.0,
+      "distanceToAttention": 0.011666666666666714,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 30.0
+        },
+        {
+          "yield": 0.055,
+          "price": 27.272727272727273
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 24.999999999999996
+        },
+        {
+          "yield": 0.065,
+          "price": 23.076923076923077
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 88.0,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "002003",
+      "name": "伟星股份",
+      "industry": "纺织服饰",
+      "price": 10.44,
+      "listingDate": "2004-06-25",
+      "avgTurnover20": 155203219.05,
+      "dividends": [
+        0.5,
+        0.35,
+        0.45,
+        0.5,
+        0.5
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.5,
+      "peTtm": 19.31,
+      "pePercentile5y": 36.3,
+      "peHistoryLow5y": 15.54,
+      "peHistoryHigh5y": 27.22,
+      "peHistorySamples5y": 913,
+      "pb": 2.63,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 10.35,
+        "support20": 8.7,
+        "resistance20": 11.0,
+        "ma20": 10.0855,
+        "ma60": 9.299833333333334,
+        "rsi14": 65.46391752577321,
+        "volatility20": 0.03511990461942006,
+        "avgTurnover20": 155203219.05
+      },
+      "latestProfit": 0.55,
+      "payoutRatio": null,
+      "qualityScore": 74.13,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "等待",
+      "reasons": [
+        "质量未触发否决",
+        "当前价格尚未进入关注区"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 74.13,
+          "threshold": 70,
+          "reason": "质量分为74"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.04789272030651341,
+          "threshold": 0.05,
+          "reason": "当前4.79%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.5,
+      "currentYield": 0.04789272030651341,
+      "targetYield": 0.05,
+      "attentionPrice": 10.0,
+      "distanceToAttention": 0.04400000000000004,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 10.0
+        },
+        {
+          "yield": 0.055,
+          "price": 9.090909090909092
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 8.333333333333332
+        },
+        {
+          "yield": 0.065,
+          "price": 7.692307692307692
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 78.4,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "601298",
+      "name": "青岛港",
+      "industry": "港口",
+      "price": 8.78,
+      "listingDate": "2019-01-21",
+      "avgTurnover20": 125937751.95,
+      "dividends": [
+        0.2564,
+        0.2693,
+        0.2927,
+        0.3141,
+        0.3454
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.3454,
+      "peTtm": 10.99,
+      "pePercentile5y": 81.9,
+      "peHistoryLow5y": 7.9,
+      "peHistoryHigh5y": 12.89,
+      "peHistorySamples5y": 913,
+      "pb": 1.22,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "高抛观察",
+        "asOf": "2026-08-10",
+        "close": 8.88,
+        "support20": 8.0,
+        "resistance20": 8.93,
+        "ma20": 8.5855,
+        "ma60": 8.509166666666667,
+        "rsi14": 73.40425531914906,
+        "volatility20": 0.023837780534749973,
+        "avgTurnover20": 125937751.95
+      },
+      "latestProfit": 0.81,
+      "payoutRatio": 1.4e-05,
+      "qualityScore": 71.53,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "当前股息率明显低于双锚目标",
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 71.53,
+          "threshold": 70,
+          "reason": "质量分为72"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.03933940774487472,
+          "threshold": 0.05,
+          "reason": "当前3.93%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.3141,
+      "currentYield": 0.03933940774487472,
+      "targetYield": 0.05,
+      "attentionPrice": 6.281999999999999,
+      "distanceToAttention": 0.39764406240050953,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 6.281999999999999
+        },
+        {
+          "yield": 0.055,
+          "price": 5.710909090909091
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 5.234999999999999
+        },
+        {
+          "yield": 0.065,
+          "price": 4.832307692307692
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 57.2,
+      "fitLabel": "谨慎观察"
+    },
+    {
+      "code": "600741",
+      "name": "华域汽车",
+      "industry": "汽车零部件",
+      "price": 15.86,
+      "listingDate": "1996-08-26",
+      "avgTurnover20": 323170758.2,
+      "dividends": [
+        0.85,
+        0.88,
+        0.75,
+        0.8,
+        1.0
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 1.0,
+      "peTtm": 7.02,
+      "pePercentile5y": 6.5,
+      "peHistoryLow5y": 5.95,
+      "peHistoryHigh5y": 13.4,
+      "peHistorySamples5y": 913,
+      "pb": 0.74,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "持有等待",
+        "asOf": "2026-08-10",
+        "close": 15.98,
+        "support20": 14.89,
+        "resistance20": 16.96,
+        "ma20": 16.159,
+        "ma60": 15.762,
+        "rsi14": 44.23963133640553,
+        "volatility20": 0.024498361622650004,
+        "avgTurnover20": 323170758.2
+      },
+      "latestProfit": 2.286,
+      "payoutRatio": 0.000554,
+      "qualityScore": 70.73,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "可关注",
+      "reasons": [
+        "质量等级达到A/B",
+        "当前股息率达到双锚目标",
+        "价格不高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 70.73,
+          "threshold": 70,
+          "reason": "质量分为71"
+        },
+        {
+          "status": "pass",
+          "label": "双锚股息率",
+          "value": 0.06305170239596469,
+          "threshold": 0.05,
+          "reason": "当前6.31%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.8,
+      "currentYield": 0.06305170239596469,
+      "targetYield": 0.05,
+      "attentionPrice": 16.0,
+      "distanceToAttention": -0.008750000000000036,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 16.0
+        },
+        {
+          "yield": 0.055,
+          "price": 14.545454545454547
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 13.333333333333332
+        },
+        {
+          "yield": 0.065,
+          "price": 12.307692307692308
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 84.3,
+      "fitLabel": "优先研究"
+    },
+    {
+      "code": "600012",
+      "name": "皖通高速",
+      "industry": "高速公路",
+      "price": 16.08,
+      "listingDate": "2003-01-07",
+      "avgTurnover20": 145449610.45,
+      "dividends": [
+        0.55,
+        0.55,
+        0.601,
+        0.604,
+        0.66
+      ],
+      "dividendYears": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "ttmDividend": 0.66,
+      "peTtm": 14.58,
+      "pePercentile5y": 73.5,
+      "peHistoryLow5y": 6.32,
+      "peHistoryHigh5y": 19.2,
+      "peHistorySamples5y": 913,
+      "pb": 2.03,
+      "valuationDate": "2026-08-10",
+      "technicalGuide": {
+        "signal": "低吸观察",
+        "asOf": "2026-08-10",
+        "close": 15.89,
+        "support20": 15.8,
+        "resistance20": 18.86,
+        "ma20": 16.9595,
+        "ma60": 16.135833333333334,
+        "rsi14": 31.9809069212411,
+        "volatility20": 0.04600200885702714,
+        "avgTurnover20": 145449610.45
+      },
+      "latestProfit": 1.1151,
+      "payoutRatio": null,
+      "qualityScore": 74.66,
+      "bondYield": 0.017074,
+      "bondDate": "2026-08-10",
+      "pool": "stable",
+      "state": "偏贵",
+      "reasons": [
+        "价格高于目标关注价"
+      ],
+      "checks": [
+        {
+          "status": "pass",
+          "label": "质量分",
+          "value": 74.66,
+          "threshold": 70,
+          "reason": "质量分为75"
+        },
+        {
+          "status": "warning",
+          "label": "双锚股息率",
+          "value": 0.04104477611940299,
+          "threshold": 0.05,
+          "reason": "当前4.10%，目标5.00%"
+        }
+      ],
+      "normalizedDividend": 0.604,
+      "currentYield": 0.04104477611940299,
+      "targetYield": 0.05,
+      "attentionPrice": 12.079999999999998,
+      "distanceToAttention": 0.3311258278145697,
+      "yieldLadder": [
+        {
+          "yield": 0.05,
+          "price": 12.079999999999998
+        },
+        {
+          "yield": 0.055,
+          "price": 10.98181818181818
+        },
+        {
+          "yield": 0.060000000000000005,
+          "price": 10.066666666666666
+        },
+        {
+          "yield": 0.065,
+          "price": 9.292307692307691
+        }
+      ],
+      "watchlisted": true,
+      "fitScore": 72.5,
+      "fitLabel": "耐心等待"
+    }
+  ],
+  "source": {
+    "kind": "akshare-live",
+    "quoteAsOf": "2026-08-11",
+    "financialAsOf": "2026-08-11",
+    "dividendAsOf": "2026-08-11",
+    "note": "实时行情：新浪/东方财富；分红：巨潮资讯；财务：新浪财经"
+  },
+  "errors": []
+}

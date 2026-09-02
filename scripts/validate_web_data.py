@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,10 @@ FULL_A_TURNOVER = WEB_DATA / "full_a_turnover_top20.json"
 HIGH_DIVIDEND = WEB_DATA / "high_dividend/latest.json"
 HIGH_DIVIDEND_STATES = {"可关注", "等待", "偏贵", "风险观察", "数据不足"}
 HIGH_DIVIDEND_POOLS = {"stable", "cyclical", "unclassified"}
+CYB_MARKET_STATES = {"强势上行", "高位分歧", "震荡蓄势", "转弱预警", "弱势修复", "弱势下行"}
+CYB_RISK_LEVELS = {"低", "升温", "高"}
+CYB_RISK_CHANGES = {"升温", "缓解", "持平"}
+CYB_TREND_STRUCTURES = {"上升结构", "下降结构", "上攻乏力", "支撑转弱", "震荡结构"}
 
 
 def load_json(path: Path) -> Any:
@@ -181,6 +186,54 @@ def validate_high_dividend(data: dict[str, Any]) -> dict[str, Any]:
     return {"date": data.get("date"), "stocks": len(stocks)}
 
 
+def validate_cyb_strength(data: dict[str, Any]) -> dict[str, Any]:
+    version = int(number_or_none(data.get("schemaVersion")) or 1)
+    days = data.get("days")
+    require(isinstance(days, list), "CYB strength days must be a list")
+    if version < 2:
+        return {"version": version, "days": len(days)}
+    require(version == 2, "CYB strength schemaVersion must be 2")
+    for index, day in enumerate(days, start=1):
+        prefix = f"CYB strength day {index}"
+        is_legacy_day = not any(
+            key in day
+            for key in ("dataQuality", "avgRecoveryRate", "closePosition", "marketState", "riskLevel")
+        )
+        if is_legacy_day:
+            continue
+        quality = day.get("dataQuality")
+        if quality is not None:
+            require(quality in {"complete", "incomplete"}, f"{prefix} invalid dataQuality")
+        for key in ("avgRecoveryRate", "closePosition"):
+            if key not in day or day.get(key) is None:
+                continue
+            value = number_or_none(day.get(key))
+            require(value is not None and math.isfinite(value) and 0 <= value <= 100, f"{prefix} invalid {key}")
+        reasons = day.get("reasons", [])
+        require(
+            isinstance(reasons, list) and len(reasons) <= 3 and all(isinstance(item, str) for item in reasons),
+            f"{prefix} invalid reasons",
+        )
+        for key, allowed in (
+            ("trendStructure", CYB_TREND_STRUCTURES),
+            ("marketState", CYB_MARKET_STATES),
+            ("riskLevel", CYB_RISK_LEVELS),
+            ("riskChange", CYB_RISK_CHANGES),
+        ):
+            value = day.get(key)
+            require(value is None or value in allowed, f"{prefix} invalid {key}")
+        if quality == "incomplete":
+            require(day.get("marketState") is None, f"{prefix} incomplete day must not have marketState")
+            require(day.get("riskLevel") is None, f"{prefix} incomplete day must not have riskLevel")
+        for dip_index, dip in enumerate(day.get("dips") or [], start=1):
+            recovery = number_or_none(dip.get("recoveryRate"))
+            require(
+                recovery is not None and math.isfinite(recovery) and 0 <= recovery <= 100,
+                f"{prefix} dip {dip_index} invalid recoveryRate",
+            )
+    return {"version": version, "days": len(days)}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate web dashboard JSON files required by the frontend.")
     parser.add_argument("--web-data", type=Path, default=WEB_DATA)
@@ -190,6 +243,8 @@ def main() -> None:
     full_a = validate_full_a_turnover(args.web_data)
     high_dividend_path = args.web_data / "high_dividend/latest.json"
     high_dividend = validate_high_dividend(load_json(high_dividend_path)) if high_dividend_path.exists() else {"date": "missing", "stocks": 0}
+    cyb_path = args.web_data / "cyb_trend_stats.json"
+    cyb_strength = validate_cyb_strength(load_json(cyb_path)) if cyb_path.exists() else {"version": "missing", "days": 0}
     print(
         "Custom board data OK: date={date}, boards={boards}, configBoards={configBoards}, membershipOverrides={membershipOverrides}".format(
             **custom
@@ -200,6 +255,7 @@ def main() -> None:
     else:
         print("Full-A turnover data OK: date={date}, stocks={stocks}".format(**full_a))
     print("High-dividend data OK: date={date}, stocks={stocks}".format(**high_dividend))
+    print("CYB strength data OK: version={version}, days={days}".format(**cyb_strength))
 
 
 if __name__ == "__main__":

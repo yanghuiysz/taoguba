@@ -13,5 +13,9 @@ logs/
 nul
 web/NUL
 .env
+# 本地临时产物 / 运行缓存，不入库
+tmp/
+output/
+.superpowers/brainstorm/
 web/data/custom_boards/intraday/
 web/data/auction_snapshots/raw/

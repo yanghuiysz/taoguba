@@ -2,13 +2,12 @@
 集合竞价探针。
 
 在 09:15-09:25 期间采样自定义板块成分股实时行情，记录原始快照，
-并按板块聚合竞价强度，推送可能超预期的板块和锚定股。
+并按板块聚合竞价强度，记录可能超预期的板块和锚定股。
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 import time
@@ -26,14 +25,12 @@ from scripts.build_custom_board_data import (  # noqa: E402
 )
 from scripts.custom_board_history import load_custom_board_payload  # noqa: E402
 from scripts.intraday_radar_engine import board_metric, score_range  # noqa: E402
-from scripts.notify_wecom import WeComNotifier  # noqa: E402
 
 
 CONFIG_PATH = ROOT / "web" / "data" / "custom_boards_config.json"
 DASHBOARD_PATH = ROOT / "web" / "data" / "custom_boards.json"
 SNAPSHOT_DIR = ROOT / "web" / "data" / "auction_snapshots"
 RAW_SNAPSHOT_DIR = SNAPSHOT_DIR / "raw"
-NOTIFY_STATE_FILE = ROOT / "logs" / "auction_probe_notify_slot.txt"
 
 
 def load_json(path: Path, fallback: Any) -> Any:
@@ -66,16 +63,6 @@ def is_before_window(now: datetime, start: dtime) -> bool:
 
 def is_trading_day(now: datetime) -> bool:
     return now.weekday() < 5
-
-
-def fmt_amount(value: float | None) -> str:
-    if value is None:
-        return "-"
-    if value >= 1e8:
-        return f"{value / 1e8:.2f}亿"
-    if value >= 1e4:
-        return f"{value / 1e4:.0f}万"
-    return f"{value:.0f}"
 
 
 def fmt_pct(value: float | None) -> str:
@@ -379,85 +366,6 @@ def append_snapshot(
     write_json(summary_path, summary_payload)
 
 
-def alert_signature(alerts: list[dict[str, Any]]) -> str:
-    text = json.dumps(
-        [
-            {
-                "board": item.get("boardCode"),
-                "score": round(item.get("score", 0) // 5 * 5),
-                "stocks": [stock.get("code") for stock in item.get("topStocks", [])[:2]],
-            }
-            for item in alerts
-        ],
-        ensure_ascii=False,
-        sort_keys=True,
-    )
-    return hashlib.sha1(text.encode("utf-8")).hexdigest()[:12]
-
-
-def load_last_notify_slot() -> str:
-    try:
-        return NOTIFY_STATE_FILE.read_text(encoding="utf-8").strip()
-    except Exception:
-        return ""
-
-
-def save_last_notify_slot(value: str) -> None:
-    NOTIFY_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    NOTIFY_STATE_FILE.write_text(value, encoding="utf-8")
-
-
-def build_markdown(alerts: list[dict[str, Any]], now: datetime, date: str) -> str:
-    lines = [
-        f"# 集合竞价探针 {now.strftime('%m/%d %H:%M:%S')}",
-        "",
-        f"> 日期 {date}，提示可能超预期的板块，仍需开盘承接确认。",
-        "",
-    ]
-    for idx, alert in enumerate(alerts, 1):
-        ratio = alert.get("turnoverRatio")
-        ratio_text = "-" if ratio is None else f"{ratio * 100:.2f}%"
-        lines.extend(
-            [
-                f"## {idx}. <font color=\"warning\">{alert['boardName']}</font>  {alert['score']:.0f}分",
-                f"- 结构：{alert.get('mode', '-')}",
-                f"- 竞价：均涨 {fmt_pct(alert.get('avgChange'))}，红盘 {alert.get('redRate', 0):.0f}%，强股 {alert.get('strongCount', 0)}/{alert.get('validCount', 0)}，竞价额 {fmt_amount(alert.get('totalTurnover'))}，占近5日额 {ratio_text}",
-            ]
-        )
-        stock_lines = []
-        for stock in alert.get("topStocks", []):
-            stock_lines.append(
-                f"**{stock.get('name')}**({stock.get('code')}) "
-                f"{fmt_pct(stock.get('changePercent'))} "
-                f"{fmt_amount(stock.get('turnover'))} "
-                f"{stock.get('score', 0):.0f}分"
-            )
-        if stock_lines:
-            lines.append(f"- 锚定股：{'；'.join(stock_lines)}")
-        lines.append("")
-    return "\n".join(lines).strip()
-
-
-def maybe_notify(
-    alerts: list[dict[str, Any]],
-    now: datetime,
-    date: str,
-    webhook: str,
-    force: bool,
-) -> bool:
-    if not alerts:
-        return False
-    signature = alert_signature(alerts)
-    slot = f"{date}-{now.strftime('%H%M')}-{signature}"
-    if not force and load_last_notify_slot() == slot:
-        return False
-    notifier = WeComNotifier(webhook_url=webhook)
-    ok = notifier.send_markdown(build_markdown(alerts, now, date))
-    if ok:
-        save_last_notify_slot(slot)
-    return ok
-
-
 def run_once(args: argparse.Namespace) -> tuple[int, int]:
     now = datetime.now()
     config = load_json(CONFIG_PATH, {"boards": []})
@@ -484,9 +392,6 @@ def run_once(args: argparse.Namespace) -> tuple[int, int]:
     append_snapshot(args.date, now, quotes, alerts, config=config)
     print(f"{now:%H:%M:%S} sampled={len(quotes)} alerts={len(alerts)} snapshot={snapshot_path(args.date)} raw={raw_snapshot_path(args.date)}")
 
-    if alerts and not args.no_notify and (args.force or now.time() >= parse_hhmm(args.notify_from)):
-        sent = maybe_notify(alerts, now, args.date, args.webhook, force=args.once)
-        print(f"notify={'sent' if sent else 'skipped'}")
     return len(quotes), len(alerts)
 
 
@@ -495,13 +400,10 @@ def main() -> int:
     parser.add_argument("--date", default=datetime.now().strftime("%Y%m%d"), help="交易日期，如 20260518")
     parser.add_argument("--start", default="09:15", help="采样开始时间 HH:MM")
     parser.add_argument("--end", default="09:25", help="采样结束时间 HH:MM")
-    parser.add_argument("--notify-from", default="09:20", help="开始推送提醒的时间 HH:MM")
     parser.add_argument("--sample-interval", type=int, default=5, help="采样间隔秒数")
     parser.add_argument("--min-score", type=float, default=68, help="板块提醒最低分")
     parser.add_argument("--top-boards", type=int, default=8, help="最多提醒板块数")
     parser.add_argument("--top-stocks", type=int, default=3, help="每个板块展示锚定股数")
-    parser.add_argument("--webhook", default="", help="企业微信 webhook，默认读取 .env")
-    parser.add_argument("--no-notify", action="store_true", help="只保存快照，不发送企业微信")
     parser.add_argument("--once", action="store_true", help="只采样一次")
     parser.add_argument("--force", action="store_true", help="忽略交易日和时间窗口，方便测试")
     args = parser.parse_args()

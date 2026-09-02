@@ -13,6 +13,7 @@
 - Do not change trend-statistics data or calculations.
 - Avoid horizontal scrolling at desktop and common tablet widths.
 - Retain a safe overflow fallback only for extremely narrow screens.
+- Render the compact full shape phrase directly in the shape column.
 
 ---
 
@@ -91,3 +92,33 @@ Expected: all collected tests pass.
 - [ ] **Step 3: Inspect the rendered page**
 
 Open the local page, select “趋势统计,” expand the daily details, and inspect desktop plus a narrow viewport. Confirm no value crosses a table border and normal width has no horizontal scrollbar.
+
+### Task 4: Show complete shape phrases
+
+**Files:**
+- Modify: `web/custom.js:trendShapeLabel`
+- Test: `scripts/test_trend_stats_table_layout.py`
+
+**Interfaces:**
+- Consumes: each day’s effective count, maximum depth, and dip count.
+- Produces: compact complete phrases such as `多而深 · 分歧加剧`; detailed threshold text remains in the title attribute.
+
+- [ ] **Step 1: Add a failing browser assertion**
+
+Assert the rendered shape cells include the literal phrases `多而深 · 分歧加剧` and `深而猛 · 抛压集中` without visual overflow.
+
+- [ ] **Step 2: Run the focused test and confirm failure**
+
+Run: `python scripts/test_trend_stats_table_layout.py`
+
+Expected: FAIL because the current cells only contain short labels.
+
+- [ ] **Step 3: Return compact complete phrases from `trendShapeLabel`**
+
+Prefix each existing conclusion with its shape characteristic while preserving the detailed `trendShapeFull` tooltip.
+
+- [ ] **Step 4: Run focused and project tests**
+
+Run: `python scripts/test_trend_stats_table_layout.py` and `python -m pytest scripts -q`.
+
+Expected: all tests pass.

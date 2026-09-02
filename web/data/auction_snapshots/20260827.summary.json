@@ -1,0 +1,3896 @@
+{
+  "date": "20260827",
+  "updatedAt": "2026-08-27 09:24:42",
+  "sampleCount": 24,
+  "samples": [
+    {
+      "time": "2026-08-27 09:15:01",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": 0.2075,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.33199999999999996,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.016923076923076923,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": 0.14999999999999997,
+          "redRate": 43.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.4083333333333332,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.4411428571428571,
+          "redRate": 37.142857142857146,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.7312500000000001,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.9675,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.49,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.08444444444444445,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.19857142857142854,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 2.0380000000000003,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.9920000000000002,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 0.9236363636363634,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.577,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.097,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.674,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": 0.11269230769230767,
+          "redRate": 42.30769230769231,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.7887500000000001,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -1.1328571428571428,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3025,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.3457142857142857,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.6875,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": 0.15699999999999997,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.04666666666666667,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.09600000000000003,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:15:29",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": 0.02416666666666666,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.371,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.3915384615384615,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.3575,
+          "redRate": 43.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.3358333333333334,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.4702857142857143,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.38333333333333325,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 1.01875,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.41250000000000003,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.35444444444444445,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.29142857142857137,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 2.0399999999999996,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.3960000000000001,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.0863636363636364,
+          "redRate": 90.9090909090909,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.5360000000000001,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.089,
+          "redRate": 55.00000000000001,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.6899999999999995,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.03846153846153854,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.34750000000000003,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.9942857142857144,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3025,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.3442857142857143,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.6575,
+          "redRate": 87.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.010000000000000045,
+          "redRate": 45.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.057499999999999996,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.10640000000000001,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:15:53",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.011666666666666667,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.438,
+          "redRate": 10.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.38384615384615395,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.35874999999999996,
+          "redRate": 43.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.33125000000000004,
+          "redRate": 45.83333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.37971428571428567,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.53,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.97,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.2216666666666667,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.9922222222222222,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.1542857142857143,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 1.7209999999999996,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.5900000000000001,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.0609090909090908,
+          "redRate": 90.9090909090909,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.048000000000000084,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.2245,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.75,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.24884615384615394,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.605,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.59,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": 0.325,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.22571428571428573,
+          "redRate": 35.714285714285715,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.47500000000000003,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": 0.18099999999999997,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.10083333333333333,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.084,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:16:18",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": 0.32583333333333336,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.196,
+          "redRate": 10.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -0.7361538461538462,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.3575,
+          "redRate": 43.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.025833333333333337,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.7142857142857144,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.45166666666666666,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": -0.17749999999999985,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.2141666666666667,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.24444444444444446,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.13000000000000003,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 1.7029999999999998,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.586,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.0945454545454545,
+          "redRate": 90.9090909090909,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.43400000000000005,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.1275,
+          "redRate": 55.00000000000001,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.754,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.18576923076923088,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -1.10125,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.7000000000000001,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": 0.6174999999999999,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.2185714285714286,
+          "redRate": 21.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.145,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": 0.17249999999999996,
+          "redRate": 55.00000000000001,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.11083333333333334,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.05160000000000001,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:16:43",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": 0.02083333333333326,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.188,
+          "redRate": 10.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -0.9453846153846152,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.9075,
+          "redRate": 31.25,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.10083333333333329,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.4605714285714286,
+          "redRate": 51.42857142857142,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.5233333333333334,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": -0.4099999999999999,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.19000000000000003,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.01999999999999997,
+          "redRate": 44.44444444444444,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.010000000000000033,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 1.656,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.6970000000000001,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 0.9581818181818181,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.273,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.040000000000000015,
+          "redRate": 55.00000000000001,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.6240000000000006,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.5461538461538463,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.8687500000000001,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.742857142857143,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": 0.575,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.07357142857142862,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.18124999999999997,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": 0.06800000000000002,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.12083333333333335,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.07640000000000001,
+          "redRate": 44.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:17:09",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.1691666666666666,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.093,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -1.013076923076923,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -1.3612499999999998,
+          "redRate": 31.25,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.09124999999999994,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.29314285714285715,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.3191666666666666,
+          "redRate": 58.333333333333336,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": -0.685,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.3558333333333333,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.07888888888888888,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.28857142857142865,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.9400000000000004,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.030000000000000183,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 0.8872727272727272,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.18899999999999997,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.12549999999999994,
+          "redRate": 55.00000000000001,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.6240000000000006,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.13653846153846164,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.31750000000000006,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.0285714285714285,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": 0.5700000000000001,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.11714285714285722,
+          "redRate": 21.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.22874999999999998,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": 0.17950000000000002,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.12083333333333335,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.08560000000000001,
+          "redRate": 48.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:17:34",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.0024999999999999922,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.073,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -2.013076923076923,
+          "redRate": 38.46153846153847,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -1.22,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.5575,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.286,
+          "redRate": 37.142857142857146,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.5145833333333333,
+          "redRate": 58.333333333333336,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": -0.6612499999999999,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.2516666666666667,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.16666666666666663,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.12571428571428575,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.9090000000000001,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.4550000000000002,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 0.8990909090909092,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.44400000000000006,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.12150000000000002,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.6240000000000006,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.19230769230769248,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.28125,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.3271428571428571,
+          "redRate": 14.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": 0.5375,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.07785714285714294,
+          "redRate": 21.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.16624999999999998,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": 0.06050000000000003,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.12083333333333335,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": 0.02999999999999998,
+          "redRate": 52.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:18:00",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.22583333333333336,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.051000000000000004,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -0.9361538461538461,
+          "redRate": 38.46153846153847,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -1.4043750000000002,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.30625,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.33,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.6,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.34375,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.20166666666666666,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.44,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.12000000000000001,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.8660000000000002,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.4750000000000001,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 0.97,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.383,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.5995,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.75,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.11846153846153853,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.7862499999999999,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.051428571428571414,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": 0.4575,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.1871428571428571,
+          "redRate": 21.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.13499999999999998,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.09899999999999992,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.14250000000000002,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.11320000000000004,
+          "redRate": 44.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:18:25",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.18166666666666667,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.073,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -0.9084615384615385,
+          "redRate": 38.46153846153847,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -1.214375,
+          "redRate": 31.25,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.3458333333333334,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.3302857142857143,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.5720833333333332,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.43499999999999994,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.1375,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.11777777777777776,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.16571428571428573,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.8110000000000003,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.4880000000000001,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.0781818181818184,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.27100000000000013,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.7515000000000001,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.364,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": 0.21461538461538465,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": 0.08625,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.051428571428571414,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.27214285714285713,
+          "redRate": 21.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.1175,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.067,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.15000000000000002,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.11840000000000003,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:18:49",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.22999999999999998,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.085,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -0.8676923076923078,
+          "redRate": 30.76923076923077,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.15375000000000008,
+          "redRate": 43.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": 0.22,
+          "redRate": 45.83333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.27228571428571424,
+          "redRate": 34.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.6333333333333332,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.36250000000000004,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.15833333333333335,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.14888888888888885,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.044285714285714275,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.9310000000000003,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.5519999999999999,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.0972727272727274,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.21399999999999997,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.001000000000000023,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -4.368,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": 0.28769230769230775,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": 0.21875,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.15285714285714286,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.2885714285714286,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.09874999999999995,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.10500000000000001,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.1425,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.14440000000000003,
+          "redRate": 36.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:19:14",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.18583333333333332,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.129,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.3061538461538461,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": 0.15625,
+          "redRate": 43.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.12833333333333338,
+          "redRate": 29.166666666666668,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.2762857142857143,
+          "redRate": 34.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.6945833333333332,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.25500000000000006,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": 0.04666666666666667,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.30333333333333334,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.2914285714285714,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.9330000000000002,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.592,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.1090909090909093,
+          "redRate": 81.81818181818183,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.223,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": -0.005500000000000016,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.702,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": 0.40384615384615385,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": 0.012500000000000004,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.11142857142857143,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.3192857142857143,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.12625,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.2565,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.1466666666666667,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.1284,
+          "redRate": 36.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:19:39",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.0058333333333333475,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.136,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.3238461538461538,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.0012499999999999976,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.1670833333333334,
+          "redRate": 29.166666666666668,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.26657142857142857,
+          "redRate": 40.0,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.6699999999999999,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.20500000000000002,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.23416666666666672,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.31444444444444447,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.30142857142857143,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.5920000000000002,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.42799999999999994,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.1427272727272728,
+          "redRate": 90.9090909090909,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.17200000000000001,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.026499999999999947,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.702,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": 0.36384615384615376,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": 0.17,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": -0.09285714285714287,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.3507142857142857,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.05375,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.252,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.1708333333333333,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.11600000000000002,
+          "redRate": 36.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:20:04",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": 0.02083333333333332,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.10800000000000001,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.32769230769230767,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.051875,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.16041666666666668,
+          "redRate": 29.166666666666668,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.14628571428571427,
+          "redRate": 37.142857142857146,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.1858333333333333,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.21250000000000002,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.20833333333333334,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.32555555555555554,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.15999999999999995,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.5990000000000002,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.44699999999999995,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.3454545454545457,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": -0.01499999999999999,
+          "redRate": 80.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.07950000000000003,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.688,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.1246153846153846,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.25750000000000006,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.0357142857142857,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.34142857142857147,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.12375000000000001,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.346,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.1791666666666667,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.064,
+          "redRate": 32.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:20:29",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": 0.010833333333333311,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.136,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.39,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.09937500000000002,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.2004166666666667,
+          "redRate": 29.166666666666668,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.10028571428571426,
+          "redRate": 34.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.21749999999999994,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.23125000000000007,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.22083333333333335,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.36666666666666664,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.12857142857142853,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.6020000000000001,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.44799999999999995,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.4745454545454544,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.010000000000000009,
+          "redRate": 80.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.10950000000000001,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.688,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.12115384615384614,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.25750000000000006,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.0357142857142857,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.3378571428571428,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.14875,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.378,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.1791666666666667,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.07120000000000001,
+          "redRate": 32.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:20:54",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.04416666666666669,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.22199999999999998,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.43,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.09437500000000001,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.30791666666666667,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.07342857142857138,
+          "redRate": 34.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.2479166666666666,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.23125000000000007,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.225,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.41555555555555557,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.16999999999999998,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.6020000000000001,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.44799999999999995,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.4954545454545454,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.278,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.11099999999999999,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.688,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.09076923076923074,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.4337500000000001,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.0357142857142857,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.38428571428571434,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.15875,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.372,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.16583333333333336,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.07920000000000002,
+          "redRate": 32.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:21:20",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.09749999999999999,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.277,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.47000000000000003,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.100625,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.33374999999999994,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.021999999999999985,
+          "redRate": 34.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.24583333333333326,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.2775,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.205,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.41555555555555557,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.02428571428571426,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.6020000000000001,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.44799999999999995,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.4963636363636363,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.279,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.1255,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.698,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.09115384615384614,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.4337500000000001,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.05428571428571426,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.5371428571428571,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.17375000000000004,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.2895,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.17,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.06960000000000001,
+          "redRate": 32.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:21:45",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.1708333333333333,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.387,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.4176923076923077,
+          "redRate": 69.23076923076923,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.096875,
+          "redRate": 31.25,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.41583333333333333,
+          "redRate": 29.166666666666668,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.008857142857142869,
+          "redRate": 34.285714285714285,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.24749999999999991,
+          "redRate": 66.66666666666666,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.2775,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.24583333333333326,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.4233333333333333,
+          "redRate": 11.11111111111111,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.04285714285714288,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.499,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.44799999999999995,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.5236363636363635,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.313,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.133,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.694,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.11461538461538459,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.4337500000000001,
+          "redRate": 37.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.05428571428571426,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.2975,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.7114285714285715,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.18625000000000003,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.28850000000000003,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.1875,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.07560000000000001,
+          "redRate": 24.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:22:10",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.17500000000000002,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.5040000000000001,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.42846153846153856,
+          "redRate": 69.23076923076923,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.096875,
+          "redRate": 31.25,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.4733333333333334,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.015428571428571451,
+          "redRate": 31.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.3299999999999999,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.29250000000000004,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.2791666666666666,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.2611111111111111,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.27999999999999997,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.5260000000000001,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.44799999999999995,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.5190909090909093,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.298,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.14200000000000002,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.828,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.28,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.58125,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.07428571428571425,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3025,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.7814285714285715,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.20500000000000002,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.2395,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.205,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.062400000000000004,
+          "redRate": 28.000000000000004,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:22:35",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.17666666666666667,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.5040000000000001,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.48307692307692307,
+          "redRate": 69.23076923076923,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.099375,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.44458333333333333,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": 0.04171428571428573,
+          "redRate": 31.428571428571427,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.34708333333333324,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.36,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.2708333333333333,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.2833333333333334,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.2771428571428572,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.5730000000000001,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.4499999999999999,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.5399999999999998,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.36400000000000005,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.1415,
+          "redRate": 60.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.844,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.25884615384615395,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.68375,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.09285714285714282,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3025,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.832857142857143,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.24750000000000003,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.17149999999999999,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.2241666666666667,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.05520000000000001,
+          "redRate": 28.000000000000004,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:23:00",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.2708333333333333,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.5510000000000002,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.3846153846153847,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.108125,
+          "redRate": 18.75,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.4479166666666668,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": -0.007142857142857143,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.3304166666666666,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.36500000000000005,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.26333333333333336,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.3244444444444445,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.24857142857142853,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.5989999999999999,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.45199999999999996,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.5527272727272725,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.35200000000000004,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.19949999999999998,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.844,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.21384615384615385,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.68375,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.09999999999999995,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3025,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.9121428571428571,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.25000000000000006,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.15750000000000003,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.23083333333333336,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.0544,
+          "redRate": 28.000000000000004,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:23:26",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.2675,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.5510000000000002,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.30846153846153856,
+          "redRate": 53.84615384615385,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.148125,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.44875000000000015,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": -0.1988571428571428,
+          "redRate": 25.71428571428571,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.3679166666666666,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.32625,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.2800000000000001,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.4066666666666667,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.23857142857142857,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.651,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.47400000000000003,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.5572727272727271,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.43000000000000005,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.19999999999999998,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.86,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.2596153846153847,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.70125,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.22714285714285712,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3025,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -0.9907142857142858,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.28,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.1645,
+          "redRate": 35.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.23083333333333336,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.056799999999999996,
+          "redRate": 32.0,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:23:51",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.26,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.542,
+          "redRate": 20.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.31538461538461543,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.14750000000000002,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.5,
+          "redRate": 29.166666666666668,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": -0.3368571428571427,
+          "redRate": 28.57142857142857,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.36583333333333323,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.33875,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.31416666666666665,
+          "redRate": 41.66666666666667,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.44333333333333336,
+          "redRate": 22.22222222222222,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.18714285714285714,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.6859999999999997,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.6130000000000001,
+          "redRate": 70.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.61,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.445,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.20499999999999993,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -0.89,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.2934615384615385,
+          "redRate": 46.15384615384615,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.68375,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.2514285714285714,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.3125,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -1.0299999999999998,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.35875,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.217,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.2741666666666667,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.1008,
+          "redRate": 28.000000000000004,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:24:17",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.36000000000000004,
+          "redRate": 16.666666666666664,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.5610000000000002,
+          "redRate": 10.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": 0.12307692307692308,
+          "redRate": 61.53846153846154,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.13437500000000002,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.6975000000000001,
+          "redRate": 20.833333333333336,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": -0.4394285714285713,
+          "redRate": 22.857142857142858,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.39416666666666655,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.27499999999999997,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.5758333333333333,
+          "redRate": 33.33333333333333,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.6088888888888889,
+          "redRate": 11.11111111111111,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": -0.1542857142857143,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.31400000000000017,
+          "redRate": 50.0,
+          "totalTurnover": 0.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.6460000000000001,
+          "redRate": 80.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.8354545454545452,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.4210000000000001,
+          "redRate": 80.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.21949999999999997,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -1.096,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.30692307692307697,
+          "redRate": 38.46153846153847,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.685,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.21285714285714283,
+          "redRate": 42.857142857142854,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.315,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -1.1657142857142857,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 0.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.44625000000000004,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.25949999999999995,
+          "redRate": 30.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.30833333333333335,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.19039999999999999,
+          "redRate": 28.000000000000004,
+          "totalTurnover": 0.0
+        }
+      }
+    },
+    {
+      "time": "2026-08-27 09:24:42",
+      "alerts": [],
+      "boardSnapshots": {
+        "guangfu": {
+          "stockCount": 12,
+          "averageChange": -0.385,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "jinshulv": {
+          "stockCount": 10,
+          "averageChange": -0.6459999999999999,
+          "redRate": 10.0,
+          "totalTurnover": 0.0
+        },
+        "chuneng": {
+          "stockCount": 13,
+          "averageChange": -0.020769230769230738,
+          "redRate": 38.46153846153847,
+          "totalTurnover": 0.0
+        },
+        "shangyehangtian": {
+          "stockCount": 16,
+          "averageChange": -0.10125,
+          "redRate": 12.5,
+          "totalTurnover": 0.0
+        },
+        "yiyao": {
+          "stockCount": 24,
+          "averageChange": -0.5991666666666667,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "dianli": {
+          "stockCount": 35,
+          "averageChange": -0.6517142857142859,
+          "redRate": 11.428571428571429,
+          "totalTurnover": 0.0
+        },
+        "suanli": {
+          "stockCount": 24,
+          "averageChange": 0.5241666666666667,
+          "redRate": 70.83333333333334,
+          "totalTurnover": 0.0
+        },
+        "yeling": {
+          "stockCount": 8,
+          "averageChange": 0.5575,
+          "redRate": 75.0,
+          "totalTurnover": 0.0
+        },
+        "likuang": {
+          "stockCount": 12,
+          "averageChange": -0.6658333333333334,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "lidian": {
+          "stockCount": 9,
+          "averageChange": -0.6766666666666667,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "boxian": {
+          "stockCount": 7,
+          "averageChange": 0.45428571428571424,
+          "redRate": 71.42857142857143,
+          "totalTurnover": 0.0
+        },
+        "guangxian": {
+          "stockCount": 10,
+          "averageChange": 0.4830000000000001,
+          "redRate": 70.0,
+          "totalTurnover": 43575961.0
+        },
+        "cpo": {
+          "stockCount": 10,
+          "averageChange": 0.7820000000000001,
+          "redRate": 90.0,
+          "totalTurnover": 0.0
+        },
+        "pcb": {
+          "stockCount": 11,
+          "averageChange": 1.9772727272727273,
+          "redRate": 100.0,
+          "totalTurnover": 0.0
+        },
+        "cunchuxinpian": {
+          "stockCount": 10,
+          "averageChange": 0.536,
+          "redRate": 80.0,
+          "totalTurnover": 0.0
+        },
+        "xinpianbandaoti": {
+          "stockCount": 20,
+          "averageChange": 0.33999999999999997,
+          "redRate": 65.0,
+          "totalTurnover": 0.0
+        },
+        "jinshuwu": {
+          "stockCount": 5,
+          "averageChange": -1.0939999999999999,
+          "redRate": 0.0,
+          "totalTurnover": 12509210.0
+        },
+        "jiqiren": {
+          "stockCount": 26,
+          "averageChange": -0.3350000000000001,
+          "redRate": 30.76923076923077,
+          "totalTurnover": 0.0
+        },
+        "wuliai": {
+          "stockCount": 8,
+          "averageChange": -0.20874999999999994,
+          "redRate": 25.0,
+          "totalTurnover": 0.0
+        },
+        "bolijiban": {
+          "stockCount": 7,
+          "averageChange": 0.29571428571428576,
+          "redRate": 57.14285714285714,
+          "totalTurnover": 0.0
+        },
+        "xitu": {
+          "stockCount": 4,
+          "averageChange": -0.4175,
+          "redRate": 0.0,
+          "totalTurnover": 0.0
+        },
+        "xiaojinshu": {
+          "stockCount": 14,
+          "averageChange": -1.1735714285714285,
+          "redRate": 7.142857142857142,
+          "totalTurnover": 12509210.0
+        },
+        "guochanhua_ai_fuwuqi": {
+          "stockCount": 8,
+          "averageChange": 0.5974999999999999,
+          "redRate": 62.5,
+          "totalTurnover": 0.0
+        },
+        "aiyingyong": {
+          "stockCount": 20,
+          "averageChange": -0.1755,
+          "redRate": 45.0,
+          "totalTurnover": 0.0
+        },
+        "yinhang": {
+          "stockCount": 12,
+          "averageChange": -0.28416666666666673,
+          "redRate": 8.333333333333332,
+          "totalTurnover": 0.0
+        },
+        "shipinyinliao": {
+          "stockCount": 25,
+          "averageChange": -0.23960000000000004,
+          "redRate": 32.0,
+          "totalTurnover": 0.0
+        }
+      }
+    }
+  ],
+  "latestAlerts": []
+}

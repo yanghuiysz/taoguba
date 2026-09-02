@@ -102,7 +102,7 @@ python .\scripts\validate_web_data.py
 
 ## 盘中雷达守护
 
-守护进程会在交易时段循环刷新盘中雷达数据，并按节流规则发送企业微信通知。
+守护进程会在交易时段循环刷新盘中雷达数据。
 
 ```powershell
 python .\scripts\intraday_radar_daemon.py
@@ -111,8 +111,6 @@ python .\scripts\intraday_radar_daemon.py
 常用参数：
 
 ```powershell
-python .\scripts\intraday_radar_daemon.py --disable-notify
-python .\scripts\intraday_radar_daemon.py --notify-interval 600
 python .\scripts\intraday_radar_daemon.py --once --force
 ```
 
@@ -132,7 +130,7 @@ python .\scripts\intraday_radar_daemon.py --after-close-time 15:40
 
 ## 集合竞价探针
 
-集合竞价探针会在 `09:15-09:25` 采样自定义板块成分股行情，保存快照，并在 `09:20` 后按板块竞价强度推送提醒。
+集合竞价探针会在 `09:15-09:25` 采样自定义板块成分股行情，保存快照，并按板块竞价强度生成预警。
 
 ```powershell
 python .\scripts\auction_probe.py
@@ -141,9 +139,8 @@ python .\scripts\auction_probe.py
 常用参数：
 
 ```powershell
-python .\scripts\auction_probe.py --no-notify
 python .\scripts\auction_probe.py --sample-interval 5
-python .\scripts\auction_probe.py --once --force --no-notify
+python .\scripts\auction_probe.py --once --force
 ```
 
 输出文件：
@@ -155,24 +152,6 @@ web/data/auction_snapshots/raw/YYYYMMDD.json
 
 盘中雷达页面会读取当天快照，在顶部展示最新集合竞价预警板块和锁定股。
 
-## 企业微信通知
-
-企业微信机器人地址放在本地 `.env`：
-
-```text
-WECOM_WEBHOOK_URL=...
-```
-
-模板见 `.env.example`。
-
-手动发送一次盘中雷达通知：
-
-```powershell
-python .\scripts\notify_intraday_radar.py --top 80
-```
-
-集合竞价探针也会复用同一套企业微信配置。
-
 ## 主要脚本
 
 | 脚本 | 说明 |
@@ -182,11 +161,9 @@ python .\scripts\notify_intraday_radar.py --top 80
 | `scripts/build_custom_board_data.py` | 生成自定义板块行情、强度和成员股数据 |
 | `scripts/serve_custom_boards.py` | 本地可编辑服务，支持页面修改自定义板块配置 |
 | `scripts/intraday_radar_engine.py` | 盘中雷达核心计算逻辑 |
-| `scripts/intraday_radar_daemon.py` | 交易时段循环刷新和通知守护进程 |
-| `scripts/notify_intraday_radar.py` | 盘中雷达企业微信消息拼装 |
-| `scripts/auction_probe.py` | 集合竞价采样、预警评分和通知 |
+| `scripts/intraday_radar_daemon.py` | 交易时段循环刷新守护进程 |
+| `scripts/auction_probe.py` | 集合竞价采样和预警评分 |
 | `scripts/refresh_latest_after_close.py` | 启动前检查并执行收盘后补刷新 |
-| `scripts/notify_wecom.py` | 企业微信发送封装 |
 | `scripts/sync_position_stops.py` | 辅助同步持仓止损线数据 |
 
 ## 数据文件
@@ -257,6 +234,6 @@ python .\scripts\validate_web_data.py
 ## 维护注意事项
 
 - 修改脚本或数据结构后，优先运行 `python .\scripts\validate_web_data.py`。
-- 不要手动提交 `.env`，企业微信 webhook 只保存在本地。
+- 不要手动提交包含本地配置或凭据的 `.env`。
 - `web/data/custom_boards.json`、`web/data/custom_boards/index.json`、`web/data/custom_boards/history/*.json`、`web/data/auction_snapshots/*.summary.json` 属于生成数据，提交前确认日期和内容是否符合预期。
 - 页面入口统一从 `web/index.html` 维护，新增页面时同步更新标签页和 README。

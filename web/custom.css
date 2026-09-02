@@ -1443,6 +1443,525 @@ th {
   font-size: 13px;
 }
 
+/* ===== 趋势统计 (创业板指 下探趋势) ===== */
+.cyb-strength-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--soft), var(--panel));
+}
+.cyb-strength-summary > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cyb-strength-summary span { color: var(--muted); font-size: 12px; }
+.cyb-strength-summary strong { color: var(--ink); font-size: 15px; }
+.cyb-strength-summary p {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-size: 12.5px;
+}
+.cyb-strength-summary p span { margin-right: 10px; }
+.cyb-strength-summary.incomplete { display: flex; justify-content: space-between; }
+
+.trend-stats-svg {
+  width: 100%;
+  aspect-ratio: 760 / 352;
+  height: auto;
+  display: block;
+}
+
+/* 图例: 左上角横排 */
+.trend-stats-legend .trend-legend-count-swatch {
+  fill: #7fa8c9;
+  opacity: 0.75;
+}
+.trend-stats-legend text {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--muted);
+}
+
+/* 次数柱状(副图): 雾蓝, 克制 */
+.trend-count-bar {
+  fill: #7fa8c9;
+  opacity: 0.78;
+  transition: opacity 160ms ease;
+}
+.trend-count-bar:hover {
+  opacity: 1;
+}
+
+.trend-count-value {
+  fill: #4a6a85;
+  font-size: 12px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+/* 主图网格: 淡虚线 */
+.trend-stats-grid-line {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.55;
+}
+.trend-stats-sub-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.3;
+}
+
+/* 主图/副图分隔线 */
+.trend-stats-split-line {
+  stroke: var(--line);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+.trend-stats-area {
+  fill: #d64541;
+  opacity: 0.035;
+  pointer-events: none;
+}
+
+.trend-date-tilt {
+  transform: rotate(-38deg);
+  transform-origin: center;
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+}
+
+/* 双折线: 累计深度=正红实线, 最大深度=琥珀虚线 */
+.trend-stats-total-line {
+  fill: none;
+  stroke: #d64541;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  opacity: 0.55;
+}
+.trend-stats-max-line {
+  fill: none;
+  stroke: #f5a623;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+  stroke-dasharray: 7 5;
+}
+.trend-stats-recovery-line {
+  fill: none;
+  stroke: #0b8f7d;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+}
+
+.trend-stats-dot.total {
+  fill: #ffffff;
+  stroke: #d64541;
+  stroke-width: 2.4;
+}
+.trend-stats-dot.max {
+  fill: #ffffff;
+  stroke: #f5a623;
+  stroke-width: 2.2;
+}
+.trend-stats-dot.peak {
+  fill: #f5a623;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+}
+.trend-stats-dot.recovery {
+  fill: #ffffff;
+  stroke: #0b8f7d;
+  stroke-width: 2.2;
+}
+
+.trend-stats-total-label {
+  fill: #b0352f;
+  font-size: 10.5px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.trend-stats-max-label {
+  fill: #b07a18;
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.trend-stats-legend line,
+.trend-stats-legend rect {
+  stroke-linecap: round;
+}
+
+/* 汇总表: 更清爽 */
+.trend-stats-table-wrap {
+  margin-top: 14px;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.trend-stats-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.trend-stats-table th,
+.trend-stats-table td {
+  min-width: 0;
+  padding: 8px 3px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trend-stats-table th:first-child,
+.trend-stats-table td:first-child {
+  text-align: left;
+}
+.trend-stats-table thead th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--soft);
+}
+.trend-stats-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.trend-stats-table tbody tr:nth-child(even) {
+  background: var(--soft);
+  background-opacity: 0.5;
+}
+.trend-stats-table tbody tr:hover {
+  background: var(--soft);
+}
+
+.trend-stats-table .trend-col-date { width: 7%; }
+.trend-stats-table .trend-col-count { width: 5%; }
+.trend-stats-table .trend-col-depth { width: 7%; }
+.trend-stats-table .trend-col-recovery { width: 7%; }
+.trend-stats-table .trend-col-position { width: 7%; }
+.trend-stats-table .trend-col-state { width: 10%; }
+.trend-stats-table .trend-col-shape {
+  width: 38%;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.trend-count-cell {
+  font-weight: 800;
+  color: #4a6a85;
+}
+
+.trend-stats-note {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-left: 3px solid #f5a623;
+  background: #fdf6ec;
+  border-radius: 0 6px 6px 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.trend-stats-note strong {
+  color: #8a4a10;
+}
+
+/* 粒度切换按钮组 */
+.trend-interval-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 4px;
+  flex-wrap: wrap;
+}
+.trend-interval-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.trend-interval-bar button {
+  padding: 5px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.trend-interval-bar button:hover {
+  border-color: #7fa8c9;
+  color: #0b7893;
+}
+.trend-interval-bar button.active {
+  background: #0b7893;
+  border-color: #0b7893;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* 三粒度对比图 */
+.trend-compare-svg {
+  aspect-ratio: 760 / 300;
+}
+.trend-compare-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.55;
+}
+.trend-compare-y {
+  fill: var(--muted);
+  font-size: 10.5px;
+}
+.trend-compare-date {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.trend-compare-bar-label {
+  fill: #4a6a85;
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.trend-compare-bar {
+  opacity: 0.85;
+  transition: opacity 160ms ease;
+}
+.trend-compare-bar:hover {
+  opacity: 1;
+}
+.trend-compare-dd-line {
+  fill: none;
+  stroke: #8a8f98;
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  stroke-linecap: round;
+}
+.trend-compare-dd-dot {
+  fill: #fff;
+  stroke: #8a8f98;
+  stroke-width: 2.2;
+}
+.trend-compare-dd-legend {
+  stroke: #8a8f98;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.trend-compare-legend-text {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--muted);
+}
+
+/* 三粒度对比表 */
+.trend-compare-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.trend-compare-table th,
+.trend-compare-table td {
+  min-width: 0;
+  padding: 8px 3px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.trend-compare-table thead th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--soft);
+}
+.trend-compare-table .trend-compare-sub {
+  font-size: 11px;
+  font-weight: 600;
+}
+.trend-compare-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.trend-compare-table tbody tr:nth-child(even) {
+  background: var(--soft);
+}
+.trend-compare-table tbody tr:hover {
+  background: var(--soft);
+}
+.trend-compare-table .trend-compare-date-cell {
+  text-align: left;
+  padding-left: 10px;
+}
+.trend-compare-table .trend-compare-count {
+  color: #4a6a85;
+  font-weight: 600;
+}
+.trend-compare-table .trend-compare-depth {
+  font-weight: 700;
+}
+.trend-compare-table .trend-compare-dd {
+  font-weight: 700;
+}
+.trend-compare-table td.best {
+  background: rgba(245, 166, 35, 0.14);
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(245, 166, 35, 0.45);
+}
+
+.trend-stats-detail {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.trend-stats-detail summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  user-select: none;
+}
+
+.trend-stats-detail summary:hover {
+  color: #0b7893;
+}
+
+.trend-stats-day {
+  padding: 10px 14px 12px;
+  border-top: 1px dashed var(--line);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.trend-stats-day h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.trend-stats-dips-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.trend-stats-dips-table th,
+.trend-stats-dips-table td {
+  min-width: 0;
+  padding: 6px 3px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trend-stats-dips-table th {
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  background: var(--soft);
+}
+
+.trend-stats-dips-table .trend-col-seq { width: 6%; }
+.trend-stats-dips-table .trend-col-type { width: 12%; }
+.trend-stats-dips-table .trend-col-time { width: 12%; }
+.trend-stats-dips-table .trend-col-depth { width: 12%; }
+.trend-stats-dips-table .trend-col-duration { width: 14%; }
+.trend-stats-dips-table .trend-col-recovery { width: 14%; }
+.trend-stats-dips-table .trend-col-recovery-time { width: 18%; }
+
+.major-dip-panel {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #ead9c2;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fffaf3 0%, #fff 42%);
+}
+.major-dip-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 10px; }
+.major-dip-head strong { display: block; color: #402f25; font-size: 16px; }
+.major-dip-head span { display: block; margin-top: 4px; color: #b45e29; font-weight: 700; }
+.major-dip-head p { max-width: 390px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.major-dip-pending { margin: 12px 0 0; padding: 18px; border-radius: 10px; background: #faf7f3; color: var(--muted); text-align: center; }
+.major-dip-chart { display: block; width: 100%; height: auto; min-width: 620px; }
+.major-dip-legend text { fill: #75665b; font-size: 11px; }
+.major-dip-grid { stroke: #e9e2da; stroke-width: 1; stroke-dasharray: 3 4; }
+.major-dip-bar { fill: #e7b26f; opacity: .72; }
+.major-dip-depth-line { fill: none; stroke: #bc542f; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.major-dip-depth-dot { fill: #fff; stroke: #bc542f; stroke-width: 2.5; }
+.major-dip-open-dot { fill: #fff8ee; stroke: #d17b25; stroke-width: 2.5; stroke-dasharray: 2 1; }
+.major-dip-value { fill: #9c4328; font-size: 11px; font-weight: 700; }
+.major-dip-table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid #eee5db; border-radius: 10px; }
+.major-dip-summary-table,
+.major-dip-detail-table { width: 100%; min-width: 0; border-collapse: collapse; table-layout: fixed; }
+.major-dip-summary-table th,
+.major-dip-summary-table td,
+.major-dip-detail-table th,
+.major-dip-detail-table td { padding: 9px 10px; border-bottom: 1px solid #eee8e1; text-align: center; white-space: nowrap; font-size: 13px; }
+.major-dip-summary-table th,
+.major-dip-detail-table th { color: #77695f; background: #faf7f3; font-weight: 600; }
+.major-dip-summary-table tr:last-child td,
+.major-dip-detail-table tr:last-child td { border-bottom: 0; }
+.major-dip-open { color: #c66a1d; font-weight: 700; }
+.major-dip-detail { margin-top: 12px; border-top: 1px solid #eee3d7; }
+.major-dip-detail summary { padding: 12px 2px 2px; color: #865638; cursor: pointer; font-weight: 600; }
+.major-dip-day { margin-top: 12px; overflow-x: auto; }
+.major-dip-day h4 { margin: 0 0 7px; color: #59483e; font-size: 13px; }
+
+@media (max-width: 680px) {
+  .cyb-strength-summary { grid-template-columns: 1fr; }
+  .cyb-strength-summary p { grid-column: 1; }
+  .trend-stats-table { min-width: 760px; }
+  .trend-stats-dips-table { min-width: 680px; }
+  .major-dip-head { display: block; }
+  .major-dip-head p { margin-top: 8px; max-width: none; }
+  .major-dip-summary-table,
+  .major-dip-detail-table { min-width: 620px; }
+  .trend-duration-unit { display: none; }
+}
+
 @media (max-width: 900px) {
   .workspace-layout { grid-template-columns: 1fr; }
   .setup-pools,
@@ -1469,4 +1988,3 @@ th {
   .stock-form { grid-template-columns: 1fr; }
   .full-a-turnover-table { min-width: 560px; }
 }
-

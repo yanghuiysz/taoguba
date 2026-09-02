@@ -145,13 +145,14 @@ def evaluate_stock(stock: dict[str, Any], config: dict[str, Any], as_of: date) -
         checks.extend(_check("fail", "质量门槛", reason) for reason in hard_failures)
         return {**stock, "pool": pool, "state": "风险观察", "reasons": hard_failures[:5], "checks": checks}
 
-    baseline = normalized_dividend(dividends, pool)
+    baseline = normalized_dividend(dividends, pool)  # 正常化股息，仅作参考展示
+    attention_dividend = float(ttm_dividend)  # 关注价采用TTM股息口径（反映最新派息水平）
     goal_yield = target_yield(pool, float(bond_yield))
-    if baseline is None or goal_yield is None or price <= 0:
-        reason = "无法计算正常化分红或目标股息率"
+    if attention_dividend is None or goal_yield is None or price <= 0:
+        reason = "无法计算TTM股息或目标股息率"
         return {**stock, "pool": pool, "state": "数据不足", "reasons": [reason], "checks": [_check("missing", "估值", reason)]}
 
-    attention_price = baseline / goal_yield
+    attention_price = attention_dividend / goal_yield
     current_yield = ttm_dividend / price
     quality_score = _number(stock.get("qualityScore"))
     warnings: list[str] = []
@@ -176,10 +177,10 @@ def evaluate_stock(stock: dict[str, Any], config: dict[str, Any], as_of: date) -
         _check("pass" if quality_score >= 70 else "warning", "质量分", f"质量分为{quality_score:.0f}", quality_score, 70),
         _check("pass" if current_yield >= goal_yield else "warning", "双锚股息率", f"当前{current_yield:.2%}，目标{goal_yield:.2%}", current_yield, goal_yield),
     ])
-    ladder = [{"yield": goal_yield + step, "price": baseline / (goal_yield + step)} for step in (0, 0.005, 0.01, 0.015)]
+    ladder = [{"yield": goal_yield + step, "price": attention_dividend / (goal_yield + step)} for step in (0, 0.005, 0.01, 0.015)]
     return {
         **stock, "pool": pool, "state": state, "reasons": reasons[:5], "checks": checks,
-        "normalizedDividend": baseline, "currentYield": current_yield, "targetYield": goal_yield,
+        "normalizedDividend": baseline, "attentionDividend": attention_dividend, "currentYield": current_yield, "targetYield": goal_yield,
         "attentionPrice": attention_price, "distanceToAttention": price / attention_price - 1,
         "yieldLadder": ladder,
     }

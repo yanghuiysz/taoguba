@@ -16,6 +16,7 @@ PYTHON = sys.executable
 CUSTOM_DASHBOARD = ROOT / "web/data/custom_boards.json"
 FULL_A_TURNOVER = ROOT / "web/data/full_a_turnover_top20.json"
 HIGH_DIVIDEND = ROOT / "web/data/high_dividend/latest.json"
+CYB_TREND_STATS = ROOT / "web/data/cyb_trend_stats.json"
 CUSTOM_HISTORY_DIR = ROOT / "web/data/custom_boards/history"
 CUSTOM_INTRADAY_DIR = ROOT / "web/data/custom_boards/intraday"
 CUSTOM_HISTORY_INDEX = ROOT / "web/data/custom_boards/index.json"
@@ -141,6 +142,7 @@ def main() -> None:
     parser.add_argument("--date", default=datetime.now().strftime("%Y%m%d"), help="Trading date, e.g. 20260415.")
     parser.add_argument("--skip-external", action="store_true", default=True, help="Skip Tonghuashun/Eastmoney external mapping (default: skipped).")
     parser.add_argument("--skip-custom", action="store_true", help="Skip custom board average history update.")
+    parser.add_argument("--skip-trend-stats", action="store_true", help="Skip 创业板指 trend stats update (needs westock skill).")
     parser.add_argument("--intraday-custom", action="store_true", help="Overlay realtime spot quotes into custom board data.")
     parser.add_argument("--custom-sleep", type=float, default=0.2, help="Delay between custom stock history requests.")
     parser.add_argument("--strict-external", action="store_true", help="Fail the run when optional external mapping fails.")
@@ -202,6 +204,16 @@ def main() -> None:
             run_optional(["scripts/build_full_a_turnover_top20.py", "--date", args.date], FULL_A_TURNOVER)
     else:
         print("\nSkipping full-A turnover top20 refresh for historical date.", flush=True)
+
+    # 创业板指 趋势统计: 仅当日盘后增量更新 (westock 分钟线单次最多5天, 此处取最近1天)
+    if not args.skip_trend_stats:
+        if target_is_today:
+            if args.strict_custom:
+                run_script(["scripts/build_cyb_trend_stats.py", "--date", args.date, "--days", "1"])
+            else:
+                run_optional(["scripts/build_cyb_trend_stats.py", "--date", args.date, "--days", "1"], CYB_TREND_STATS)
+        else:
+            print("\nSkipping cyb trend stats refresh for historical date.", flush=True)
 
     if not radar_only:
         dividend_args = ["scripts/build_high_dividend_data.py", "--date", format_date(args.date)]
