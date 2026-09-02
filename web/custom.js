@@ -1,9 +1,12 @@
 ﻿const app = document.querySelector('#app');
 
+const TREND_STATS_DISPLAY_DAYS = 15; // 下探趋势统计面板只展示最近N个交易日
+
 const state = {
   data: null,
   fullATurnover: null,
   fullATurnoverCache: new Map(),
+  cybTrendStats: null,
   labels: [],
   membership: { overrides: [] },
   selectedCode: null,
@@ -13,6 +16,7 @@ const state = {
   profitSort: { key: 'profitScore', direction: 'desc' },
   stockListSort: { key: 'displayChangePercent', direction: 'desc' },
   detailTab: 'overview',
+  trendInterval: '15',   // 趋势统计粒度: '15'/'30'/'compare'
   editable: false,
   busy: false,
   message: '',
@@ -332,6 +336,18 @@ async function loadFullATurnoverData(date = null) {
 
 async function syncFullATurnoverForDate(date) {
   state.fullATurnover = await loadFullATurnoverData(date);
+}
+
+async function loadCybTrendStats() {
+  if (state.cybTrendStats) return state.cybTrendStats;
+  try {
+    const payload = await fetchJsonNoStore('./data/cyb_trend_stats.json');
+    state.cybTrendStats = payload;
+    return payload;
+  } catch (error) {
+    state.cybTrendStats = { index: '创业板指', code: 'sz399006', days: [], error: error.message };
+    return state.cybTrendStats;
+  }
 }
 
 async function setSortDate(date, options = {}) {
@@ -2061,6 +2077,607 @@ function renderFullATurnoverPanel() {
   `;
 }
 
+function isFiniteMetric(value) {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function metricPercent(value, digits = 0) {
+  return isFiniteMetric(value) ? `${number(value, digits)}%` : '—';
+}
+
+function metricMinutes(value) {
+  return isFiniteMetric(value) ? `${number(value, 0)} 分钟` : '—';
+}
+
+function renderCybStrengthSummary(day) {
+  if (!day || day.dataQuality === 'incomplete' || !day.marketState || !day.riskLevel) {
+    return '<div class="cyb-strength-summary incomplete"><strong>数据不完整</strong><span>暂不推断市场状态和下探风险</span></div>';
+  }
+  const riskArrow = day.riskChange === '升温' ? ' ↑' : (day.riskChange === '缓解' ? ' ↓' : '');
+  const reasons = Array.isArray(day.reasons) ? day.reasons.slice(0, 3) : [];
+  return `
+    <div class="cyb-strength-summary">
+      <div><span>创业板强弱</span><strong>${day.marketState}</strong></div>
+      <div><span>下探风险</span><strong>${day.riskLevel}${riskArrow}</strong></div>
+      <div><span>趋势结构</span><strong>${day.trendStructure || '—'}</strong></div>
+      <div><span>平均收复</span><strong>${metricPercent(day.avgRecoveryRate)}</strong></div>
+      <div><span>收盘位置</span><strong>${metricPercent(day.closePosition)}</strong></div>
+      <div><span>修复速度</span><strong>${metricMinutes(day.medianRecovery50Minutes)}</strong></div>
+      ${reasons.length ? `<p><span>依据</span>${reasons.join('｜')}</p>` : ''}
+    </div>
+  `;
+}
+
+function applyInterval(days, interval) {
+  // 把某粒度的 count/maxDepth/.../dips 合并进 day 顶层副本, 用于单粒度视图
+  // (closePosition/趋势结构/风险等全天属性保留 15min 主口径结果)
+  return days.map((day) => {
+    const iv = day.intervals?.[interval];
+    if (!iv) return day;
+    return { ...day, ...iv, date: day.date };
+  });
+}
+
+function renderTrendStatsPanel() {
+  const stats = state.cybTrendStats;
+  const allDays = Array.isArray(stats?.days) ? stats.days : [];
+  const days = allDays.slice(-TREND_STATS_DISPLAY_DAYS);
+  if (!days.length) {
+    return `
+      <section class="card section-card">
+        <div class="section-head">
+          <div>
+            <h2>创业板指 · 趋势统计</h2>
+            <p class="muted">暂无统计数据${stats?.error ? `，加载失败：${stats.error}` : ''}。</p>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+  const latestDay = days[days.length - 1];
+  const iv = state.trendInterval;
+  const isCompare = iv === 'compare';
+  const ivLabel = { '15': '15分钟', '30': '30分钟' }[iv] || '';
+  const body = isCompare
+    ? renderCybTrendCompare(days)
+    : `
+      <div class="chart-panel">
+        <div class="chart-panel-head">
+          <strong>次数 × 深度 复合趋势（${ivLabel}）</strong>
+          <span>上区折线=最大/累计深度（左轴）与平均收复率（右轴）；下区柱状=下探次数</span>
+        </div>
+        <div class="chart-box">${renderCybTrendStatsChart(applyInterval(days, iv))}</div>
+      </div>
+      ${renderCybTrendStatsTable(applyInterval(days, iv))}
+      ${renderCybTrendDipsDetail(applyInterval(days, iv))}
+    `;
+  return `
+    <section class="card section-card">
+      <div class="section-head">
+        <div>
+          <h2>${stats.index} · 下探趋势统计</h2>
+          <p class="muted">${stats.method}。深度阈值：有效下探 ≥ 1.0%；更新时间 ${stats.updatedAt || stats.updated || '暂无'}；数据源：${stats.source?.name || 'westock 1分钟线'}（最近${days.length}个交易日）。</p>
+        </div>
+        <div class="count-pill">${days.length} 天</div>
+      </div>
+      ${renderCybStrengthSummary(latestDay)}
+      <div class="trend-interval-bar" role="group" aria-label="K线粒度">
+        <span class="trend-interval-label">K线粒度</span>
+        <button type="button" data-trend-interval="15" class="${iv === '15' ? ' active' : ''}">15分钟</button>
+        <button type="button" data-trend-interval="30" class="${iv === '30' ? ' active' : ''}">30分钟</button>
+        <button type="button" data-trend-interval="compare" class="${isCompare ? ' active' : ''}">双粒度对比</button>
+      </div>
+      ${body}
+      ${renderCybMajorDipPanel(days)}
+      <div class="trend-stats-note">
+        <p><strong>怎么看：</strong>下探按1分钟峰谷回撤识别，反弹收复前段跌幅50%才确认结束。<strong>最大深度</strong>代表单次最猛抛压，<strong>平均收复率</strong>衡量承接，市场状态再结合15分钟高低点结构和收盘位置判断。粒度越粗切段越少，深度越接近全天真实回撤；切换 30 分钟或双粒度对比可交叉验证单日下探强度。</p>
+      </div>
+    </section>
+  `;
+}
+
+function renderCybMajorDipPanel(days) {
+  const majorDays = days.filter((day) => isFiniteMetric(day.majorDipCount));
+  const content = majorDays.length
+    ? `
+      <div class="chart-box">${renderCybMajorDipChart(majorDays)}</div>
+      ${renderCybMajorDipSummaryTable(majorDays)}
+      ${renderCybMajorDipDetail(majorDays)}
+    `
+    : '<p class="major-dip-pending">历史数据待重新计算后显示，原有下探统计不受影响。</p>';
+  return `
+    <section class="major-dip-panel" aria-label="主要下探确认统计">
+      <div class="major-dip-head">
+        <div>
+          <strong>主要下探 · 独立确认口径</strong>
+          <span>0.8%下跌确认 + 0.8%反弹确认</span>
+        </div>
+        <p>过滤途中小阳线，只观察肉眼可见的完整下探波段；不影响上方原有统计。</p>
+      </div>
+      ${content}
+    </section>
+  `;
+}
+
+function renderCybMajorDipChart(days) {
+  const width = 760;
+  const height = 250;
+  const pad = { top: 38, right: 48, bottom: 34, left: 46 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const maxDepth = Math.max(1.6, ...days.map((day) => day.majorDipMaxDepth || 0));
+  const depthLimit = Math.ceil(maxDepth / 0.5) * 0.5;
+  const maxCount = Math.max(2, ...days.map((day) => day.majorDipCount || 0));
+  const x = (index) => chartPointX(index, days.length, width, pad);
+  const depthY = (value) => pad.top + (depthLimit - value) / depthLimit * plotH;
+  const countY = (value) => pad.top + (maxCount - value) / maxCount * plotH;
+  const points = days.map((day, index) => ({
+    ...day,
+    x: x(index),
+    depthY: depthY(day.majorDipMaxDepth || 0),
+    countY: countY(day.majorDipCount || 0),
+  }));
+  const depthPath = smoothPath(points.map((point) => ({ x: point.x, y: point.depthY })));
+  const barWidth = Math.max(14, Math.min(38, plotW / Math.max(days.length, 1) * 0.45));
+  const ticks = [0, 0.5, 1].map((ratio) => ({
+    depth: depthLimit * ratio,
+    count: maxCount * ratio,
+    y: depthY(depthLimit * ratio),
+  }));
+  return `
+    <svg class="major-dip-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="主要下探次数与最大深度">
+      <g class="major-dip-legend">
+        <rect x="${pad.left}" y="15" width="12" height="12" rx="3" class="major-dip-bar"></rect>
+        <text x="${pad.left + 19}" y="25">主要下探次数</text>
+        <line x1="${pad.left + 122}" y1="21" x2="${pad.left + 150}" y2="21" class="major-dip-depth-line"></line>
+        <text x="${pad.left + 158}" y="25">最大深度</text>
+        <circle cx="${pad.left + 249}" cy="21" r="5" class="major-dip-open-dot"></circle>
+        <text x="${pad.left + 260}" y="25">含收盘未确认</text>
+      </g>
+      ${ticks.map((tick) => `
+        <line x1="${pad.left}" y1="${tick.y}" x2="${width - pad.right}" y2="${tick.y}" class="major-dip-grid"></line>
+        <text x="${pad.left - 8}" y="${tick.y + 4}" text-anchor="end" class="axis-label">${number(tick.depth, 1)}%</text>
+        <text x="${width - pad.right + 8}" y="${tick.y + 4}" class="axis-label">${number(tick.count, 0)}次</text>
+      `).join('')}
+      ${points.map((point) => `
+        <rect x="${point.x - barWidth / 2}" y="${point.countY}" width="${barWidth}" height="${Math.max(1, pad.top + plotH - point.countY)}" rx="4" class="major-dip-bar"></rect>
+      `).join('')}
+      <path d="${depthPath}" class="major-dip-depth-line"></path>
+      ${points.map((point) => `
+        <g>
+          <circle cx="${point.x}" cy="${point.depthY}" r="${point.majorDipOpenCount ? 5 : 4}" class="${point.majorDipOpenCount ? 'major-dip-open-dot' : 'major-dip-depth-dot'}"></circle>
+          <text x="${point.x}" y="${point.depthY - 9}" text-anchor="middle" class="major-dip-value">${number(point.majorDipMaxDepth || 0)}%</text>
+          <text x="${point.x}" y="${height - 10}" text-anchor="middle" class="date-label">${shortDate(point.date)}</text>
+          <title>${point.date}\n主要下探 ${point.majorDipCount || 0} 次\n最大深度 ${number(point.majorDipMaxDepth || 0)}%\n已确认 ${point.majorDipConfirmedCount || 0} 次\n收盘未确认 ${point.majorDipOpenCount || 0} 次</title>
+        </g>
+      `).join('')}
+    </svg>
+  `;
+}
+
+function renderCybMajorDipSummaryTable(days) {
+  return `
+    <div class="major-dip-table-wrap">
+      <table class="major-dip-summary-table">
+        <thead><tr><th>日期</th><th>主要下探</th><th>最大深度</th><th>平均深度</th><th>已确认</th><th>收盘未确认</th></tr></thead>
+        <tbody>${days.map((day) => `
+          <tr>
+            <td><strong>${shortDate(day.date)}</strong></td>
+            <td>${day.majorDipCount ?? 0} 次</td>
+            <td class="rise">${number(day.majorDipMaxDepth || 0)}%</td>
+            <td>${number(day.majorDipAvgDepth || 0)}%</td>
+            <td>${day.majorDipConfirmedCount ?? 0}</td>
+            <td class="${day.majorDipOpenCount ? 'major-dip-open' : ''}">${day.majorDipOpenCount ?? 0}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderCybMajorDipDetail(days) {
+  const sections = days.map((day) => {
+    const dips = Array.isArray(day.majorDips) ? day.majorDips : [];
+    if (!dips.length) return '';
+    return `
+      <div class="major-dip-day">
+        <h4>${day.date} · ${dips.length} 次主要下探</h4>
+        <table class="major-dip-detail-table">
+          <thead><tr><th>#</th><th>高点时间</th><th>低点时间</th><th>深度</th><th>反弹确认</th><th>状态</th></tr></thead>
+          <tbody>${dips.map((dip) => `
+            <tr><td>${dip.wave}</td><td>${dip.start}</td><td>${dip.end}</td><td class="rise">${number(dip.depth)}%</td><td>${dip.confirmTime || '—'}</td><td class="${dip.status === '收盘未确认' ? 'major-dip-open' : ''}">${dip.status}</td></tr>
+          `).join('')}</tbody>
+        </table>
+      </div>
+    `;
+  }).join('');
+  return `<details class="major-dip-detail"><summary>查看主要下探明细（高点 → 低点 → 反弹确认）</summary>${sections || '<p class="muted">当前范围内没有达到0.8%的主要下探。</p>'}</details>`;
+}
+
+function smoothPath(pts) {
+  // Catmull-Rom -> 三次贝塞尔, 让折线平滑
+  if (pts.length < 2) return pts.length ? `M ${pts[0].x},${pts[0].y}` : '';
+  if (pts.length === 2) return `M ${pts[0].x},${pts[0].y} L ${pts[1].x},${pts[1].y}`;
+  let d = `M ${pts[0].x},${pts[0].y}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+    d += ` C ${p1.x + (p2.x - p0.x) / 6},${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6},${p2.y - (p3.y - p1.y) / 6} ${p2.x},${p2.y}`;
+  }
+  return d;
+}
+
+function renderCybTrendStatsChart(days) {
+  // ===== 上下双区布局: 上区=深度折线主图, 下区=次数柱状副图 (类似股票软件 主图+副图) =====
+  const width = 760;
+  const height = 352;
+  const pad = { top: 40, right: 50, bottom: 30, left: 46 };
+  const plotWidth = width - pad.left - pad.right;
+
+  // 双区边界
+  const mainTop = pad.top;          // 主图顶部
+  const mainBottom = 218;           // 主图底部
+  const splitY = 230;               // 分隔线
+  const subTop = 244;               // 副图顶部
+  const subBottom = 312;            // 副图底部
+  const dateY = 342;                // 日期标签
+  const mainH = mainBottom - mainTop;
+  const subH = subBottom - subTop;
+
+  // 量程
+  const maxTotal = Math.max(...days.map((d) => d.totalDepth), 0);
+  const maxMax = Math.max(...days.map((d) => d.maxDepth), 0);
+  const depthLimit = Math.max(2, Math.ceil(Math.max(maxTotal, maxMax) * 1.18)); // 主图左轴
+  const maxCount = Math.max(...days.map((d) => d.count), 1);
+  const countLimit = Math.max(5, Math.ceil(maxCount / 5) * 5);                   // 副图右轴(整5)
+  const barWidth = Math.max(12, Math.min(34, plotWidth / days.length * 0.5));
+  const manyDays = days.length >= 14;   // 日期拥挤时旋转标签
+  const showMaxLabels = days.length <= 10; // 天数多时只保留累计深度标签
+
+  const mainY = (v) => mainTop + ((depthLimit - v) / depthLimit) * mainH;
+  const subY = (v) => subTop + ((countLimit - v) / countLimit) * subH;
+  const recoveryY = (v) => mainTop + ((100 - v) / 100) * mainH;
+  const x = (i) => chartPointX(i, days.length, width, pad);
+
+  const points = days.map((day, i) => ({
+    ...day,
+    x: x(i),
+    totalY: mainY(day.totalDepth),
+    maxY: mainY(day.maxDepth),
+    countY: subY(day.count),
+    recoveryY: isFiniteMetric(day.avgRecoveryRate) ? recoveryY(day.avgRecoveryRate) : null,
+  }));
+  const peak = points.reduce((b, p) => (p.maxDepth > b.maxDepth ? p : b), points[0] || {});
+  const totalPath = smoothPath(points.map((p) => ({ x: p.x, y: p.totalY })));
+  const maxPath = smoothPath(points.map((p) => ({ x: p.x, y: p.maxY })));
+  const recoveryPaths = [];
+  let recoverySegment = [];
+  points.forEach((point) => {
+    if (point.recoveryY === null) {
+      if (recoverySegment.length) recoveryPaths.push(smoothPath(recoverySegment));
+      recoverySegment = [];
+    } else {
+      recoverySegment.push({ x: point.x, y: point.recoveryY });
+    }
+  });
+  if (recoverySegment.length) recoveryPaths.push(smoothPath(recoverySegment));
+  const areaPath = totalPath
+    ? `${totalPath} L ${points[points.length - 1].x},${mainBottom} L ${points[0].x},${mainBottom} Z`
+    : '';
+
+  // 主图左轴刻度(4档) + 副图右轴刻度(3档)
+  const depthTicks = [0, 1, 2, 3].map((i) => ({ v: depthLimit * i / 4, y: mainY(depthLimit * i / 4) }));
+  const countTicks = [0, 1, 2].map((i) => ({ v: countLimit * i / 2, y: subY(countLimit * i / 2) }));
+
+  return `
+    <svg class="trend-stats-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="创业板指 下探趋势统计">
+      <!-- 图例: 左上角横排, 不遮数据 -->
+      <g class="trend-stats-legend">
+        <rect x="${pad.left}" y="14" width="11" height="11" rx="3" class="trend-legend-count-swatch"></rect>
+        <text x="${pad.left + 18}" y="23" class="trend-legend-text">次数</text>
+        <line x1="${pad.left + 58}" y1="19.5" x2="${pad.left + 84}" y2="19.5" class="trend-stats-total-line"></line>
+        <text x="${pad.left + 90}" y="23" class="trend-legend-text">累计深度</text>
+        <line x1="${pad.left + 148}" y1="19.5" x2="${pad.left + 174}" y2="19.5" class="trend-stats-max-line"></line>
+        <text x="${pad.left + 180}" y="23" class="trend-legend-text">最大深度</text>
+        <line x1="${pad.left + 242}" y1="19.5" x2="${pad.left + 268}" y2="19.5" class="trend-stats-recovery-line"></line>
+        <text x="${pad.left + 274}" y="23" class="trend-legend-text">平均收复率</text>
+      </g>
+
+      <!-- 主图: 深度网格 + 左轴 -->
+      ${depthTicks.map((tick) => `
+        <line class="trend-stats-grid-line" x1="${pad.left}" y1="${tick.y}" x2="${width - pad.right}" y2="${tick.y}"></line>
+        <text x="${pad.left - 8}" y="${tick.y + 4}" text-anchor="end" class="axis-label">${number(tick.v, 1)}</text>
+      `).join('')}
+      <text x="${pad.left - 8}" y="${mainBottom + 4}" text-anchor="end" class="axis-label">%</text>
+      <line class="zero-line" x1="${pad.left}" y1="${mainBottom}" x2="${width - pad.right}" y2="${mainBottom}"></line>
+      ${[0, 50, 100].map((value) => `<text x="${width - pad.right + 8}" y="${recoveryY(value) + 4}" class="axis-label">${value}%</text>`).join('')}
+
+      <!-- 主图: 累计深度面积 + 双折线 + 数据点/标签 -->
+      ${areaPath ? `<path class="trend-stats-area" d="${areaPath}"></path>` : ''}
+      <path d="${totalPath}" class="trend-stats-total-line"></path>
+      <path d="${maxPath}" class="trend-stats-max-line"></path>
+      ${recoveryPaths.map((path) => `<path d="${path}" class="trend-stats-recovery-line"></path>`).join('')}
+      ${points.map((point) => `
+        <g>
+          <circle class="trend-stats-dot total" cx="${point.x}" cy="${point.totalY}" r="4.2"></circle>
+          <circle class="${point.date === peak.date ? 'trend-stats-dot peak' : 'trend-stats-dot max'}" cx="${point.x}" cy="${point.maxY}" r="${point.date === peak.date ? 6 : 3.8}"></circle>
+          ${point.recoveryY === null ? '' : `<circle class="trend-stats-dot recovery" cx="${point.x}" cy="${point.recoveryY}" r="3.8"></circle>`}
+          <text x="${point.x}" y="${point.totalY - 9}" text-anchor="middle" class="trend-stats-total-label">${number(point.totalDepth)}</text>
+          ${showMaxLabels ? `<text x="${point.x}" y="${point.maxY + 16}" text-anchor="middle" class="trend-stats-max-label">${number(point.maxDepth)}</text>` : ''}
+          <title>${point.date}\n下探 ${point.count} 次\n最大深度 ${number(point.maxDepth)}%\n累计深度 ${number(point.totalDepth)}%\n平均收复 ${metricPercent(point.avgRecoveryRate)}</title>
+        </g>
+      `).join('')}
+
+      <!-- 分隔线 -->
+      <line class="trend-stats-split-line" x1="${pad.left}" y1="${splitY}" x2="${width - pad.right}" y2="${splitY}"></line>
+
+      <!-- 副图: 次数柱状 + 右轴 -->
+      ${countTicks.map((tick) => `
+        <line class="trend-stats-sub-grid" x1="${pad.left}" y1="${tick.y}" x2="${width - pad.right}" y2="${tick.y}"></line>
+        <text x="${width - pad.right + 8}" y="${tick.y + 4}" text-anchor="start" class="axis-label">${tick.v}</text>
+      `).join('')}
+      <text x="${width - pad.right + 8}" y="${subBottom + 4}" text-anchor="start" class="axis-label">次</text>
+      ${points.map((point) => `
+        <g>
+          <rect class="trend-count-bar" x="${point.x - barWidth / 2}" y="${point.countY}" width="${barWidth}" height="${Math.max(1, subBottom - point.countY)}" rx="3"></rect>
+          <text x="${point.x}" y="${point.countY - 6}" text-anchor="middle" class="trend-count-value">${point.count}</text>
+        </g>
+      `).join('')}
+
+      <!-- 共享日期轴 -->
+      ${points.map((point) => `
+        <text x="${point.x}" y="${dateY}" text-anchor="middle" class="date-label${manyDays ? ' trend-date-tilt' : ''}">${shortDate(point.date)}</text>
+      `).join('')}
+    </svg>
+  `;
+}
+
+function renderCybTrendStatsTable(days) {
+  return `
+    <div class="trend-stats-table-wrap">
+      <table class="trend-stats-table">
+        <thead>
+          <tr>
+            <th class="trend-col-date">日期</th>
+            <th class="trend-col-count">下探次数</th>
+            <th class="trend-col-depth">最大深度</th>
+            <th class="trend-col-depth">累计深度</th>
+            <th class="trend-col-depth">平均深度</th>
+            <th class="trend-col-count">有效下探</th>
+            <th class="trend-col-recovery">平均收复</th>
+            <th class="trend-col-position">收盘位置</th>
+            <th class="trend-col-state">市场状态</th>
+            <th class="trend-col-shape">形态</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${days.map((day) => `
+            <tr>
+              <td class="trend-col-date"><strong>${shortDate(day.date)}</strong></td>
+              <td class="trend-col-count trend-count-cell">${day.count}</td>
+              <td class="trend-col-depth rise">${number(day.maxDepth)}%</td>
+              <td class="trend-col-depth rise">${number(day.totalDepth)}%</td>
+              <td class="trend-col-depth">${number(day.avgDepth)}%</td>
+              <td class="trend-col-count">${day.effectiveCount}</td>
+              <td class="trend-col-recovery">${metricPercent(day.avgRecoveryRate)}</td>
+              <td class="trend-col-position">${metricPercent(day.closePosition)}</td>
+              <td class="trend-col-state">${day.marketState || '—'}</td>
+              <td class="trend-col-shape muted" title="${trendShapeFull(day)}">${trendShapeLabel(day)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function trendShapeFull(day) {
+  if (day.effectiveCount >= 2) return '多而深 · 分歧加剧（有效下探≥2次）';
+  if (day.maxDepth >= 2) return '深而猛 · 抛压集中（最大深度≥2%）';
+  if (day.count >= 4) return '多而浅 · 健康换手（下探≥4次）';
+  if (day.effectiveCount === 1) return '少而深 · 单波兑现';
+  return '浅回调 · 涨势健康';
+}
+
+function trendShapeLabel(day) {
+  if (day.effectiveCount >= 2) return '多而深 · 分歧加剧';
+  if (day.maxDepth >= 2) return '深而猛 · 抛压集中';
+  if (day.count >= 4) return '多而浅 · 健康换手';
+  if (day.effectiveCount === 1) return '少而深 · 单波兑现';
+  return '浅回调 · 涨势健康';
+}
+
+function renderCybTrendDipsDetail(days) {
+  return `
+    <details class="trend-stats-detail">
+      <summary>查看每日下探明细（开始/结束时间 · 深度 · 持续时长）</summary>
+      ${days.map((day) => {
+        const dips = Array.isArray(day.dips) ? day.dips : [];
+        if (!dips.length) return '';
+        return `
+          <div class="trend-stats-day">
+            <h4>${day.date} · ${day.count} 次下探</h4>
+            <table class="trend-stats-dips-table">
+              <thead>
+                <tr><th class="trend-col-seq">#</th><th class="trend-col-type">类型</th><th class="trend-col-time">开始</th><th class="trend-col-time">结束</th><th class="trend-col-depth">深度</th><th class="trend-col-duration">时长</th><th class="trend-col-recovery">收复率</th><th class="trend-col-recovery-time">修复至50%</th></tr>
+              </thead>
+              <tbody>
+                ${dips.map((dip) => `
+                  <tr>
+                    <td class="trend-col-seq">${dip.wave}</td>
+                    <td class="trend-col-type">${dip.type}</td>
+                    <td class="trend-col-time">${dip.start}</td>
+                    <td class="trend-col-time">${dip.end}</td>
+                    <td class="trend-col-depth rise">${number(dip.depth)}%</td>
+                    <td class="trend-col-duration">${dip.duration}<span class="trend-duration-unit"> 分钟</span></td>
+                    <td class="trend-col-recovery">${metricPercent(dip.recoveryRate)}</td>
+                    <td class="trend-col-recovery-time">${metricMinutes(dip.recovery50Minutes)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }).join('')}
+    </details>
+  `;
+}
+
+// ===== 双粒度对比视图 (15/30 分钟 vs 全天真实回撤) =====
+const TREND_IV_ORDER = ['15', '30'];
+const TREND_IV_LABEL = { '15': '15分钟', '30': '30分钟' };
+const TREND_IV_COLOR = { '15': '#7fa8c9', '30': '#f5a623' };
+
+function bestInterval(day, drawdown) {
+  // 哪个粒度的最大深度最接近全天真实回撤(误差最小)
+  if (drawdown == null) return null;
+  let best = null;
+  let bestGap = Infinity;
+  TREND_IV_ORDER.forEach((iv) => {
+    const md = day.intervals?.[iv]?.maxDepth;
+    if (md == null) return;
+    const gap = Math.abs(md - drawdown);
+    if (gap < bestGap) { bestGap = gap; best = iv; }
+  });
+  return best;
+}
+
+function renderCybTrendCompare(days) {
+  return `
+    <div class="chart-panel">
+      <div class="chart-panel-head">
+        <strong>双粒度最大深度 × 全天回撤对比</strong>
+        <span>柱=各粒度连续阴线波段的最大深度；灰虚线=全天真实回撤（1分钟线峰谷，不依赖切段）</span>
+      </div>
+      <div class="chart-box">${renderCybTrendCompareChart(days)}</div>
+    </div>
+    ${renderCybTrendCompareTable(days)}
+    <div class="trend-stats-note">
+      <p><strong>怎么读：</strong>粒度越粗，小阳线越容易被吞并、波段越连续，最大深度越接近全天真实回撤。柱高贴近灰虚线 = 该粒度较好还原盘中抛压；明显偏低（如 15min 常被小阳线切段）则低估单次下探的真实深度。对比表中每行「最大深度」误差最小的粒度会以高亮标出。</p>
+    </div>
+  `;
+}
+
+function renderCybTrendCompareChart(days) {
+  const width = 760;
+  const height = 300;
+  const pad = { top: 36, right: 46, bottom: 28, left: 46 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const groupW = plotW / days.length;
+  const xC = (i) => pad.left + groupW * i + groupW / 2;
+  const maxVal = Math.max(3, ...days.map((d) => Math.max(
+    d.intervals?.['15']?.maxDepth || 0,
+    d.intervals?.['30']?.maxDepth || 0,
+    d.intradayDrawdown?.drawdown || 0,
+  )));
+  const yLimit = Math.ceil(maxVal * 1.12 / 0.5) * 0.5;   // 0.5 步长向上取整
+  const yStep = yLimit <= 3 ? 0.5 : 1;
+  const y = (v) => pad.top + (yLimit - v) / yLimit * plotH;
+  const barW = Math.max(9, Math.min(22, groupW * 0.2));
+  const barGap = barW * 0.18;
+  const many = days.length >= 14;
+
+  let grid = '';
+  for (let v = 0; v <= yLimit + 1e-6; v += yStep) {
+    const yy = y(v);
+    grid += `<line class="trend-compare-grid" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}"/>`;
+    grid += `<text class="trend-compare-y" x="${pad.left - 7}" y="${yy + 3}" text-anchor="end">${Number(v.toFixed(1))}%</text>`;
+  }
+
+  let bars = '';
+  days.forEach((day, i) => {
+    TREND_IV_ORDER.forEach((iv, k) => {
+      const depth = day.intervals?.[iv]?.maxDepth || 0;
+      if (!depth) return;
+      const x0 = xC(i) - barW - barGap + k * (barW + barGap);
+      const yTop = y(depth);
+      bars += `
+        <rect class="trend-compare-bar" x="${x0}" y="${yTop}" width="${barW}" height="${pad.top + plotH - yTop}" rx="2" fill="${TREND_IV_COLOR[iv]}">
+          <title>${shortDate(day.date)} ${TREND_IV_LABEL[iv]}：${number(depth)}%</title>
+        </rect>
+        <text class="trend-compare-bar-label" x="${x0 + barW / 2}" y="${yTop - 4}" text-anchor="middle">${number(depth, 1)}</text>`;
+    });
+  });
+
+  const ddPts = days.map((day, i) => ({ x: xC(i), y: y(day.intradayDrawdown?.drawdown || 0) }));
+  const ddPath = ddPts.map((p, i) => `${i ? 'L' : 'M'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const ddDots = ddPts.map((p, i) => `
+    <circle class="trend-compare-dd-dot" cx="${p.x}" cy="${p.y}" r="4">
+      <title>${shortDate(days[i].date)} 全天回撤 ${days[i].intradayDrawdown?.drawdown || 0}%</title>
+    </circle>`).join('');
+
+  const dateLabels = days.map((day, i) => {
+    if (many && i % 2) return '';
+    return `<text class="trend-compare-date" x="${xC(i)}" y="${height - 6}" text-anchor="middle">${shortDate(day.date)}</text>`;
+  }).join('');
+
+  let lx = pad.left;
+  let legend = '';
+  TREND_IV_ORDER.forEach((iv) => {
+    legend += `<rect x="${lx}" y="12" width="10" height="10" rx="2" fill="${TREND_IV_COLOR[iv]}"/><text class="trend-compare-legend-text" x="${lx + 14}" y="21">${TREND_IV_LABEL[iv]}</text>`;
+    lx += 74;
+  });
+  legend += `<line class="trend-compare-dd-legend" x1="${lx}" y1="17" x2="${lx + 12}" y2="17"/><text class="trend-compare-legend-text" x="${lx + 16}" y="21">全天真实回撤</text>`;
+
+  return `
+    <svg class="trend-stats-svg trend-compare-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="双粒度最大深度与全天回撤对比图">
+      ${grid}
+      ${bars}
+      <path class="trend-compare-dd-line" d="${ddPath}"/>
+      ${ddDots}
+      ${dateLabels}
+      <g class="trend-compare-legend">${legend}</g>
+    </svg>`;
+}
+
+function renderCybTrendCompareTable(days) {
+  const rows = days.map((day) => {
+    const dd = day.intradayDrawdown?.drawdown;
+    const best = bestInterval(day, dd);
+    const cell = (iv) => {
+      const v = day.intervals?.[iv];
+      if (!v) return '<td class="muted">—</td><td class="muted">—</td>';
+      const cls = best === iv ? ' best' : '';
+      const gap = dd != null && v.maxDepth != null ? `，误差 ${Math.abs(v.maxDepth - dd).toFixed(2)}%` : '';
+      return `
+        <td class="trend-compare-count${cls}" title="${TREND_IV_LABEL[iv]}${gap}">${v.count}次</td>
+        <td class="trend-compare-depth${cls} rise" title="${TREND_IV_LABEL[iv]}${gap}">${number(v.maxDepth)}%</td>`;
+    };
+    return `
+      <tr>
+        <td class="trend-compare-date-cell"><strong>${shortDate(day.date)}</strong></td>
+        ${cell('15')}
+        ${cell('30')}
+        <td class="trend-compare-dd rise">${metricPercent(dd, 2)}<span class="muted"> @${day.intradayDrawdown?.troughTime || '—'}</span></td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <div class="trend-stats-table-wrap">
+      <table class="trend-compare-table">
+        <thead>
+          <tr>
+            <th rowspan="2" class="trend-col-date">日期</th>
+            <th colspan="2">15分钟</th>
+            <th colspan="2">30分钟</th>
+            <th rowspan="2">全天回撤<br><span class="muted">真实参考</span></th>
+          </tr>
+          <tr>
+            <th class="trend-compare-sub">次数</th>
+            <th class="trend-compare-sub">最大深度</th>
+            <th class="trend-compare-sub">次数</th>
+            <th class="trend-compare-sub">最大深度</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderStocksTable(board) {
   const stocks = [...(board?.stocks || [])]
     .map((stock) => {
@@ -2135,6 +2752,7 @@ function renderDetail(board) {
   const isTrendTab = state.detailTab === 'trend';
   const isProfitTab = state.detailTab === 'profit';
   const isFullATurnoverTab = state.detailTab === 'full-a-turnover';
+  const isTrendStatsTab = state.detailTab === 'trend-stats';
 
   return `
     <div class="stack">
@@ -2145,6 +2763,7 @@ function renderDetail(board) {
           <button class="detail-tab-btn${isProfitTab ? ' active' : ''}" type="button" data-detail-tab="profit" role="tab" aria-selected="${isProfitTab}">盈利评分</button>
           <button class="detail-tab-btn${state.detailTab === 'stocks' ? ' active' : ''}" type="button" data-detail-tab="stocks" role="tab" aria-selected="${state.detailTab === 'stocks'}">板块个股</button>
           <button class="detail-tab-btn${isFullATurnoverTab ? ' active' : ''}" type="button" data-detail-tab="full-a-turnover" role="tab" aria-selected="${isFullATurnoverTab}">成交额前20</button>
+          <button class="detail-tab-btn${isTrendStatsTab ? ' active' : ''}" type="button" data-detail-tab="trend-stats" role="tab" aria-selected="${isTrendStatsTab}">趋势统计</button>
         </div>
       </section>
       ${isOverviewTab ? `
@@ -2189,6 +2808,7 @@ function renderDetail(board) {
       ${isProfitTab ? renderProfitPanel(board) : ''}
       ${state.detailTab === 'stocks' ? renderStocksTable(board) : ''}
       ${isFullATurnoverTab ? renderFullATurnoverPanel() : ''}
+      ${isTrendStatsTab ? renderTrendStatsPanel() : ''}
     </div>
   `;
 }
@@ -2292,6 +2912,17 @@ function render() {
         });
         return;
       }
+      if (state.detailTab === 'trend-stats') {
+        render();
+        loadCybTrendStats().then(() => render());
+        return;
+      }
+      render();
+    });
+  });
+  document.querySelectorAll('[data-trend-interval]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.trendInterval = button.dataset.trendInterval;
       render();
     });
   });

@@ -1,0 +1,193 @@
+{
+  "date": "2026-08-07",
+  "count": 3,
+  "maxDepth": 2.41,
+  "totalDepth": 3.71,
+  "avgDepth": 1.24,
+  "effectiveCount": 1,
+  "effectiveTotal": 2.41,
+  "avgRecoveryRate": 81.35,
+  "medianRecovery50Minutes": 8.5,
+  "closePosition": 50.52,
+  "dayChange": 0.7,
+  "trendStructure": "支撑转弱",
+  "dataQuality": "complete",
+  "intradayDrawdown": {
+    "drawdown": 2.41,
+    "peak": 3613.59,
+    "peakTime": "13:31",
+    "trough": 3526.33,
+    "troughTime": "14:28"
+  },
+  "dips": [
+    {
+      "wave": 1,
+      "type": "单阴",
+      "range": "09:30→09:30",
+      "start": "09:33",
+      "end": "09:35",
+      "depth": 0.51,
+      "duration": 2,
+      "peak": 3550.27,
+      "trough": 3532.32,
+      "recoveryRate": 100.0,
+      "recovery50Minutes": 2,
+      "fullyRecovered": true
+    },
+    {
+      "wave": 2,
+      "type": "2连阴",
+      "range": "10:45→11:00",
+      "start": "10:52",
+      "end": "11:12",
+      "depth": 0.79,
+      "duration": 20,
+      "peak": 3588.46,
+      "trough": 3559.94,
+      "recoveryRate": 100.0,
+      "recovery50Minutes": 15,
+      "fullyRecovered": true
+    },
+    {
+      "wave": 3,
+      "type": "4连阴",
+      "range": "13:30→14:15",
+      "start": "13:31",
+      "end": "14:28",
+      "depth": 2.41,
+      "duration": 57,
+      "peak": 3613.59,
+      "trough": 3526.33,
+      "recoveryRate": 44.04,
+      "recovery50Minutes": null,
+      "fullyRecovered": false
+    }
+  ],
+  "majorDipCount": 3,
+  "majorDipMaxDepth": 2.41,
+  "majorDipAvgDepth": 1.57,
+  "majorDipConfirmedCount": 3,
+  "majorDipOpenCount": 0,
+  "majorDips": [
+    {
+      "wave": 1,
+      "start": "09:38",
+      "end": "09:47",
+      "peak": 3552.63,
+      "trough": 3509.99,
+      "depth": 1.2,
+      "duration": 9,
+      "confirmTime": "09:57",
+      "status": "已确认"
+    },
+    {
+      "wave": 2,
+      "start": "10:38",
+      "end": "11:22",
+      "peak": 3595.45,
+      "trough": 3556.18,
+      "depth": 1.09,
+      "duration": 44,
+      "confirmTime": "13:02",
+      "status": "已确认"
+    },
+    {
+      "wave": 3,
+      "start": "13:31",
+      "end": "14:28",
+      "peak": 3613.59,
+      "trough": 3526.33,
+      "depth": 2.41,
+      "duration": 57,
+      "confirmTime": "14:34",
+      "status": "已确认"
+    }
+  ],
+  "intervals": {
+    "15": {
+      "count": 3,
+      "maxDepth": 2.41,
+      "totalDepth": 3.71,
+      "avgDepth": 1.24,
+      "effectiveCount": 1,
+      "avgRecoveryRate": 81.35,
+      "dips": [
+        {
+          "wave": 1,
+          "type": "单阴",
+          "range": "09:30→09:30",
+          "start": "09:33",
+          "end": "09:35",
+          "depth": 0.51,
+          "duration": 2,
+          "peak": 3550.27,
+          "trough": 3532.32,
+          "recoveryRate": 100.0,
+          "recovery50Minutes": 2,
+          "fullyRecovered": true
+        },
+        {
+          "wave": 2,
+          "type": "2连阴",
+          "range": "10:45→11:00",
+          "start": "10:52",
+          "end": "11:12",
+          "depth": 0.79,
+          "duration": 20,
+          "peak": 3588.46,
+          "trough": 3559.94,
+          "recoveryRate": 100.0,
+          "recovery50Minutes": 15,
+          "fullyRecovered": true
+        },
+        {
+          "wave": 3,
+          "type": "4连阴",
+          "range": "13:30→14:15",
+          "start": "13:31",
+          "end": "14:28",
+          "depth": 2.41,
+          "duration": 57,
+          "peak": 3613.59,
+          "trough": 3526.33,
+          "recoveryRate": 44.04,
+          "recovery50Minutes": null,
+          "fullyRecovered": false
+        }
+      ]
+    },
+    "30": {
+      "count": 1,
+      "maxDepth": 2.41,
+      "totalDepth": 2.41,
+      "avgDepth": 2.41,
+      "effectiveCount": 1,
+      "avgRecoveryRate": 44.04,
+      "dips": [
+        {
+          "wave": 1,
+          "type": "2连阴",
+          "range": "13:30→14:00",
+          "start": "13:31",
+          "end": "14:28",
+          "depth": 2.41,
+          "duration": 57,
+          "peak": 3613.59,
+          "trough": 3526.33,
+          "recoveryRate": 44.04,
+          "recovery50Minutes": null,
+          "fullyRecovered": false
+        }
+      ]
+    }
+  },
+  "marketState": "转弱预警",
+  "riskLevel": "升温",
+  "riskChange": "持平",
+  "reasons": [
+    "有效下探1次",
+    "最大回撤2.41%",
+    "平均收复81%"
+  ],
+  "updatedAt": "2026-08-14T17:14:47"
+}
